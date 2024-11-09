@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SlideKit
+import SlidysCore
 
 @Slide
 struct ReferenceSlide: View {

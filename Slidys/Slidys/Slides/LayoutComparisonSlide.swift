@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SlideKit
+import SlidysCore
 
 struct TableData: Identifiable {
     var id: String {

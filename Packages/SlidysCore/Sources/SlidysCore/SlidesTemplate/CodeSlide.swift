@@ -9,18 +9,18 @@ import SwiftUI
 import SlideKit
 
 @Slide
-struct CodeSlide: View {
+public struct CodeSlide: View {
     let title: String
     let code: String
     let fontSize: CGFloat
 
-    init(title: String, code: String, fontSize: CGFloat = 40) {
+    public init(title: String, code: String, fontSize: CGFloat = 40) {
         self.title = title
         self.code = code
         self.fontSize = fontSize
     }
 
-    var body: some View {
+    public var body: some View {
         HeaderSlide(LocalizedStringKey(title)) {
             Code(code,
                  colorTheme: .defaultDark,
@@ -34,7 +34,11 @@ struct CodeSlide: View {
     SlidePreview {
         CodeSlide(
             title: "実際のコード1",
-            code: Constants.strokeAnimationShapeViewCode,
+            code: """
+final class Hoge {
+    let hoge: String
+}
+""",
             fontSize: 38
         )
     }

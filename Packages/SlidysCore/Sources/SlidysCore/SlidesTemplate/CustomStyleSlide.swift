@@ -9,8 +9,10 @@ import SwiftUI
 import SlideKit
 
 @Slide
-struct CustomStyleSlide: View {
-    var body: some View {
+public struct CustomStyleSlide: View {
+    public init() {}
+
+    public var body: some View {
         HeaderSlide("Custom Style Slide") {
             Item("Header Slide Style") {
                 Item("You can customize the layout of HeaderSlide by HeaderSlideStyle")
@@ -26,6 +28,8 @@ struct CustomStyleSlide: View {
 
 
 public struct CustomHeaderSlideStyle: HeaderSlideStyle {
+    public init() {}
+
     public func makeBody(configuration: Configuration) -> some View {
         VStack(alignment: .leading, spacing: 40) {
             configuration.header
@@ -48,8 +52,10 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
     }
 }
 
-struct CustomItemStyle: ItemStyle {
-    func makeBody(configuration: Configuration) -> some View {
+public struct CustomItemStyle: ItemStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
         VStack(alignment: .leading, spacing: 28) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 switch configuration.accessory {

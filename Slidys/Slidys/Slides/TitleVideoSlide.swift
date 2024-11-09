@@ -10,6 +10,7 @@ import SwiftUI
 import SlideKit
 import AVKit
 import Combine
+import SlidysCore
 
 // Frameworks, Libraries, and Embedded ContentにAVKitを追加しないと、Previewでクラッシュする
 @Slide

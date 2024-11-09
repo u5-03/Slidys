@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SlideKit
+import SlidysCore
 
 @Slide
 struct ReadmeSlide: View {

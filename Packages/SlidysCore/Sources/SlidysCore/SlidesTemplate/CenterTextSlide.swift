@@ -9,10 +9,14 @@ import SwiftUI
 import SlideKit
 
 @Slide
-struct CenterTextSlide: View {
+public struct CenterTextSlide: View {
     let text: String
 
-    var body: some View {
+    public init(text: String) {
+        self.text = text
+    }
+
+    public var body: some View {
         Text(text)
             .font(.largeFont)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

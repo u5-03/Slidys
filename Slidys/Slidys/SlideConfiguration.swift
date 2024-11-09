@@ -8,6 +8,7 @@
 import Foundation
 import SlideKit
 import SwiftUI
+import SlidysCore
 
 struct SlideConfiguration {
 
