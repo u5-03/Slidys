@@ -1,0 +1,663 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BB9133601438797DA5ECC197 /* Pods_Slidys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC6F97E27F9B84AFE0BD8172 /* Pods_Slidys.framework */; };
+		C3286A2D2CDBA39D007367BC /* ReadMeSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A2C2CDBA39D007367BC /* ReadMeSlide.swift */; };
+		C3286A2F2CDBA988007367BC /* QuestionCircleSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A2E2CDBA97E007367BC /* QuestionCircleSlide.swift */; };
+		C3286A312CDBAA8C007367BC /* QuestionCircleWithInfoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A302CDBAA67007367BC /* QuestionCircleWithInfoSlide.swift */; };
+		C3286A342CDBACBD007367BC /* DescriptionSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A332CDBACA7007367BC /* DescriptionSlide.swift */; };
+		C3286A362CDBAD53007367BC /* CharactersSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A352CDBAD4D007367BC /* CharactersSlide.swift */; };
+		C3286A382CDBAE18007367BC /* ShowDemoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A372CDBAE15007367BC /* ShowDemoSlide.swift */; };
+		C3286A3A2CDBAECA007367BC /* CircleCodeSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A392CDBAEC5007367BC /* CircleCodeSlide.swift */; };
+		C3286A3C2CDBAEDC007367BC /* CodeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A3B2CDBAED7007367BC /* CodeConstants.swift */; };
+		C3286A3E2CDBB3C8007367BC /* TitleVideoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A3D2CDBB3C4007367BC /* TitleVideoSlide.swift */; };
+		C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C3286A402CDBB41B007367BC /* opening_input.mp4 */; };
+		C3286A432CDBB734007367BC /* LayoutComparisonSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A422CDBB727007367BC /* LayoutComparisonSlide.swift */; };
+		C359A8A32CCE309E00370A72 /* SlidysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A22CCE309E00370A72 /* SlidysApp.swift */; };
+		C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A42CCE309E00370A72 /* ContentView.swift */; };
+		C359A8A72CCE309F00370A72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C359A8A62CCE309F00370A72 /* Assets.xcassets */; };
+		C359A8AB2CCE309F00370A72 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C359A8AA2CCE309F00370A72 /* Preview Assets.xcassets */; };
+		C359A8B62CCE3D3D00370A72 /* FlutterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8B52CCE3D3D00370A72 /* FlutterView.swift */; };
+		C359A8B82CCE466D00370A72 /* FlutterEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8B72CCE466D00370A72 /* FlutterEngineManager.swift */; };
+		C3A3FB5A2CCE8460009E3EA4 /* CenterTextSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB552CCE8460009E3EA4 /* CenterTextSlide.swift */; };
+		C3A3FB5B2CCE8460009E3EA4 /* CodeSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB562CCE8460009E3EA4 /* CodeSlide.swift */; };
+		C3A3FB5C2CCE8460009E3EA4 /* CustomStyleSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB572CCE8460009E3EA4 /* CustomStyleSlide.swift */; };
+		C3A3FB5F2CCE8495009E3EA4 /* PianoKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB5E2CCE8495009E3EA4 /* PianoKey.swift */; };
+		C3A3FB612CCE84AC009E3EA4 /* PianoKeyStroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB602CCE84AC009E3EA4 /* PianoKeyStroke.swift */; };
+		C3A3FB632CCE84D2009E3EA4 /* PianoKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB622CCE84D2009E3EA4 /* PianoKeyView.swift */; };
+		C3A3FB652CCE84EA009E3EA4 /* PianoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB642CCE84EA009E3EA4 /* PianoView.swift */; };
+		C3A3FB672CCE8519009E3EA4 /* AspectRatioConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB662CCE8519009E3EA4 /* AspectRatioConstants.swift */; };
+		C3A3FB692CCE8554009E3EA4 /* KeyStrokedType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB682CCE8554009E3EA4 /* KeyStrokedType.swift */; };
+		C3A3FB6B2CCE8571009E3EA4 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB6A2CCE8571009E3EA4 /* UserDefaults.swift */; };
+		C3A3FB6E2CCE859D009E3EA4 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB6D2CCE859D009E3EA4 /* Color.swift */; };
+		C3A3FB702CCE8696009E3EA4 /* PianoConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB6F2CCE8696009E3EA4 /* PianoConstants.swift */; };
+		C3A3FB732CCE86D7009E3EA4 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB722CCE86D7009E3EA4 /* Constants.swift */; };
+		C3A3FB752CCE8750009E3EA4 /* PianoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB742CCE8750009E3EA4 /* PianoSlide.swift */; };
+		C3A3FB772CCE896C009E3EA4 /* SlideConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB762CCE896C009E3EA4 /* SlideConfiguration.swift */; };
+		C3A3FB792CD0926E009E3EA4 /* TitleSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB782CD0926E009E3EA4 /* TitleSlide.swift */; };
+		C3BD7CEF2CD9A4EE0034611D /* SplitContentSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BD7CEE2CD9A4D90034611D /* SplitContentSlide.swift */; };
+		C3C5ED902CDF9F2500D46185 /* CircleAnimationDescriptionSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED8F2CDF9F1E00D46185 /* CircleAnimationDescriptionSlide.swift */; };
+		C3C5ED952CDF9FCD00D46185 /* WrapUpSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED942CDF9FC900D46185 /* WrapUpSlide.swift */; };
+		C3C5ED972CDFA01800D46185 /* ReferenceSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED962CDFA01400D46185 /* ReferenceSlide.swift */; };
+		C3C5ED992CDFA42600D46185 /* LiveDescriptionSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED982CDFA41E00D46185 /* LiveDescriptionSlide.swift */; };
+		C3E9A17D2CDFA8F10022F34A /* SlideKit in Frameworks */ = {isa = PBXBuildFile; productRef = C3E9A17C2CDFA8F10022F34A /* SlideKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4B89B0599B99B529A58C3667 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
+		9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
+		B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
+		BE63C38D864D86218C573BD7 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
+		C3286A2C2CDBA39D007367BC /* ReadMeSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadMeSlide.swift; sourceTree = "<group>"; };
+		C3286A2E2CDBA97E007367BC /* QuestionCircleSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionCircleSlide.swift; sourceTree = "<group>"; };
+		C3286A302CDBAA67007367BC /* QuestionCircleWithInfoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionCircleWithInfoSlide.swift; sourceTree = "<group>"; };
+		C3286A332CDBACA7007367BC /* DescriptionSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionSlide.swift; sourceTree = "<group>"; };
+		C3286A352CDBAD4D007367BC /* CharactersSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersSlide.swift; sourceTree = "<group>"; };
+		C3286A372CDBAE15007367BC /* ShowDemoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDemoSlide.swift; sourceTree = "<group>"; };
+		C3286A392CDBAEC5007367BC /* CircleCodeSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleCodeSlide.swift; sourceTree = "<group>"; };
+		C3286A3B2CDBAED7007367BC /* CodeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeConstants.swift; sourceTree = "<group>"; };
+		C3286A3D2CDBB3C4007367BC /* TitleVideoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleVideoSlide.swift; sourceTree = "<group>"; };
+		C3286A402CDBB41B007367BC /* opening_input.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = opening_input.mp4; sourceTree = "<group>"; };
+		C3286A422CDBB727007367BC /* LayoutComparisonSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutComparisonSlide.swift; sourceTree = "<group>"; };
+		C359A89F2CCE309E00370A72 /* Slidys.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slidys.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C359A8A22CCE309E00370A72 /* SlidysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysApp.swift; sourceTree = "<group>"; };
+		C359A8A42CCE309E00370A72 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C359A8A62CCE309F00370A72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C359A8A82CCE309F00370A72 /* Slidys.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slidys.entitlements; sourceTree = "<group>"; };
+		C359A8AA2CCE309F00370A72 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C359A8B52CCE3D3D00370A72 /* FlutterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterView.swift; sourceTree = "<group>"; };
+		C359A8B72CCE466D00370A72 /* FlutterEngineManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterEngineManager.swift; sourceTree = "<group>"; };
+		C3A3FB552CCE8460009E3EA4 /* CenterTextSlide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterTextSlide.swift; sourceTree = "<group>"; };
+		C3A3FB562CCE8460009E3EA4 /* CodeSlide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodeSlide.swift; sourceTree = "<group>"; };
+		C3A3FB572CCE8460009E3EA4 /* CustomStyleSlide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomStyleSlide.swift; sourceTree = "<group>"; };
+		C3A3FB5E2CCE8495009E3EA4 /* PianoKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoKey.swift; sourceTree = "<group>"; };
+		C3A3FB602CCE84AC009E3EA4 /* PianoKeyStroke.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoKeyStroke.swift; sourceTree = "<group>"; };
+		C3A3FB622CCE84D2009E3EA4 /* PianoKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoKeyView.swift; sourceTree = "<group>"; };
+		C3A3FB642CCE84EA009E3EA4 /* PianoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoView.swift; sourceTree = "<group>"; };
+		C3A3FB662CCE8519009E3EA4 /* AspectRatioConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectRatioConstants.swift; sourceTree = "<group>"; };
+		C3A3FB682CCE8554009E3EA4 /* KeyStrokedType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyStrokedType.swift; sourceTree = "<group>"; };
+		C3A3FB6A2CCE8571009E3EA4 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		C3A3FB6D2CCE859D009E3EA4 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		C3A3FB6F2CCE8696009E3EA4 /* PianoConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoConstants.swift; sourceTree = "<group>"; };
+		C3A3FB722CCE86D7009E3EA4 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		C3A3FB742CCE8750009E3EA4 /* PianoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoSlide.swift; sourceTree = "<group>"; };
+		C3A3FB762CCE896C009E3EA4 /* SlideConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideConfiguration.swift; sourceTree = "<group>"; };
+		C3A3FB782CD0926E009E3EA4 /* TitleSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleSlide.swift; sourceTree = "<group>"; };
+		C3BD7CEE2CD9A4D90034611D /* SplitContentSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitContentSlide.swift; sourceTree = "<group>"; };
+		C3C5ED8F2CDF9F1E00D46185 /* CircleAnimationDescriptionSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleAnimationDescriptionSlide.swift; sourceTree = "<group>"; };
+		C3C5ED942CDF9FC900D46185 /* WrapUpSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrapUpSlide.swift; sourceTree = "<group>"; };
+		C3C5ED962CDFA01400D46185 /* ReferenceSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceSlide.swift; sourceTree = "<group>"; };
+		C3C5ED982CDFA41E00D46185 /* LiveDescriptionSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveDescriptionSlide.swift; sourceTree = "<group>"; };
+		FC6F97E27F9B84AFE0BD8172 /* Pods_Slidys.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Slidys.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C359A89C2CCE309E00370A72 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB9133601438797DA5ECC197 /* Pods_Slidys.framework in Frameworks */,
+				C3E9A17D2CDFA8F10022F34A /* SlideKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9DA90DF292DA18BA8A96F5B1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				BE63C38D864D86218C573BD7 /* Pods-Slidys.debug.xcconfig */,
+				4B89B0599B99B529A58C3667 /* Pods-Slidys.release.xcconfig */,
+				B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */,
+				9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		9EB32BB0D052B36F8042AF6E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FC6F97E27F9B84AFE0BD8172 /* Pods_Slidys.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C3286A3F2CDBB417007367BC /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				C3286A402CDBB41B007367BC /* opening_input.mp4 */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		C359A8962CCE309E00370A72 = {
+			isa = PBXGroup;
+			children = (
+				C359A8A12CCE309E00370A72 /* Slidys */,
+				C359A8A02CCE309E00370A72 /* Products */,
+				9DA90DF292DA18BA8A96F5B1 /* Pods */,
+				9EB32BB0D052B36F8042AF6E /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		C359A8A02CCE309E00370A72 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C359A89F2CCE309E00370A72 /* Slidys.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C359A8A12CCE309E00370A72 /* Slidys */ = {
+			isa = PBXGroup;
+			children = (
+				C3286A3F2CDBB417007367BC /* Assets */,
+				C3A3FB712CCE86CD009E3EA4 /* Constants */,
+				C3A3FB6C2CCE8594009E3EA4 /* Extensions */,
+				C3A3FB5D2CCE848D009E3EA4 /* Piano */,
+				C3A3FB592CCE8460009E3EA4 /* Slides */,
+				C359A8B42CCE3D3200370A72 /* Views */,
+				C359A8A22CCE309E00370A72 /* SlidysApp.swift */,
+				C359A8A42CCE309E00370A72 /* ContentView.swift */,
+				C359A8A62CCE309F00370A72 /* Assets.xcassets */,
+				C359A8A82CCE309F00370A72 /* Slidys.entitlements */,
+				C359A8A92CCE309F00370A72 /* Preview Content */,
+				C359A8B72CCE466D00370A72 /* FlutterEngineManager.swift */,
+				C3A3FB762CCE896C009E3EA4 /* SlideConfiguration.swift */,
+			);
+			path = Slidys;
+			sourceTree = "<group>";
+		};
+		C359A8A92CCE309F00370A72 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C359A8AA2CCE309F00370A72 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C359A8B42CCE3D3200370A72 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C359A8B52CCE3D3D00370A72 /* FlutterView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C3A3FB582CCE8460009E3EA4 /* Format */ = {
+			isa = PBXGroup;
+			children = (
+				C3BD7CEE2CD9A4D90034611D /* SplitContentSlide.swift */,
+				C3A3FB552CCE8460009E3EA4 /* CenterTextSlide.swift */,
+				C3A3FB562CCE8460009E3EA4 /* CodeSlide.swift */,
+				C3A3FB572CCE8460009E3EA4 /* CustomStyleSlide.swift */,
+			);
+			path = Format;
+			sourceTree = "<group>";
+		};
+		C3A3FB592CCE8460009E3EA4 /* Slides */ = {
+			isa = PBXGroup;
+			children = (
+				C3C5ED982CDFA41E00D46185 /* LiveDescriptionSlide.swift */,
+				C3C5ED962CDFA01400D46185 /* ReferenceSlide.swift */,
+				C3C5ED942CDF9FC900D46185 /* WrapUpSlide.swift */,
+				C3C5ED8F2CDF9F1E00D46185 /* CircleAnimationDescriptionSlide.swift */,
+				C3286A422CDBB727007367BC /* LayoutComparisonSlide.swift */,
+				C3286A3D2CDBB3C4007367BC /* TitleVideoSlide.swift */,
+				C3286A392CDBAEC5007367BC /* CircleCodeSlide.swift */,
+				C3286A372CDBAE15007367BC /* ShowDemoSlide.swift */,
+				C3286A352CDBAD4D007367BC /* CharactersSlide.swift */,
+				C3286A332CDBACA7007367BC /* DescriptionSlide.swift */,
+				C3286A302CDBAA67007367BC /* QuestionCircleWithInfoSlide.swift */,
+				C3286A2E2CDBA97E007367BC /* QuestionCircleSlide.swift */,
+				C3A3FB582CCE8460009E3EA4 /* Format */,
+				C3286A2C2CDBA39D007367BC /* ReadMeSlide.swift */,
+				C3A3FB742CCE8750009E3EA4 /* PianoSlide.swift */,
+				C3A3FB782CD0926E009E3EA4 /* TitleSlide.swift */,
+			);
+			path = Slides;
+			sourceTree = "<group>";
+		};
+		C3A3FB5D2CCE848D009E3EA4 /* Piano */ = {
+			isa = PBXGroup;
+			children = (
+				C3A3FB5E2CCE8495009E3EA4 /* PianoKey.swift */,
+				C3A3FB602CCE84AC009E3EA4 /* PianoKeyStroke.swift */,
+				C3A3FB622CCE84D2009E3EA4 /* PianoKeyView.swift */,
+				C3A3FB642CCE84EA009E3EA4 /* PianoView.swift */,
+				C3A3FB662CCE8519009E3EA4 /* AspectRatioConstants.swift */,
+				C3A3FB682CCE8554009E3EA4 /* KeyStrokedType.swift */,
+				C3A3FB6A2CCE8571009E3EA4 /* UserDefaults.swift */,
+				C3A3FB6F2CCE8696009E3EA4 /* PianoConstants.swift */,
+			);
+			path = Piano;
+			sourceTree = "<group>";
+		};
+		C3A3FB6C2CCE8594009E3EA4 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				C3A3FB6D2CCE859D009E3EA4 /* Color.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		C3A3FB712CCE86CD009E3EA4 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				C3286A3B2CDBAED7007367BC /* CodeConstants.swift */,
+				C3A3FB722CCE86D7009E3EA4 /* Constants.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C359A89E2CCE309E00370A72 /* Slidys */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "Slidys" */;
+			buildPhases = (
+				4E12D9ABCAFB5E34DF1D13F6 /* [CP] Check Pods Manifest.lock */,
+				8A42AAB59A4576247BE68332 /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */,
+				C359A89B2CCE309E00370A72 /* Sources */,
+				C359A89C2CCE309E00370A72 /* Frameworks */,
+				C359A89D2CCE309E00370A72 /* Resources */,
+				178A624CF75D10A7AF95E0FE /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Slidys;
+			packageProductDependencies = (
+				C3E9A17C2CDFA8F10022F34A /* SlideKit */,
+			);
+			productName = Slidys;
+			productReference = C359A89F2CCE309E00370A72 /* Slidys.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C359A8972CCE309E00370A72 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					C359A89E2CCE309E00370A72 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = C359A89A2CCE309E00370A72 /* Build configuration list for PBXProject "Slidys" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C359A8962CCE309E00370A72;
+			packageReferences = (
+				C3E9A17B2CDFA8F10022F34A /* XCRemoteSwiftPackageReference "SlideKit" */,
+			);
+			productRefGroup = C359A8A02CCE309E00370A72 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C359A89E2CCE309E00370A72 /* Slidys */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C359A89D2CCE309E00370A72 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C359A8AB2CCE309F00370A72 /* Preview Assets.xcassets in Resources */,
+				C359A8A72CCE309F00370A72 /* Assets.xcassets in Resources */,
+				C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		178A624CF75D10A7AF95E0FE /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "[CP-User] Embed Flutter Build flutter_kaigi_slide Script";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh embed_and_thin\n";
+		};
+		4E12D9ABCAFB5E34DF1D13F6 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Slidys-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8A42AAB59A4576247BE68332 /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "[CP-User] Run Flutter Build flutter_kaigi_slide Script";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh build\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C359A89B2CCE309E00370A72 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C359A8B82CCE466D00370A72 /* FlutterEngineManager.swift in Sources */,
+				C3C5ED952CDF9FCD00D46185 /* WrapUpSlide.swift in Sources */,
+				C3A3FB732CCE86D7009E3EA4 /* Constants.swift in Sources */,
+				C3286A3A2CDBAECA007367BC /* CircleCodeSlide.swift in Sources */,
+				C3A3FB5F2CCE8495009E3EA4 /* PianoKey.swift in Sources */,
+				C3A3FB652CCE84EA009E3EA4 /* PianoView.swift in Sources */,
+				C3A3FB772CCE896C009E3EA4 /* SlideConfiguration.swift in Sources */,
+				C3286A382CDBAE18007367BC /* ShowDemoSlide.swift in Sources */,
+				C3C5ED902CDF9F2500D46185 /* CircleAnimationDescriptionSlide.swift in Sources */,
+				C3C5ED972CDFA01800D46185 /* ReferenceSlide.swift in Sources */,
+				C3A3FB702CCE8696009E3EA4 /* PianoConstants.swift in Sources */,
+				C3A3FB5C2CCE8460009E3EA4 /* CustomStyleSlide.swift in Sources */,
+				C3286A342CDBACBD007367BC /* DescriptionSlide.swift in Sources */,
+				C3A3FB692CCE8554009E3EA4 /* KeyStrokedType.swift in Sources */,
+				C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */,
+				C3286A2F2CDBA988007367BC /* QuestionCircleSlide.swift in Sources */,
+				C3A3FB5B2CCE8460009E3EA4 /* CodeSlide.swift in Sources */,
+				C3A3FB792CD0926E009E3EA4 /* TitleSlide.swift in Sources */,
+				C3A3FB612CCE84AC009E3EA4 /* PianoKeyStroke.swift in Sources */,
+				C3286A312CDBAA8C007367BC /* QuestionCircleWithInfoSlide.swift in Sources */,
+				C3A3FB6E2CCE859D009E3EA4 /* Color.swift in Sources */,
+				C3286A432CDBB734007367BC /* LayoutComparisonSlide.swift in Sources */,
+				C3BD7CEF2CD9A4EE0034611D /* SplitContentSlide.swift in Sources */,
+				C3C5ED992CDFA42600D46185 /* LiveDescriptionSlide.swift in Sources */,
+				C3286A3C2CDBAEDC007367BC /* CodeConstants.swift in Sources */,
+				C3A3FB632CCE84D2009E3EA4 /* PianoKeyView.swift in Sources */,
+				C3286A2D2CDBA39D007367BC /* ReadMeSlide.swift in Sources */,
+				C3286A362CDBAD53007367BC /* CharactersSlide.swift in Sources */,
+				C3286A3E2CDBB3C8007367BC /* TitleVideoSlide.swift in Sources */,
+				C359A8A32CCE309E00370A72 /* SlidysApp.swift in Sources */,
+				C3A3FB672CCE8519009E3EA4 /* AspectRatioConstants.swift in Sources */,
+				C359A8B62CCE3D3D00370A72 /* FlutterView.swift in Sources */,
+				C3A3FB6B2CCE8571009E3EA4 /* UserDefaults.swift in Sources */,
+				C3A3FB5A2CCE8460009E3EA4 /* CenterTextSlide.swift in Sources */,
+				C3A3FB752CCE8750009E3EA4 /* PianoSlide.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C359A8AC2CCE309F00370A72 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C359A8AD2CCE309F00370A72 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		C359A8AF2CCE309F00370A72 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Slidys/Slidys.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Slidys/Preview Content\"";
+				DEVELOPMENT_TEAM = 669226BDWM;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide.debug;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C359A8B02CCE309F00370A72 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Slidys/Slidys.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Slidys/Preview Content\"";
+				DEVELOPMENT_TEAM = 669226BDWM;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C359A89A2CCE309E00370A72 /* Build configuration list for PBXProject "Slidys" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C359A8AC2CCE309F00370A72 /* Debug */,
+				C359A8AD2CCE309F00370A72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "Slidys" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C359A8AF2CCE309F00370A72 /* Debug */,
+				C359A8B02CCE309F00370A72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C3E9A17B2CDFA8F10022F34A /* XCRemoteSwiftPackageReference "SlideKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mtj0928/SlideKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C3E9A17C2CDFA8F10022F34A /* SlideKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3E9A17B2CDFA8F10022F34A /* XCRemoteSwiftPackageReference "SlideKit" */;
+			productName = SlideKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = C359A8972CCE309E00370A72 /* Project object */;
+}
