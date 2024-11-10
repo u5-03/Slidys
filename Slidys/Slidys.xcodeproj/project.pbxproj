@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1B5AA9F438A8C628CB32AD21 /* Pods_Slidys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4BC0A29FD8C6318120DCB8F /* Pods_Slidys.framework */; };
 		C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C3286A402CDBB41B007367BC /* opening_input.mp4 */; };
+		C33B7AAD2CE0FC87007FC049 /* iOSDCSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C33B7AAC2CE0FC87007FC049 /* iOSDCSlide */; };
 		C359A8A32CCE309E00370A72 /* SlidysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A22CCE309E00370A72 /* SlidysApp.swift */; };
 		C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A42CCE309E00370A72 /* ContentView.swift */; };
 		C359A8A72CCE309F00370A72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C359A8A62CCE309F00370A72 /* Assets.xcassets */; };
@@ -46,6 +47,7 @@
 		B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
 		BE63C38D864D86218C573BD7 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
 		C3286A402CDBB41B007367BC /* opening_input.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = opening_input.mp4; sourceTree = "<group>"; };
+		C33B7AAB2CE0FB2E007FC049 /* iOSDCSlide */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = iOSDCSlide; path = ../Packages/iOSDCSlide; sourceTree = "<group>"; };
 		C359A89F2CCE309E00370A72 /* Slidys.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slidys.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C359A8A22CCE309E00370A72 /* SlidysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysApp.swift; sourceTree = "<group>"; };
 		C359A8A42CCE309E00370A72 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 				C3D0D6B22CE04AB90055F861 /* FlutterKaigiSlide in Frameworks */,
 				1B5AA9F438A8C628CB32AD21 /* Pods_Slidys.framework in Frameworks */,
 				C3D0D6BF2CE096BC0055F861 /* SlidysCore in Frameworks */,
+				C33B7AAD2CE0FC87007FC049 /* iOSDCSlide in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,6 +117,7 @@
 		C359A8962CCE309E00370A72 = {
 			isa = PBXGroup;
 			children = (
+				C33B7AAB2CE0FB2E007FC049 /* iOSDCSlide */,
 				C3D0D6C02CE09D7F0055F861 /* KanagawaSwiftSlide */,
 				C3D0D6BD2CE095090055F861 /* PianoUI */,
 				C3D0D6B82CE08C270055F861 /* ChibaSwiftSlide */,
@@ -209,6 +213,7 @@
 				C3D0D6BB2CE08FDA0055F861 /* ChibaSwiftSlide */,
 				C3D0D6BE2CE096BC0055F861 /* SlidysCore */,
 				C3D0D6C12CE09DCE0055F861 /* KanagawaSwiftSlide */,
+				C33B7AAC2CE0FC87007FC049 /* iOSDCSlide */,
 			);
 			productName = Slidys;
 			productReference = C359A89F2CCE309E00370A72 /* Slidys.app */;
@@ -545,6 +550,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C33B7AAC2CE0FC87007FC049 /* iOSDCSlide */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = iOSDCSlide;
+		};
 		C3D0D6B12CE04AB90055F861 /* FlutterKaigiSlide */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FlutterKaigiSlide;

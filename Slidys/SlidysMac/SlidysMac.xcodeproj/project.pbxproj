@@ -13,6 +13,7 @@
 		C33B7A932CE0E8A7007FC049 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C33B7A922CE0E8A7007FC049 /* Preview Assets.xcassets */; };
 		C33B7AA72CE0EA60007FC049 /* ChibaSwiftSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C33B7AA62CE0EA60007FC049 /* ChibaSwiftSlide */; };
 		C33B7AA92CE0EA63007FC049 /* KanagawaSwiftSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C33B7AA82CE0EA63007FC049 /* KanagawaSwiftSlide */; };
+		C33B7AAF2CE108A6007FC049 /* iOSDCSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C33B7AAE2CE108A6007FC049 /* iOSDCSlide */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 			files = (
 				C33B7AA72CE0EA60007FC049 /* ChibaSwiftSlide in Frameworks */,
 				C33B7AA92CE0EA63007FC049 /* KanagawaSwiftSlide in Frameworks */,
+				C33B7AAF2CE108A6007FC049 /* iOSDCSlide in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,6 +110,7 @@
 			packageProductDependencies = (
 				C33B7AA62CE0EA60007FC049 /* ChibaSwiftSlide */,
 				C33B7AA82CE0EA63007FC049 /* KanagawaSwiftSlide */,
+				C33B7AAE2CE108A6007FC049 /* iOSDCSlide */,
 			);
 			productName = SlidysMac;
 			productReference = C33B7A882CE0E8A6007FC049 /* SlidysMac.app */;
@@ -376,6 +379,10 @@
 		C33B7AA82CE0EA63007FC049 /* KanagawaSwiftSlide */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = KanagawaSwiftSlide;
+		};
+		C33B7AAE2CE108A6007FC049 /* iOSDCSlide */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = iOSDCSlide;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
