@@ -6,13 +6,12 @@
 //
 
 import SwiftUI
-import FlutterPluginRegistrant
-import Flutter
 import SlideKit
+import FlutterKaigiSlide
 
 @main
 struct SlidysApp: App {
-    @UIApplicationDelegateAdaptor (AppDelegate.self) var appDelegate
+    @UIApplicationDelegateAdaptor (FlutterAppDelegate.self) var appDelegate
     static let configuration = SlideConfiguration()
 
     var presentationContentView: some View {
@@ -45,16 +44,9 @@ struct SlidysApp: App {
                     }
                 }
             }
+            .environment(\.router, Router())
         }
     }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate {
-    var flutterEngine: FlutterEngine?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        FlutterEngineManager.shared.startEngine()
-
-        return true
-    }
-}

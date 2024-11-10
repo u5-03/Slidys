@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SlidysCore
 
 public enum UserDefaultsKey: String {
     case strokeUnitMilliseconds

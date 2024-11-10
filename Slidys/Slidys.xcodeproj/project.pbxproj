@@ -7,59 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BB9133601438797DA5ECC197 /* Pods_Slidys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC6F97E27F9B84AFE0BD8172 /* Pods_Slidys.framework */; };
-		C3286A2D2CDBA39D007367BC /* ReadMeSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A2C2CDBA39D007367BC /* ReadMeSlide.swift */; };
-		C3286A2F2CDBA988007367BC /* QuestionCircleSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A2E2CDBA97E007367BC /* QuestionCircleSlide.swift */; };
-		C3286A312CDBAA8C007367BC /* QuestionCircleWithInfoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A302CDBAA67007367BC /* QuestionCircleWithInfoSlide.swift */; };
-		C3286A342CDBACBD007367BC /* DescriptionSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A332CDBACA7007367BC /* DescriptionSlide.swift */; };
-		C3286A362CDBAD53007367BC /* CharactersSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A352CDBAD4D007367BC /* CharactersSlide.swift */; };
-		C3286A382CDBAE18007367BC /* ShowDemoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A372CDBAE15007367BC /* ShowDemoSlide.swift */; };
-		C3286A3A2CDBAECA007367BC /* CircleCodeSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A392CDBAEC5007367BC /* CircleCodeSlide.swift */; };
-		C3286A3C2CDBAEDC007367BC /* CodeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A3B2CDBAED7007367BC /* CodeConstants.swift */; };
-		C3286A3E2CDBB3C8007367BC /* TitleVideoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A3D2CDBB3C4007367BC /* TitleVideoSlide.swift */; };
+		1B5AA9F438A8C628CB32AD21 /* Pods_Slidys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4BC0A29FD8C6318120DCB8F /* Pods_Slidys.framework */; };
 		C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C3286A402CDBB41B007367BC /* opening_input.mp4 */; };
-		C3286A432CDBB734007367BC /* LayoutComparisonSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3286A422CDBB727007367BC /* LayoutComparisonSlide.swift */; };
 		C359A8A32CCE309E00370A72 /* SlidysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A22CCE309E00370A72 /* SlidysApp.swift */; };
 		C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A42CCE309E00370A72 /* ContentView.swift */; };
 		C359A8A72CCE309F00370A72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C359A8A62CCE309F00370A72 /* Assets.xcassets */; };
 		C359A8AB2CCE309F00370A72 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C359A8AA2CCE309F00370A72 /* Preview Assets.xcassets */; };
 		C359A8B62CCE3D3D00370A72 /* FlutterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8B52CCE3D3D00370A72 /* FlutterView.swift */; };
-		C359A8B82CCE466D00370A72 /* FlutterEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8B72CCE466D00370A72 /* FlutterEngineManager.swift */; };
-		C3A3FB5F2CCE8495009E3EA4 /* PianoKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB5E2CCE8495009E3EA4 /* PianoKey.swift */; };
-		C3A3FB612CCE84AC009E3EA4 /* PianoKeyStroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB602CCE84AC009E3EA4 /* PianoKeyStroke.swift */; };
-		C3A3FB632CCE84D2009E3EA4 /* PianoKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB622CCE84D2009E3EA4 /* PianoKeyView.swift */; };
-		C3A3FB652CCE84EA009E3EA4 /* PianoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB642CCE84EA009E3EA4 /* PianoView.swift */; };
-		C3A3FB672CCE8519009E3EA4 /* AspectRatioConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB662CCE8519009E3EA4 /* AspectRatioConstants.swift */; };
-		C3A3FB692CCE8554009E3EA4 /* KeyStrokedType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB682CCE8554009E3EA4 /* KeyStrokedType.swift */; };
-		C3A3FB6B2CCE8571009E3EA4 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB6A2CCE8571009E3EA4 /* UserDefaults.swift */; };
-		C3A3FB702CCE8696009E3EA4 /* PianoConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB6F2CCE8696009E3EA4 /* PianoConstants.swift */; };
-		C3A3FB732CCE86D7009E3EA4 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB722CCE86D7009E3EA4 /* Constants.swift */; };
-		C3A3FB752CCE8750009E3EA4 /* PianoSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB742CCE8750009E3EA4 /* PianoSlide.swift */; };
-		C3A3FB772CCE896C009E3EA4 /* SlideConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB762CCE896C009E3EA4 /* SlideConfiguration.swift */; };
-		C3A3FB792CD0926E009E3EA4 /* TitleSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A3FB782CD0926E009E3EA4 /* TitleSlide.swift */; };
-		C3C5ED902CDF9F2500D46185 /* CircleAnimationDescriptionSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED8F2CDF9F1E00D46185 /* CircleAnimationDescriptionSlide.swift */; };
-		C3C5ED952CDF9FCD00D46185 /* WrapUpSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED942CDF9FC900D46185 /* WrapUpSlide.swift */; };
-		C3C5ED972CDFA01800D46185 /* ReferenceSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED962CDFA01400D46185 /* ReferenceSlide.swift */; };
-		C3C5ED992CDFA42600D46185 /* LiveDescriptionSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C5ED982CDFA41E00D46185 /* LiveDescriptionSlide.swift */; };
-		C3E930662CDFAE2D00C1C169 /* SlidysCore in Frameworks */ = {isa = PBXBuildFile; productRef = C3E930652CDFAE2D00C1C169 /* SlidysCore */; };
+		C3D0D6B02CE049AA0055F861 /* FlutterAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */; };
+		C3D0D6B22CE04AB90055F861 /* FlutterKaigiSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C3D0D6B12CE04AB90055F861 /* FlutterKaigiSlide */; };
+		C3D0D6B52CE055F60055F861 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D0D6B42CE055F60055F861 /* Router.swift */; };
+		C3D0D6B72CE077530055F861 /* FlutterEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */; };
+		C3E9A1B62CDFB9640022F34A /* SlidysCore in Resources */ = {isa = PBXBuildFile; fileRef = C3E9A1B52CDFB9640022F34A /* SlidysCore */; };
+		C3E9A1B82CDFB96C0022F34A /* SlidysCore in Frameworks */ = {isa = PBXBuildFile; productRef = C3E9A1B72CDFB96C0022F34A /* SlidysCore */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C3E9A1AF2CDFB8430022F34A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4B89B0599B99B529A58C3667 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
+		665115867B42FE5CE46AC762 /* Pods-FlutterKaigiSlide.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlutterKaigiSlide.debug.xcconfig"; path = "Target Support Files/Pods-FlutterKaigiSlide/Pods-FlutterKaigiSlide.debug.xcconfig"; sourceTree = "<group>"; };
+		99CA147A46BF6E71A48DACEC /* Pods_FlutterKaigiSlide.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FlutterKaigiSlide.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
+		B4BC0A29FD8C6318120DCB8F /* Pods_Slidys.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Slidys.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
 		BE63C38D864D86218C573BD7 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
-		C3286A2C2CDBA39D007367BC /* ReadMeSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadMeSlide.swift; sourceTree = "<group>"; };
-		C3286A2E2CDBA97E007367BC /* QuestionCircleSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionCircleSlide.swift; sourceTree = "<group>"; };
-		C3286A302CDBAA67007367BC /* QuestionCircleWithInfoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionCircleWithInfoSlide.swift; sourceTree = "<group>"; };
-		C3286A332CDBACA7007367BC /* DescriptionSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionSlide.swift; sourceTree = "<group>"; };
-		C3286A352CDBAD4D007367BC /* CharactersSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersSlide.swift; sourceTree = "<group>"; };
-		C3286A372CDBAE15007367BC /* ShowDemoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDemoSlide.swift; sourceTree = "<group>"; };
-		C3286A392CDBAEC5007367BC /* CircleCodeSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleCodeSlide.swift; sourceTree = "<group>"; };
-		C3286A3B2CDBAED7007367BC /* CodeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeConstants.swift; sourceTree = "<group>"; };
-		C3286A3D2CDBB3C4007367BC /* TitleVideoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleVideoSlide.swift; sourceTree = "<group>"; };
 		C3286A402CDBB41B007367BC /* opening_input.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = opening_input.mp4; sourceTree = "<group>"; };
-		C3286A422CDBB727007367BC /* LayoutComparisonSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutComparisonSlide.swift; sourceTree = "<group>"; };
 		C359A89F2CCE309E00370A72 /* Slidys.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slidys.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C359A8A22CCE309E00370A72 /* SlidysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysApp.swift; sourceTree = "<group>"; };
 		C359A8A42CCE309E00370A72 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -67,25 +51,13 @@
 		C359A8A82CCE309F00370A72 /* Slidys.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slidys.entitlements; sourceTree = "<group>"; };
 		C359A8AA2CCE309F00370A72 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C359A8B52CCE3D3D00370A72 /* FlutterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterView.swift; sourceTree = "<group>"; };
-		C359A8B72CCE466D00370A72 /* FlutterEngineManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterEngineManager.swift; sourceTree = "<group>"; };
-		C3A3FB5E2CCE8495009E3EA4 /* PianoKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoKey.swift; sourceTree = "<group>"; };
-		C3A3FB602CCE84AC009E3EA4 /* PianoKeyStroke.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoKeyStroke.swift; sourceTree = "<group>"; };
-		C3A3FB622CCE84D2009E3EA4 /* PianoKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoKeyView.swift; sourceTree = "<group>"; };
-		C3A3FB642CCE84EA009E3EA4 /* PianoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoView.swift; sourceTree = "<group>"; };
-		C3A3FB662CCE8519009E3EA4 /* AspectRatioConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectRatioConstants.swift; sourceTree = "<group>"; };
-		C3A3FB682CCE8554009E3EA4 /* KeyStrokedType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyStrokedType.swift; sourceTree = "<group>"; };
-		C3A3FB6A2CCE8571009E3EA4 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
-		C3A3FB6F2CCE8696009E3EA4 /* PianoConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoConstants.swift; sourceTree = "<group>"; };
-		C3A3FB722CCE86D7009E3EA4 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		C3A3FB742CCE8750009E3EA4 /* PianoSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoSlide.swift; sourceTree = "<group>"; };
-		C3A3FB762CCE896C009E3EA4 /* SlideConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideConfiguration.swift; sourceTree = "<group>"; };
-		C3A3FB782CD0926E009E3EA4 /* TitleSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleSlide.swift; sourceTree = "<group>"; };
-		C3C5ED8F2CDF9F1E00D46185 /* CircleAnimationDescriptionSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleAnimationDescriptionSlide.swift; sourceTree = "<group>"; };
-		C3C5ED942CDF9FC900D46185 /* WrapUpSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrapUpSlide.swift; sourceTree = "<group>"; };
-		C3C5ED962CDFA01400D46185 /* ReferenceSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceSlide.swift; sourceTree = "<group>"; };
-		C3C5ED982CDFA41E00D46185 /* LiveDescriptionSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveDescriptionSlide.swift; sourceTree = "<group>"; };
-		C3E930642CDFAE1900C1C169 /* SlidysCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SlidysCore; path = ../Packages/SlidysCore; sourceTree = SOURCE_ROOT; };
-		FC6F97E27F9B84AFE0BD8172 /* Pods_Slidys.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Slidys.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3D0D6AC2CDFBD350055F861 /* SlidysRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SlidysRelease.entitlements; sourceTree = "<group>"; };
+		C3D0D6AD2CE03D0D0055F861 /* FlutterKaigiSlide */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterKaigiSlide; path = ../Packages/FlutterKaigiSlide; sourceTree = "<group>"; };
+		C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterAppDelegate.swift; sourceTree = "<group>"; };
+		C3D0D6B42CE055F60055F861 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlutterEngineManager.swift; sourceTree = "<group>"; };
+		C3E9A1B52CDFB9640022F34A /* SlidysCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SlidysCore; path = ../Packages/SlidysCore; sourceTree = "<group>"; };
+		E9619B77083A30446359AF03 /* Pods-FlutterKaigiSlide.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlutterKaigiSlide.release.xcconfig"; path = "Target Support Files/Pods-FlutterKaigiSlide/Pods-FlutterKaigiSlide.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,8 +65,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C3E930662CDFAE2D00C1C169 /* SlidysCore in Frameworks */,
-				BB9133601438797DA5ECC197 /* Pods_Slidys.framework in Frameworks */,
+				C3D0D6B22CE04AB90055F861 /* FlutterKaigiSlide in Frameworks */,
+				C3E9A1B82CDFB96C0022F34A /* SlidysCore in Frameworks */,
+				1B5AA9F438A8C628CB32AD21 /* Pods_Slidys.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,6 +81,8 @@
 				4B89B0599B99B529A58C3667 /* Pods-Slidys.release.xcconfig */,
 				B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */,
 				9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */,
+				665115867B42FE5CE46AC762 /* Pods-FlutterKaigiSlide.debug.xcconfig */,
+				E9619B77083A30446359AF03 /* Pods-FlutterKaigiSlide.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -115,7 +90,8 @@
 		9EB32BB0D052B36F8042AF6E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				FC6F97E27F9B84AFE0BD8172 /* Pods_Slidys.framework */,
+				99CA147A46BF6E71A48DACEC /* Pods_FlutterKaigiSlide.framework */,
+				B4BC0A29FD8C6318120DCB8F /* Pods_Slidys.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -131,7 +107,8 @@
 		C359A8962CCE309E00370A72 = {
 			isa = PBXGroup;
 			children = (
-				C3E930642CDFAE1900C1C169 /* SlidysCore */,
+				C3D0D6AD2CE03D0D0055F861 /* FlutterKaigiSlide */,
+				C3E9A1B52CDFB9640022F34A /* SlidysCore */,
 				C359A8A12CCE309E00370A72 /* Slidys */,
 				C359A8A02CCE309E00370A72 /* Products */,
 				9DA90DF292DA18BA8A96F5B1 /* Pods */,
@@ -150,18 +127,16 @@
 		C359A8A12CCE309E00370A72 /* Slidys */ = {
 			isa = PBXGroup;
 			children = (
+				C3D0D6B32CE055E90055F861 /* FlutterKaigiSlide */,
+				C3D0D6AE2CE03D3F0055F861 /* Flutter */,
+				C3D0D6AC2CDFBD350055F861 /* SlidysRelease.entitlements */,
 				C3286A3F2CDBB417007367BC /* Assets */,
-				C3A3FB712CCE86CD009E3EA4 /* Constants */,
-				C3A3FB5D2CCE848D009E3EA4 /* Piano */,
-				C3A3FB592CCE8460009E3EA4 /* Slides */,
 				C359A8B42CCE3D3200370A72 /* Views */,
 				C359A8A22CCE309E00370A72 /* SlidysApp.swift */,
 				C359A8A42CCE309E00370A72 /* ContentView.swift */,
 				C359A8A62CCE309F00370A72 /* Assets.xcassets */,
 				C359A8A82CCE309F00370A72 /* Slidys.entitlements */,
 				C359A8A92CCE309F00370A72 /* Preview Content */,
-				C359A8B72CCE466D00370A72 /* FlutterEngineManager.swift */,
-				C3A3FB762CCE896C009E3EA4 /* SlideConfiguration.swift */,
 			);
 			path = Slidys;
 			sourceTree = "<group>";
@@ -182,50 +157,21 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		C3A3FB592CCE8460009E3EA4 /* Slides */ = {
+		C3D0D6AE2CE03D3F0055F861 /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
-				C3C5ED982CDFA41E00D46185 /* LiveDescriptionSlide.swift */,
-				C3C5ED962CDFA01400D46185 /* ReferenceSlide.swift */,
-				C3C5ED942CDF9FC900D46185 /* WrapUpSlide.swift */,
-				C3C5ED8F2CDF9F1E00D46185 /* CircleAnimationDescriptionSlide.swift */,
-				C3286A422CDBB727007367BC /* LayoutComparisonSlide.swift */,
-				C3286A3D2CDBB3C4007367BC /* TitleVideoSlide.swift */,
-				C3286A392CDBAEC5007367BC /* CircleCodeSlide.swift */,
-				C3286A372CDBAE15007367BC /* ShowDemoSlide.swift */,
-				C3286A352CDBAD4D007367BC /* CharactersSlide.swift */,
-				C3286A332CDBACA7007367BC /* DescriptionSlide.swift */,
-				C3286A302CDBAA67007367BC /* QuestionCircleWithInfoSlide.swift */,
-				C3286A2E2CDBA97E007367BC /* QuestionCircleSlide.swift */,
-				C3286A2C2CDBA39D007367BC /* ReadMeSlide.swift */,
-				C3A3FB742CCE8750009E3EA4 /* PianoSlide.swift */,
-				C3A3FB782CD0926E009E3EA4 /* TitleSlide.swift */,
+				C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */,
+				C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */,
 			);
-			path = Slides;
+			path = Flutter;
 			sourceTree = "<group>";
 		};
-		C3A3FB5D2CCE848D009E3EA4 /* Piano */ = {
+		C3D0D6B32CE055E90055F861 /* FlutterKaigiSlide */ = {
 			isa = PBXGroup;
 			children = (
-				C3A3FB5E2CCE8495009E3EA4 /* PianoKey.swift */,
-				C3A3FB602CCE84AC009E3EA4 /* PianoKeyStroke.swift */,
-				C3A3FB622CCE84D2009E3EA4 /* PianoKeyView.swift */,
-				C3A3FB642CCE84EA009E3EA4 /* PianoView.swift */,
-				C3A3FB662CCE8519009E3EA4 /* AspectRatioConstants.swift */,
-				C3A3FB682CCE8554009E3EA4 /* KeyStrokedType.swift */,
-				C3A3FB6A2CCE8571009E3EA4 /* UserDefaults.swift */,
-				C3A3FB6F2CCE8696009E3EA4 /* PianoConstants.swift */,
+				C3D0D6B42CE055F60055F861 /* Router.swift */,
 			);
-			path = Piano;
-			sourceTree = "<group>";
-		};
-		C3A3FB712CCE86CD009E3EA4 /* Constants */ = {
-			isa = PBXGroup;
-			children = (
-				C3286A3B2CDBAED7007367BC /* CodeConstants.swift */,
-				C3A3FB722CCE86D7009E3EA4 /* Constants.swift */,
-			);
-			path = Constants;
+			path = FlutterKaigiSlide;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,11 +182,12 @@
 			buildConfigurationList = C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "Slidys" */;
 			buildPhases = (
 				4E12D9ABCAFB5E34DF1D13F6 /* [CP] Check Pods Manifest.lock */,
-				8A42AAB59A4576247BE68332 /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */,
+				8406CA16DD8F7808634BE19A /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */,
 				C359A89B2CCE309E00370A72 /* Sources */,
 				C359A89C2CCE309E00370A72 /* Frameworks */,
 				C359A89D2CCE309E00370A72 /* Resources */,
-				178A624CF75D10A7AF95E0FE /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */,
+				C3E9A1AF2CDFB8430022F34A /* Embed Frameworks */,
+				ED3B39026F70BE9BAD71E520 /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */,
 			);
 			buildRules = (
 			);
@@ -248,7 +195,8 @@
 			);
 			name = Slidys;
 			packageProductDependencies = (
-				C3E930652CDFAE2D00C1C169 /* SlidysCore */,
+				C3E9A1B72CDFB96C0022F34A /* SlidysCore */,
+				C3D0D6B12CE04AB90055F861 /* FlutterKaigiSlide */,
 			);
 			productName = Slidys;
 			productReference = C359A89F2CCE309E00370A72 /* Slidys.app */;
@@ -278,8 +226,6 @@
 				Base,
 			);
 			mainGroup = C359A8962CCE309E00370A72;
-			packageReferences = (
-			);
 			productRefGroup = C359A8A02CCE309E00370A72 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -297,22 +243,13 @@
 				C359A8AB2CCE309F00370A72 /* Preview Assets.xcassets in Resources */,
 				C359A8A72CCE309F00370A72 /* Assets.xcassets in Resources */,
 				C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */,
+				C3E9A1B62CDFB9640022F34A /* SlidysCore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		178A624CF75D10A7AF95E0FE /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			name = "[CP-User] Embed Flutter Build flutter_kaigi_slide Script";
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh embed_and_thin\n";
-		};
 		4E12D9ABCAFB5E34DF1D13F6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -335,7 +272,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8A42AAB59A4576247BE68332 /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */ = {
+		8406CA16DD8F7808634BE19A /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -343,7 +280,17 @@
 			name = "[CP-User] Run Flutter Build flutter_kaigi_slide Script";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh build\n";
+			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh build";
+		};
+		ED3B39026F70BE9BAD71E520 /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "[CP-User] Embed Flutter Build flutter_kaigi_slide Script";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh embed_and_thin";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -352,36 +299,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C359A8B82CCE466D00370A72 /* FlutterEngineManager.swift in Sources */,
-				C3C5ED952CDF9FCD00D46185 /* WrapUpSlide.swift in Sources */,
-				C3A3FB732CCE86D7009E3EA4 /* Constants.swift in Sources */,
-				C3286A3A2CDBAECA007367BC /* CircleCodeSlide.swift in Sources */,
-				C3A3FB5F2CCE8495009E3EA4 /* PianoKey.swift in Sources */,
-				C3A3FB652CCE84EA009E3EA4 /* PianoView.swift in Sources */,
-				C3A3FB772CCE896C009E3EA4 /* SlideConfiguration.swift in Sources */,
-				C3286A382CDBAE18007367BC /* ShowDemoSlide.swift in Sources */,
-				C3C5ED902CDF9F2500D46185 /* CircleAnimationDescriptionSlide.swift in Sources */,
-				C3C5ED972CDFA01800D46185 /* ReferenceSlide.swift in Sources */,
-				C3A3FB702CCE8696009E3EA4 /* PianoConstants.swift in Sources */,
-				C3286A342CDBACBD007367BC /* DescriptionSlide.swift in Sources */,
-				C3A3FB692CCE8554009E3EA4 /* KeyStrokedType.swift in Sources */,
+				C3D0D6B72CE077530055F861 /* FlutterEngineManager.swift in Sources */,
 				C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */,
-				C3286A2F2CDBA988007367BC /* QuestionCircleSlide.swift in Sources */,
-				C3A3FB792CD0926E009E3EA4 /* TitleSlide.swift in Sources */,
-				C3A3FB612CCE84AC009E3EA4 /* PianoKeyStroke.swift in Sources */,
-				C3286A312CDBAA8C007367BC /* QuestionCircleWithInfoSlide.swift in Sources */,
-				C3286A432CDBB734007367BC /* LayoutComparisonSlide.swift in Sources */,
-				C3C5ED992CDFA42600D46185 /* LiveDescriptionSlide.swift in Sources */,
-				C3286A3C2CDBAEDC007367BC /* CodeConstants.swift in Sources */,
-				C3A3FB632CCE84D2009E3EA4 /* PianoKeyView.swift in Sources */,
-				C3286A2D2CDBA39D007367BC /* ReadMeSlide.swift in Sources */,
-				C3286A362CDBAD53007367BC /* CharactersSlide.swift in Sources */,
-				C3286A3E2CDBB3C8007367BC /* TitleVideoSlide.swift in Sources */,
+				C3D0D6B02CE049AA0055F861 /* FlutterAppDelegate.swift in Sources */,
+				C3D0D6B52CE055F60055F861 /* Router.swift in Sources */,
 				C359A8A32CCE309E00370A72 /* SlidysApp.swift in Sources */,
-				C3A3FB672CCE8519009E3EA4 /* AspectRatioConstants.swift in Sources */,
 				C359A8B62CCE3D3D00370A72 /* FlutterView.swift in Sources */,
-				C3A3FB6B2CCE8571009E3EA4 /* UserDefaults.swift in Sources */,
-				C3A3FB752CCE8750009E3EA4 /* PianoSlide.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -506,6 +429,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Slidys/Slidys.entitlements;
@@ -546,9 +470,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Slidys/Slidys.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Slidys/SlidysRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Slidys/Preview Content\"";
@@ -606,7 +531,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C3E930652CDFAE2D00C1C169 /* SlidysCore */ = {
+		C3D0D6B12CE04AB90055F861 /* FlutterKaigiSlide */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FlutterKaigiSlide;
+		};
+		C3E9A1B72CDFB96C0022F34A /* SlidysCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SlidysCore;
 		};

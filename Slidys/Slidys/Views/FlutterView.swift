@@ -7,17 +7,7 @@
 
 import SwiftUI
 import Flutter
-
-enum FlutterViewType: String {
-    case piano
-    case circle
-    case calendar
-    case circleAnimation
-
-    fileprivate var path: String {
-        return "/\(rawValue)"
-    }
-}
+import FlutterKaigiSlide
 
 struct FlutterView: UIViewControllerRepresentable {
     let type: FlutterViewType

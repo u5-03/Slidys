@@ -1,5 +1,4 @@
 {
-  "originHash" : "241d103d42a3784cd985654408cc14c0bfcfb08b21fb1136126fc8c12995c90a",
   "pins" : [
     {
       "identity" : "slidekit",
@@ -29,5 +28,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }

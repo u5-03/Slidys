@@ -10,12 +10,11 @@ import SlideKit
 import SwiftUI
 import SlidysCore
 
-struct SlideConfiguration {
-
+public struct SlideConfiguration {
     /// Edit the slide size.
-    let size = SlideSize.standard16_9
+    public let size = SlideSize.standard16_9
 
-    let slideIndexController = SlideIndexController(index: 0) {
+    public let slideIndexController = SlideIndexController(index: 0) {
         CenterTextSlide(text: "みなさん")
         CenterTextSlide(text: "早速ですが質問です！")
         QuestionCircleSlide()
@@ -88,17 +87,23 @@ struct SlideConfiguration {
         CenterTextSlide(text: "おしまい")
     }
 
-    let theme = CustomSlideTheme()
+    public let theme = CustomSlideTheme()
+
+    public init() {}
 }
 
-struct CustomSlideTheme: SlideTheme {
-    let headerSlideStyle = CustomHeaderSlideStyle()
-    let itemStyle = CustomItemStyle()
-    let indexStyle = CustomIndexStyle()
+public struct CustomSlideTheme: SlideTheme {
+    public let headerSlideStyle = CustomHeaderSlideStyle()
+    public let itemStyle = CustomItemStyle()
+    public let indexStyle = CustomIndexStyle()
+
+    public init() {}
 }
 
-struct CustomIndexStyle: IndexStyle {
-    func makeBody(configuration: Configuration) -> some View {
+public struct CustomIndexStyle: IndexStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
         Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
             .foregroundColor(.gray)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)

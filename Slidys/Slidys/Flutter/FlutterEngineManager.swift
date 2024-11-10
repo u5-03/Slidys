@@ -9,7 +9,7 @@ import Foundation
 import Flutter
 import FlutterPluginRegistrant
 
-class FlutterEngineManager {
+final class FlutterEngineManager {
     static let shared = FlutterEngineManager()
     var engine: FlutterEngine?
 
