@@ -27,8 +27,8 @@ public struct RouterKey: EnvironmentKey {
     public static var defaultValue: RouterProtocol = DefaultRouter()
 }
 
-public extension EnvironmentValues {
-    var router: RouterProtocol {
+extension EnvironmentValues {
+    public var router: RouterProtocol {
         get { self[RouterKey.self] }
         set { self[RouterKey.self] = newValue }
     }

@@ -133,7 +133,6 @@
 				C3286A3F2CDBB417007367BC /* Assets */,
 				C359A8B42CCE3D3200370A72 /* Views */,
 				C359A8A22CCE309E00370A72 /* SlidysApp.swift */,
-				C359A8A42CCE309E00370A72 /* ContentView.swift */,
 				C359A8A62CCE309F00370A72 /* Assets.xcassets */,
 				C359A8A82CCE309F00370A72 /* Slidys.entitlements */,
 				C359A8A92CCE309F00370A72 /* Preview Content */,
@@ -152,7 +151,7 @@
 		C359A8B42CCE3D3200370A72 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C359A8B52CCE3D3D00370A72 /* FlutterView.swift */,
+				C359A8A42CCE309E00370A72 /* ContentView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -160,6 +159,7 @@
 		C3D0D6AE2CE03D3F0055F861 /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
+				C359A8B52CCE3D3D00370A72 /* FlutterView.swift */,
 				C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */,
 				C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */,
 			);

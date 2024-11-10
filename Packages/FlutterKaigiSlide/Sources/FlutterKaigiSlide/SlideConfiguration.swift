@@ -10,9 +10,7 @@ import SlideKit
 import SwiftUI
 import SlidysCore
 
-public struct SlideConfiguration {
-    /// Edit the slide size.
-    public let size = SlideSize.standard16_9
+public struct SlideConfiguration: SlideConfigurationProtocol {
 
     public let slideIndexController = SlideIndexController(index: 0) {
         CenterTextSlide(text: "みなさん")
@@ -87,27 +85,5 @@ public struct SlideConfiguration {
         CenterTextSlide(text: "おしまい")
     }
 
-    public let theme = CustomSlideTheme()
-
     public init() {}
-}
-
-public struct CustomSlideTheme: SlideTheme {
-    public let headerSlideStyle = CustomHeaderSlideStyle()
-    public let itemStyle = CustomItemStyle()
-    public let indexStyle = CustomIndexStyle()
-
-    public init() {}
-}
-
-public struct CustomIndexStyle: IndexStyle {
-    public init() {}
-
-    public func makeBody(configuration: Configuration) -> some View {
-        Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
-            .foregroundColor(.gray)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-            .font(.system(size: 30))
-            .padding()
-    }
 }

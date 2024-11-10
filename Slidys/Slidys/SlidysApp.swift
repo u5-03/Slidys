@@ -12,39 +12,10 @@ import FlutterKaigiSlide
 @main
 struct SlidysApp: App {
     @UIApplicationDelegateAdaptor (FlutterAppDelegate.self) var appDelegate
-    static let configuration = SlideConfiguration()
-
-    var presentationContentView: some View {
-        SlideRouterView(slideIndexController: Self.configuration.slideIndexController)
-            .slideTheme(Self.configuration.theme)
-            .foregroundColor(.black)
-            .background(.white)
-    }
 
     var body: some Scene {
         WindowGroup {
-            PresentationView(slideSize: Self.configuration.size) {
-                ZStack {
-                    presentationContentView
-                    HStack(spacing: 0) {
-                        Rectangle()
-                            .foregroundStyle(Color.black.opacity(0.01))
-                            .onTapGesture {
-                                Self.configuration.slideIndexController.back()
-                            }
-                        Color.clear
-                            .containerRelativeFrame(.horizontal) { length, _ in
-                                return length * 0.8
-                            }
-                        Rectangle()
-                            .foregroundStyle(Color.black.opacity(0.01))
-                            .onTapGesture {
-                                Self.configuration.slideIndexController.forward()
-                            }
-                    }
-                }
-            }
-            .environment(\.router, Router())
+            ContentView()
         }
     }
 }

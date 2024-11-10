@@ -1,12 +1,20 @@
 //
-//  CustomStyleSlide.swift
-//  Slidys
+//  SlideTheme.swift
 //
-//  Created by Yugo Sugiyama on 2024/10/27.
+//
+//  Created by Yugo Sugiyama on 2024/11/10.
 //
 
 import SwiftUI
 import SlideKit
+
+public struct CustomSlideTheme: SlideTheme {
+    public let headerSlideStyle = CustomHeaderSlideStyle()
+    public let itemStyle = CustomItemStyle()
+    public let indexStyle = CustomIndexStyle()
+
+    public init() {}
+}
 
 @Slide
 public struct CustomStyleSlide: View {
@@ -81,9 +89,14 @@ public struct CustomItemStyle: ItemStyle {
     }
 }
 
-#Preview {
-    SlidePreview {
-        CustomStyleSlide()
+public struct CustomIndexStyle: IndexStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
+            .foregroundColor(.gray)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .font(.system(size: 30))
+            .padding()
     }
 }
-
