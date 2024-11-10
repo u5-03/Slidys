@@ -4,12 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "FlutterKaigiSlide",
+    name: "ChibaSwiftSlide",
     platforms: [.iOS(.v17), .macOS(.v13)],
     products: [
         .library(
-            name: "FlutterKaigiSlide",
-            targets: ["FlutterKaigiSlide"]),
+            name: "ChibaSwiftSlide",
+            targets: ["ChibaSwiftSlide"]),
     ],
     dependencies: [
         .package(path: "../SlidysCore"),
@@ -17,14 +17,14 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "FlutterKaigiSlide",
+            name: "ChibaSwiftSlide",
             dependencies: [
                 "SlidysCore",
                 "PianoUI",
             ]
         ),
         .testTarget(
-            name: "FlutterKaigiSlideTests",
-            dependencies: ["FlutterKaigiSlide"]),
+            name: "ChibaSwiftSlideTests",
+            dependencies: ["ChibaSwiftSlide"]),
     ]
 )

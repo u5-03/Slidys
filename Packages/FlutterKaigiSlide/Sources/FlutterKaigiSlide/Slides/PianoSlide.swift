@@ -5,11 +5,9 @@
 //  Created by Yugo Sugiyama on 2024/10/27.
 //
 
-import Foundation
-
-
 import SwiftUI
 import SlideKit
+import PianoUI
 
 @Slide
 struct PianoSlide: View {
