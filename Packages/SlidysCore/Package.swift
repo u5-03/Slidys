@@ -13,12 +13,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.4.0"),
+        .package(url: "https://github.com/cybozu/WebUI", from: "2.3.0"),
     ],
     targets: [
         .target(
             name: "SlidysCore",
             dependencies: [
                 "SlideKit",
+                "WebUI",
             ]
         ),
         .testTarget(

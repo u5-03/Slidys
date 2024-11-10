@@ -8,10 +8,12 @@
 import SwiftUI
 import FlutterKaigiSlide
 import ChibaSwiftSlide
+import KanagawaSwiftSlide
 
 enum SlideType: CaseIterable, Identifiable {
     case flutterKaigi
     case chibaSwift
+    case kanagawaSwift
 
     var id: String {
         return displayValue
@@ -23,6 +25,8 @@ enum SlideType: CaseIterable, Identifiable {
             return "FlutterKaigi2024"
         case .chibaSwift:
             return "Chiba.swift #1"
+        case .kanagawaSwift:
+            return "Kanagawa.swift #1"
         }
     }
 }
@@ -47,6 +51,8 @@ struct ContentView: View {
                         .environment(\.router, Router())
                 case .chibaSwift:
                     ChibaSwiftSlideView()
+                case .kanagawaSwift:
+                    KanagawaSwiftSlideView()
                 }
                 closeButton
             }

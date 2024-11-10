@@ -1,6 +1,6 @@
 //
 //  SlideBaseView.swift
-//  
+//
 //
 //  Created by Yugo Sugiyama on 2024/11/10.
 //
@@ -37,29 +37,24 @@ public struct SlideBaseView: View {
 
     public var body: some View {
         PresentationView(slideSize: slideConfiguration.size) {
-            ZStack {
-                presentationContentView
-                HStack(spacing: 0) {
-                    Rectangle()
+            GeometryReader { proxy in
+                let circleHeight = proxy.size.height * 1.5
+                ZStack {
+                    presentationContentView
+                    Circle()
+                        .frame(width: circleHeight, height: circleHeight)
                         .foregroundStyle(Color.black.opacity(0.01))
-                        .simultaneousGesture(
-                            TapGesture()
-                                .onEnded { _ in
-                                    slideConfiguration.slideIndexController.back()
-                                }
-                        )
-                    Color.clear
-                        .containerRelativeFrame(.horizontal) { length, _ in
-                            return length * 0.8
+                        .position(x: 0, y: 0)
+                        .onTapGesture {
+                            slideConfiguration.slideIndexController.back()
                         }
-                    Rectangle()
+                    Circle()
+                        .frame(width: circleHeight, height: circleHeight)
                         .foregroundStyle(Color.black.opacity(0.01))
-                        .simultaneousGesture(
-                            TapGesture()
-                                .onEnded { _ in
-                                    slideConfiguration.slideIndexController.forward()
-                                }
-                        )
+                        .position(x: proxy.size.width, y: 0)
+                        .onTapGesture {
+                            slideConfiguration.slideIndexController.forward()
+                        }
                 }
             }
         }
