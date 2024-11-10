@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:SlidysMac/SlidysMac.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Slidys.xcodeproj">
    </FileRef>
    <FileRef
