@@ -55,6 +55,7 @@
 		C359A8A82CCE309F00370A72 /* Slidys.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slidys.entitlements; sourceTree = "<group>"; };
 		C359A8AA2CCE309F00370A72 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C359A8B52CCE3D3D00370A72 /* FlutterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterView.swift; sourceTree = "<group>"; };
+		C3B94A252CE65C5A0024632E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C3D0D6AC2CDFBD350055F861 /* SlidysRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SlidysRelease.entitlements; sourceTree = "<group>"; };
 		C3D0D6AD2CE03D0D0055F861 /* FlutterKaigiSlide */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterKaigiSlide; path = ../Packages/FlutterKaigiSlide; sourceTree = "<group>"; };
 		C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterAppDelegate.swift; sourceTree = "<group>"; };
@@ -141,6 +142,7 @@
 		C359A8A12CCE309E00370A72 /* Slidys */ = {
 			isa = PBXGroup;
 			children = (
+				C3B94A252CE65C5A0024632E /* Info.plist */,
 				C3D0D6B32CE055E90055F861 /* FlutterKaigiSlide */,
 				C3D0D6AE2CE03D3F0055F861 /* Flutter */,
 				C3D0D6AC2CDFBD350055F861 /* SlidysRelease.entitlements */,
@@ -458,6 +460,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Slidys/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -500,6 +503,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Slidys/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

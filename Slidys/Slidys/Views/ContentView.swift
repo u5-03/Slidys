@@ -10,12 +10,14 @@ import FlutterKaigiSlide
 import ChibaSwiftSlide
 import KanagawaSwiftSlide
 import iOSDCSlide
+import SlidysCore
 
 enum SlideType: CaseIterable, Identifiable {
     case flutterKaigi
     case chibaSwift
     case kanagawaSwift
     case iosdcSlide
+    case share
 
     var id: String {
         return displayValue
@@ -31,6 +33,8 @@ enum SlideType: CaseIterable, Identifiable {
             return "Kanagawa.swift #1"
         case .iosdcSlide:
             return "iOSDC2024"
+        case .share:
+            return "Share Page"
         }
     }
 }
@@ -59,6 +63,8 @@ struct ContentView: View {
                     KanagawaSwiftSlideView()
                 case .iosdcSlide:
                     iOSDCSlideView()
+                case .share:
+                    ShareQrCodeView()
                 }
                 closeButton
             }
@@ -70,9 +76,10 @@ struct ContentView: View {
             selectedItem = nil
         }) {
             Circle()
-                .strokeBorder(Color.white, lineWidth: 2)
-                .background(Image(systemName: "xmark").foregroundStyle(.white))
+                .strokeBorder(Color.gray, lineWidth: 2)
+                .background(Image(systemName: "xmark").foregroundStyle(.gray))
                 .frame(width: 50, height: 50)
+                .padding()
 
         }
     }

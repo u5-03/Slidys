@@ -9,11 +9,13 @@ import SwiftUI
 import ChibaSwiftSlide
 import KanagawaSwiftSlide
 import iOSDCSlide
+import SlidysCore
 
 enum SlideType: CaseIterable, Identifiable, Equatable {
     case chibaSwift
     case kanagawaSwift
     case iosdcSlide
+    case share
 
     var id: String {
         return displayValue
@@ -27,6 +29,8 @@ enum SlideType: CaseIterable, Identifiable, Equatable {
             return "Kanagawa.swift #1"
         case .iosdcSlide:
             return "iOSDC2024"
+        case .share:
+            return "Share Page"
         }
     }
 }
@@ -53,6 +57,8 @@ struct ContentView: View {
                     KanagawaSwiftSlideView()
                 case .iosdcSlide:
                     iOSDCSlideView()
+                case .share:
+                    ShareQrCodeView()
                 }
                 closeButton
             }
