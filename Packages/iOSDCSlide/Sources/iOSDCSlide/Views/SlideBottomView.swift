@@ -10,8 +10,8 @@ import SwiftUI
 struct SlideBottomView: View {
     private let autoScrollController = AutoScrollController(
         message: introductionSentence,
-        autoScrollType: .speed(speed: 1000)
-//        autoScrollType: .timer(duration: .seconds(10))
+//        autoScrollType: .speed(speed: 1000)
+        autoScrollType: .timer(duration: .seconds(300))
     )
 
     var body: some View {
