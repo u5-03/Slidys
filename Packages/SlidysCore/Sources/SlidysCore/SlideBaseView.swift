@@ -37,7 +37,7 @@ public struct SlideBaseView: View {
     public var body: some View {
         PresentationView(slideSize: slideConfiguration.size) {
             GeometryReader { proxy in
-                let circleHeight = proxy.size.height * 1.5
+                let circleHeight = proxy.size.height * 1
                 ZStack {
                     presentationContentView
 #if os(macOS)
