@@ -21,6 +21,9 @@ let package = Package(
             dependencies: [
                 "SlidysCore",
                 "PianoUI",
+            ],
+            resources: [
+                .process("Resources/vision_pro_piano_demo.mp4"),
             ]
         ),
         .testTarget(

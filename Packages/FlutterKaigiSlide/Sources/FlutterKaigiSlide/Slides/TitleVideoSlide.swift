@@ -25,7 +25,7 @@ struct TitleVideoSlide: View {
 
     init(title: String, videoName: String, fileExtension: String) {
         self.title = title
-        if let filePath = Bundle.main.path(forResource: videoName, ofType: fileExtension) {
+        if let filePath = Bundle.module.path(forResource: videoName, ofType: fileExtension) {
             let fileURL = URL(fileURLWithPath: filePath)
             let playerItem = AVPlayerItem(url: fileURL)
             self.playerItem = playerItem
