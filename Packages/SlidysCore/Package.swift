@@ -21,6 +21,10 @@ let package = Package(
             dependencies: [
                 "SlideKit",
                 "WebUI",
+            ],
+            resources: [
+                .process("Resources/opening_input.mp4"),
+                .process("Resources/opening_output.mp4"),
             ]
         ),
         .testTarget(

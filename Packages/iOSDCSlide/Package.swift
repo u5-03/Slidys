@@ -23,10 +23,6 @@ let package = Package(
                 "SlidysCore",
                 "PianoUI",
                 .product(name: "Algorithms", package: "swift-algorithms")
-            ],
-            resources: [
-                .process("Resources/opening_input.mp4"),
-                .process("Resources/opening_output.mp4"),
             ]
         ),
         .testTarget(

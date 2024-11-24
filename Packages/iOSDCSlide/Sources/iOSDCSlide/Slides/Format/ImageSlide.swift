@@ -10,11 +10,11 @@ import SlideKit
 
 @Slide
 struct ImageSlide: View {
-    let imageName: String
+    let imageResource: ImageResource
 
     var body: some View {
         Group {
-            Image(imageName)
+            Image(imageResource)
                 .resizable()
                 .scaledToFit()
         }
@@ -26,6 +26,6 @@ struct ImageSlide: View {
 
 #Preview {
     SlidePreview {
-        ImageSlide(imageName: "ipadAppCapture")
+        ImageSlide(imageResource: .ipadAppCapture)
     }
 }

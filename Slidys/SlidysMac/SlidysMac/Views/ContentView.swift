@@ -11,11 +11,10 @@ import KanagawaSwiftSlide
 import iOSDCSlide
 import SlidysCore
 
-enum SlideType: CaseIterable, Identifiable, Equatable {
+enum SlideType: CaseIterable, Identifiable {
     case chibaSwift
     case kanagawaSwift
     case iosdcSlide
-    case share
 
     var id: String {
         return displayValue
@@ -29,51 +28,89 @@ enum SlideType: CaseIterable, Identifiable, Equatable {
             return "Kanagawa.swift #1"
         case .iosdcSlide:
             return "iOSDC2024"
-        case .share:
-            return "Share Page"
+        }
+    }
+
+    @ViewBuilder
+    public var view: some View {
+        switch self {
+        case .chibaSwift:
+            ChibaSwiftSlideView()
+        case .kanagawaSwift:
+            KanagawaSwiftSlideView()
+        case .iosdcSlide:
+            iOSDCSlideView()
+        }
+    }
+}
+
+enum SlideSectionType: Identifiable, Hashable {
+    case slides(SlideType)
+    case info(InfoSectionType)
+
+    var id: String {
+        switch self {
+        case .slides(let slideType):
+            return slideType.id
+        case .info(let infoSectionType):
+            return infoSectionType.id
+        }
+    }
+
+    @ViewBuilder
+    var view: some View {
+        switch self {
+        case .slides(let slideType):
+            slideType.view
+        case .info(let infoSectionType):
+            infoSectionType.view
         }
     }
 }
 
 struct ContentView: View {
-    @State private var selectedItem: SlideType?
-    @Environment(\.openWindow) var openWindow
+    @State private var selectedSectionType: SlideSectionType?
 
     var body: some View {
         NavigationStack {
-            List(SlideType.allCases, selection: $selectedItem) { item in
-                Text(item.displayValue)
-                    .padding()
-                    .tag(item)
+            List(selection: $selectedSectionType) {
+                Section("Slides") {
+                    ForEach(SlideType.allCases) { type in
+                        Text(type.displayValue)
+                            .padding()
+                            .tag(SlideSectionType.slides(type))
+                    }
+                }
+                Section("Other") {
+                    ForEach(InfoSectionType.allCases) { type in
+                        Text(type.displayValue)
+                            .padding()
+                            .tag(SlideSectionType.info(type))
+                    }
+                }
             }
+            .listRowBackground(Color.clear)
             .navigationTitle("Slidys")
         }
-        .sheet(item: $selectedItem) { type in
+        .sheet(item: $selectedSectionType) { type in
             ZStack(alignment: .topTrailing) {
-                switch type {
-                case .chibaSwift:
-                    ChibaSwiftSlideView()
-                case .kanagawaSwift:
-                    KanagawaSwiftSlideView()
-                case .iosdcSlide:
-                    iOSDCSlideView()
-                case .share:
-                    ShareQrCodeView()
-                }
+                type.view
+                    .frame(width: 800, height: 450)
                 closeButton
             }
-            .frame(width: 800, height: 450)
         }
     }
 
     var closeButton: some View {
         Button(action: {
-            selectedItem = nil
+            selectedSectionType = nil
         }) {
-            Image(systemName: "xmark")
-                .foregroundStyle(.white)
-                .background(.clear)
-                .frame(width: 50, height: 50)
+            Circle()
+                .strokeBorder(Color.gray, lineWidth: 2)
+                .background(Image(systemName: "xmark").foregroundStyle(.gray))
+                .frame(width: 24, height: 24)
+                .padding(.all, 4)
+
         }
     }
 }

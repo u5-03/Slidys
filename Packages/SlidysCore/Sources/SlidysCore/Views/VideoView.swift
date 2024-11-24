@@ -1,39 +1,56 @@
 //
-//  VideoSlide.swift
-//  iOSDC2024Slide
+//  VideoView.swift
+//  
 //
-//  Created by Yugo Sugiyama on 2024/07/27.
+//  Created by Yugo Sugiyama on 2024/11/24.
 //
 
 import SwiftUI
-import SlideKit
 import AVKit
 import Combine
-import SlidysCore
+
+public enum VideoType {
+    case visionProDemoInput
+    case visionProDemoOutput
+
+    var fileName: String {
+        switch self {
+        case .visionProDemoInput:
+            return "opening_input"
+        case .visionProDemoOutput:
+            return "opening_output"
+        }
+    }
+
+    var fileExtension: String {
+        return "mp4"
+    }
+}
 
 // Frameworks, Libraries, and Embedded ContentにAVKitを追加しないと、Previewでクラッシュする
-@Slide
-struct VideoSlide: View {
+public struct VideoView: View {
     @State private var player: AVPlayer
     @State private var playerItem: AVPlayerItem
     @State private var currentTime: Double = 0.0
     @State private var duration: Double = 0.0
     @State private var timeObserverToken: Any?
     @State private var cancellableSet = Set<AnyCancellable>()
+    private let videoType: VideoType
 
-    init(videoName: String, fileExtension: String) {
-        if let filePath = Bundle.module.path(forResource: videoName, ofType: fileExtension) {
+    public init(videoType: VideoType) {
+        self.videoType = videoType
+
+        if let filePath = Bundle.module.path(forResource: videoType.fileName, ofType: videoType.fileExtension) {
             let fileURL = URL(fileURLWithPath: filePath)
             let playerItem = AVPlayerItem(url: fileURL)
             self.playerItem = playerItem
             player = AVPlayer(playerItem: playerItem)
-
         } else {
             fatalError("Video file not found in bundle.")
         }
     }
 
-    var body: some View {
+    public var body: some View {
         VideoPlayer(player: player)
             .task {
                 do {
@@ -61,6 +78,5 @@ struct VideoSlide: View {
 }
 
 #Preview {
-    VideoSlide(videoName: "piano_demo", fileExtension: "mov")
-        .frame(width: 800, height: 450)
+    VideoView(videoType: .visionProDemoInput)
 }

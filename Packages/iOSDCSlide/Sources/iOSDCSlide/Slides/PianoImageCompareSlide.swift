@@ -22,7 +22,9 @@ struct PianoImageCompareSlide: View {
                         .frame(height: 320)
                 }
                 PianoView(pianoStrokes: [])
-                    .frame(width: 200)
+                    .containerRelativeFrame(.horizontal) { length, _ in
+                        return length / 2
+                    }
             }
         }
     }

@@ -11,7 +11,7 @@ import PianoUI
 import SlidysCore
 
 @Slide
-struct WrapupSlide: View {
+struct WrapUpSlide: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             HeaderSlide("まとめ・感想") {
@@ -41,7 +41,7 @@ struct WrapupSlide: View {
 
 #Preview {
     SlidePreview {
-        WrapupSlide()
+        WrapUpSlide()
     }
     .headerSlideStyle(CustomHeaderSlideStyle())
     .itemStyle(CustomItemStyle())

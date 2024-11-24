@@ -43,8 +43,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         }
         TitleVideoSlide(
             title: "Vision Proで動くピアノのUIをSwiftUIで\n実装して、iOSDC2024で発表しました！",
-            videoName: "vision_pro_piano_demo",
-            fileExtension: "mp4"
+            videoType: .visionProDemoInput
         )
         PianoSlide()
         LayoutComparisonSlide()
