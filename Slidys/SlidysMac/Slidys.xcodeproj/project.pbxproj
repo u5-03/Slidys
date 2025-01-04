@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C33B7A8C2CE0E8A6007FC049 /* SlidysMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33B7A8B2CE0E8A6007FC049 /* SlidysMacApp.swift */; };
+		C33B7A8C2CE0E8A6007FC049 /* SlidysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33B7A8B2CE0E8A6007FC049 /* SlidysApp.swift */; };
 		C33B7A8E2CE0E8A6007FC049 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33B7A8D2CE0E8A6007FC049 /* ContentView.swift */; };
 		C33B7A902CE0E8A7007FC049 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C33B7A8F2CE0E8A7007FC049 /* Assets.xcassets */; };
 		C33B7A932CE0E8A7007FC049 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C33B7A922CE0E8A7007FC049 /* Preview Assets.xcassets */; };
@@ -17,8 +17,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C33B7A882CE0E8A6007FC049 /* SlidysMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SlidysMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C33B7A8B2CE0E8A6007FC049 /* SlidysMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysMacApp.swift; sourceTree = "<group>"; };
+		C33B7A882CE0E8A6007FC049 /* Slidys.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slidys.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C33B7A8B2CE0E8A6007FC049 /* SlidysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysApp.swift; sourceTree = "<group>"; };
 		C33B7A8D2CE0E8A6007FC049 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C33B7A8F2CE0E8A7007FC049 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C33B7A922CE0E8A7007FC049 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -43,7 +43,7 @@
 		C33B7A7F2CE0E8A6007FC049 = {
 			isa = PBXGroup;
 			children = (
-				C33B7A8A2CE0E8A6007FC049 /* SlidysMac */,
+				C33B7A8A2CE0E8A6007FC049 /* Slidys */,
 				C33B7A892CE0E8A6007FC049 /* Products */,
 				C33B7AA02CE0E9A3007FC049 /* Frameworks */,
 			);
@@ -52,22 +52,22 @@
 		C33B7A892CE0E8A6007FC049 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C33B7A882CE0E8A6007FC049 /* SlidysMac.app */,
+				C33B7A882CE0E8A6007FC049 /* Slidys.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C33B7A8A2CE0E8A6007FC049 /* SlidysMac */ = {
+		C33B7A8A2CE0E8A6007FC049 /* Slidys */ = {
 			isa = PBXGroup;
 			children = (
 				C3B94A232CE63A230024632E /* Info.plist */,
 				C33B7AA52CE0E9F4007FC049 /* Views */,
-				C33B7A8B2CE0E8A6007FC049 /* SlidysMacApp.swift */,
+				C33B7A8B2CE0E8A6007FC049 /* SlidysApp.swift */,
 				C33B7A8F2CE0E8A7007FC049 /* Assets.xcassets */,
 				C33B7A942CE0E8A7007FC049 /* SlidysMac.entitlements */,
 				C33B7A912CE0E8A7007FC049 /* Preview Content */,
 			);
-			path = SlidysMac;
+			path = Slidys;
 			sourceTree = "<group>";
 		};
 		C33B7A912CE0E8A7007FC049 /* Preview Content */ = {
@@ -96,9 +96,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C33B7A872CE0E8A6007FC049 /* SlidysMac */ = {
+		C33B7A872CE0E8A6007FC049 /* Slidys */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C33B7A972CE0E8A7007FC049 /* Build configuration list for PBXNativeTarget "SlidysMac" */;
+			buildConfigurationList = C33B7A972CE0E8A7007FC049 /* Build configuration list for PBXNativeTarget "Slidys" */;
 			buildPhases = (
 				C33B7A842CE0E8A6007FC049 /* Sources */,
 				C33B7A852CE0E8A6007FC049 /* Frameworks */,
@@ -108,14 +108,14 @@
 			);
 			dependencies = (
 			);
-			name = SlidysMac;
+			name = Slidys;
 			packageProductDependencies = (
 				C33B7AA62CE0EA60007FC049 /* ChibaSwiftSlide */,
 				C33B7AA82CE0EA63007FC049 /* KanagawaSwiftSlide */,
 				C33B7AAE2CE108A6007FC049 /* iOSDCSlide */,
 			);
 			productName = SlidysMac;
-			productReference = C33B7A882CE0E8A6007FC049 /* SlidysMac.app */;
+			productReference = C33B7A882CE0E8A6007FC049 /* Slidys.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -133,7 +133,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C33B7A832CE0E8A6007FC049 /* Build configuration list for PBXProject "SlidysMac" */;
+			buildConfigurationList = C33B7A832CE0E8A6007FC049 /* Build configuration list for PBXProject "Slidys" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -146,7 +146,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C33B7A872CE0E8A6007FC049 /* SlidysMac */,
+				C33B7A872CE0E8A6007FC049 /* Slidys */,
 			);
 		};
 /* End PBXProject section */
@@ -169,7 +169,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C33B7A8E2CE0E8A6007FC049 /* ContentView.swift in Sources */,
-				C33B7A8C2CE0E8A6007FC049 /* SlidysMacApp.swift in Sources */,
+				C33B7A8C2CE0E8A6007FC049 /* SlidysApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,16 +312,20 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Slidys;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -343,23 +347,27 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Slidys;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C33B7A832CE0E8A6007FC049 /* Build configuration list for PBXProject "SlidysMac" */ = {
+		C33B7A832CE0E8A6007FC049 /* Build configuration list for PBXProject "Slidys" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C33B7A952CE0E8A7007FC049 /* Debug */,
@@ -368,7 +376,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C33B7A972CE0E8A7007FC049 /* Build configuration list for PBXNativeTarget "SlidysMac" */ = {
+		C33B7A972CE0E8A7007FC049 /* Build configuration list for PBXNativeTarget "Slidys" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C33B7A982CE0E8A7007FC049 /* Debug */,

@@ -1,6 +1,6 @@
 //
-//  SlidysMacApp.swift
-//  SlidysMac
+//  SlidysApp.swift
+//  Slidys
 //
 //  Created by Yugo Sugiyama on 2024/11/10.
 //
@@ -10,7 +10,7 @@ import ChibaSwiftSlide
 import KanagawaSwiftSlide
 
 @main
-struct SlidysMacApp: App {
+struct SlidysApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

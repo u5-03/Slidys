@@ -10,7 +10,7 @@
 		1B5AA9F438A8C628CB32AD21 /* Pods_Slidys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4BC0A29FD8C6318120DCB8F /* Pods_Slidys.framework */; };
 		C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C3286A402CDBB41B007367BC /* opening_input.mp4 */; };
 		C33B7AAD2CE0FC87007FC049 /* iOSDCSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C33B7AAC2CE0FC87007FC049 /* iOSDCSlide */; };
-		C359A8A32CCE309E00370A72 /* SlidysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A22CCE309E00370A72 /* SlidysApp.swift */; };
+		C359A8A32CCE309E00370A72 /* SlidysFlutterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A22CCE309E00370A72 /* SlidysFlutterApp.swift */; };
 		C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A42CCE309E00370A72 /* ContentView.swift */; };
 		C359A8A72CCE309F00370A72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C359A8A62CCE309F00370A72 /* Assets.xcassets */; };
 		C359A8AB2CCE309F00370A72 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C359A8AA2CCE309F00370A72 /* Preview Assets.xcassets */; };
@@ -46,8 +46,8 @@
 		B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
 		BE63C38D864D86218C573BD7 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
 		C3286A402CDBB41B007367BC /* opening_input.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = opening_input.mp4; sourceTree = "<group>"; };
-		C359A89F2CCE309E00370A72 /* Slidys.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slidys.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C359A8A22CCE309E00370A72 /* SlidysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysApp.swift; sourceTree = "<group>"; };
+		C359A89F2CCE309E00370A72 /* SlidysFlutter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SlidysFlutter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C359A8A22CCE309E00370A72 /* SlidysFlutterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysFlutterApp.swift; sourceTree = "<group>"; };
 		C359A8A42CCE309E00370A72 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C359A8A62CCE309F00370A72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C359A8A82CCE309F00370A72 /* Slidys.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slidys.entitlements; sourceTree = "<group>"; };
@@ -111,7 +111,7 @@
 		C359A8962CCE309E00370A72 = {
 			isa = PBXGroup;
 			children = (
-				C359A8A12CCE309E00370A72 /* Slidys */,
+				C359A8A12CCE309E00370A72 /* SlidysFlutter */,
 				C359A8A02CCE309E00370A72 /* Products */,
 				9DA90DF292DA18BA8A96F5B1 /* Pods */,
 				9EB32BB0D052B36F8042AF6E /* Frameworks */,
@@ -121,12 +121,12 @@
 		C359A8A02CCE309E00370A72 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C359A89F2CCE309E00370A72 /* Slidys.app */,
+				C359A89F2CCE309E00370A72 /* SlidysFlutter.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C359A8A12CCE309E00370A72 /* Slidys */ = {
+		C359A8A12CCE309E00370A72 /* SlidysFlutter */ = {
 			isa = PBXGroup;
 			children = (
 				C3B94A252CE65C5A0024632E /* Info.plist */,
@@ -135,12 +135,12 @@
 				C3D0D6AC2CDFBD350055F861 /* SlidysRelease.entitlements */,
 				C3286A3F2CDBB417007367BC /* Assets */,
 				C359A8B42CCE3D3200370A72 /* Views */,
-				C359A8A22CCE309E00370A72 /* SlidysApp.swift */,
+				C359A8A22CCE309E00370A72 /* SlidysFlutterApp.swift */,
 				C359A8A62CCE309F00370A72 /* Assets.xcassets */,
 				C359A8A82CCE309F00370A72 /* Slidys.entitlements */,
 				C359A8A92CCE309F00370A72 /* Preview Content */,
 			);
-			path = Slidys;
+			path = SlidysFlutter;
 			sourceTree = "<group>";
 		};
 		C359A8A92CCE309F00370A72 /* Preview Content */ = {
@@ -180,9 +180,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C359A89E2CCE309E00370A72 /* Slidys */ = {
+		C359A89E2CCE309E00370A72 /* SlidysFlutter */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "Slidys" */;
+			buildConfigurationList = C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "SlidysFlutter" */;
 			buildPhases = (
 				4E12D9ABCAFB5E34DF1D13F6 /* [CP] Check Pods Manifest.lock */,
 				8406CA16DD8F7808634BE19A /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */,
@@ -196,7 +196,7 @@
 			);
 			dependencies = (
 			);
-			name = Slidys;
+			name = SlidysFlutter;
 			packageProductDependencies = (
 				C3D0D6B12CE04AB90055F861 /* FlutterKaigiSlide */,
 				C3D0D6BB2CE08FDA0055F861 /* ChibaSwiftSlide */,
@@ -205,7 +205,7 @@
 				C33B7AAC2CE0FC87007FC049 /* iOSDCSlide */,
 			);
 			productName = Slidys;
-			productReference = C359A89F2CCE309E00370A72 /* Slidys.app */;
+			productReference = C359A89F2CCE309E00370A72 /* SlidysFlutter.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -223,7 +223,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C359A89A2CCE309E00370A72 /* Build configuration list for PBXProject "Slidys" */;
+			buildConfigurationList = C359A89A2CCE309E00370A72 /* Build configuration list for PBXProject "SlidysFlutter" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -236,7 +236,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C359A89E2CCE309E00370A72 /* Slidys */,
+				C359A89E2CCE309E00370A72 /* SlidysFlutter */,
 			);
 		};
 /* End PBXProject section */
@@ -308,7 +308,7 @@
 				C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */,
 				C3D0D6B02CE049AA0055F861 /* FlutterAppDelegate.swift in Sources */,
 				C3D0D6B52CE055F60055F861 /* Router.swift in Sources */,
-				C359A8A32CCE309E00370A72 /* SlidysApp.swift in Sources */,
+				C359A8A32CCE309E00370A72 /* SlidysFlutterApp.swift in Sources */,
 				C359A8B62CCE3D3D00370A72 /* FlutterView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -459,12 +459,12 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide.debug;
+				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024SlideFlutter.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -504,12 +504,12 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide;
+				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024SlideFlutter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -523,7 +523,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C359A89A2CCE309E00370A72 /* Build configuration list for PBXProject "Slidys" */ = {
+		C359A89A2CCE309E00370A72 /* Build configuration list for PBXProject "SlidysFlutter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C359A8AC2CCE309F00370A72 /* Debug */,
@@ -532,7 +532,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "Slidys" */ = {
+		C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "SlidysFlutter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C359A8AF2CCE309F00370A72 /* Debug */,

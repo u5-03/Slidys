@@ -1,6 +1,6 @@
 //
-//  SlidysApp.swift
-//  Slidys
+//  SlidysFlutterApp.swift
+//  SlidysFlutter
 //
 //  Created by Yugo Sugiyama on 2024/10/27.
 //
@@ -10,7 +10,7 @@ import SlideKit
 import FlutterKaigiSlide
 
 @main
-struct SlidysApp: App {
+struct SlidysFlutterApp: App {
     @UIApplicationDelegateAdaptor (FlutterAppDelegate.self) var appDelegate
 
     var body: some Scene {
