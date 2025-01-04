@@ -22,7 +22,6 @@
 		C3D0D6BC2CE08FDA0055F861 /* ChibaSwiftSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C3D0D6BB2CE08FDA0055F861 /* ChibaSwiftSlide */; };
 		C3D0D6BF2CE096BC0055F861 /* SlidysCore in Frameworks */ = {isa = PBXBuildFile; productRef = C3D0D6BE2CE096BC0055F861 /* SlidysCore */; };
 		C3D0D6C22CE09DCE0055F861 /* KanagawaSwiftSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C3D0D6C12CE09DCE0055F861 /* KanagawaSwiftSlide */; };
-		C3E9A1B62CDFB9640022F34A /* SlidysCore in Resources */ = {isa = PBXBuildFile; fileRef = C3E9A1B52CDFB9640022F34A /* SlidysCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -47,7 +46,6 @@
 		B6E5C4E2CA171978BFDD26F4 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
 		BE63C38D864D86218C573BD7 /* Pods-Slidys.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.debug.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.debug.xcconfig"; sourceTree = "<group>"; };
 		C3286A402CDBB41B007367BC /* opening_input.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = opening_input.mp4; sourceTree = "<group>"; };
-		C33B7AAB2CE0FB2E007FC049 /* iOSDCSlide */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = iOSDCSlide; path = ../Packages/iOSDCSlide; sourceTree = "<group>"; };
 		C359A89F2CCE309E00370A72 /* Slidys.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slidys.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C359A8A22CCE309E00370A72 /* SlidysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysApp.swift; sourceTree = "<group>"; };
 		C359A8A42CCE309E00370A72 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -57,14 +55,9 @@
 		C359A8B52CCE3D3D00370A72 /* FlutterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterView.swift; sourceTree = "<group>"; };
 		C3B94A252CE65C5A0024632E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C3D0D6AC2CDFBD350055F861 /* SlidysRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SlidysRelease.entitlements; sourceTree = "<group>"; };
-		C3D0D6AD2CE03D0D0055F861 /* FlutterKaigiSlide */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterKaigiSlide; path = ../Packages/FlutterKaigiSlide; sourceTree = "<group>"; };
 		C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterAppDelegate.swift; sourceTree = "<group>"; };
 		C3D0D6B42CE055F60055F861 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlutterEngineManager.swift; sourceTree = "<group>"; };
-		C3D0D6B82CE08C270055F861 /* ChibaSwiftSlide */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ChibaSwiftSlide; path = ../Packages/ChibaSwiftSlide; sourceTree = "<group>"; };
-		C3D0D6BD2CE095090055F861 /* PianoUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = PianoUI; path = ../Packages/PianoUI; sourceTree = "<group>"; };
-		C3D0D6C02CE09D7F0055F861 /* KanagawaSwiftSlide */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = KanagawaSwiftSlide; path = ../Packages/KanagawaSwiftSlide; sourceTree = "<group>"; };
-		C3E9A1B52CDFB9640022F34A /* SlidysCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SlidysCore; path = ../Packages/SlidysCore; sourceTree = "<group>"; };
 		E9619B77083A30446359AF03 /* Pods-FlutterKaigiSlide.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlutterKaigiSlide.release.xcconfig"; path = "Target Support Files/Pods-FlutterKaigiSlide/Pods-FlutterKaigiSlide.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -118,12 +111,6 @@
 		C359A8962CCE309E00370A72 = {
 			isa = PBXGroup;
 			children = (
-				C33B7AAB2CE0FB2E007FC049 /* iOSDCSlide */,
-				C3D0D6C02CE09D7F0055F861 /* KanagawaSwiftSlide */,
-				C3D0D6BD2CE095090055F861 /* PianoUI */,
-				C3D0D6B82CE08C270055F861 /* ChibaSwiftSlide */,
-				C3D0D6AD2CE03D0D0055F861 /* FlutterKaigiSlide */,
-				C3E9A1B52CDFB9640022F34A /* SlidysCore */,
 				C359A8A12CCE309E00370A72 /* Slidys */,
 				C359A8A02CCE309E00370A72 /* Products */,
 				9DA90DF292DA18BA8A96F5B1 /* Pods */,
@@ -262,7 +249,6 @@
 				C359A8AB2CCE309F00370A72 /* Preview Assets.xcassets in Resources */,
 				C359A8A72CCE309F00370A72 /* Assets.xcassets in Resources */,
 				C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */,
-				C3E9A1B62CDFB9640022F34A /* SlidysCore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

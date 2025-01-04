@@ -2,6 +2,24 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:../Packages/SlidysCore">
+   </FileRef>
+   <FileRef
+      location = "group:../Packages/iOSDCSlide">
+   </FileRef>
+   <FileRef
+      location = "group:../Packages/PianoUI">
+   </FileRef>
+   <FileRef
+      location = "group:../Packages/SymbolKit">
+   </FileRef>
+   <FileRef
+      location = "group:../Packages/ChibaSwiftSlide">
+   </FileRef>
+   <FileRef
+      location = "group:../Packages/KanagawaSwiftSlide">
+   </FileRef>
+   <FileRef
       location = "group:SlidysMac/SlidysMac.xcodeproj">
    </FileRef>
    <FileRef
