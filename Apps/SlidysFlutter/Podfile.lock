@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - FlutterPluginRegistrant (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `../../flutter_kaigi_slide/.ios/Flutter`)
+  - FlutterPluginRegistrant (from `../../flutter_kaigi_slide/.ios/Flutter/FlutterPluginRegistrant`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: "../../flutter_kaigi_slide/.ios/Flutter"
+  FlutterPluginRegistrant:
+    :path: "../../flutter_kaigi_slide/.ios/Flutter/FlutterPluginRegistrant"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  FlutterPluginRegistrant: 0b732256b4829f9783c18c68e2f9adacc1536955
+
+PODFILE CHECKSUM: 3dcf3bc2213f87f51fa5785e72f6f80c806f98ff
+
+COCOAPODS: 1.16.2

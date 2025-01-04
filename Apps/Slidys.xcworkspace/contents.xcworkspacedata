@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:../Packages/SlidysCore">
+   </FileRef>
+   <FileRef
+      location = "group:../Packages/PianoUI">
+   </FileRef>
+   <FileRef
+      location = "group:../Packages/SymbolKit">
+   </FileRef>
+   <FileRef
+      location = "group:Slidys/Slidys.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:SlidysFlutter/SlidysFlutter.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:SlidysFlutter/Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>

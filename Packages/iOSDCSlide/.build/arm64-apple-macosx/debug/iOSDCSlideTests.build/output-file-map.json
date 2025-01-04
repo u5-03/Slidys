@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/yugo.a.sugiyama/Dev/Swift/Slidys/Packages/iOSDCSlide/.build/arm64-apple-macosx/debug/iOSDCSlideTests.build/master.swiftdeps"
+  },
+  "/Users/yugo.a.sugiyama/Dev/Swift/Slidys/Packages/iOSDCSlide/Tests/iOSDCSlideTests/iOSDCSlideTests.swift": {
+    "dependencies": "/Users/yugo.a.sugiyama/Dev/Swift/Slidys/Packages/iOSDCSlide/.build/arm64-apple-macosx/debug/iOSDCSlideTests.build/iOSDCSlideTests.d",
+    "object": "/Users/yugo.a.sugiyama/Dev/Swift/Slidys/Packages/iOSDCSlide/.build/arm64-apple-macosx/debug/iOSDCSlideTests.build/iOSDCSlideTests.swift.o",
+    "swiftmodule": "/Users/yugo.a.sugiyama/Dev/Swift/Slidys/Packages/iOSDCSlide/.build/arm64-apple-macosx/debug/iOSDCSlideTests.build/iOSDCSlideTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/yugo.a.sugiyama/Dev/Swift/Slidys/Packages/iOSDCSlide/.build/arm64-apple-macosx/debug/iOSDCSlideTests.build/iOSDCSlideTests.swiftdeps"
+  }
+}
