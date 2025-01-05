@@ -12,11 +12,14 @@ public struct DebugPageView: View {
     public var body: some View {
         StrokeAnimationShapeView(
             shape: TextPathShape(
-                "UniversalStudioJapan",
-                font: .singlePathLineFont(),
-                textAnimationOrder: .random
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                font: .singlePathLineFont()
             ),
-            duration: .seconds(60)
+            lineWidth: 3,
+            lineColor: .black,
+            duration: .seconds(3),
+            isPaused: false,
+            shapeAspectRatio: 0.5
         )
     }
 }

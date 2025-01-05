@@ -21,6 +21,7 @@ public protocol SlideTypeProtocol: CaseIterable, Identifiable {
 public enum SlideType: SlideTypeProtocol {
     case chibaSwift
     case kanagawaSwift
+    case osakaSwift
     case iosdcSlide
 
     public var id: String {
@@ -33,6 +34,8 @@ public enum SlideType: SlideTypeProtocol {
             return "Chiba.swift #1"
         case .kanagawaSwift:
             return "Kanagawa.swift #1"
+        case .osakaSwift:
+            return "Osaka.swift #1"
         case .iosdcSlide:
             return "iOSDC2024"
         }
@@ -44,6 +47,8 @@ public enum SlideType: SlideTypeProtocol {
             ChibaSwiftSlideView()
         case .kanagawaSwift:
             KanagawaSwiftSlideView()
+        case .osakaSwift:
+            OsakaSwiftSlideView()
         case .iosdcSlide:
             iOSDCSlideView()
         }

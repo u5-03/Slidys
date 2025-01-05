@@ -109,18 +109,22 @@ public struct SymbolQuizView<Content: View>: View {
                     }
                 } label: {
                     showAnswerContent
+                        .minimumScaleFactor(0.1)
                         .padding()
                         .frame(height: 120)
                 }
                 Spacer()
                 if !shouldShowAnswerName {
                     answerHintContent
+                        .minimumScaleFactor(0.1)
                 }
                 HStack(spacing: 4) {
                     answerPrefixContent
+                        .minimumScaleFactor(0.1)
                         .padding()
                         .frame(height: 120)
                     answerContent
+                        .minimumScaleFactor(0.1)
                         .padding()
                         .frame(height: 120)
                 }
