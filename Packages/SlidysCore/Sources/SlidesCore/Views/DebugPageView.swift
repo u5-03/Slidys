@@ -11,11 +11,12 @@ import SymbolKit
 public struct DebugPageView: View {
     public var body: some View {
         StrokeAnimationShapeView(
-            shape: PathTextShape(
-                "Hello, world!",
-                font: .singlePathLineFont()
+            shape: TextPathShape(
+                "UniversalStudioJapan",
+                font: .singlePathLineFont(),
+                textAnimationOrder: .random
             ),
-            duration: .seconds(3)
+            duration: .seconds(60)
         )
     }
 }

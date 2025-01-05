@@ -7,13 +7,29 @@
 
 import SwiftUI
 
-public struct PathTextShape: Shape {
+public enum TextAnimationOrder {
+    case standard
+    case random
+    case shuffled(indices: [Int])
+}
+
+public struct TextPathShape: Shape {
     let text: String
     let font: AppFont
+    private let indices: [Int]
 
-    public init(_ text: String, font: AppFont? = .singlePathLineFont()) {
-        self.text = text.replacingOccurrences(of: " ", with: "")
+    public init(_ text: String, font: AppFont? = .singlePathLineFont(), textAnimationOrder: TextAnimationOrder = .standard) {
+        let adjustedText = text.replacingOccurrences(of: " ", with: "")
+        self.text = adjustedText
         self.font = font!
+        switch textAnimationOrder {
+        case .standard:
+            indices = adjustedText.enumerated().map(\.offset)
+        case .random:
+            indices = Array(0...adjustedText.count - 1).shuffled()
+        case .shuffled(let indices):
+            self.indices = indices
+        }
     }
 
     public func path(in rect: CGRect) -> Path {
@@ -30,6 +46,8 @@ public struct PathTextShape: Shape {
 
         // CTLineからグリフランを取得
         let runs = CTLineGetGlyphRuns(line) as! [CTRun]
+        // グリフパスと位置を保持
+        var glyphPaths: [(Path, CGPoint)] = []
         for run in runs {
             for i in 0..<CTRunGetGlyphCount(run) {
                 var glyph: CGGlyph = 0
@@ -39,10 +57,19 @@ public struct PathTextShape: Shape {
 
                 // 各グリフのパスを作成し、結合
                 if let letterPath = CTFontCreatePathForGlyph(ctFont, glyph, nil) {
-                    let transform = CGAffineTransform(translationX: position.x, y: position.y)
-                    combinedPath.addPath(Path(letterPath).applying(transform))
+                    let glyphPath = Path(letterPath)
+                    glyphPaths.append((glyphPath, position))
                 }
             }
+        }
+
+        // indicesに基づいてグリフの順序を決定
+        let orderedPaths = indices.map { glyphPaths[$0] }
+
+        // ランダムな順番でグリフを結合
+        for (glyphPath, position) in orderedPaths {
+            let transform = CGAffineTransform(translationX: position.x, y: position.y)
+            combinedPath.addPath(glyphPath.applying(transform))
         }
 
         // テキストの表示領域にスケーリング
