@@ -68,14 +68,6 @@ public enum SlideSectionType {
         switch self {
         case .slides(let slideType):
             AnyView(slideType.view)
-//            switch slideType {
-//            case .chibaSwift:
-//                ChibaSwiftSlideView()
-//            case .kanagawaSwift:
-//                KanagawaSwiftSlideView()
-//            case .iosdcSlide:
-//                iOSDCSlideView()
-//            }
         case .info(let infoSectionType):
             infoSectionType.view
         }

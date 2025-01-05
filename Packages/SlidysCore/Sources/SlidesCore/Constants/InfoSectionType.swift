@@ -10,6 +10,9 @@ import SwiftUI
 public enum InfoSectionType: String, CaseIterable, Identifiable {
     case share
     case howToUse
+#if DEBUG
+    case debugPage
+#endif
 
     public var id: String {
         return rawValue
@@ -21,6 +24,10 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
             return "Share Page"
         case .howToUse:
             return "How to use"
+#if DEBUG
+        case .debugPage:
+            return "Debug Page"
+#endif
         }
     }
 
@@ -31,6 +38,10 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
             ShareQrCodeView()
         case .howToUse:
             HowToUseSlide()
+#if DEBUG
+        case .debugPage:
+            DebugPageView()
+#endif
         }
     }
 }

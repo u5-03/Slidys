@@ -49,6 +49,7 @@ let package = Package(
             dependencies: [
                 "SlideKit",
                 "WebUI",
+                "SymbolKit",
             ],
             resources: [
                 .process("Resources/opening_input.mp4"),

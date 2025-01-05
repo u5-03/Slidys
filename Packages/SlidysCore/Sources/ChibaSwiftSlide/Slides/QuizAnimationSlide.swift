@@ -8,6 +8,7 @@
 import SwiftUI
 import SlideKit
 import SlidesCore
+import SymbolKit
 
 @Slide
 struct QuizAnimationSlide<S: Shape>: View {

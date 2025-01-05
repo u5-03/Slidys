@@ -1,38 +1,19 @@
 //
-//  TextPathView.swift
-//  KanagawaSwiftSlide
+//  TextShape.swift
+//  SymbolKit
 //
-//  Created by Yugo Sugiyama on 2024/11/02.
+//  Created by Yugo Sugiyama on 2025/01/05.
 //
 
 import SwiftUI
-import CoreText
-import CoreGraphics
 
-#if os(macOS)
-public typealias AppFont = NSFont
-#else
-public typealias AppFont = UIFont
-#endif
-
-struct TextPathView: View {
+public struct PathTextShape: Shape {
     let text: String
     let font: AppFont
 
-    var body: some View {
-        TextPath(text: text, font: font)
-            .stroke(Color.blue, lineWidth: 1)
-        //            .frame(width: 300, height: 100)
-    }
-}
-
-public struct TextPath: Shape {
-    public let text: String
-    public let font: AppFont
-
-    public init(text: String, font: AppFont) {
-        self.text = text
-        self.font = font
+    public init(_ text: String, font: AppFont? = .singlePathLineFont()) {
+        self.text = text.replacingOccurrences(of: " ", with: "")
+        self.font = font!
     }
 
     public func path(in rect: CGRect) -> Path {
@@ -79,22 +60,8 @@ public struct TextPath: Shape {
     }
 }
 
-#Preview {
-    StrokeAnimationShapeView(
-        shape: TextPath(
-            text: "Hello, SwiftUI!",
-            font: AppFont(name: "HeftyRewardSingleLine", size: 40)!
-//            font: AppFont.systemFont(ofSize: 40)
-        ),
-        lineWidth: 2,
-        lineColor: .white,
-        duration: .seconds(3),
-        isPaused: false
-    )
-//    .frame(width: 200, height: 300)
-//    StrokeAnimatableShape(
-//        animationProgress: 0.1,
-//        shape: TextPath(text: "Hello, SwiftUI!", font: AppFont.systemFont(ofSize: 40))
-//    )
-    .padding()
+private extension AppFont {
+    var cgFont: CGFont? {
+        return CGFont(self.fontName as CFString)
+    }
 }
