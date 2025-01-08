@@ -9,13 +9,13 @@ import SwiftUI
 import SymbolKit
 
 enum SymbolType {
-    case myakumyaku
+    case daruma
     case bento
     case usj
 
     var quizIndex: Int {
         switch self {
-        case .myakumyaku: return 1
+        case .daruma: return 1
         case .bento: return 2
         case .usj: return 3
         }
@@ -23,7 +23,7 @@ enum SymbolType {
 
     var answer: String {
         switch self {
-        case .myakumyaku: return "ミャクミャク"
+        case .daruma: return "串カツだるまのだるま大臣"
         case .bento: return "ととさんのお弁当"
         case .usj: return "UniversalStudioJapan"
         }
@@ -31,7 +31,7 @@ enum SymbolType {
 
     var answerHint: String {
         switch self {
-        case .myakumyaku: return ""
+        case .daruma: return ""
         case .bento: return "〇〇さんのお〇〇"
         case .usj: return ""
         }
@@ -39,18 +39,18 @@ enum SymbolType {
 
     var aspectRatio: CGFloat {
         switch self {
-        case .myakumyaku: return 433 / 395
-        case .bento: return 460 / 355
+        case .daruma: return 103 / 344
+        case .bento: return 579 / 361
         case .usj: return 546 / 297
         }
     }
 
     var shape: any Shape {
         switch self {
-        case .myakumyaku:
-            return TrainShape()
+        case .daruma:
+            return DarumaShape()
         case .bento:
-            return KamabokoShape()
+            return BentoShape()
         case .usj:
             return TextPathShape(
                 "UniversalStudioJapan",

@@ -25,7 +25,7 @@ struct OsakaQuizAnimationSlide: View {
 
 #Preview {
     SlidePreview {
-        OsakaQuizAnimationSlide(symbolType: .myakumyaku)
+        OsakaQuizAnimationSlide(symbolType: .daruma)
     }
 }
 

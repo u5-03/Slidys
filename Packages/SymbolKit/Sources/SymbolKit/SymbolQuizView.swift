@@ -97,21 +97,43 @@ public struct SymbolQuizView<Content: View>: View {
                         .padding(20)
                         .frame(width: 120, height: 120)
                 }
-                Button {
-                    shouldShowAnswer.toggle()
-                    shouldShowCorrectMark = false
-                    shouldShowNotCorrectMark = false
-                    Task {
-                        try? await Task.sleep(for: answerDrawingDuration)
-                        withAnimation(.easeInOut) {
-                            shouldShowAnswerName = true
+                VStack {
+                    Button {
+                        shouldShowAnswer.toggle()
+                        shouldShowCorrectMark = false
+                        shouldShowNotCorrectMark = false
+                        Task {
+                            try? await Task.sleep(for: answerDrawingDuration)
+                            withAnimation(.easeInOut) {
+                                shouldShowAnswerName = true
+                            }
                         }
+                    } label: {
+                        showAnswerContent
+                            .minimumScaleFactor(0.1)
+                            .padding()
+                            .frame(height: 120)
                     }
-                } label: {
-                    showAnswerContent
-                        .minimumScaleFactor(0.1)
-                        .padding()
-                        .frame(height: 120)
+#if os(iOS)
+                    HStack(spacing: 32) {
+                        Image(systemName: "circle")
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                            .foregroundStyle(.red)
+                            .shadow(radius: 10)
+                            .onTapGesture {
+                                showCorrectAnswer()
+                            }
+                        Image(systemName: "xmark")
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                            .foregroundStyle(.blue)
+                            .shadow(radius: 10)
+                            .onTapGesture {
+                                showInCorrectAnswer()
+                            }
+                    }
+#endif
                 }
                 Spacer()
                 if !shouldShowAnswerName {
@@ -144,34 +166,44 @@ public struct SymbolQuizView<Content: View>: View {
             return .handled
         }
         .onKeyPress(.init("c")) {
-            withAnimation(.easeInOut) {
-                shouldShowCorrectMark = true
-            } completion: {
-                Task {
-                    try? await Task.sleep(for: .seconds(2))
-                    withAnimation(.easeInOut) {
-                        shouldShowCorrectMark = false
-                    }
-                }
-            }
+            showCorrectAnswer()
             return .handled
         }
         .onKeyPress(.init("u")) {
-            withAnimation(.easeInOut) {
-                shouldShowNotCorrectMark = true
-            } completion: {
-                Task {
-                    try? await Task.sleep(for: .seconds(2))
-                    withAnimation(.easeInOut) {
-                        shouldShowNotCorrectMark = false
-                    }
-                }
-            }
+            showInCorrectAnswer()
             return .handled
         }
 #endif
         .onAppear {
             isFocused = true
+        }
+    }
+}
+
+private extension SymbolQuizView {
+    func showCorrectAnswer() {
+        withAnimation(.easeInOut) {
+            shouldShowCorrectMark = true
+        } completion: {
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                withAnimation(.easeInOut) {
+                    shouldShowCorrectMark = false
+                }
+            }
+        }
+    }
+
+    func showInCorrectAnswer() {
+        withAnimation(.easeInOut) {
+            shouldShowNotCorrectMark = true
+        } completion: {
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                withAnimation(.easeInOut) {
+                    shouldShowNotCorrectMark = false
+                }
+            }
         }
     }
 }

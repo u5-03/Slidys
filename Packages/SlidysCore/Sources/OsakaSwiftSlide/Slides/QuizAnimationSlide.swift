@@ -70,7 +70,7 @@ struct QuizAnimationSlide: View {
             title: "千葉シンボルクイズ 第1問",
             answer: "ピーナッツ",
             answerHint: "ヒント",
-            shape: EnoshimaShape(),
+            shape: UhooiShape(),
             shapeAspectRatio: 990 / 617
         )
     }

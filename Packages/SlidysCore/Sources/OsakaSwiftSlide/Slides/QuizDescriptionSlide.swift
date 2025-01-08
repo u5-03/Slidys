@@ -19,7 +19,7 @@ struct QuizDescriptionSlide: View {
                 Item("色々推測して、がんばってください！笑", accessory: .number(1))
                 Item("今回は手書きなので、より手作り感のある絵です笑", accessory: .number(2))
             }
-            Item("Kanagawa.swiftと違って、マニアックなものが多め！", accessory: .number(3))
+            Item("Kanagawa.swiftと違って、マニアックなものがあるかも！", accessory: .number(3))
         }
     }
 }
