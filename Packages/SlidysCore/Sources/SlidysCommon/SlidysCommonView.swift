@@ -164,6 +164,7 @@ public struct SlidysCommonView: View {
                 .padding(.all, 4)
 
         }
+        .buttonStyle(.borderless)
     }
 }
 

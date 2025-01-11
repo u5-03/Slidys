@@ -10,6 +10,9 @@ import SwiftUI
 public enum InfoSectionType: String, CaseIterable, Identifiable {
     case share
     case howToUse
+    case slidys
+    case symbolKit
+    case japanRegionSwift
 #if DEBUG
     case debugPage
 #endif
@@ -24,6 +27,12 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
             return "Share Page"
         case .howToUse:
             return "How to use"
+        case .slidys:
+            return "Slidys"
+        case .symbolKit:
+            return "SymbolKit"
+        case .japanRegionSwift:
+            return "japan-region-swift"
 #if DEBUG
         case .debugPage:
             return "Debug Page"
@@ -38,6 +47,12 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
             ShareQrCodeView()
         case .howToUse:
             HowToUseSlide()
+        case .slidys:
+            WebPageView(url: URL(string: "https://github.com/u5-03/Slidys")!)
+        case .symbolKit:
+            WebPageView(url: URL(string: "https://github.com/u5-03/SymbolKit")!)
+        case .japanRegionSwift:
+            WebPageView(url: URL(string: "https://japan-region-swift.github.io/Japan-region-swift/")!)
 #if DEBUG
         case .debugPage:
             DebugPageView()
