@@ -35,6 +35,10 @@ let package = Package(
             name: "OsakaSwiftSlide",
             targets: ["OsakaSwiftSlide"]
         ),
+        .library(
+            name: "MinokamoSwiftSlide",
+            targets: ["MinokamoSwiftSlide"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.4.0"),
@@ -63,6 +67,7 @@ let package = Package(
                 "ChibaSwiftSlide",
                 "KanagawaSwiftSlide",
                 "OsakaSwiftSlide",
+                "MinokamoSwiftSlide",
             ]
         ),
         .target(
@@ -100,6 +105,14 @@ let package = Package(
         ),
         .target(
             name: "OsakaSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+                "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "MinokamoSwiftSlide",
             dependencies: [
                 "SlidesCore",
                 "PianoUI",

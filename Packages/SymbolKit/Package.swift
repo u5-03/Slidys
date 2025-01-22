@@ -1,11 +1,12 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "SymbolKit",
-    platforms: [.iOS(.v17), .macOS(.v14)],
+    defaultLocalization: "en",
+    platforms: [.iOS(.v17), .macOS(.v14), .visionOS(.v1)],
     products: [
         .library(
             name: "SymbolKit",
@@ -16,6 +17,8 @@ let package = Package(
             name: "SymbolKit"),
         .testTarget(
             name: "SymbolKitTests",
-            dependencies: ["SymbolKit"]),
-    ]
+            dependencies: ["SymbolKit"]
+        ),
+    ],
+    swiftLanguageModes: [.v5]
 )
