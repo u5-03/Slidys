@@ -12,6 +12,7 @@ public enum RegionKind {
     case chiba
     case kanagawa
     case osaka
+    case gifu
 
     public var displayName: String {
         switch self {
@@ -21,6 +22,8 @@ public enum RegionKind {
             return "神奈川"
         case .osaka:
             return "大阪"
+        case .gifu:
+            return "岐阜"
         }
     }
 
@@ -32,6 +35,8 @@ public enum RegionKind {
             return .kanagawa
         case .osaka:
             return .osaka
+        case .gifu:
+            return .gifu
         }
     }
 }
