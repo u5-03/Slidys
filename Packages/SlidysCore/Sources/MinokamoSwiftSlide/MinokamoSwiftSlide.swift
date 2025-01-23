@@ -20,12 +20,10 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "Chiba.swift/Kanagawa.swift/Osaka.swift")
         QuizTitleSlide(regionKind: .chiba)
         QuizTitleSlide(regionKind: .kanagawa)
-        QuizTitleSlide(regionKind: .osaka)
+        QuizTitleSlide(regionKind: .osaka, isAlmostSymbol: true)
         QuizAnimationSlide(title: "シンボルクイズ例題", answer: "Sugiy", shape: SugiyShape())
         WebTitleSlide(title: "SymbolKit 爆誕！", url: URL(string: "https://github.com/u5-03/SymbolKit")!)
-        CenterTextSlide(text: "iOSDCのLTスライドで色々な\nアニメーションで遊んだ")
-        MusicNoteAnimationSlide()
-        CenterTextSlide(text: "この線を描くアニメーションの\n仕組みを軽く解説しました")
+        CenterTextSlide(text: "Pathを描くアニメーションの\n仕組みを軽く解説します")
         AnimationStructureSlide()
         CodeSlide(
             title: "実際のコード1",
@@ -37,8 +35,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
             code: Constants.strokeAnimationShapeViewCode,
             fontSize: 38
         )
-        MarkAnimationSlide()
-        QuizTitleSlide(regionKind: .osaka, isAlmostSymbol: true)
+        QuizTitleSlide(regionKind: .gifu, isAlmostSymbol: true)
         QuizDescriptionSlide()
         CenterTextSlide(text: "第1問")
         MinokamoQuizAnimationSlide(symbolInfo: SymbolType.raicho)
@@ -49,15 +46,19 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         WrapUpSlide()
         CenterTextSlide(text: "おしまい")
         OneMoreThingSlide()
-        CenterTextSlide(text: "このまま終わっては、Kanagawa.swiftと\n同じでつまらん！")
-        CenterTextSlide(text: "SymbolKitを進化させよう！")
-        WebTitleSlide(title: "SymbolKit2 爆誕！", url: URL(string: "https://github.com/u5-03/SymbolKit/tree/2.0.0")!)
-        TextAnimationSampleSlide()
+        CenterTextSlide(text: "このまま終わっては、Osaka.swiftと\n同じでつまらん！(n回目)")
+        CenterTextSlide(text: "SymbolKitを再進化させよう！")
+        WebTitleSlide(title: "SymbolKit v3 爆誕！", url: URL(string: "https://github.com/u5-03/SymbolKit/tree/3.0.0")!)
+        MarkAnimationSlide()
+        CodeSlide(
+            title: "2つの値の変化をアニメーションで表現",
+            code: Constants.strokePairAnimationShapeViewCode,
+            fontSize: 40
+        )
         CenterTextSlide(text: "ということで")
         CenterTextSlide(text: "最終問題")
         MinokamoQuizAnimationSlide(symbolInfo: SymbolType.nobunaga)
         WebViewSlide(url: URL(string: "https://www.irasutoya.com/2013/09/blog-post_21.html")!)
-        CenterTextSlide(text: "SymbolKit2の仕組みが気になる人は\n懇親会などで聞いてください！")
         CenterTextSlide(text: "ほんとうにおしまい！")
     }
 }

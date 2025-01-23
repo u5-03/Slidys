@@ -25,9 +25,9 @@ struct ReadmeSlide: View {
             Item("DeNAでFlutter製のスポーツ系のライブ配信アプリplay-by-sportsを開発中", accessory: .number(1)) {
                 Item("大型アップデート準備中で忙しい", accessory: .number(1))
             }
-            Item("Kanagawa.swiftの運営してました", accessory: .number(2))
-            Item("戸建て準備中(次は電気系の仕様を決めるMTG)", accessory: .number(3))
-            Item("確定申告でVisionProをどうやって減価償却するかを悩み中", accessory: .number(4))
+            Item("岐阜、初上陸！", accessory: .number(2))
+            Item("神山.swiftからJapan-Region-Swiftコンプリート中", accessory: .number(3))
+            Item("戸建て準備中(次は電気系の仕様を決めるMTG)", accessory: .number(4))
         }
     }
 }

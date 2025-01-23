@@ -44,6 +44,28 @@ struct StrokeAnimationShapeView: View {
     }
 }
 """
+
+    static let strokePairAnimationShapeViewCode = """
+extension PathAnimatableShape: Shape {
+    public var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get {
+            return AnimatablePair(fromAnimationProgress, toAnimationProgress)
+        }
+        set {
+            fromAnimationProgress = newValue.first
+            toAnimationProgress = newValue.second
+        }
+    }
+
+    public func path(in rect: CGRect) -> Path {
+        return shape.path(in: rect)
+            .trimmedPath(
+                from: fromAnimationProgress,
+                to: toAnimationProgress
+            )
+    }
+}
+"""
 }
 
 extension Font {
