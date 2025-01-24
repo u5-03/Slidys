@@ -22,16 +22,28 @@ public struct QuizAnimationSlide: View {
     @State private var shouldShowAnswer = false
     @State private var shouldShowAnswerName = false
     @FocusState private var isFocused: Bool
-    let answerDuration: CGFloat = 5
+    let questionDrawingDuration: Duration
+    let answerDrawingDuration: Duration
     let pathAnimationType: PathAnimationType
 
-    public init(title: String, answer: String, answerHint: String? = nil, shape: any Shape, shapeAspectRatio: CGFloat = 1, pathAnimationType: PathAnimationType = .progressiveDraw) {
+    public init(
+        title: String,
+        answer: String,
+        answerHint: String? = nil,
+        shape: any Shape,
+        shapeAspectRatio: CGFloat = 1,
+        pathAnimationType: PathAnimationType = .progressiveDraw,
+        questionDrawingDuration: Duration = .seconds(60),
+        answerDrawingDuration: Duration = .seconds(5)
+    ) {
         self.title = title
         self.answer = answer
         self.answerHint = answerHint
         self.shape = shape
         self.shapeAspectRatio = shapeAspectRatio
         self.pathAnimationType = pathAnimationType
+        self.questionDrawingDuration = questionDrawingDuration
+        self.answerDrawingDuration = answerDrawingDuration
     }
 
     public init(title: String, symbolInfo: SymbolInfo) {
@@ -41,6 +53,8 @@ public struct QuizAnimationSlide: View {
         shape = symbolInfo.shape
         shapeAspectRatio = symbolInfo.aspectRatio
         pathAnimationType = symbolInfo.pathAnimationType
+        questionDrawingDuration = symbolInfo.questionDrawingDuration
+        answerDrawingDuration = symbolInfo.answerDrawingDuration
     }
 
     public var body: some View {
@@ -68,7 +82,7 @@ public struct QuizAnimationSlide: View {
             },
             shape: shape,
             shapeAspectRatio: shapeAspectRatio,
-            pathAnimationType: pathAnimationType
+            questionDrawingDuration: questionDrawingDuration, answerDrawingDuration: answerDrawingDuration, pathAnimationType: pathAnimationType
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.slideBackgroundColor)

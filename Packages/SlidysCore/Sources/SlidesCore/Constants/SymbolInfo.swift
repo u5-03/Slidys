@@ -15,13 +15,17 @@ public struct SymbolInfo {
     public let aspectRatio: CGFloat
     public let pathAnimationType: PathAnimationType
     public let shape: any Shape
+    public let questionDrawingDuration: Duration
+    public let answerDrawingDuration: Duration
 
-    public init(quizIndex: Int, answer: String, answerHint: String = "", aspectRatio: CGFloat, pathAnimationType: PathAnimationType = .progressiveDraw, shape: any Shape) {
+    public init(quizIndex: Int, answer: String, answerHint: String = "", aspectRatio: CGFloat, pathAnimationType: PathAnimationType = .progressiveDraw, shape: any Shape, questionDrawingDuration: Duration = .seconds(60), answerDrawingDuration: Duration = .seconds(5)) {
         self.quizIndex = quizIndex
         self.answer = answer
         self.answerHint = answerHint
         self.aspectRatio = aspectRatio
         self.pathAnimationType = pathAnimationType
         self.shape = shape
+        self.questionDrawingDuration = questionDrawingDuration
+        self.answerDrawingDuration = answerDrawingDuration
     }
 }

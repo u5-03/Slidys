@@ -21,7 +21,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         QuizTitleSlide(regionKind: .chiba)
         QuizTitleSlide(regionKind: .kanagawa)
         QuizTitleSlide(regionKind: .osaka, isAlmostSymbol: true)
-        QuizAnimationSlide(title: "シンボルクイズ例題", answer: "Sugiy", shape: SugiyShape())
+        QuizAnimationSlide(title: "シンボルクイズ例題", answer: "Sugiy", shape: SugiyShape(), shapeAspectRatio: SugiyShape.aspectRatio)
         WebTitleSlide(title: "SymbolKit 爆誕！", url: URL(string: "https://github.com/u5-03/SymbolKit")!)
         CenterTextSlide(text: "Pathを描くアニメーションの\n仕組みを軽く解説します")
         AnimationStructureSlide()
@@ -35,7 +35,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
             code: Constants.strokeAnimationShapeViewCode,
             fontSize: 38
         )
-        QuizTitleSlide(regionKind: .gifu, isAlmostSymbol: true)
+        QuizTitleSlide(regionKind: .gifu)
         QuizDescriptionSlide()
         CenterTextSlide(text: "第1問")
         MinokamoQuizAnimationSlide(symbolInfo: SymbolType.raicho)
