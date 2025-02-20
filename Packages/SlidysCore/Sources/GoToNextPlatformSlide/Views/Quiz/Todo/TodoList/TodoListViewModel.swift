@@ -15,10 +15,18 @@ final class TodoListViewModel: ObservableObject {
         "Go", "Web", "Unity", "Swift", "Android", "Flutter", "Ruby", "Data/ML", "Vim"
     ]
     private(set) var todoList: [Todo] = [
-        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: -1)),
+        .mock.copy(tags: tagList, limitDate: .now.offsetDays(offset: -1)),
         .mock.copy(description: "TechConのイベントのURLはこちらです\n https://techcon2025.dena.dev", tags: tagList.randomSubset),
         .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 1)),
         .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 5)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 10)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 10)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 10)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 10)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 10)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 10)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 15)),
+        .mock.copy(tags: tagList.randomSubset, limitDate: .now.offsetDays(offset: 30)),
     ]
 
     func addTodo(todo: Todo) {

@@ -90,7 +90,7 @@ struct DataChartView: View {
                     x: .value("Date", data.date.asString(withFormat: .monthDay)),
                     yStart: .value("value", data.minValue),
                     yEnd: .value("value", data.maxValue),
-                    width: 2
+                    width: 4
                 )
                 .foregroundStyle(data.isPositive ? .red : .blue)
             }
@@ -99,7 +99,7 @@ struct DataChartView: View {
                     x: .value("Date", data.date.asString(withFormat: .monthDay)),
                     yStart: .value("value", data.startValue),
                     yEnd: .value("value", data.endValue),
-                    width: 6
+                    width: 12
                 )
                 .cornerRadius(1)
                 .foregroundStyle(data.isPositive ? .red : .blue)
@@ -121,8 +121,8 @@ struct DataChartView: View {
                 }
             }
         }
-        .frame(height: 200)
-        .padding()
+        .background(.white)
+//        .padding()
     }
 }
 

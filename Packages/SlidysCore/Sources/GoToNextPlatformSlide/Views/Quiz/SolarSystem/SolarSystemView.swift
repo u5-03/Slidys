@@ -53,22 +53,17 @@ extension Planet {
     }
 }
 
-struct CopernicanTheoryView: View {
+struct SolarSystemView: View {
     @State private var angle: Angle = .degrees(0)
 
     var body: some View {
-        CopernicanTheoryChildView(angle: angle)
-            .onAppear {
-                withAnimation(Animation.linear(duration: 1000).repeatForever(autoreverses: false)) {
-                    angle = .degrees(-360)
-                }
-            }
-
+        SolarSystemChildView(angle: angle, bindingAngle: $angle)
     }
 }
 
-struct CopernicanTheoryChildView: View {
+private struct SolarSystemChildView: View {
     var angle: Angle
+    @Binding var bindingAngle: Angle
 
     var body: some View {
         GeometryReader { proxy in
@@ -81,6 +76,11 @@ struct CopernicanTheoryChildView: View {
                             .foregroundStyle(.white)
                     }
                     .frame(width: length * 0.1, height: length * 0.1)
+                    .onTapGesture {
+                        withAnimation(Animation.linear(duration: 500).repeatForever(autoreverses: false)) {
+                            bindingAngle = .degrees(-360)
+                        }
+                    }
                 ForEach(Array(Planet.allCases.enumerated()), id: \.element) { (index, planet) in
                     let orbitAngle = angle.degrees / planet.orbitalPeriod
                     let centerPoint = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2)
@@ -107,7 +107,7 @@ struct CopernicanTheoryChildView: View {
     }
 }
 
-extension CopernicanTheoryChildView: Animatable {
+extension SolarSystemChildView: Animatable {
     var animatableData: Angle.AnimatableData {
         get {
             angle.animatableData
@@ -119,5 +119,5 @@ extension CopernicanTheoryChildView: Animatable {
 }
 
 #Preview {
-    CopernicanTheoryView()
+    SolarSystemView()
 }
