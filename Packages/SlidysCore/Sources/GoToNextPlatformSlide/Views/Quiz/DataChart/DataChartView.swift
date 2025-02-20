@@ -117,7 +117,7 @@ struct DataChartView: View {
                    Calendar.current.component(.weekday, from: date) == 2 {
                     AxisValueLabel()
                     AxisGridLine()
-                        .offset(x: 8)
+                        .offset(x: 17)
                 }
             }
         }
