@@ -13,6 +13,13 @@ public struct MultiReadmeInfo {
     let image: ImageResource
     let firstText: String
     let secondText: String
+
+    public init(name: String, image: ImageResource, firstText: String, secondText: String) {
+        self.name = name
+        self.image = image
+        self.firstText = firstText
+        self.secondText = secondText
+    }
 }
 
 @Slide

@@ -95,6 +95,7 @@ private struct SolarSystemChildView: View {
 
                     Circle()
                         .stroke()
+                        .foregroundStyle(.white)
                         .frame(width: orbitRadius * 2, height: orbitRadius * 2)
                     Circle()
                         .fill(planet.planetColor)
@@ -120,4 +121,5 @@ extension SolarSystemChildView: Animatable {
 
 #Preview {
     SolarSystemView()
+        .background(.black)
 }
