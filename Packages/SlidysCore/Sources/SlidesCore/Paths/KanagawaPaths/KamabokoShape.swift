@@ -1,7 +1,9 @@
 import SwiftUI
 
-struct KamabokoShape: Shape {
-    func path(in rect: CGRect) -> Path {
+public struct KamabokoShape: Shape {
+    public init() {}
+
+    public func path(in rect: CGRect) -> Path {
         var path = Path()
         let width = rect.size.width
         let height = rect.size.height

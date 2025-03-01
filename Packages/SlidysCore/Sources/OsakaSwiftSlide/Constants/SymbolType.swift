@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SymbolKit
+import SlidesCore
 
 enum SymbolType {
     case daruma

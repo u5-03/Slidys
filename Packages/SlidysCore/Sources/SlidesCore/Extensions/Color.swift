@@ -16,7 +16,7 @@ typealias AppColor = UIColor
 #endif
 
 // Ref: https://zenn.dev/ueeek/articles/20240418color_filter_appstroage
-extension Color: RawRepresentable {
+extension Color: @retroactive RawRepresentable {
     public init(hex: String) {
        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
        var int = UInt64()

@@ -116,47 +116,50 @@ public struct SlidysCommonView: View {
     }
 
     public var body: some View {
-        NavigationStack {
-            List(selection: $selectedSectionType) {
-                Section("Slides") {
-                    ForEach(slideTypes, id: \.id) { type in
-                        Text(type.displayValue)
-                            .padding()
-                            .tag(SlideSectionType.slides(type))
+        GeometryReader { proxy in
+            NavigationStack {
+                List(selection: $selectedSectionType) {
+                    Section("Slides") {
+                        ForEach(slideTypes, id: \.id) { type in
+                            Text(type.displayValue)
+                                .padding()
+                                .tag(SlideSectionType.slides(type))
+                        }
+                    }
+                    Section("Other") {
+                        ForEach(InfoSectionType.allCases) { type in
+                            Text(type.displayValue)
+                                .padding()
+                                .tag(SlideSectionType.info(type))
+                        }
+                    }
+                    Section("App Info") {
+                        Text(appVersionAndBuildNumber)
                     }
                 }
-                Section("Other") {
-                    ForEach(InfoSectionType.allCases) { type in
-                        Text(type.displayValue)
-                            .padding()
-                            .tag(SlideSectionType.info(type))
-                    }
-                }
-                Section("App Info") {
-                    Text(appVersionAndBuildNumber)
-                }
+                .listRowBackground(Color.clear)
+                .navigationTitle("Slidys")
             }
-            .listRowBackground(Color.clear)
-            .navigationTitle("Slidys")
-        }
 #if os(macOS)
-        .sheet(item: $selectedSectionType) { type in
-            ZStack(alignment: .topTrailing) {
-                type.view
-                    .frame(width: 800, height: 450)
-                closeButton
-                    .padding()
+            .sheet(item: $selectedSectionType) { type in
+                ZStack(alignment: .topTrailing) {
+                    let size = proxy.size
+                    type.view
+                        .frame(width: size.width, height: size.height)
+                    closeButton
+                        .padding()
+                }
             }
-        }
 #elseif os(iOS)
-        .fullScreenCover(item: $selectedSectionType) { type in
-            ZStack(alignment: .topTrailing) {
-                type.view
-                closeButton
-                    .padding()
+            .fullScreenCover(item: $selectedSectionType) { type in
+                ZStack(alignment: .topTrailing) {
+                    type.view
+                    closeButton
+                        .padding()
+                }
             }
-        }
 #endif
+        }
     }
 
     var closeButton: some View {
