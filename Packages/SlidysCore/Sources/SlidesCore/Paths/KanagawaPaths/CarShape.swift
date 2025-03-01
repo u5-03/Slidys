@@ -7,8 +7,10 @@
 
 import SwiftUI
 
-struct CarShape: Shape {
-    func path(in rect: CGRect) -> Path {
+public struct CarShape: Shape {
+    public init() {}
+
+    public func path(in rect: CGRect) -> Path {
         var path = Path()
         let width = rect.size.width
         let height = rect.size.height

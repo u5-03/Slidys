@@ -7,8 +7,10 @@
 
 import SwiftUI
 
-struct EnoshimaShape: Shape {
-    func path(in rect: CGRect) -> Path {
+public struct EnoshimaShape: Shape {
+    public init() {}
+
+    public func path(in rect: CGRect) -> Path {
         var path = Path()
         let width = rect.size.width
         let height = rect.size.height

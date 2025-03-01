@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SlidesCore
 
 struct PathAnimatableShape {
     var fromAnimationProgress: CGFloat = 0
