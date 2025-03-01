@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SlidesCore
 
 enum SymbolType {
     case train

@@ -8,6 +8,7 @@
 import SwiftUI
 
 public enum InfoSectionType: String, CaseIterable, Identifiable {
+    case sampleViews
     case share
     case howToUse
     case slidys
@@ -23,6 +24,8 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
 
     public var displayValue: String {
         switch self {
+        case .sampleViews:
+            return "Sample Views"
         case .share:
             return "Share Page"
         case .howToUse:
@@ -43,6 +46,8 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
     @ViewBuilder
     public var view: some View {
         switch self {
+        case .sampleViews:
+            SamplePageView()
         case .share:
             ShareQrCodeView()
         case .howToUse:
