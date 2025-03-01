@@ -46,13 +46,13 @@ extension CardModel {
     )
 
     static let minokamoCard: CardModel = .init(
-        name: "岐阜のとある将軍",
+        name: "岐阜のとある武将",
         attribute: "武",
         starCount: 8,
         imageType: .shape(shape: NobunagaShape(), aspectRatio: 1015 / 1192),
         imageBackgroundColor: Color(hex: "6E8A65"),
         species: "戦士",
-        description: "Uhooi星から都内某所へ出向いて働いているエンジニア。Swiftとポケカを愛するアクティブなモンスター",
+        description: "教科書にも載っているらしい有名な将軍。このカードがフィールド上に表側表示で存在する限り、相手は１ターンに１度しか魔法・罠カードを発動できない。",
         attackPoint: 3000,
         defencePoint: 2000
     )
