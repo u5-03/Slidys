@@ -11,9 +11,7 @@ import SlidesCore
 
 @Slide
 struct QuizMcReadMeSlide: View {
-    private let verticalAspectRatio: CGFloat = 9 / 16
-    private let horizontalAspectRatio: CGFloat = 16.0 / 9
-
+    
     var body: some View {
         MultiIntroductionSlide(
             title: "README",

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SlidesCore
 
 struct TodoListView: View {
     private let viewModel = TodoListViewModel()
@@ -42,6 +43,7 @@ private extension TodoListView {
                 FlowLayout(spacing: 2) {
                     ForEach(todo.tags, id: \.self) { tag in
                         Text(tag)
+                            .foregroundStyle(.black)
                             .font(.system(size: 12))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 8)
@@ -51,6 +53,7 @@ private extension TodoListView {
                 }
                 HStack {
                     Text("期限:")
+                        .font(.system(size: 14))
                     if todo.isDueOver {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .resizable()
@@ -59,6 +62,7 @@ private extension TodoListView {
                             .foregroundStyle(.red)
                     }
                     Text(todo.displayLimitDate)
+                        .font(.system(size: 12))
                         .foregroundStyle(todo.isDueOver ? .red : Color(uiColor: .label))
                     Spacer()
                 }

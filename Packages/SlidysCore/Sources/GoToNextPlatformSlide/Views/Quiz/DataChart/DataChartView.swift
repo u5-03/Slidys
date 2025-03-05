@@ -106,6 +106,13 @@ struct DataChartView: View {
             }
         }
         .chartYScale(domain: 2000...4400)
+        .chartYAxis {
+            AxisMarks { _ in
+                AxisValueLabel()
+                    .font(.system(size: 16))
+                    .foregroundStyle(.black)
+            }
+        }
         .chartXAxis {
             AxisMarks(values: dataList.map { $0.date.asString(withFormat: .monthDay) }) { value in
                 if let dateString = value.as(String.self),
@@ -116,13 +123,17 @@ struct DataChartView: View {
                    // 仮で月曜日のみラベルを表示
                    Calendar.current.component(.weekday, from: date) == 2 {
                     AxisValueLabel()
-                    AxisGridLine()
-                        .offset(x: 17)
+                        .font(.system(size: 16))
+                        .foregroundStyle(.black)
+                    AxisGridLine(
+                        centered: true,
+                        stroke: .init(lineWidth: 1, lineCap: .round, dash: [])
+                    )
+                        .foregroundStyle(.gray)
                 }
             }
         }
         .background(.white)
-//        .padding()
     }
 }
 
