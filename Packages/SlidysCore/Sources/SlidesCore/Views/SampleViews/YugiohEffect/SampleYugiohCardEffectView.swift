@@ -18,7 +18,8 @@ struct SampleYugiohCardEffectView: View {
                     .kanagawaCard,
                     .osakaCard,
                     .minokamoCard,
-                    .sample2
+                    .sample2,
+                    .kyon
                 ]
             )
         )

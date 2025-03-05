@@ -13,7 +13,7 @@ extension CardModel {
         name: "千葉のモンスター",
         attribute: "D",
         starCount: 4,
-        imageType: .shape(shape: UhooiShape(), aspectRatio: 880 / 617),
+        imageType: .shape(shape: UhooiShape(), aspectRatio: 411 / 405),
         imageBackgroundColor: Color(hex: "B2E6A7"),
         species: "ポケカ",
         description: "某惑星から都内某所へ出向いて働いているエンジニア。Swiftとポケカを愛するアクティブなモンスター",
@@ -46,15 +46,28 @@ extension CardModel {
     )
 
     static let minokamoCard: CardModel = .init(
-        name: "岐阜のとある将軍",
+        name: "岐阜のとある武将",
         attribute: "武",
         starCount: 8,
         imageType: .shape(shape: NobunagaShape(), aspectRatio: 1015 / 1192),
         imageBackgroundColor: Color(hex: "6E8A65"),
         species: "戦士",
-        description: "Uhooi星から都内某所へ出向いて働いているエンジニア。Swiftとポケカを愛するアクティブなモンスター",
+        description: "教科書にも載っているらしい有名な将軍。このカードがフィールド上に表側表示で存在する限り、相手は１ターンに１度しか魔法・罠カードを発動できない。",
         attackPoint: 3000,
         defencePoint: 2000
+    )
+
+    static let kyon: CardModel = .init(
+        name: "ピアノマスターきょん",
+        attribute: "音",
+        starCount: 12,
+        imageType: .image(image: .init(.kyon), aspectRatio: 1),
+        imageBackgroundColor: Color(hex: "F0D793"),
+        species: "音楽",
+        description: "ピアノをこよなく愛する音楽戦士。街中の効果音を聞いた時にすぐにそれをドレミに変換できるほぼ絶対音感の持ち主。ピアノ同様に、昼寝とラーメンとお寿司が大好き。「Sugiy - あんこフォルム」がフィールドにあると、攻撃力が1000アップする。",
+        attackPoint: 3000,
+        defencePoint: 2000,
+        isRare: true
     )
 }
 
@@ -63,4 +76,5 @@ extension CardModel {
     CardView(card: .kanagawaCard)
     CardView(card: .osakaCard)
     CardView(card: .minokamoCard)
+    CardView(card: .kyon)
 }
