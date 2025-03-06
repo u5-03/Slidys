@@ -15,7 +15,7 @@ struct GaugeView: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            Color(UIColor.systemGray6)
+            Color.white.grayscale(0.5)
             ZStack(alignment: .center) {
                 gaugeView(color: .green)
                 ZStack {
@@ -36,12 +36,10 @@ struct GaugeView: View {
         .mask(Capsule()
             .frame(height: 74)
         )
-        .onAppear {
+        .task {
             startCounting()
-            withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
-                value = 1
-            }
         }
+        .preferredColorScheme(.dark)
     }
 
     private func startCounting() {
@@ -52,10 +50,13 @@ struct GaugeView: View {
         Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { timer in
             if percentage < 100 {
                 percentage = min(100, percentage + Double(increment))
+                // macOSでwithAnimationでのアニメーションが動かなかったので、手動で値を増やす
+                value = percentage / 100
             } else {
                 timer.invalidate()
                 percentage = 0
                 startCounting()
+                value = 0
             }
         }
     }
@@ -68,6 +69,7 @@ private extension GaugeView {
         }
         .gaugeStyle(.linearCapacity)
         .tint(color)
+        .background(.white)
         .scaleEffect(.init(width: 1, height: 4), anchor: .center)
         .mask(Capsule()
             .frame(height: 60)
@@ -76,5 +78,6 @@ private extension GaugeView {
 }
 
 #Preview {
+    @Previewable @State var value: CGFloat = 0.5
     GaugeView()
 }

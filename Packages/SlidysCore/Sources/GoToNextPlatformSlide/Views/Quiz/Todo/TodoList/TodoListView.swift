@@ -15,8 +15,12 @@ struct TodoListView: View {
         List {
             ForEach(viewModel.todoList) { todo in
                 todoItemView(todo: todo)
+                    .listRowSeparatorTint(.gray)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(.white)
+        .preferredColorScheme(.light)
     }
 }
 
@@ -24,7 +28,8 @@ private extension TodoListView {
     func todoItemView(todo: Todo) -> some View {
         HStack(spacing: 12) {
             Group {
-                todo.isDone ? Image(systemName: "checkmark.circle").resizable() : Image(systemName: "circle").resizable()
+                todo.isDone ? Image(systemName: "checkmark.circle").resizable()
+                    : Image(systemName: "circle").resizable()
             }
             .frame(width: 32, height: 32)
             .onTapGesture {
@@ -34,12 +39,12 @@ private extension TodoListView {
                 Text(todo.title)
                     .strikethrough(todo.isDone)
                     .font(.system(size: 20))
-                    .foregroundStyle(Color(uiColor: .label))
+                    .foregroundStyle(Color.black)
                 Text(makeAttributedString(text: todo.description))
                     .lineLimit(nil)
                     .strikethrough(todo.isDone)
                     .font(.system(size: 16))
-                    .foregroundStyle(Color(uiColor: .systemGray))
+                    .foregroundStyle(Color.gray)
                 FlowLayout(spacing: 2) {
                     ForEach(todo.tags, id: \.self) { tag in
                         Text(tag)
@@ -54,6 +59,7 @@ private extension TodoListView {
                 HStack {
                     Text("期限:")
                         .font(.system(size: 14))
+                        .foregroundStyle(.black)
                     if todo.isDueOver {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .resizable()
@@ -63,7 +69,7 @@ private extension TodoListView {
                     }
                     Text(todo.displayLimitDate)
                         .font(.system(size: 12))
-                        .foregroundStyle(todo.isDueOver ? .red : Color(uiColor: .label))
+                        .foregroundStyle(todo.isDueOver ? .red : Color.black)
                     Spacer()
                 }
             }

@@ -22,11 +22,12 @@ struct QuizViewSlide: View {
                     .aspectRatio(QuizViewSlide.verticalAspectRatio, contentMode: .fit)
                 VStack(spacing: 0) {
                     AppEventView()
-                        .frame(width: proxy.size.width * 0.5)
+                        .frame(width: proxy.size.width * 0.5, height: proxy.size.height * 0.4)
                         .aspectRatio(QuizViewSlide.horizontalAspectRatio, contentMode: .fit)
                     Spacer()
                     DataChartView()
                         .stroked(color: .black)
+                        .frame(width: proxy.size.width * 0.5, height: proxy.size.height * 0.4)
                         .aspectRatio(QuizViewSlide.horizontalAspectRatio, contentMode: .fit)
                 }
                 .frame(width: proxy.size.width * 0.5, height: proxy.size.height)
@@ -38,6 +39,7 @@ struct QuizViewSlide: View {
         }
         .background(.slideBackgroundColor)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .preferredColorScheme(.dark)
     }
 }
 
