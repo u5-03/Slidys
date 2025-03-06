@@ -134,6 +134,7 @@ struct DataChartView: View {
             }
         }
         .background(.white)
+        .aspectRatio(QuizViewSlide.horizontalAspectRatio, contentMode: .fit)
     }
 }
 

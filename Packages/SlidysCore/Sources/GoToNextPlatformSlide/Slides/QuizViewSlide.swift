@@ -20,14 +20,13 @@ struct QuizViewSlide: View {
                 TodoListView()
                     .frame(width: proxy.size.width * 0.25)
                     .aspectRatio(QuizViewSlide.verticalAspectRatio, contentMode: .fit)
-                VStack(spacing: 0) {
+                VStack(alignment: .center, spacing: 0) {
                     AppEventView()
-                        .frame(width: proxy.size.width * 0.5, height: proxy.size.height * 0.4)
+                        .frame(width: proxy.size.width * 0.5, height: proxy.size.height * 0.45, alignment: .center)
                         .aspectRatio(QuizViewSlide.horizontalAspectRatio, contentMode: .fit)
-                    Spacer()
                     DataChartView()
                         .stroked(color: .black)
-                        .frame(width: proxy.size.width * 0.5, height: proxy.size.height * 0.4)
+                        .frame(width: proxy.size.width * 0.5, height: proxy.size.height * 0.45)
                         .aspectRatio(QuizViewSlide.horizontalAspectRatio, contentMode: .fit)
                 }
                 .frame(width: proxy.size.width * 0.5, height: proxy.size.height)

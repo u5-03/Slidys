@@ -15,12 +15,10 @@ struct TodoListView: View {
         List {
             ForEach(viewModel.todoList) { todo in
                 todoItemView(todo: todo)
+                    .listRowBackground(Color.white)
                     .listRowSeparatorTint(.gray)
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(.white)
-        .preferredColorScheme(.light)
     }
 }
 
