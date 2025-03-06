@@ -14,11 +14,11 @@ struct QuizMcReadMeSlide: View {
     
     var body: some View {
         MultiIntroductionSlide(
-            title: "README",
+            title: "「隣の芝鑑賞会」MC",
             firstPersonInfo: .init(
                 name: "すぎー/Sugiy",
                 image: .icon,
-                firstText: "現職はDeNAで、Flutter製のスポーツ系のライブ配信アプリを開発中",
+                firstText: "現職はDeNAで、play-by-sportsというFlutter製のスポーツ系のライブ配信アプリを開発中",
                 secondText: "注文住宅の要件定義が終わったので、これから家のBuildが始まります"
             ),
             secondPersonInfo: .init(

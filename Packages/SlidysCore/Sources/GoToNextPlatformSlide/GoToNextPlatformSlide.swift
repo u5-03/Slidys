@@ -23,10 +23,12 @@ public struct GoToNextPlatformSlideView: SlideViewProtocol {
 struct SlideConfiguration: SlideConfigurationProtocol {
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "突撃！隣のモバイルプラットフォーム！")
+        QuizDescriptionSlide()
+        QuizMcReadMeSlide()
+        CenterTextSlide(text: "お題を紹介します!")
         ContentSlide(headerTitle: "1問目") {
-                TodoListView()
-//                    .frame(height: proxy.size.height)
-                    .aspectRatio(QuizViewSlide.verticalAspectRatio, contentMode: .fit)
+            TodoListView()
+                .aspectRatio(QuizViewSlide.verticalAspectRatio, contentMode: .fit)
         }
         ContentSlide(headerTitle: "2問目") {
             DataChartView()
@@ -44,5 +46,15 @@ struct SlideConfiguration: SlideConfigurationProtocol {
             }
         }
         QuizViewSlide()
+        QuizAndroidReadMeSlide()
+        QuizIosReadMeSlide()
+        QuizFlutterReadMeSlide()
+        QuizViewSlide()
+        PanelDescriptionSlide()
+        PanelMcReadMe()
+        PanelerReadMeSlide()
+        ContentSlide(headerTitle: "トークテーマ") {
+            PanelThemeView()
+        }
     }
 }

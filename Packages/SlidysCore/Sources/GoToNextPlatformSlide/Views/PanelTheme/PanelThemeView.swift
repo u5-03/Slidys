@@ -13,7 +13,6 @@ struct PanelThemeView: View {
     @Namespace var backgroundNameSpace
     @State private var panelThemes = PanelData.panelThemeList
     @State private var selectedTheme: PanelThemeModel?
-    let duration: TimeInterval = 0.3
 
     var body: some View {
         ZStack {
@@ -35,6 +34,7 @@ struct PanelThemeView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .foregroundStyle(.white)
         .animation(.bouncy, value: selectedTheme?.id)
         .ignoresSafeArea()
     }
@@ -57,6 +57,7 @@ private extension PanelThemeView {
                     Text(theme.title)
                         .font(.system(size: isDetail ? 80 : 42, weight: .bold))
                         .minimumScaleFactor(0.5)
+                        .shadow(color: .black, radius: 10)
                         .matchedGeometryEffect(id: theme.id, in: titleNameSpace)
                     if isDetail {
                         VStack(alignment: .leading, spacing: 32) {
@@ -64,6 +65,7 @@ private extension PanelThemeView {
                                 Text("\($0.offset + 1). \($0.element)")
                                     .minimumScaleFactor(0.1)
                                     .font(.system(size: 60, weight: .medium))
+                                    .shadow(color: .black, radius: 10)
                                     .frame(alignment: .leading)
                             }
                         }

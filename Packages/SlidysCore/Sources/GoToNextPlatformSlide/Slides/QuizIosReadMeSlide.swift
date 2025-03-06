@@ -16,10 +16,10 @@ struct QuizIosReadMeSlide: View {
         MultiIntroductionSlide(
             title: "チームiOS",
             firstPersonInfo: .init(
-                name: "",
-                image: .akidon,
-                firstText: "",
-                secondText: ""
+                name: "小清水健人",
+                image: .takehito,
+                firstText: "現職 Sansan で、個人向け名刺管理アプリ Eight の iOS アプリを開発しています",
+                secondText: "SwiftUI で素振りをするのが趣味です"
             ),
             secondPersonInfo: .init(
                 name: "akidon0000",

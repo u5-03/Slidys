@@ -14,18 +14,18 @@ struct QuizFlutterReadMeSlide: View {
 
     var body: some View {
         MultiIntroductionSlide(
-            title: "",
+            title: "チームFlutter",
             firstPersonInfo: .init(
-                name: "",
-                image: .icon,
-                firstText: "",
-                secondText: ""
+                name: "朝日 大樹(ashdik)",
+                image: .ashdik,
+                firstText: "2020年12月に株式会社YOUTRUSTにジョインし、FlutterにてYOUTRUSTアプリを開発中",
+                secondText: "一児の父で、投資、プロ野球観戦、クラフトビール、ワインなどをこよなく愛しています"
             ),
             secondPersonInfo: .init(
-                name: "",
-                image: .clockvoid,
-                firstText: "",
-                secondText: ""
+                name: "Lucas Goldner/金 瑠加須",
+                image: .lucas,
+                firstText: "YOUTRUSTの2代目Flutterエンジニア",
+                secondText: "ドイツ出身。Flutter Tokyoの運営もしてます！"
             )
         )
     }

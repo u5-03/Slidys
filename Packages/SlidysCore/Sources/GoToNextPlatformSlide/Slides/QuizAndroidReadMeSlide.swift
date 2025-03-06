@@ -22,10 +22,10 @@ struct QuizAndroidReadMeSlide: View {
                 secondText: "アクセシビリティとアプリ品質についてお話をしましょう！"
             ),
             secondPersonInfo: .init(
-                name: "",
-                image: .tahia,
-                firstText: "",
-                secondText: ""
+                name: "shinmiy",
+                image: .shinmiy,
+                firstText: "株式会社メルペイで主にAndroidアプリの開発をやっています",
+                secondText: "6ヶ月の娘の蹴りがだんだん痛くなってきました"
             )
         )
     }
