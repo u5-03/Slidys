@@ -5,7 +5,6 @@
 //  Created by Yugo Sugiyama on 2024/11/02.
 //
 
-
 import SwiftUI
 import SlideKit
 import SlidesCore
