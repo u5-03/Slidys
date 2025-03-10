@@ -1,5 +1,5 @@
 {
-  "originHash" : "1140bb4fbb83067df03538711a781897eeab69c2df2451304cdef6af027a0a4d",
+  "originHash" : "b0d8b6b7e56b39016fe20e2f0751f4975b94c6f6866760f21445dbaec36f2284",
   "pins" : [
     {
       "identity" : "slidekit",
@@ -53,6 +53,15 @@
       "state" : {
         "revision" : "9579095605b6e2d8c0712cbf6fb37dc04b7fe173",
         "version" : "2.3.0"
+      }
+    },
+    {
+      "identity" : "yugiohcardeffect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/u5-03/YugiohCardEffect",
+      "state" : {
+        "revision" : "938a2a84ec1e3b042a2a216493e59c2757ab6054",
+        "version" : "0.3.0"
       }
     }
   ],
