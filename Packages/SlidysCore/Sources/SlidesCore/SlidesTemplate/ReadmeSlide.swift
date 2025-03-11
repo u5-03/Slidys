@@ -16,6 +16,16 @@ public struct ReadmeInfo {
     let thirdText: String
     let fourthText: String
     let fifthText: String
+
+    public init(name: String, image: ImageResource, firstText: String, secondText: String, thirdText: String, fourthText: String, fifthText: String) {
+        self.name = name
+        self.image = image
+        self.firstText = firstText
+        self.secondText = secondText
+        self.thirdText = thirdText
+        self.fourthText = fourthText
+        self.fifthText = fifthText
+    }
 }
 
 @Slide

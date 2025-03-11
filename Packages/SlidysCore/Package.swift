@@ -41,6 +41,10 @@ let package = Package(
         ),
         .library(
             name: "GoToNextPlatformSlide",
+            targets: ["TrySwiftTokyoSlide"]
+        ),
+        .library(
+            name: "TrySwiftTokyoSlide",
             targets: ["GoToNextPlatformSlide"]
         ),
     ],
@@ -75,6 +79,7 @@ let package = Package(
                 "OsakaSwiftSlide",
                 "MinokamoSwiftSlide",
                 "GoToNextPlatformSlide",
+                "TrySwiftTokyoSlide",
             ]
         ),
         .target(
@@ -128,6 +133,12 @@ let package = Package(
         ),
         .target(
             name: "GoToNextPlatformSlide",
+            dependencies: [
+                "SlidesCore",
+            ]
+        ),
+        .target(
+            name: "TrySwiftTokyoSlide",
             dependencies: [
                 "SlidesCore",
             ]
