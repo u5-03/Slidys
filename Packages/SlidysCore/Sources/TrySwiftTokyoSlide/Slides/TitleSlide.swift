@@ -9,6 +9,7 @@ import SwiftUI
 import SlideKit
 import PianoUI
 import SlidesCore
+import SymbolKit
 
 @Slide
 struct TitleSlide: View {
@@ -34,8 +35,8 @@ struct TitleSlide: View {
             }
             .foregroundStyle(.themeColor)
             Spacer()
-                .frame(height: 20)
-            VStack(alignment: .trailing, spacing: 20) {
+                .frame(height: 28)
+            VStack(alignment: .trailing, spacing: 32) {
                 HStack(spacing: 20) {
                     Spacer()
                     Text(dateString)
@@ -47,7 +48,16 @@ struct TitleSlide: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.leading)
-                HStack(spacing: 20) {
+                HStack(alignment: .top, spacing: 20) {
+                    StrokeAnimationShapeView(
+                        shape: SugiyShape(),
+                        lineWidth: 6,
+                        lineColor: .strokeColor,
+                        duration: .seconds(6),
+                        shapeAspectRatio: SugiyShape.aspectRatio,
+                        viewModel: .init(animationType: .progressiveDraw)
+                    )
+                    .padding()
                     Spacer()
                     Text(authorName)
                         .font(.system(size: 100, weight: .heavy))

@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct EnoshimaShape: Shape {
+    public static let aspectRatio: CGFloat = 990 / 617
     public init() {}
 
     public func path(in rect: CGRect) -> Path {

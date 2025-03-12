@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct NobunagaShape: Shape {
+    public static let aspectRatio: CGFloat = 1015 / 1192
     public init() {}
 
     public func path(in rect: CGRect) -> Path {

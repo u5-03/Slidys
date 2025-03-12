@@ -23,6 +23,8 @@ public struct TrySwiftTokyoSlideView: SlideViewProtocol {
 struct SlideConfiguration: SlideConfigurationProtocol {
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "try! Swift Tokyo 2025")
+        CenterTextSlide(text: "Question!")
+        HelloAnimationSlide()
         TitleSlide()
         ReadmeSlide(
             title: "README",
@@ -30,7 +32,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 name: "Sugiy",
                 image: .icon,
                 firstText: "Developing Flutter live streaming app in DeNA Co., Ltd.",
-                secondText: "First time to speak in try! Swift",
+                secondText: "First time to speak at try! Swift",
                 thirdText: "Absolutely adore fish, Japanese cuisine/sweets",
                 fourthText: "interested in visionOS development",
                 fifthText: "I will also speak at Flutter Ninjas 2025 next month"
@@ -39,9 +41,25 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "Structure is simple!")
         CenterTextSlide(text: "How can we make use of it?")
 
-
-        CenterTextSlide(text: "By the way..")
-        CenterTextSlide(text: "Next Japan-\\(region).swift is..")
-        CenterTextSlide(text: "")
+        ContentSlide(headerTitle: "Regional Swift events called 'Japan-\\(region)-Swift' are being held accoss Japan") {
+            Image(.japanRegionMap)
+                .resizable()
+        }
+        RegionSymbolQuizSlide()
+        CenterTextSlide(text: "By the way...")
+        CenterTextSlide(text: "Next Japan-\\(region).swift is...")
+        ContentSlide(headerTitle: "Nagoya.swift") {
+            Image(.japanRegionMapWithNagoya)
+                .resizable()
+        }
+        ContentSlide(headerTitle: "See you in Nagoya.swift!") {
+            Image(.nagoyaSwift)
+                .resizable()
+        }
+        CenterTextSlide(text: "End")
     }
+}
+
+#Preview {
+    TrySwiftTokyoSlideView()
 }

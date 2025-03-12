@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct TrainShape: Shape {
+    public static let aspectRatio: CGFloat = 433 / 395
     public init() {}
 
     public func path(in rect: CGRect) -> Path {
