@@ -16,12 +16,14 @@ public struct QuizAnimationSlide: View {
     let answerHint: String?
     let shape: any Shape
     let shapeAspectRatio: CGFloat
+    let answerAlternativeContent: AnyView?
     @State private var isPaused = true
     @State private var shouldShowCorrectMark = false
     @State private var shouldShowNotCorrectMark = false
     @State private var shouldShowAnswer = false
     @State private var shouldShowAnswerName = false
     @FocusState private var isFocused: Bool
+    let lineWidth: CGFloat
     let questionDrawingDuration: Duration
     let answerDrawingDuration: Duration
     let pathAnimationType: PathAnimationType
@@ -32,18 +34,22 @@ public struct QuizAnimationSlide: View {
         answerHint: String? = nil,
         shape: any Shape,
         shapeAspectRatio: CGFloat = 1,
+        lineWidth: CGFloat = 5,
         pathAnimationType: PathAnimationType = .progressiveDraw,
         questionDrawingDuration: Duration = .seconds(60),
-        answerDrawingDuration: Duration = .seconds(5)
+        answerDrawingDuration: Duration = .seconds(5),
+        answerAlternativeContent: AnyView? = nil
     ) {
         self.title = title
         self.answer = answer
         self.answerHint = answerHint
         self.shape = shape
         self.shapeAspectRatio = shapeAspectRatio
+        self.lineWidth = lineWidth
         self.pathAnimationType = pathAnimationType
         self.questionDrawingDuration = questionDrawingDuration
         self.answerDrawingDuration = answerDrawingDuration
+        self.answerAlternativeContent = answerAlternativeContent
     }
 
     public init(title: String, symbolInfo: SymbolInfo) {
@@ -53,8 +59,10 @@ public struct QuizAnimationSlide: View {
         shape = symbolInfo.shape
         shapeAspectRatio = symbolInfo.aspectRatio
         pathAnimationType = symbolInfo.pathAnimationType
+        lineWidth = symbolInfo.lineWidth
         questionDrawingDuration = symbolInfo.questionDrawingDuration
         answerDrawingDuration = symbolInfo.answerDrawingDuration
+        answerAlternativeContent = symbolInfo.answerAlternativeContent
     }
 
     public var body: some View {
@@ -64,7 +72,7 @@ public struct QuizAnimationSlide: View {
                     .font(.largeFont)
                     .foregroundStyle(.themeColor)
             }, answerPrefixContent: {
-                Text("正解:")
+                Text("A:")
                     .font(.mediumFont)
                     .foregroundStyle(.defaultForegroundColor)
             }, answerContent: {
@@ -72,16 +80,17 @@ public struct QuizAnimationSlide: View {
                     .font(.largeFont)
                     .foregroundStyle(.strokeColor)
             }, showAnswerContent: {
-                Text("正解を表示")
+                Text("Show Answer")
                     .font(.mediumFont)
                     .foregroundStyle(.defaultForegroundColor)
             }, answerHintContent: {
                 Text(answerHint ?? "")
                     .font(.mediumFont)
                     .foregroundStyle(.defaultForegroundColor)
-            },
+            }, answerAlternativeContent: answerAlternativeContent,
             shape: shape,
             shapeAspectRatio: shapeAspectRatio,
+            lineWidth: lineWidth,
             questionDrawingDuration: questionDrawingDuration, answerDrawingDuration: answerDrawingDuration, pathAnimationType: pathAnimationType
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)

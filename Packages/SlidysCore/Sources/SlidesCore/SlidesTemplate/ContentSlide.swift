@@ -22,7 +22,7 @@ public struct ContentSlide<Content: View>: View {
     }
 
     public var body: some View {
-        HeaderSlide(.init(stringLiteral: headerTitle)) {
+        HeaderSlide(.init(headerTitle)) {
             GeometryReader { proxy in
                 HStack {
                     Spacer()
@@ -39,7 +39,7 @@ public struct ContentSlide<Content: View>: View {
 }
 
 #Preview {
-    ContentSlide(headerTitle: "CenterText") {
+    ContentSlide(headerTitle: "Regional Swift events called 'Japan-\\\\(region)-Swift' are being held accoss Japan") {
         Text("ContentTex")
     }
 }

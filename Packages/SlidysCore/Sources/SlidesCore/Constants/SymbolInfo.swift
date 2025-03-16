@@ -17,8 +17,10 @@ public struct SymbolInfo {
     public let shape: any Shape
     public let questionDrawingDuration: Duration
     public let answerDrawingDuration: Duration
+    public let lineWidth: CGFloat
+    public let answerAlternativeContent: AnyView?
 
-    public init(quizIndex: Int, answer: String, answerHint: String = "", aspectRatio: CGFloat, pathAnimationType: PathAnimationType = .progressiveDraw, shape: any Shape, questionDrawingDuration: Duration = .seconds(60), answerDrawingDuration: Duration = .seconds(5)) {
+    public init(quizIndex: Int, answer: String, answerHint: String = "", aspectRatio: CGFloat, pathAnimationType: PathAnimationType = .progressiveDraw, shape: any Shape, questionDrawingDuration: Duration = .seconds(60), answerDrawingDuration: Duration = .seconds(5), lineWidth: CGFloat = 5, answerAlternativeContent: AnyView? = nil) {
         self.quizIndex = quizIndex
         self.answer = answer
         self.answerHint = answerHint
@@ -27,5 +29,7 @@ public struct SymbolInfo {
         self.shape = shape
         self.questionDrawingDuration = questionDrawingDuration
         self.answerDrawingDuration = answerDrawingDuration
+        self.lineWidth = lineWidth
+        self.answerAlternativeContent = answerAlternativeContent
     }
 }

@@ -11,7 +11,7 @@ import SlidesCore
 struct RegionSymbolQuizSlide: View {
 
     var body: some View {
-        HeaderSlide("I worked quiz to guess the symbols of the region.") {
+        HeaderSlide("I worked quiz to guess the symbols of the region") {
             RegionSymbolQuizView()
         }
     }

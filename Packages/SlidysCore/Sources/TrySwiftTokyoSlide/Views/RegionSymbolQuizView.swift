@@ -9,7 +9,7 @@ import SlidesCore
 
 struct RegionSymbolQuizView: View {
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             HStack(spacing: 0) {
                 symbolView(
                     title: "Chiba.swift",
@@ -39,7 +39,7 @@ struct RegionSymbolQuizView: View {
                 )
             }
         }
-        .padding(12)
+        .padding(4)
         .background(.slideBackgroundColor)
     }
 }
@@ -51,7 +51,7 @@ private extension RegionSymbolQuizView {
         aspectRatio: CGFloat,
         animationType: PathAnimationType = .progressiveDraw
     ) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 6) {
             StrokeAnimationShapeView(
                 shape: shape,
                 lineWidth: 4,

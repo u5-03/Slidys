@@ -38,14 +38,17 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 fifthText: "I will also speak at Flutter Ninjas 2025 next month"
             )
         )
+        AnimationStructureSlide()
         CenterTextSlide(text: "Structure is simple!")
         CenterTextSlide(text: "How can we make use of it?")
 
-        ContentSlide(headerTitle: "Regional Swift events called 'Japan-\\(region)-Swift' are being held accoss Japan") {
+        ContentSlide(headerTitle: "Regional Swift events called 'Japan-\\\\(region)-Swift' are being held accross Japan") {
             Image(.japanRegionMap)
                 .resizable()
         }
         RegionSymbolQuizSlide()
+        TrySwiftSymbolQuizSlide()
+        WrapUpSlide()
         CenterTextSlide(text: "By the way...")
         CenterTextSlide(text: "Next Japan-\\(region).swift is...")
         ContentSlide(headerTitle: "Nagoya.swift") {
