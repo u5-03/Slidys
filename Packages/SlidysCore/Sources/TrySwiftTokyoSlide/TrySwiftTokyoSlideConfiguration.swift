@@ -38,28 +38,42 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 fifthText: "I will also speak at Flutter Ninjas 2025 next month"
             )
         )
-        AnimationStructureSlide()
+        AnimationStructure1Slide()
+        CodeSlide(
+            title: "Source Code 1",
+            code: Constants.strokeAnimatableShapeCodeCode,
+            fontSize: 40
+        )
+        AnimationStructure2Slide()
+        CodeSlide(
+            title: "Source Code 2",
+            code: Constants.strokeAnimationShapeViewCode,
+            fontSize: 38
+        )
+        ContentSlide(headerTitle: "That's all!") {
+            HelloAnimationView()
+        }
         CenterTextSlide(text: "Structure is simple!")
         CenterTextSlide(text: "How can we make use of it?")
 
-        ContentSlide(headerTitle: "Regional Swift events called 'Japan-\\\\(region)-Swift' are being held accross Japan") {
+        ContentSlide(headerTitle: "Regional Swift events called 'Japan-\\\\(region).swift' are being held across Japan") {
             Image(.japanRegionMap)
                 .resizable()
         }
         RegionSymbolQuizSlide()
         TrySwiftSymbolQuizSlide()
         WrapUpSlide()
-        CenterTextSlide(text: "By the way...")
+        OneMoreThingSlide()
         CenterTextSlide(text: "Next Japan-\\(region).swift is...")
-        ContentSlide(headerTitle: "Nagoya.swift") {
+        ContentSlide(headerTitle: "Nagoya.swift at the end of this April") {
             Image(.japanRegionMapWithNagoya)
                 .resizable()
         }
-        ContentSlide(headerTitle: "See you in Nagoya.swift!") {
+        ContentSlide(headerTitle: "See you again at Nagoya.swift!") {
             Image(.nagoyaSwift)
                 .resizable()
         }
-        CenterTextSlide(text: "End")
+        ShareEndSlide()
     }
 }
 

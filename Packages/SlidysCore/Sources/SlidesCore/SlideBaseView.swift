@@ -20,6 +20,8 @@ public extension SlideConfigurationProtocol {
 }
 
 public struct SlideBaseView: View {
+    @FocusState private var isFocused: Bool
+
     var presentationContentView: some View {
         SlideRouterView(slideIndexController: slideConfiguration.slideIndexController)
             .slideTheme(slideTheme)
@@ -41,8 +43,19 @@ public struct SlideBaseView: View {
                 ZStack {
                     presentationContentView
 #if os(macOS)
-                    // Toolbarに重ならないための仮対応
+                        // Toolbarに重ならないための仮対応
                         .padding(.top, 60)
+                        .focusable()
+                        .focused($isFocused)
+                        .focusEffectDisabled()
+                        .onKeyPress(.leftArrow) {
+                            slideConfiguration.slideIndexController.back()
+                            return .handled
+                        }
+                        .onKeyPress(.rightArrow) {
+                            slideConfiguration.slideIndexController.forward()
+                            return .handled
+                        }
 #endif
                     Circle()
                         .frame(width: circleHeight, height: circleHeight)

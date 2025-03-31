@@ -111,6 +111,7 @@ public struct SymbolQuizView<TextContent: View>: View {
             }
             .focusable()
             .focused($isFocused)
+            .focusEffectDisabled()
 #if os(macOS)
             .onKeyPress(.space) {
                 isPaused.toggle()
@@ -128,6 +129,7 @@ public struct SymbolQuizView<TextContent: View>: View {
             .onAppear {
                 isFocused = true
             }
+            .tint(.red)
         }
     }
 }
