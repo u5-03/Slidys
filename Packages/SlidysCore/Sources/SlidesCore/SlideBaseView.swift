@@ -45,17 +45,6 @@ public struct SlideBaseView: View {
 #if os(macOS)
                         // Toolbarに重ならないための仮対応
                         .padding(.top, 60)
-                        .focusable()
-                        .focused($isFocused)
-                        .focusEffectDisabled()
-                        .onKeyPress(.leftArrow) {
-                            slideConfiguration.slideIndexController.back()
-                            return .handled
-                        }
-                        .onKeyPress(.rightArrow) {
-                            slideConfiguration.slideIndexController.forward()
-                            return .handled
-                        }
 #endif
                     Circle()
                         .frame(width: circleHeight, height: circleHeight)
@@ -74,5 +63,18 @@ public struct SlideBaseView: View {
                 }
             }
         }
+#if os(macOS)
+        .focusable()
+        .focused($isFocused)
+        .focusEffectDisabled()
+        .onKeyPress(.leftArrow) {
+            slideConfiguration.slideIndexController.back()
+            return .handled
+        }
+        .onKeyPress(.rightArrow) {
+            slideConfiguration.slideIndexController.forward()
+            return .handled
+        }
+#endif
     }
 }

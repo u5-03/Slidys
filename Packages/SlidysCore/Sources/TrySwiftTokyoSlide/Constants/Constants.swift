@@ -31,13 +31,16 @@ struct StrokeAnimationShapeView: View {
     let shape: any Shape
 ...
     var body: some View {
-        StrokeAnimatableShape(shape: shape)
-            .stroke(lineColor, lineWidth: lineWidth)
-                .onAppear {
-                    withAnimation(.linear(duration: seconds)) {
-                        strokeAnimatableShape.animatableData = 1.0
-                    }
+        StrokeAnimatableShape(
+            animationProgress: viewModel.animationProgress,
+            shape: shape
+        )
+        .stroke(lineColor, lineWidth: lineWidth)
+            .onAppear {
+                withAnimation(.linear(duration: seconds)) {
+                    strokeAnimatableShape.animatableData = 1.0
                 }
+            }
     }
 }
 """
