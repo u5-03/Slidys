@@ -51,6 +51,8 @@ public struct SlideBaseView: View {
                         .foregroundStyle(Color.black.opacity(0.01))
                         .position(x: 0, y: 0)
                         .onTapGesture {
+                            // SymbolQuizのViewなどでFocusが移動した時に、再度Focusを有効にする処理
+                            isFocused = true
                             slideConfiguration.slideIndexController.back()
                         }
                     Circle()
@@ -58,6 +60,7 @@ public struct SlideBaseView: View {
                         .foregroundStyle(Color.black.opacity(0.01))
                         .position(x: proxy.size.width, y: 0)
                         .onTapGesture {
+                            isFocused = true
                             slideConfiguration.slideIndexController.forward()
                         }
                 }
@@ -69,10 +72,12 @@ public struct SlideBaseView: View {
         .focusEffectDisabled()
         .onKeyPress(.leftArrow) {
             slideConfiguration.slideIndexController.back()
+            isFocused = true
             return .handled
         }
         .onKeyPress(.rightArrow) {
             slideConfiguration.slideIndexController.forward()
+            isFocused = true
             return .handled
         }
 #endif

@@ -219,6 +219,7 @@ private extension SymbolQuizView {
                     try? await Task.sleep(for: answerDrawingDuration)
                     withAnimation(.easeInOut) {
                         shouldShowAnswerName = true
+                        isFocused = false
                     }
                 }
             } label: {

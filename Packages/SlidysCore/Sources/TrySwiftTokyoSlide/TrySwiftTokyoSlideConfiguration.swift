@@ -51,7 +51,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
             fontSize: 38
         )
         ContentSlide(headerTitle: "That's all!") {
-            HelloAnimationView()
+            HelloAnimationView(duration: .seconds(2))
         }
         CenterTextSlide(text: "Structure is simple!")
         CenterTextSlide(text: "How can we make use of it?")

@@ -7,6 +7,12 @@ import SwiftUI
 import SymbolKit
 
 struct HelloAnimationView: View {
+    let duration: Duration
+
+    init(duration: Duration = .seconds(3)) {
+        self.duration = duration
+    }
+
     var body: some View {
         VStack(spacing: 64) {
             Spacer()
@@ -23,7 +29,7 @@ struct HelloAnimationView: View {
                 shape: HelloJapaneseShape(),
                 lineWidth: 8,
                 lineColor: .white,
-                duration: .seconds(3),
+                duration: duration,
                 shapeAspectRatio: HelloJapaneseShape.aspectRatio,
                 viewModel: .init(animationType: .progressiveDraw)
             )
