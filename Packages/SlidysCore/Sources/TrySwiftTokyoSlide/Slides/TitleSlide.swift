@@ -53,7 +53,7 @@ struct TitleSlide: View {
                         shape: SugiyShape(),
                         lineWidth: 6,
                         lineColor: .strokeColor,
-                        duration: .seconds(6),
+                        duration: .seconds(4),
                         shapeAspectRatio: SugiyShape.aspectRatio,
                         viewModel: .init(animationType: .progressiveDraw)
                     )

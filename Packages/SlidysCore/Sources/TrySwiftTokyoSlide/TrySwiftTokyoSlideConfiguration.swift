@@ -32,7 +32,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 name: "Sugiy",
                 image: .icon,
                 firstText: "Developing Flutter live streaming app in DeNA Co., Ltd.",
-                secondText: "First time to speak at try! Swift",
+                secondText: "First time to speak at try! Swift Tokyo",
                 thirdText: "Absolutely adore fish, Japanese cuisine/sweets",
                 fourthText: "interested in visionOS development",
                 fifthText: "I will also speak at Flutter Ninjas 2025 next month"

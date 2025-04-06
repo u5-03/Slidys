@@ -129,7 +129,6 @@ public struct SymbolQuizView<TextContent: View>: View {
             .onAppear {
                 isFocused = true
             }
-            .tint(.red)
         }
     }
 }
