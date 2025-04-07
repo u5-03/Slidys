@@ -53,7 +53,9 @@ public struct SlideBaseView: View {
                         .onTapGesture {
                             // SymbolQuizのViewなどでFocusが移動した時に、再度Focusを有効にする処理
                             isFocused = true
-                            slideConfiguration.slideIndexController.back()
+                            Task {
+                                slideConfiguration.slideIndexController.back()
+                            }
                         }
                     Circle()
                         .frame(width: circleHeight, height: circleHeight)
@@ -61,7 +63,9 @@ public struct SlideBaseView: View {
                         .position(x: proxy.size.width, y: 0)
                         .onTapGesture {
                             isFocused = true
-                            slideConfiguration.slideIndexController.forward()
+                            Task {
+                                slideConfiguration.slideIndexController.forward()
+                            }
                         }
                 }
             }
@@ -71,13 +75,17 @@ public struct SlideBaseView: View {
         .focused($isFocused)
         .focusEffectDisabled()
         .onKeyPress(.leftArrow) {
-            slideConfiguration.slideIndexController.back()
             isFocused = true
+            Task {
+                slideConfiguration.slideIndexController.back()
+            }
             return .handled
         }
         .onKeyPress(.rightArrow) {
-            slideConfiguration.slideIndexController.forward()
             isFocused = true
+            Task {
+                slideConfiguration.slideIndexController.forward()
+            }
             return .handled
         }
 #endif

@@ -40,20 +40,23 @@ public struct ReadmeSlide: View {
 
     public var body: some View {
         HeaderSlide(.init(stringLiteral: title)) {
-            HStack(spacing: 32) {
-                Text(.init(stringLiteral: info.name))
-                    .font(.largeFont)
-                Image(info.image)
-                    .resizable()
-                    .frame(width: 160, height: 160, alignment: .leading)
-                    .aspectRatio(contentMode: .fit)
-                    .clipShape(Circle())
-            }
+            Text(.init(stringLiteral: info.name))
+                .font(.largeFont)
+                .padding(.bottom, 80)
             Item(.init(stringLiteral: info.firstText), accessory: .number(1))
             Item(.init(stringLiteral: info.secondText), accessory: .number(2))
             Item(.init(stringLiteral: info.thirdText), accessory: .number(3))
             Item(.init(stringLiteral: info.fourthText), accessory: .number(4))
             Item(.init(stringLiteral: info.fifthText), accessory: .number(5))
+        }
+        .overlay {
+            Image(info.image)
+                .resizable()
+                .frame(width: 360, height: 360)
+                .aspectRatio(contentMode: .fit)
+                .clipShape(Circle())
+                .padding(40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         }
     }
 }
