@@ -121,6 +121,7 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
+				ORGANIZATIONNAME = Slidys;
 				TargetAttributes = {
 					C33B7A872CE0E8A6007FC049 = {
 						CreatedOnToolsVersion = 15.4;

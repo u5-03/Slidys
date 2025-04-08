@@ -110,6 +110,7 @@ struct QuizAnimationSlide<S: Shape>: View {
         .background(.slideBackgroundColor)
         .focusable()
         .focused($isFocused)
+        .focusEffectDisabled()
         .onKeyPress(.space) {
             isPaused.toggle()
             return .handled

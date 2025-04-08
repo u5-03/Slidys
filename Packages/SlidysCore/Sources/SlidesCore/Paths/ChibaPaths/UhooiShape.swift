@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct UhooiShape: Shape {
+    public static let aspectRatio: CGFloat = 411 / 405
     public init() {}
 
     public func path(in rect: CGRect) -> Path {

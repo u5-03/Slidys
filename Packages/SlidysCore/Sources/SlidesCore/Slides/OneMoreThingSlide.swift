@@ -7,12 +7,12 @@
 
 import SwiftUI
 import SlideKit
-import SlidesCore
 
 @Slide
-struct OneMoreThingSlide: View {
+public struct OneMoreThingSlide: View {
+    public init() {}
 
-    var body: some View {
+    public var body: some View {
         VStack {
             Spacer()
             LinearGradient(

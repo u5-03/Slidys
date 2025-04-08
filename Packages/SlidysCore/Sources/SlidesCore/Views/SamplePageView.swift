@@ -6,9 +6,13 @@
 //
 
 import SwiftUI
+import SymbolKit
 
 enum SamplePageType: String, CaseIterable, Identifiable {
     case yugiohEffect
+    case japanSymbolQuizExtra1
+    case japanSymbolQuizExtra2
+    case japanSymbolQuizExtra3
 
     public var id: String {
         return rawValue
@@ -18,6 +22,12 @@ enum SamplePageType: String, CaseIterable, Identifiable {
         switch self {
         case .yugiohEffect:
             return "Yugioh Effect"
+        case .japanSymbolQuizExtra1:
+            return "Japan Symbol Quiz Extra1"
+        case .japanSymbolQuizExtra2:
+            return "Japan Symbol Quiz Extra2"
+        case .japanSymbolQuizExtra3:
+            return "Japan Symbol Quiz Extra3"
         }
     }
 
@@ -26,6 +36,40 @@ enum SamplePageType: String, CaseIterable, Identifiable {
         switch self {
         case .yugiohEffect:
             SampleYugiohCardEffectView()
+        case .japanSymbolQuizExtra1:
+            SymbolQuizSampleView(
+                title: "JapanSymbolQuiz Extra1",
+                answer: "Mt.Fuji/富士山",
+                answerHint: "",
+                shape: MtFujiShape(),
+                shapeAspectRatio: MtFujiShape.aspectRatio,
+                questionDrawingDuration: .seconds(20),
+                answerDrawingDuration: .seconds(6),
+                pathAnimationType: .progressiveDraw
+            )
+        case .japanSymbolQuizExtra2:
+            SymbolQuizSampleView(
+                title: "JapanSymbolQuiz Extra2",
+                answer: "Origami/折り紙",
+                answerHint: "",
+                shape: OrigamiShape(),
+                shapeAspectRatio: OrigamiShape.aspectRatio,
+                questionDrawingDuration: .seconds(60),
+                answerDrawingDuration: .seconds(6),
+                pathAnimationType: .progressiveDraw
+            )
+        case .japanSymbolQuizExtra3:
+            SymbolQuizSampleView(
+                title: "JapanSymbolQuiz Extra3",
+                answer: "Dragon Ball",
+                answerHint: "",
+                shape: DragonBallShape(),
+                shapeAspectRatio: DragonBallShape.aspectRatio,
+                lineWidth: 2,
+                questionDrawingDuration: .seconds(60),
+                answerDrawingDuration: .seconds(6),
+                pathAnimationType: .progressiveDraw
+            )
         }
     }
 }

@@ -20,6 +20,8 @@ public extension SlideConfigurationProtocol {
 }
 
 public struct SlideBaseView: View {
+    @FocusState private var isFocused: Bool
+
     var presentationContentView: some View {
         SlideRouterView(slideIndexController: slideConfiguration.slideIndexController)
             .slideTheme(slideTheme)
@@ -41,7 +43,7 @@ public struct SlideBaseView: View {
                 ZStack {
                     presentationContentView
 #if os(macOS)
-                    // Toolbarに重ならないための仮対応
+                        // Toolbarに重ならないための仮対応
                         .padding(.top, 60)
 #endif
                     Circle()
@@ -49,17 +51,43 @@ public struct SlideBaseView: View {
                         .foregroundStyle(Color.black.opacity(0.01))
                         .position(x: 0, y: 0)
                         .onTapGesture {
-                            slideConfiguration.slideIndexController.back()
+                            // SymbolQuizのViewなどでFocusが移動した時に、再度Focusを有効にする処理
+                            isFocused = true
+                            Task {
+                                slideConfiguration.slideIndexController.back()
+                            }
                         }
                     Circle()
                         .frame(width: circleHeight, height: circleHeight)
                         .foregroundStyle(Color.black.opacity(0.01))
                         .position(x: proxy.size.width, y: 0)
                         .onTapGesture {
-                            slideConfiguration.slideIndexController.forward()
+                            isFocused = true
+                            Task {
+                                slideConfiguration.slideIndexController.forward()
+                            }
                         }
                 }
             }
         }
+#if os(macOS)
+        .focusable()
+        .focused($isFocused)
+        .focusEffectDisabled()
+        .onKeyPress(.leftArrow) {
+            isFocused = true
+            Task {
+                slideConfiguration.slideIndexController.back()
+            }
+            return .handled
+        }
+        .onKeyPress(.rightArrow) {
+            isFocused = true
+            Task {
+                slideConfiguration.slideIndexController.forward()
+            }
+            return .handled
+        }
+#endif
     }
 }
