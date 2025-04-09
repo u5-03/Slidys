@@ -19,7 +19,7 @@ struct WrapUpSlide: View {
                 Item("Did you have fun?", accessory: .number(1))
             }
             Item("There are a few other quizzes available too", accessory: .number(4)) {
-                Item("If you want to try, please come to the DeNA sponsor booth", accessory: .number(1))
+                Item("If you want to take the quizzes, please come to the DeNA sponsor booth", accessory: .number(1))
             }
         }
     }
