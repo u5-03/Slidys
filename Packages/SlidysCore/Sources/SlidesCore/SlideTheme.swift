@@ -39,22 +39,27 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
     public init() {}
 
     public func makeBody(configuration: Configuration) -> some View {
-        VStack(alignment: .leading, spacing: 40) {
-            configuration.header
-                .font(.mediumFont)
-                .lineLimit(1)
-                .minimumScaleFactor(0.1)
-                .foregroundStyle(.themeColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            VStack(alignment: .leading, spacing: 30) {
-                configuration.content
-                    .font(.system(size: 60, weight: .medium))
-                    .foregroundStyle(.defaultForegroundColor)
+        GeometryReader { proxy in
+            VStack(alignment: .leading, spacing: 40) {
+                configuration.header
+                    .font(.mediumFont)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.1)
+                    .foregroundStyle(.themeColor)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(height: 100)
+                VStack(alignment: .leading, spacing: 30) {
+                    configuration.content
+                        .font(.system(size: 60, weight: .medium))
+//                        .fixedSize(horizontal: false, vertical: true)
+                        .foregroundStyle(.defaultForegroundColor)
+                }
             }
+            .padding(60)
+//            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+//            .frame(width: proxy.size.width, height: proxy.size.height)
+            .background(.slideBackgroundColor)
         }
-        .padding(60)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(.slideBackgroundColor)
     }
 }
 
@@ -81,7 +86,6 @@ public struct CustomItemStyle: ItemStyle {
             if let child = configuration.child {
                 child
                     .padding(.leading, 60)
-
             }
         }
     }
@@ -108,9 +112,7 @@ struct AnimationStructureSlide: View {
             Item("As an application, we played the Japan Symbol Quiz to guess the Japan symbol", accessory: .number(3)) {
                 Item("Did you have fun?", accessory: .number(1))
             }
-            Item("There are a few other quizzes available too", accessory: .number(4)) {
-                Item("If you want to try, please come to Ask The Speaker or the DeNA sponsor booth", accessory: .number(1))
-            }
+            Item("There are a few other quizzes available too", accessory: .number(4))
         }
     }
 }
@@ -122,11 +124,11 @@ struct AnimationStructureSlide: View {
             info: .init(
                 name: "すぎー/Sugiy",
                 image: .icon,
-                firstText: "DeNAでFlutter製のスポーツ系のライブ配信アプリplay-by-sportsを開発中",
-                secondText: "神山.swiftからJapan-Region-Swiftコンプリート中",
-                thirdText: "1月に岐阜に来たとき以来の名古屋！",
+                firstText: "DeNAでFlutterのスポーツ系ライブ配信アプリplay-by-sports開発中",
+                secondText: "神山.swiftからJapan-\\\\(Region)-Swiftコンプリート中",
+                thirdText: "1月に岐阜(minokamo.swift)に来たとき以来の名古屋！",
                 fourthText: "今月try!SwiftTokyo2025で登壇して、来月FlutterNinjas2025でも登壇",
-                fifthText: "再来月からの家のBuildに向け、購入した土地の雑草抜きを絶賛計画中..!"
+                fifthText: "再来月からの家のBuildに向け、土地の雑草抜きを絶賛計画中..!"
             )
         )
     }

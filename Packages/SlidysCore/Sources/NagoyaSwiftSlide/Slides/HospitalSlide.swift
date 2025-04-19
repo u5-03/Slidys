@@ -10,14 +10,18 @@ import SlidesCore
 @Slide
 struct HospitalSlide: View {
     var body: some View {
-        HeaderSlide("try!SwiftTokyo2024の翌々日~の入院中") {
-            HStack {
-                Image(.hospitalTweet)
-                    .resizable()
-                    .scaledToFit()
-                Image(.hospitalRoom)
-                    .resizable()
-                    .scaledToFit()
+        GeometryReader { proxy in
+            HeaderSlide("try!SwiftTokyo2024の翌々日~の入院中") {
+                HStack(alignment: .center, spacing: 0) {
+                    Image(.hospitalTweet)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: proxy.size.width / 2)
+                    Image(.hospitalRoom)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: proxy.size.width / 2)
+                }
             }
         }
     }
