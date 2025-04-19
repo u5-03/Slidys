@@ -42,10 +42,7 @@ public struct SlideBaseView: View {
                 let circleHeight = proxy.size.height * 1
                 ZStack {
                     presentationContentView
-#if os(macOS)
-                        // Toolbarに重ならないための仮対応
-                        .padding(.top, 60)
-#endif
+                        .frame(maxHeight: .infinity)
                     Circle()
                         .frame(width: circleHeight, height: circleHeight)
                         .foregroundStyle(Color.black.opacity(0.01))

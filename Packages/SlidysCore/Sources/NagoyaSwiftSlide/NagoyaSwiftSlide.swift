@@ -16,7 +16,8 @@ public struct NagoyaSwiftSlideView: SlideViewProtocol {
 struct SlideConfiguration: SlideConfigurationProtocol {
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "Nagoya.swift！")
-        CenterTextSlide(text: "※今回はSwiftUIのパスのアニメーションやそれを使ったシンボルクイズは出てきません！")
+        CenterTextSlide(text: "※今回はSwiftUIのパスのアニメーションやそれを使ったシンボルクイズは出ません！")
+        CenterTextSlide(text: "本題")
         CenterTextSlide(text: "みなさんは思ったことはありませんか？")
         CenterTextSlide(text: "Blurってなに？")
         HospitalSlide()
@@ -35,6 +36,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         )
         BlurSummarySlide()
         GaussianBlurSlide()
+        BlurEffectComparisonSlide()
         VideoSlide(videoType: .bookAnimation)
     }
 }

@@ -23,6 +23,7 @@ struct HospitalSlide: View {
                         .frame(width: proxy.size.width / 2)
                 }
             }
+            .frame(height: proxy.size.height)
         }
     }
 }

@@ -56,8 +56,8 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
                 }
             }
             .padding(60)
-//            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-//            .frame(width: proxy.size.width, height: proxy.size.height)
+            .frame(width: proxy.size.width)
+            .frame(maxHeight: .infinity, alignment: .topLeading)
             .background(.slideBackgroundColor)
         }
     }

@@ -10,7 +10,7 @@ import SlideKit
 import SlidesCore
 
 @Slide
-struct MinokamoQuizAnimationSlide: View {
+struct NagoyaQuizAnimationSlide: View {
     let symbolInfo: SymbolInfo
 
     var body: some View {
@@ -23,7 +23,7 @@ struct MinokamoQuizAnimationSlide: View {
 
 #Preview {
     SlidePreview {
-        MinokamoQuizAnimationSlide(symbolInfo: SymbolType.nobunaga)
+        NagoyaQuizAnimationSlide(symbolInfo: SymbolType.nobunaga)
     }
 }
 

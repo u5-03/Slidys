@@ -15,13 +15,13 @@ struct BlurSummarySlide: View {
         HeaderSlide("Blurとは？ UIにおける役割") {
             Item("背景との視認性のバランス", accessory: .number(1)) {
                 Item("背景とのその前面のコントラストを確保するのに役立つ", accessory: .number(1))
-                Item("visionOSではWindowの背景のコンテキストを掴みやすくするため", accessory: .number(2)) {
-                    Item("Window選択中は透明度が変わって、薄くなる", accessory: .number(1))
-                }
             }
             Item("奥行き・階層表現", accessory: .number(2)) {
                 Item("背景のContextを維持したまま、前面にUIを表示", accessory: .number(1)) {
                     Item("例: 通知センターやコントロールセンター", accessory: .number(1))
+                }
+                Item("visionOSは背景のコンテキストの把握のため、WindowはBlur", accessory: .number(2)) {
+                    Item("Window選択中は透明度が変わって、薄くなる", accessory: .number(1))
                 }
             }
             Item("モダンで洗練された印象を与える", accessory: .number(3)) {
