@@ -68,6 +68,7 @@ let package = Package(
                 "WebUI",
                 "YugiohCardEffect",
                 "SymbolKit",
+                .product(name: "Algorithms", package: "swift-algorithms"),
             ],
             resources: [
                 .process("Resources/opening_input.mp4"),

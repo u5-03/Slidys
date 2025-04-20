@@ -13,13 +13,15 @@ import SlidesCore
 struct WrapUpSlide: View {
     var body: some View {
         HeaderSlide("まとめ・補足") {
-            Item("SwiftUIのStrokeのアニメーション方法について解説", accessory: .number(1))
-            Item("Strokeのアニメーションを使った大阪シンボル？クイズをしました", accessory: .number(2)) {
-                Item("楽しかったですか？", accessory: .number(1))
+            Item("Blurの仕組みの概要や使われ方について考えてみた", accessory: .number(1))
+            Item("Apple Platformを含めて、BlurエフェクトがUXを考慮してどのように使われているかを考えるのも面白い", accessory: .number(2))
+            Item("Blurは内部的にかなり重たい処理をしているので、多用すると負荷がかかる", accessory: .number(3)) {
+                Item("どのような場面で使うべきなのかを、日頃からしっかり考えたい", accessory: .number(1)) {
+                }
             }
-            Item("ちなみにSwiftUIのwithAnimationはアニメーションの中断・再開ができないので、今回のクイズ用に中断・再開ができる仕組みをSwiftUIで無理やり実装しました", accessory: .number(3)) {
-            }
-            Item("もちろんこのスライドは@mtj_jさん🦌のSlideKit製です笑", accessory: .number(4))
+            Item("愛知のあのシンボルは久々に見た", accessory: .number(4))
+            Item("入院中の作業は捗る", accessory: .number(5))
+            Item("もちろんこのスライドは@mtj_jさん🦌のSlideKit製です(n回目)", accessory: .number(6))
         }
     }
 }

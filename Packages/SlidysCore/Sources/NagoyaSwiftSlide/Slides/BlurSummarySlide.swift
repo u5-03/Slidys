@@ -14,7 +14,7 @@ struct BlurSummarySlide: View {
     var body: some View {
         HeaderSlide("Blurとは？ UIにおける役割") {
             Item("背景との視認性のバランス", accessory: .number(1)) {
-                Item("背景とのその前面のコントラストを確保するのに役立つ", accessory: .number(1))
+                Item("背景とその前面のコントラストを確保するのに役立つ", accessory: .number(1))
             }
             Item("奥行き・階層表現", accessory: .number(2)) {
                 Item("背景のContextを維持したまま、前面にUIを表示", accessory: .number(1)) {

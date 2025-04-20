@@ -13,6 +13,7 @@ enum SamplePageType: String, CaseIterable, Identifiable {
     case japanSymbolQuizExtra1
     case japanSymbolQuizExtra2
     case japanSymbolQuizExtra3
+    case pixelImage
 
     public var id: String {
         return rawValue
@@ -28,6 +29,8 @@ enum SamplePageType: String, CaseIterable, Identifiable {
             return "Japan Symbol Quiz Extra2"
         case .japanSymbolQuizExtra3:
             return "Japan Symbol Quiz Extra3"
+        case .pixelImage:
+            return "PixelUIView"
         }
     }
 
@@ -70,6 +73,9 @@ enum SamplePageType: String, CaseIterable, Identifiable {
                 answerDrawingDuration: .seconds(6),
                 pathAnimationType: .progressiveDraw
             )
+        case .pixelImage:
+            PixelImageSettingView(imageResource: .icon)
+                .padding(.top, 60)
         }
     }
 }

@@ -23,7 +23,9 @@ struct HospitalSlide: View {
                         .frame(width: proxy.size.width / 2)
                 }
             }
+            .padding(80)
             .frame(height: proxy.size.height)
+            .background(.slideBackgroundColor)
         }
     }
 }

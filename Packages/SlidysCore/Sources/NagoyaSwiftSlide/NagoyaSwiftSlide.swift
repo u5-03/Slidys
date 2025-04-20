@@ -15,7 +15,7 @@ public struct NagoyaSwiftSlideView: SlideViewProtocol {
 
 struct SlideConfiguration: SlideConfigurationProtocol {
     let slideIndexController = SlideIndexController() {
-        CenterTextSlide(text: "Nagoya.swift！")
+        CenterTextSlide(text: "Nagoya.swift #1")
         CenterTextSlide(text: "※今回はSwiftUIのパスのアニメーションやそれを使ったシンボルクイズは出ません！")
         CenterTextSlide(text: "本題")
         CenterTextSlide(text: "みなさんは思ったことはありませんか？")
@@ -37,6 +37,32 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         BlurSummarySlide()
         GaussianBlurSlide()
         BlurEffectComparisonSlide()
+        CenterTextSlide(text: "なるほど？")
+        CenterTextSlide(text: "ちょっと試しに実装してみよう")
+        ContentSlide(headerTitle: "SwiftUIでBlurのUIを再現") {
+            PixelImageSettingView(imageResource: .icon, isBlurred: true, dimension: 50, blurDistance: 5)
+        }
+        CenterTextSlide(text: "めちゃくちゃ処理重い....")
+        CenterTextSlide(text: "パフォーマンス向上の\nリファクタリングチャレンジの\n挑戦者、募集中！", alignment: .center)
+        HospitalSlide()
         VideoSlide(videoType: .bookAnimation)
+        CenterTextSlide(text: "入院中は開発や仕事が捗りますね！")
+        CenterTextSlide(text: "じゃあ最後に！")
+        CenterTextSlide(text: "愛知シンボルクイズ！")
+        CenterTextSlide(text: "固まったら、ごめんなさい🙇")
+        ContentSlide(headerTitle: "愛知シンボルクイズ") {
+            PixelImageSettingView(imageResource: .morizoKikkoroQuiz, isBlurred: true, dimension: 50, blurDistance: 20)
+        }
+        CenterImageSlide(imageResource: .morizoKikkoroQuiz)
+        CenterImageSlide(imageResource: .morizoKikkoroAnswer)
+
+        WrapUpSlide()
+        ReferenceSlide()
+        JapanRegionSwiftMapSlide()
+        CenterTextSlide(text: "またどこかの\nJapan-\\(region).swiftで\n会いましょう！")
+        ShareEndSlide()
+        OneMoreThingSlide()
+        CenterTextSlide(text: "実はJapan-\\(region).swiftのイベントが...")
+        CenterImageSlide(imageResource: .regionWwdcRecap)
     }
 }
