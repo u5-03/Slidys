@@ -46,9 +46,9 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "パフォーマンス向上の\nリファクタリングチャレンジの\n挑戦者、募集中！", alignment: .center)
         HospitalSlide()
         VideoSlide(videoType: .bookAnimation)
-        CenterTextSlide(text: "入院中は開発や仕事が捗りますね！")
+        CenterTextSlide(text: "なんか入院中のパフォーマンスが高い？笑")
         CenterTextSlide(text: "じゃあ最後に！")
-        CenterTextSlide(text: "愛知シンボルクイズ！")
+        QuizTitleSlide(regionKind: .aichi)
         CenterTextSlide(text: "固まったら、ごめんなさい🙇")
         ContentSlide(headerTitle: "愛知シンボルクイズ") {
             PixelImageSettingView(imageResource: .morizoKikkoroQuiz, isBlurred: true, dimension: 50, blurDistance: 20)
@@ -62,7 +62,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "またどこかの\nJapan-\\(region).swiftで\n会いましょう！")
         ShareEndSlide()
         OneMoreThingSlide()
-        CenterTextSlide(text: "実はJapan-\\(region).swiftのイベントが...")
+        CenterTextSlide(text: "実はJapan-\\(region).swiftの特別イベントが...")
         CenterImageSlide(imageResource: .regionWwdcRecap)
     }
 }
