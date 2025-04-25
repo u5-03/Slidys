@@ -34,7 +34,7 @@ background(.regularMaterial)
         TableTripleData(
             leading: "主な使い所",
             center: "iOS 8 以降で広く使われる\nカスタムViewに組み込みやすい",
-            trailing: "SwiftUI 2.0（iOS 14）以降で正式対応。\n宣言的に簡単に使える"
+            trailing: "iOS13(一部iOS15~)以降で正式対応。\n宣言的に簡単に使える"
         ),
         TableTripleData(
             leading: "パフォーマンス",

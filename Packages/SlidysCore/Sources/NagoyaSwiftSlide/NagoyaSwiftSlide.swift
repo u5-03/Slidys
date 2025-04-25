@@ -62,7 +62,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "またどこかの\nJapan-\\(region).swiftで\n会いましょう！")
         ShareEndSlide()
         OneMoreThingSlide()
-        CenterTextSlide(text: "実はJapan-\\(region).swiftの特別イベントが...")
+        CenterTextSlide(text: "Japan-\\(region).swiftの特別イベントが...")
         CenterImageSlide(imageResource: .regionWwdcRecap)
     }
 }

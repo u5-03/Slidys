@@ -20,7 +20,7 @@ struct WrapUpSlide: View {
                 }
             }
             Item("愛知のあのシンボルは久々に見た", accessory: .number(4))
-            Item("入院中の作業は捗る", accessory: .number(5))
+            Item("入院中はできることが制限されるので、集中できた", accessory: .number(5))
             Item("もちろんこのスライドは@mtj_jさん🦌のSlideKit製です(n回目)", accessory: .number(6))
         }
     }

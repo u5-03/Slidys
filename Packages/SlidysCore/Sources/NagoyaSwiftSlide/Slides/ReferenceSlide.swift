@@ -12,7 +12,7 @@ import SlidesCore
 @Slide
 struct ReferenceSlide: View {
     var body: some View {
-        HeaderSlide("参考情報情報") {
+        HeaderSlide("参考情報") {
             Item("http://www.expo2005.or.jp/jp/A0/A1/A1.10/index.html", accessory: .number(1))
         }
     }
