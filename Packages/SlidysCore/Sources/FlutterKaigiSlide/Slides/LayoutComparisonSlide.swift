@@ -9,15 +9,6 @@ import SwiftUI
 import SlideKit
 import SlidesCore
 
-struct TableData: Identifiable {
-    var id: String {
-        return leading + trailing
-    }
-
-    let leading: String
-    let trailing: String
-}
-
 @Slide
 struct LayoutComparisonSlide: View {
     let datas: [TableData] = [

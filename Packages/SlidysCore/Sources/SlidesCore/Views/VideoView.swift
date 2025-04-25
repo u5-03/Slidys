@@ -12,6 +12,7 @@ import Combine
 public enum VideoType {
     case visionProDemoInput
     case visionProDemoOutput
+    case bookAnimation
 
     var fileName: String {
         switch self {
@@ -19,6 +20,8 @@ public enum VideoType {
             return "opening_input"
         case .visionProDemoOutput:
             return "opening_output"
+        case .bookAnimation:
+            return "book_animation"
         }
     }
 

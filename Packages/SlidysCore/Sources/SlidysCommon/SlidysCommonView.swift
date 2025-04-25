@@ -14,6 +14,7 @@ import OsakaSwiftSlide
 import MinokamoSwiftSlide
 import GoToNextPlatformSlide
 import TrySwiftTokyoSlide
+import NagoyaSwiftSlide
 
 public protocol SlideTypeProtocol: CaseIterable, Identifiable {
     var id: String { get }
@@ -22,13 +23,14 @@ public protocol SlideTypeProtocol: CaseIterable, Identifiable {
 }
 
 public enum SlideType: SlideTypeProtocol {
+    case iosdcSlide
     case chibaSwift
     case kanagawaSwift
     case osakaSwift
     case minokamoSwift
-    case iosdcSlide
     case goToNextPlatform
     case trySwiftTokyo
+    case nagoyaSwift
 
     public var id: String {
         return displayValue
@@ -50,6 +52,8 @@ public enum SlideType: SlideTypeProtocol {
             return "try! Swift Tokyo2025"
         case .iosdcSlide:
             return "iOSDC2024"
+        case .nagoyaSwift:
+            return "Nagoya.swift#1"
         }
     }
 
@@ -69,6 +73,8 @@ public enum SlideType: SlideTypeProtocol {
             TrySwiftTokyoSlideView()
         case .iosdcSlide:
             iOSDCSlideView()
+        case .nagoyaSwift:
+            NagoyaSwiftSlideView()
         }
     }
 }

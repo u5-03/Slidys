@@ -41,11 +41,15 @@ let package = Package(
         ),
         .library(
             name: "GoToNextPlatformSlide",
-            targets: ["TrySwiftTokyoSlide"]
+            targets: ["GoToNextPlatformSlide"]
         ),
         .library(
             name: "TrySwiftTokyoSlide",
-            targets: ["GoToNextPlatformSlide"]
+            targets: ["TrySwiftTokyoSlide"]
+        ),
+        .library(
+            name: "NagoyaSwiftSlide",
+            targets: ["NagoyaSwiftSlide"]
         ),
     ],
     dependencies: [
@@ -64,10 +68,12 @@ let package = Package(
                 "WebUI",
                 "YugiohCardEffect",
                 "SymbolKit",
+                .product(name: "Algorithms", package: "swift-algorithms"),
             ],
             resources: [
                 .process("Resources/opening_input.mp4"),
                 .process("Resources/opening_output.mp4"),
+                .process("Resources/book_animation.mp4"),
             ]
         ),
         .target(
@@ -80,6 +86,7 @@ let package = Package(
                 "MinokamoSwiftSlide",
                 "GoToNextPlatformSlide",
                 "TrySwiftTokyoSlide",
+                "NagoyaSwiftSlide",
             ]
         ),
         .target(
@@ -141,6 +148,14 @@ let package = Package(
             name: "TrySwiftTokyoSlide",
             dependencies: [
                 "SlidesCore",
+            ]
+        ),
+        .target(
+            name: "NagoyaSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+                "SymbolKit",
             ]
         ),
         .testTarget(
