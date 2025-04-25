@@ -51,7 +51,7 @@ public extension AppImage {
         }
         return bitmap.cgImage
 #else
-        return image.cgImage
+        return cgImage
 #endif
     }
 }
