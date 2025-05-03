@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "debug flutter_kaigi_slide example app",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "flutter_kaigi_slide/flutter_kaigi_slide_example",
+      "args": [
+        "--debug",
+        "--target",
+        "lib/main.dart",
+        // "--verbose" //(詳細なログを出力する場合)
+      ]
+    },
+  ],
+  "compounds": []
+}

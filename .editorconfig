@@ -1,0 +1,32 @@
+root = true
+
+[*]
+end_of_line = lf
+# 各ファイルの末尾に空行を追加する
+insert_final_newline = true
+
+# 行末のスペース削除
+trim_trailing_whitespace = true
+
+[*.dart]
+max_line_length = 80
+indent_style = space
+
+[*.sh]
+indent_style = tab
+indent_size = 2
+
+[*.md]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+[{*.yml,*.yaml,*.json}]
+indent_style = space
+indent_size = 2
+max_line_length = off
+
+[*.{json,pdf.link}]
+max_line_length = off
+
+[Makefile]
+indent_style = tab

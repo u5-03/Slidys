@@ -13,6 +13,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_kaigi_slide:
     path: ../
+  flutter_svg: ^2.1.0
+  dev: ^1.0.0
+  build_runner: ^2.4.15
 
 dev_dependencies:
   flutter_test:
@@ -22,3 +25,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+
+flutter_gen:
+  integrations:
+    flutter_svg: true
+    lottie: true
