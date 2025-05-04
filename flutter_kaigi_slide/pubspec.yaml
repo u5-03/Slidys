@@ -13,6 +13,7 @@ dependencies:
   flutter_hooks: ^0.21.2
   xml: ^6.5.0
   path_drawing: ^1.0.1
+  text_to_path_maker: ^0.6.0
 
 dev_dependencies:
   flutter_test:
@@ -21,6 +22,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Hefty Reward Single Line
+      fonts:
+        - asset: lib/assets/fonts/HeftyRewardSingleLine-JRqWx.ttf
 
   module:
     androidX: true

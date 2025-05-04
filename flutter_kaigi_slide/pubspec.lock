@@ -224,6 +224,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.4"
+  text_to_path_maker:
+    dependency: "direct main"
+    description:
+      name: text_to_path_maker
+      sha256: f6c32efe89416a943487693db51648a0e573963106ecbb39f35417b977f23cab
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   vector_math:
     dependency: transitive
     description:

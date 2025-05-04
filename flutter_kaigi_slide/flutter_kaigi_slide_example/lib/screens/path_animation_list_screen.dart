@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_kaigi_slide/components/svg_path_widget.dart';
+import 'package:flutter_kaigi_slide/components/text_path_widget.dart';
 import 'package:flutter_kaigi_slide/utils/svg_path_painter.dart';
 import 'package:flutter_kaigi_slide_example/gen/assets.gen.dart';
 import 'package:flutter_kaigi_slide_example/gen/fonts.gen.dart';
@@ -21,6 +22,14 @@ final class PathAnimationListScreen extends StatelessWidget {
               fontSize: 32,
               fontFamily: FontFamily.heftyRewardSingleLine,
               fontWeight: FontWeight.w900,
+            ),
+          ),
+          AspectRatio(
+            aspectRatio: 1,
+            child: TextPathWidget(
+              text: 'Path Animation List SingleLineテスト',
+              fontFamily: FontFamily.heftyRewardSingleLine,
+              animationType: PathAnimationType.progressiveDraw(),
             ),
           ),
           AspectRatio(
