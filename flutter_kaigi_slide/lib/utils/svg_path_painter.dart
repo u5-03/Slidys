@@ -2,14 +2,38 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+/// Pathアニメーションの種類を定義するsealed class
+sealed class PathAnimationType {
+  const PathAnimationType();
+
+  factory PathAnimationType.fixedRatioMove(double strokeLengthRatio) =>
+      FixedRatioMove(strokeLengthRatio);
+  factory PathAnimationType.progressiveDraw() => const ProgressiveDraw();
+}
+
+/// Pathが進捗率に応じてどんどん伸びるアニメーション
+final class ProgressiveDraw extends PathAnimationType {
+  const ProgressiveDraw();
+}
+
+/// Pathが一定の幅を維持しながら移動するアニメーション
+final class FixedRatioMove extends PathAnimationType {
+  final double strokeLengthRatio; // Path全体の長さに対する比率 (0.0～1.0)
+  const FixedRatioMove(this.strokeLengthRatio);
+}
+
 /// CustomPainterで、統合したPathを元のアスペクト比を保持しながら
 /// 指定領域内に収め、さらに extractPath を使って進捗率 (progress: 0～1) に基づき
 /// 全体のPathを1つの連続したPathとして描画する例
 final class SvgPathPainter extends CustomPainter {
   final Path path;
   final double progress; // 0.0～1.0 の進捗率。デフォルトは1.0（全体描画）
+  final PathAnimationType animationType;
 
-  SvgPathPainter(this.path, {this.progress = 1.0});
+  SvgPathPainter(this.path,
+      {this.progress = 1.0, this.animationType = const ProgressiveDraw()})
+      : assert(progress >= 0.0 && progress <= 1.0,
+            'Progress must be between 0.0 and 1.0');
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -37,14 +61,56 @@ final class SvgPathPainter extends CustomPainter {
     canvas.translate(offsetX, offsetY);
     canvas.scale(scale, scale);
 
-    // 全体のPathの累積長に対して、progress に応じた長さを求める
+    // Pathの描画処理
+    switch (animationType) {
+      case ProgressiveDraw():
+        _drawProgressive(canvas, paint);
+        break;
+      case FixedRatioMove(:final strokeLengthRatio):
+        _drawFixedRatioMove(canvas, paint, strokeLengthRatio);
+        break;
+    }
+
+    // // 全体のPathの累積長に対して、progress に応じた長さを求める
+    // final metrics = path.computeMetrics().toList();
+    // final totalLength = metrics.fold(0.0, (sum, metric) => sum + metric.length);
+    // final targetLength = totalLength * progress;
+    // double currentLength = 0.0;
+    // final trimmedPath = Path();
+
+    // // 各 Metric を累積的に抽出し、1つの連続した Path として生成
+    // for (final metric in metrics) {
+    //   if (currentLength + metric.length < targetLength) {
+    //     trimmedPath.addPath(metric.extractPath(0, metric.length), Offset.zero);
+    //     currentLength += metric.length;
+    //   } else {
+    //     final remaining = targetLength - currentLength;
+    //     if (remaining > 0) {
+    //       trimmedPath.addPath(metric.extractPath(0, remaining), Offset.zero);
+    //     }
+    //     break;
+    //   }
+    // }
+
+    // canvas.drawPath(trimmedPath, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant SvgPathPainter oldDelegate) {
+    return oldDelegate.progress != progress || oldDelegate.path != path;
+  }
+}
+
+extension on SvgPathPainter {
+  /// ProgressiveDraw: Pathが進捗率に応じてどんどん伸びる
+  void _drawProgressive(Canvas canvas, Paint paint) {
     final metrics = path.computeMetrics().toList();
     final totalLength = metrics.fold(0.0, (sum, metric) => sum + metric.length);
     final targetLength = totalLength * progress;
     double currentLength = 0.0;
     final trimmedPath = Path();
 
-    // 各 Metric を累積的に抽出し、1つの連続した Path として生成
     for (final metric in metrics) {
       if (currentLength + metric.length < targetLength) {
         trimmedPath.addPath(metric.extractPath(0, metric.length), Offset.zero);
@@ -59,11 +125,37 @@ final class SvgPathPainter extends CustomPainter {
     }
 
     canvas.drawPath(trimmedPath, paint);
-    canvas.restore();
   }
 
-  @override
-  bool shouldRepaint(covariant SvgPathPainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.path != path;
+  /// FixedRatioMove: Pathが一定の幅を維持しながら移動
+  void _drawFixedRatioMove(
+      Canvas canvas, Paint paint, double strokeLengthRatio) {
+    final metrics = path.computeMetrics().toList();
+    final totalLength = metrics.fold(0.0, (sum, metric) => sum + metric.length);
+    final strokeLength = totalLength * strokeLengthRatio;
+    final startLength = totalLength * progress;
+    final endLength = startLength + strokeLength;
+    double currentLength = 0.0;
+    final trimmedPath = Path();
+
+    for (final metric in metrics) {
+      if (currentLength + metric.length < startLength) {
+        currentLength += metric.length;
+        continue;
+      }
+
+      final localStart = math.max(0.0, startLength - currentLength);
+      final localEnd = math.min(metric.length, endLength - currentLength);
+
+      if (localStart < localEnd) {
+        trimmedPath.addPath(
+            metric.extractPath(localStart, localEnd), Offset.zero);
+      }
+
+      currentLength += metric.length;
+      if (currentLength >= endLength) break;
+    }
+
+    canvas.drawPath(trimmedPath, paint);
   }
 }

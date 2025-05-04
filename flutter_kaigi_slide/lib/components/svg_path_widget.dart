@@ -5,8 +5,10 @@ import 'package:flutter_kaigi_slide/utils/svg_path_painter.dart';
 
 class AnimatedSvgPathWidget extends HookWidget {
   final String assetPath;
+  final PathAnimationType animationType;
 
-  const AnimatedSvgPathWidget({super.key, required this.assetPath});
+  const AnimatedSvgPathWidget(
+      {super.key, required this.assetPath, required this.animationType});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,11 @@ class AnimatedSvgPathWidget extends HookWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return CustomPaint(
-            painter: SvgPathPainter(snapshot.data!, progress: progress),
+            painter: SvgPathPainter(
+              snapshot.data!,
+              progress: progress,
+              animationType: animationType,
+            ),
             // 外側でサイズ指定できるようにchildは空のContainerとする
             child: Container(),
           );

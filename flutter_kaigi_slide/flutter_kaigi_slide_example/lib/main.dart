@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_kaigi_slide/main.dart';
+import 'package:flutter_kaigi_slide_example/extensions/string.dart';
 import 'package:flutter_kaigi_slide_example/screens/path_animation_list_screen.dart';
 
 void main() {
@@ -58,9 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
             return SliverList(
                 delegate: SliverChildListDelegate([
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Text(
-                  sectionType.name,
+                  sectionType.name.capitalized,
                   style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -74,12 +75,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () {
                         _onTapItem(sectionType, item.name);
                       },
-                      child: ListTile(
-                        title: Text(item.name,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              color: Colors.black,
-                            )),
+                      child: SizedBox(
+                        height: 60,
+                        child: ListTile(
+                          title: Text(item.name.capitalized,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colors.black,
+                              )),
+                        ),
                       ),
                     ),
                     Divider(
