@@ -164,7 +164,7 @@
 				C8E443B5811EEE0078FA641699C28BB1 /* Support Files */,
 			);
 			name = FlutterPluginRegistrant;
-			path = ../../../flutter_kaigi_slide/.ios/Flutter/FlutterPluginRegistrant;
+			path = ../../../flutter_slide/.ios/Flutter/FlutterPluginRegistrant;
 			sourceTree = "<group>";
 		};
 		59AD82012C42AF48777EEA23EFAD16DB /* Targets Support Files */ = {
@@ -182,7 +182,7 @@
 				3539DA0FD611088E6E43EC797E5BF0C0 /* Support Files */,
 			);
 			name = Flutter;
-			path = ../../../flutter_kaigi_slide/.ios/Flutter;
+			path = ../../../flutter_slide/.ios/Flutter;
 			sourceTree = "<group>";
 		};
 		666B7DF18F59E40BFD959C36E7C83506 /* Pod */ = {

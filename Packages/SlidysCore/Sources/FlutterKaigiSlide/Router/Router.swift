@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum FlutterViewType: String {
+public enum FlutterKaigiViewType: String {
     case piano
     case circle
     case calendar
@@ -20,7 +20,7 @@ public enum FlutterViewType: String {
 
 // Ref: https://qiita.com/Soccerboy_Hamada/items/686e994c53736593659e
 public protocol RouterProtocol {
-    func build(viewType: FlutterViewType) -> AnyView
+    func build(viewType: FlutterKaigiViewType) -> AnyView
 }
 
 public struct RouterKey: EnvironmentKey {
@@ -36,7 +36,7 @@ extension EnvironmentValues {
 
 struct DefaultRouter: RouterProtocol {
     /// 遷移先の画面を返すだけ, 画面遷移 はView側で行う
-    func build(viewType: FlutterViewType) -> AnyView {
+    func build(viewType: FlutterKaigiViewType) -> AnyView {
         return AnyView(EmptyView())
     }
 }

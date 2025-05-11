@@ -51,6 +51,10 @@ let package = Package(
             name: "NagoyaSwiftSlide",
             targets: ["NagoyaSwiftSlide"]
         ),
+        .library(
+            name: "FlutterNinjasSlide",
+            targets: ["FlutterNinjasSlide"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.4.0"),
@@ -156,6 +160,12 @@ let package = Package(
                 "SlidesCore",
                 "PianoUI",
                 "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "FlutterNinjasSlide",
+            dependencies: [
+                "SlidesCore",
             ]
         ),
         .testTarget(

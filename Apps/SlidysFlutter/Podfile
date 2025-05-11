@@ -2,7 +2,7 @@
 platform :ios, '16.0'
 
 # Flutterプロジェクトのパス
-flutter_application_path = '../../flutter_kaigi_slide'
+flutter_application_path = '../../flutter_slide'
 load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
 
 # メインのAppターゲット

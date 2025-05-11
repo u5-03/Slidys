@@ -8,6 +8,21 @@
 import SwiftUI
 import Flutter
 import FlutterKaigiSlide
+import FlutterNinjasSlide
+
+enum FlutterViewType {
+    case flutterKaigi(type: FlutterKaigiViewType)
+    case flutterNinjas(type: FlutterNinjasViewType)
+
+    var path: String {
+        switch self {
+        case .flutterKaigi(type: let type):
+            return type.path
+        case .flutterNinjas(type: let type):
+            return type.path
+        }
+    }
+}
 
 struct FlutterView: UIViewControllerRepresentable {
     let type: FlutterViewType
