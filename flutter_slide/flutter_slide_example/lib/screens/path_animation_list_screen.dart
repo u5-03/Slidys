@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slide/components/svg_path_widget.dart';
 import 'package:flutter_slide/components/text_path_widget.dart';
-import 'package:flutter_slide/utils/svg_path_painter.dart';
+import 'package:flutter_slide/widgets/path_animation/flight_route_animation_widget.dart';
 import 'package:flutter_slide_example/gen/assets.gen.dart';
 import 'package:flutter_slide_example/gen/fonts.gen.dart';
 
@@ -16,6 +16,10 @@ final class PathAnimationListScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          const SizedBox(
+            height: 300,
+            child: FlightRouteAnimationWidget(),
+          ),
           const Text(
             'Path Animation List SingleLineテスト',
             style: TextStyle(
@@ -35,14 +39,14 @@ final class PathAnimationListScreen extends StatelessWidget {
           AspectRatio(
             aspectRatio: 1,
             child: AnimatedSvgPathWidget(
-              assetPath: 'assets/images/icon.svg',
+              pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
               animationType: PathAnimationType.progressiveDraw(),
             ),
           ),
           AspectRatio(
             aspectRatio: 1,
             child: AnimatedSvgPathWidget(
-              assetPath: 'assets/images/icon.svg',
+              pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
               animationType: PathAnimationType.fixedRatioMove(0.1),
             ),
           ),

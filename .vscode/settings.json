@@ -11,9 +11,9 @@
   "files.insertFinalNewline": true,
   // Ref: https://zenn.dev/inari_sushio/articles/0f4c606c8340ee
   "editor.quickSuggestions": {
-    "other": true,
-    "comments": false,
-    "strings": false
+    "comments": "off",
+    "strings": "off",
+    "other": "off"
   },
   "editor.formatOnSave": true,
   "editor.suggestSelection": "first",

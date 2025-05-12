@@ -16,7 +16,7 @@ struct QuestionCircleSlide: View {
                 .font(.largeFont)
             Spacer()
                 .frame(height: 12)
-            FlutterView(type: .circle)
+            FlutterView(type: .flightRouter)
                 .aspectRatio(contentMode: .fit)
         }
         .padding(12)

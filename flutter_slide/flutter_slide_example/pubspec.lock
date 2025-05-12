@@ -74,7 +74,7 @@ packages:
     source: hosted
     version: "2.4.4"
   build_runner:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: build_runner
       sha256: "058fe9dce1de7d69c4b84fada934df3e0153dd000758c4d65964d0166779aa99"
@@ -177,14 +177,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  dev:
-    dependency: "direct main"
-    description:
-      name: dev
-      sha256: e7e806af20d53e293a7878212d2246d3e9fccd2b49d597600f9898ed83501cb4
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -258,14 +250,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
-  gestures:
-    dependency: transitive
-    description:
-      name: gestures
-      sha256: "6e75e4ba1ad033a8be9a682974dfe6a2be96ab07b4aa8335ed37bbecb75b7770"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   glob:
     dependency: transitive
     description:

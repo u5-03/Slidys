@@ -17,8 +17,8 @@ struct QuestionCircleWithInfoSlide: View {
                 Item("StackとPositionを使えば頑張って作ることはできそう", accessory: .number(2))
                 Item("できそうだけど、かなり複雑になって、保守が大変そう", accessory: .number(3))
             }
-            FlutterView(type: .circle)
-                                .aspectRatio(contentMode: .fit)
+            FlutterView(type: .flightRouter)
+                .aspectRatio(contentMode: .fit)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.slideBackgroundColor)

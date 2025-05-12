@@ -13,6 +13,7 @@ dependencies:
   flutter_hooks: ^0.21.2
   xml: ^6.5.0
   path_drawing: ^1.0.1
+  flutter_svg: ^2.1.0
   text_to_path_maker: ^0.6.0
 
 dev_dependencies:
@@ -26,8 +27,18 @@ flutter:
     - family: Hefty Reward Single Line
       fonts:
         - asset: lib/assets/fonts/HeftyRewardSingleLine-JRqWx.ttf
-
+  assets:
+    - assets/images/
   module:
     androidX: true
     androidPackage: com.example.flutter_slide
     iosBundleIdentifier: com.example.flutterSlide
+
+flutter_gen:
+  integrations:
+    flutter_svg: true
+    lottie: true
+  assets:
+    outputs:
+      class_name: ModuleAssets
+      package_parameter_enabled: true

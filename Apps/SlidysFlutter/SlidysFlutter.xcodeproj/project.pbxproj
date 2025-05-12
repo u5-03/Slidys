@@ -41,6 +41,8 @@
 		4B89B0599B99B529A58C3667 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
 		63485D03684691BD8F920A33 /* Pods_SlidysFlutter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlidysFlutter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		665115867B42FE5CE46AC762 /* Pods-FlutterKaigiSlide.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlutterKaigiSlide.debug.xcconfig"; path = "Target Support Files/Pods-FlutterKaigiSlide/Pods-FlutterKaigiSlide.debug.xcconfig"; sourceTree = "<group>"; };
+		68B303A62DD24EA900D9A424 /* icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = icon.svg; sourceTree = "<group>"; };
+		68B303A72DD24EA900D9A424 /* map.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = map.png; sourceTree = "<group>"; };
 		68E4E4052DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterNinjasTokyoRouter.swift; sourceTree = "<group>"; };
 		99CA147A46BF6E71A48DACEC /* Pods_FlutterKaigiSlide.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FlutterKaigiSlide.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
@@ -78,6 +80,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		68B303A82DD24EA900D9A424 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				68B303A62DD24EA900D9A424 /* icon.svg */,
+				68B303A72DD24EA900D9A424 /* map.png */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
+		68B303A92DD24EA900D9A424 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				68B303A82DD24EA900D9A424 /* images */,
+			);
+			name = assets;
+			path = ../../../flutter_slide/assets;
+			sourceTree = "<group>";
+		};
 		9DA90DF292DA18BA8A96F5B1 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -141,6 +161,7 @@
 				C359A8A62CCE309F00370A72 /* Assets.xcassets */,
 				C359A8A82CCE309F00370A72 /* SlidysFlutter.entitlements */,
 				C359A8A92CCE309F00370A72 /* Preview Content */,
+				68B303A92DD24EA900D9A424 /* assets */,
 			);
 			path = SlidysFlutter;
 			sourceTree = "<group>";
@@ -296,7 +317,7 @@
 			name = "[CP-User] Embed Flutter Build flutter_slide Script";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../../flutter_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh embed_and_thin";
+			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../../flutter_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh embed_and_thin\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

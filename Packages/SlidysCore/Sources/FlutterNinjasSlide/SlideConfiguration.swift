@@ -15,6 +15,9 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
     public let slideIndexController = SlideIndexController(index: 0) {
         CenterTextSlide(text: "FlutterNinjas2025")
         CenterTextSlide(text: "早速ですが質問です！")
+        ContentSlide(headerTitle: "どうやって実装しますか？") {
+            FlutterView(type: .flightRouter)
+        }
         QuestionCircleSlide()
         QuestionCircleWithInfoSlide()
         CenterTextSlide(text: "これらのUIをFlutterで実装するにはどうすればいいだろう？")
@@ -28,7 +31,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
                 .font(.largeFont)
                 .foregroundStyle(.tint)
         } trailingContent: {
-            FlutterView(type: .circleAnimation)
+            FlutterView(type: .flightRouter)
         }
         CircleAnimationDescriptionSlide()
         WrapUpSlide()

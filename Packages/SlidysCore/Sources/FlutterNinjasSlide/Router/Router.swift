@@ -8,10 +8,8 @@
 import SwiftUI
 
 public enum FlutterNinjasViewType: String {
-    case piano
-    case circle
-    case calendar
-    case circleAnimation
+    case flightRouter
+    case icon
 
     public var path: String {
         return "/\(rawValue)"
