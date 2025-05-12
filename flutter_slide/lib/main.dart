@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slide/components/svg_path_widget.dart';
 import 'package:flutter_slide/widgets/calendar_ui/calendar_ui_widget.dart';
 import 'package:flutter_slide/widgets/path_animation/flight_route_animation_widget.dart';
@@ -31,7 +32,7 @@ enum PageType {
       case PageType.circleAnimation:
         return CircleMusicNoteView.demoWithAnimation();
       case PageType.flightRouter:
-        return const FlightRouteAnimationWidget();
+        return const _FlightRoutePage();
       case PageType.icon:
         return AnimatedSvgPathWidget(
           pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
@@ -40,6 +41,15 @@ enum PageType {
           loop: true,
         );
     }
+  }
+}
+
+class _FlightRoutePage extends HookWidget {
+  const _FlightRoutePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const FlightRouteAnimationWidget();
   }
 }
 
