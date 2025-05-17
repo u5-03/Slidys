@@ -6,14 +6,14 @@
 import SwiftUI
 import SymbolKit
 
-struct HelloAnimationView: View {
+public struct HelloAnimationView: View {
     let duration: Duration
 
-    init(duration: Duration = .seconds(3)) {
+    public init(duration: Duration = .seconds(3)) {
         self.duration = duration
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 64) {
             Spacer()
             StrokeAnimationShapeView(

@@ -10,6 +10,7 @@ import SwiftUI
 public enum FlutterNinjasViewType: String {
     case flightRouter
     case icon
+    case iconFixedLength
 
     public var path: String {
         return "/\(rawValue)"

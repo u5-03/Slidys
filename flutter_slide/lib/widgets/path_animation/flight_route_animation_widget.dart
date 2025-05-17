@@ -68,7 +68,8 @@ final class FlightRouteAnimationWidget extends HookWidget {
               child: Image.asset(
                 'assets/images/map.png',
                 fit: BoxFit.contain,
-                package: 'flutter_slide',
+                // Flutterアプリからビルドする時のみ有効にする
+                // package: 'flutter_slide',
               ),
             ),
             // Pathアニメーション
@@ -98,7 +99,7 @@ final class FlightRouteAnimationWidget extends HookWidget {
                 duration: controller.duration ?? const Duration(seconds: 2),
                 loop: true,
                 offsetX: -12,
-                offsetY: -24,
+                offsetY: -40,
                 externalController: controller,
               ),
             ),

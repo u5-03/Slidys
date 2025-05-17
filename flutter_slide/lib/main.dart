@@ -17,6 +17,7 @@ enum PageType {
   circleAnimation,
   flightRouter,
   icon,
+  iconFixedLength,
   ;
 
   String get routeName => '/$name';
@@ -37,6 +38,13 @@ enum PageType {
         return AnimatedSvgPathWidget(
           pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
           animationType: PathAnimationType.progressiveDraw(),
+          duration: const Duration(seconds: 5),
+          loop: true,
+        );
+      case PageType.iconFixedLength:
+        return AnimatedSvgPathWidget(
+          pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
+          animationType: PathAnimationType.fixedRatioMove(0.5),
           duration: const Duration(seconds: 5),
           loop: true,
         );

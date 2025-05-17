@@ -116,29 +116,30 @@ extension on SvgPathPainter {
   /// FixedRatioMove: Pathが一定の幅を維持しながら移動
   void _drawFixedRatioMove(
       Canvas canvas, Paint paint, double strokeLengthRatio) {
-    final metrics = path.computeMetrics().toList();
-    final totalLength = metrics.fold(0.0, (sum, metric) => sum + metric.length);
+    final pathMetrics = path.computeMetrics().toList();
+    final totalLength =
+        pathMetrics.fold(0.0, (sum, metric) => sum + metric.length);
     final strokeLength = totalLength * strokeLengthRatio;
     final startLength = totalLength * progress;
     final endLength = startLength + strokeLength;
     double currentLength = 0.0;
     final trimmedPath = Path();
 
-    for (final metric in metrics) {
-      if (currentLength + metric.length < startLength) {
-        currentLength += metric.length;
+    for (final pathMetric in pathMetrics) {
+      if (currentLength + pathMetric.length < startLength) {
+        currentLength += pathMetric.length;
         continue;
       }
 
       final localStart = math.max(0.0, startLength - currentLength);
-      final localEnd = math.min(metric.length, endLength - currentLength);
+      final localEnd = math.min(pathMetric.length, endLength - currentLength);
 
       if (localStart < localEnd) {
         trimmedPath.addPath(
-            metric.extractPath(localStart, localEnd), Offset.zero);
+            pathMetric.extractPath(localStart, localEnd), Offset.zero);
       }
 
-      currentLength += metric.length;
+      currentLength += pathMetric.length;
       if (currentLength >= endLength) break;
     }
 

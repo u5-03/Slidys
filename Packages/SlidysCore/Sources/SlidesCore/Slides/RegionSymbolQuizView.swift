@@ -5,10 +5,11 @@
 
 import SwiftUI
 import SymbolKit
-import SlidesCore
 
-struct RegionSymbolQuizView: View {
-    var body: some View {
+public struct RegionSymbolQuizView: View {
+    public init() {}
+
+    public var body: some View {
         VStack(spacing: 4) {
             HStack(spacing: 0) {
                 symbolView(
