@@ -12,11 +12,14 @@ import SlidesCore
 @Slide
 struct WrapUpSlide: View {
     var body: some View {
-        HeaderSlide("まとめ") {
-            Item("CustomMultiChildLayoutは、既存のWidgetやContainerでは表現が難しいデザインの時に活躍する強い味方", accessory: .number(1))
-            Item("パフォーマンスを考慮して使うことが必要そう(特にスクロールが必要な場合)", accessory: .number(2))
-            Item("学習コストが高く、運用にも明確なルールの設定や周知などが必要になるので、RowやColumn、Stackの基本的な使い方で実装できない場合の最終手段として使うのがよい", accessory: .number(3)) {
-                Item("乱用は注意！", accessory: .number(1))
+        HeaderSlide("Wrap up") {
+            Item("Explained how to animate Flutter Paths", accessory: .number(1))
+            Item("Simple topic, but one that has many applications", accessory: .number(2))
+            Item("As an application, we played the Japan Symbol Quiz to guess the Japan symbol", accessory: .number(3)) {
+                Item("Did you have fun?", accessory: .number(1))
+            }
+            Item("There are a few other quizzes available too", accessory: .number(4)) {
+                Item("If you want to take the quizzes, please catch me after this session.", accessory: .number(1))
             }
         }
     }

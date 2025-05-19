@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slide/main.dart';
+import 'package:flutter_slide/widgets/icon_move_tab/icon_move_tab_widget.dart';
 import 'package:flutter_slide_example/extensions/string.dart';
 import 'package:flutter_slide_example/screens/path_animation_list_screen.dart';
 
@@ -31,6 +32,7 @@ enum SectionType {
 
 enum SampleTypes {
   pathAnimation,
+  iconMoveTab,
 }
 
 class MyHomePage extends StatefulWidget {
@@ -126,6 +128,11 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               MaterialPageRoute(
                   builder: (context) => const PathAnimationListScreen()),
+            );
+          case SampleTypes.iconMoveTab:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => IconMoveTabWidget()),
             );
         }
     }

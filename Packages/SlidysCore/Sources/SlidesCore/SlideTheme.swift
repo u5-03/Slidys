@@ -51,7 +51,6 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
                 VStack(alignment: .leading, spacing: 30) {
                     configuration.content
                         .font(.system(size: 60, weight: .medium))
-//                        .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(.defaultForegroundColor)
                 }
             }
@@ -80,7 +79,7 @@ public struct CustomItemStyle: ItemStyle {
                     EmptyView()
                 }
                 configuration.label
-                    .lineLimit(2)
+                    .lineLimit(4)
             }
 
             if let child = configuration.child {

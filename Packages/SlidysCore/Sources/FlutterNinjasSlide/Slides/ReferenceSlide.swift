@@ -12,7 +12,7 @@ import SlidesCore
 @Slide
 struct ReferenceSlide: View {
     var body: some View {
-        HeaderSlide("参考資料") {
+        HeaderSlide("Reference") {
             Item("CustomMultiChildLayout class", accessory: .number(1)) {
                 Item("https://api.flutter.dev/flutter/widgets/CustomMultiChildLayout-class.html", accessory: .number(1))
             }

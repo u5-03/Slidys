@@ -10,7 +10,11 @@ import SwiftUI
 public enum FlutterNinjasViewType: String {
     case flightRouter
     case icon
-    case iconFixedLength
+    case waveFixedLength
+    case iconMove
+    case moveTab
+    case symbolQuiz1
+    case symbolQuiz2
 
     public var path: String {
         return "/\(rawValue)"

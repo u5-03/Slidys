@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_slide/utils/font_path_converter.dart';
 import 'package:flutter_slide/utils/svg_path_converter.dart';
 import 'package:flutter_slide/utils/svg_path_painter.dart';
 
@@ -9,18 +10,28 @@ export 'package:flutter_slide/utils/svg_path_painter.dart'
 sealed class PathSourceType {
   const PathSourceType();
 
-  factory PathSourceType.path(Path path) = _PathSource;
-  factory PathSourceType.assetPath(String assetPath) = _AssetPathSource;
+  factory PathSourceType.path(Path path) = PathSource;
+  factory PathSourceType.assetPath(String assetPath) = AssetPathSource;
+  factory PathSourceType.text(
+    String text,
+    double fontSize,
+  ) = TextSource;
 }
 
-final class _PathSource extends PathSourceType {
+final class PathSource extends PathSourceType {
   final Path path;
-  const _PathSource(this.path);
+  const PathSource(this.path);
 }
 
-final class _AssetPathSource extends PathSourceType {
+final class AssetPathSource extends PathSourceType {
   final String assetPath;
-  const _AssetPathSource(this.assetPath);
+  const AssetPathSource(this.assetPath);
+}
+
+final class TextSource extends PathSourceType {
+  final String text;
+  final double fontSize;
+  const TextSource(this.text, this.fontSize);
 }
 
 final class AnimatedSvgPathWidget extends HookWidget {
@@ -70,16 +81,19 @@ final class AnimatedSvgPathWidget extends HookWidget {
       future: _resolvePath(pathSource),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return CustomPaint(
-            painter: SvgPathPainter(
-              snapshot.data!,
-              progress: progress,
-              animationType: animationType,
-              strokeWidth: strokeWidth, // 線の幅を指定
-              strokeColor: strokeColor, // 線の色を指定
+          return Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: CustomPaint(
+              painter: SvgPathPainter(
+                snapshot.data!,
+                progress: progress,
+                animationType: animationType,
+                strokeWidth: strokeWidth, // 線の幅を指定
+                strokeColor: strokeColor, // 線の色を指定
+              ),
+              // 外側でサイズ指定できるようにchildは空のContainerとする
+              child: Container(),
             ),
-            // 外側でサイズ指定できるようにchildは空のContainerとする
-            child: Container(),
           );
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading path: ${snapshot.error}'));
@@ -89,12 +103,19 @@ final class AnimatedSvgPathWidget extends HookWidget {
     );
   }
 
-  Future<Path> _resolvePath(PathSourceType source) async {
-    if (source is _PathSource) {
-      return source.path;
-    } else if (source is _AssetPathSource) {
-      return convertSvgPathFromAsset(source.assetPath);
+  Future<Path> _resolvePath(PathSourceType sourceType) async {
+    switch (sourceType) {
+      case AssetPathSource assetPathSource:
+        return convertSvgPathFromAsset(assetPathSource.assetPath);
+      case PathSource pathSource:
+        return pathSource.path;
+      case TextSource(:final text, :final fontSize):
+        return TextPathConverter.generatePath(
+          text,
+          'lib/assets/fonts/HeftyRewardSingleLine-JRqWx.ttf', // 固定フォント
+          fontSize, // フォントサイズ
+          const Size(300, 300), // サイズを固定
+        );
     }
-    throw ArgumentError('Unsupported PathSourceType');
   }
 }

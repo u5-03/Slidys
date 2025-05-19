@@ -43,7 +43,7 @@ public struct VideoView: View {
     public init(videoType: VideoType) {
         self.videoType = videoType
 
-        if let filePath = Bundle.module.path(forResource: videoType.fileName, ofType: videoType.fileExtension) {
+        if let filePath = Bundle.myModule.path(forResource: videoType.fileName, ofType: videoType.fileExtension) {
             let fileURL = URL(fileURLWithPath: filePath)
             let playerItem = AVPlayerItem(url: fileURL)
             self.playerItem = playerItem

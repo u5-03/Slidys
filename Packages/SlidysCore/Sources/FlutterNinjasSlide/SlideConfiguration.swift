@@ -31,7 +31,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
             info: ReadmeInfo(
                 name: "Sugiy",
                 image: .icon,
-                firstText: "Developing Flutter live streaming app, play-by-sports in DeNA Co., Ltd.",
+                firstText: "Developing Flutter live streaming app, play-by-sports at DeNA",
                 secondText: "I'm originally and currently iOS developer, but develop Flutter app for work",
                 thirdText: "First time to speak and participate in FlutterNinjas!",
                 fourthText: "Interested in 脱single-app対応",
@@ -51,29 +51,42 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "Japan Symbol Quiz")
         JapanRegionSwiftMapSlide()
         SymbolsGridSlide()
-        // Symbol Quiz View 1
+        ContentSlide(headerTitle: "Japan Symbol Quiz 1") {
+            FlutterView(type: .symbolQuiz1)
+        }
+        ContentSlide(headerTitle: "折り紙") {
+            Image(.origami)
+                .resizable()
+                .scaledToFit()
+        }
 
         SymbolsGridSlide()
         ImplementationFixedLengthStepSlide()
         ImplementationFixedLengthCodeSlide()
         ContentSlide(headerTitle: "こんな感じに動きます！") {
-            FlutterView(type: .iconFixedLength)
+            FlutterView(type: .waveFixedLength)
         }
         SymbolsGridSlide()
         TextAnimationSampleSlide()
         ImplementationTextPathStepSlide()
         CenterTextSlide(text: "では動作確認をしましょう！")
-        // Symbol Quiz View 2
+        ContentSlide(headerTitle: "Japan Symbol Quiz 2") {
+            FlutterView(type: .symbolQuiz2)
+        }
         CenterTextSlide(text: "これでSwiftで実装したことの\n確認は終わりました！")
         ContentSlide(headerTitle: "この実装について忘れてました！") {
             FlutterView(type: .flightRouter)
         }
         ImplementationTextPathStepSlide()
-
-
+        ContentSlide(headerTitle: "こんなこともできる") {
+            FlutterView(type: .iconMove)
+        }
+        ViewSlide {
+            FlutterView(type: .moveTab)
+        }
         WrapUpSlide()
         ReferenceSlide()
-        CenterTextSlide(text: "おしまい")
+        CenterTextSlide(text: "Thank you for listening!")
     }
 
     public init() {}

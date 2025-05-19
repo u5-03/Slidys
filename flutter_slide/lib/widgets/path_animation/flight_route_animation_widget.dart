@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_slide/constants/constants.dart';
 
 import 'path_content_move_animation_widget.dart';
 
@@ -16,49 +17,15 @@ final class FlightRouteAnimationWidget extends HookWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // 画像の描画サイズ
+        // 地図画像の全体サイズ
         final double imageWidth;
         final double imageHeight;
-        final Offset baseOffset;
         if (constraints.maxWidth > constraints.maxHeight / 284 * 648) {
           imageWidth = constraints.maxHeight / 284 * 648;
-          imageHeight = constraints.maxHeight; // 高さを基準にする
-          baseOffset = Offset(
-            (constraints.maxWidth - imageWidth) / 2,
-            0,
-          );
+          imageHeight = constraints.maxHeight;
         } else {
           imageWidth = constraints.maxWidth;
-          imageHeight = constraints.maxWidth / 648 * 284; // 幅を基準にする
-          baseOffset = Offset(
-            0,
-            (constraints.maxHeight - imageHeight) / 2,
-          );
-        }
-        // 基準サイズ (w: 648, h: 284) に基づく相対座標
-        final tokyo = Offset(baseOffset.dx + imageWidth / 20 * 4,
-            baseOffset.dy + imageHeight / 10 * 6);
-        // const tokyo = Offset(300, 100);
-        final california = Offset(baseOffset.dx + imageWidth / 100 * 68,
-            baseOffset.dy + imageHeight / 100 * 55);
-        final controlPoint = Offset(
-          (tokyo.dx + california.dx) / 2,
-          (tokyo.dy + california.dy) / 2 - 100,
-        );
-        final path = Path()
-          ..moveTo(tokyo.dx, tokyo.dy)
-          ..quadraticBezierTo(
-            controlPoint.dx,
-            controlPoint.dy,
-            california.dx,
-            california.dy,
-          );
-
-        final pathMetrics = path.computeMetrics().toList(); // 遅延評価を防ぐためにリストに変換
-        if (pathMetrics.isEmpty) {
-          return const Center(
-            child: Text('Error: Path is empty'),
-          );
+          imageHeight = constraints.maxWidth / 648 * 284;
         }
 
         return Stack(
@@ -68,40 +35,78 @@ final class FlightRouteAnimationWidget extends HookWidget {
               child: Image.asset(
                 'assets/images/map.png',
                 fit: BoxFit.contain,
-                // Flutterアプリからビルドする時のみ有効にする
-                // package: 'flutter_slide',
+                package: packageName,
               ),
             ),
-            // Pathアニメーション
-            AnimatedBuilder(
-                animation: controller,
-                builder: (context, child) {
-                  return CustomPaint(
-                    painter: _FlightRoutePainter(
-                      progress: controller.value,
-                      path: path,
+            Positioned(
+              left: constraints.maxWidth * 0.25,
+              top: constraints.maxHeight * 0.4,
+              child: SizedBox(
+                width: imageWidth * 0.5,
+                height: imageHeight * 0.2,
+                child: PathAreaAnimationWidget(
+                  content: Transform.rotate(
+                    angle: pi / 2,
+                    child: const Icon(
+                      Icons.flight,
+                      size: 60,
+                      color: Colors.red,
                     ),
-                    child: Container(),
-                  );
-                }),
-            // Path上をIcons.flightが動くアニメーション
-            SizedBox(
-              child: PathContentMoveAnimationWidget(
-                path: path,
-                content: Transform.rotate(
-                  angle: pi / 2, // 右側に向くように90度回転
-                  child: const Icon(
-                    Icons.flight,
-                    size: 100,
-                    color: Colors.red,
                   ),
+                  controller: controller,
                 ),
-                duration: controller.duration ?? const Duration(seconds: 2),
-                loop: true,
-                offsetX: -12,
-                offsetY: -40,
-                externalController: controller,
               ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PathAreaAnimationWidget extends StatelessWidget {
+  final Widget content;
+  final AnimationController controller;
+
+  const PathAreaAnimationWidget({
+    super.key,
+    required this.content,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final widgetWidth = constraints.maxWidth;
+        final widgetHeight = constraints.maxHeight;
+        final start = Offset(0, widgetHeight * 0.9);
+        final end = Offset(widgetWidth, widgetHeight * 0.9);
+        final control = Offset((start.dx + end.dx) / 2, 0);
+        final originalPath = Path()
+          ..moveTo(start.dx, start.dy)
+          ..quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
+
+        return Stack(
+          children: [
+            AnimatedBuilder(
+              animation: controller,
+              builder: (context, child) {
+                return CustomPaint(
+                  painter: _FlightRoutePainter(
+                    progress: controller.value,
+                    path: originalPath,
+                  ),
+                  child: Container(),
+                );
+              },
+            ),
+            PathContentMoveAnimationWidget(
+              path: originalPath,
+              content: content,
+              externalController: controller,
+              offsetX: -widgetWidth * 0.03,
+              offsetY: -widgetHeight * 0.25,
             ),
           ],
         );

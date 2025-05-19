@@ -21,6 +21,9 @@ struct PathCodeScrollSlide: View {
             HStack {
                 Image(.pathIcon)
                     .resizable()
+                    .renderingMode(.template)
+                    .tint(.white)
+                    .foregroundStyle(.white)
                     .scaledToFit()
                 ScrollView {
                     Text(CodeConstants.iconPathStringCode)

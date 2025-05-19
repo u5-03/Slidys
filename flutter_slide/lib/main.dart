@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slide/components/svg_path_widget.dart';
 import 'package:flutter_slide/widgets/calendar_ui/calendar_ui_widget.dart';
+import 'package:flutter_slide/widgets/icon_move_tab/icon_move_tab_widget.dart';
 import 'package:flutter_slide/widgets/path_animation/flight_route_animation_widget.dart';
+import 'package:flutter_slide/widgets/path_animation/icon_path_animation_widget.dart';
 import 'package:flutter_slide/widgets/piano_ui/piano_widget.dart';
 import 'package:flutter_slide/widgets/radial/circle_music_note_widget.dart';
+import 'package:flutter_slide/widgets/symbol_quiz/symbol_quiz_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +19,11 @@ enum PageType {
   circleAnimation,
   flightRouter,
   icon,
-  iconFixedLength,
+  waveFixedLength,
+  iconMove,
+  moveTab,
+  symbolQuiz1,
+  symbolQuiz2,
   ;
 
   String get routeName => '/$name';
@@ -33,7 +39,7 @@ enum PageType {
       case PageType.circleAnimation:
         return CircleMusicNoteView.demoWithAnimation();
       case PageType.flightRouter:
-        return const _FlightRoutePage();
+        return const FlightRouteAnimationWidget();
       case PageType.icon:
         return AnimatedSvgPathWidget(
           pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
@@ -41,23 +47,58 @@ enum PageType {
           duration: const Duration(seconds: 5),
           loop: true,
         );
-      case PageType.iconFixedLength:
+      case PageType.waveFixedLength:
         return AnimatedSvgPathWidget(
-          pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
-          animationType: PathAnimationType.fixedRatioMove(0.5),
+          pathSource: PathSourceType.path(_generateWavePath(const Size(100, 20),
+              waveHeight: 30, waveCount: 5)),
+          animationType: PathAnimationType.fixedRatioMove(0.2),
           duration: const Duration(seconds: 5),
           loop: true,
         );
+      case PageType.iconMove:
+        return const IconPathAnimationWidget();
+      case PageType.moveTab:
+        return const IconMoveTabWidget();
+      case PageType.symbolQuiz1:
+        return SymbolQuizWidget(
+          pathSource: PathSourceType.assetPath(
+            'assets/images/origami.svg',
+          ),
+          animationType: PathAnimationType.progressiveDraw(),
+          duration: const Duration(seconds: 30),
+          loop: true,
+          strokeColor: Colors.white,
+        );
+      case PageType.symbolQuiz2:
+        return SymbolQuizWidget(
+          pathSource: PathSourceType.text('ToyosuMarket', 50),
+          animationType: PathAnimationType.progressiveDraw(),
+          duration: const Duration(seconds: 30),
+          loop: true,
+          strokeColor: Colors.white,
+        );
     }
   }
-}
 
-class _FlightRoutePage extends HookWidget {
-  const _FlightRoutePage({super.key});
+  Path _generateWavePath(Size size,
+      {double waveHeight = 20, int waveCount = 2}) {
+    final path = Path();
+    final waveWidth = size.width / waveCount;
 
-  @override
-  Widget build(BuildContext context) {
-    return const FlightRouteAnimationWidget();
+    path.moveTo(0, size.height / 2); // 開始点
+
+    for (int i = 0; i < waveCount; i++) {
+      final startX = i * waveWidth;
+      final midX = startX + waveWidth / 2;
+      final endX = startX + waveWidth;
+
+      path.quadraticBezierTo(
+        midX, size.height / 2 - waveHeight, // 上方向へのカーブ
+        endX, size.height / 2, // 終点（水平線に戻る）
+      );
+    }
+
+    return path;
   }
 }
 

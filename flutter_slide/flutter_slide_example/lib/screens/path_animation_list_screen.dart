@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slide/components/svg_path_widget.dart';
 import 'package:flutter_slide/components/text_path_widget.dart';
 import 'package:flutter_slide/widgets/path_animation/flight_route_animation_widget.dart';
+import 'package:flutter_slide/widgets/path_animation/icon_path_animation_widget.dart';
+import 'package:flutter_slide/widgets/symbol_quiz/symbol_quiz_widget.dart';
 import 'package:flutter_slide_example/gen/assets.gen.dart';
 import 'package:flutter_slide_example/gen/fonts.gen.dart';
 
@@ -16,8 +18,35 @@ final class PathAnimationListScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          SizedBox(
+            height: 500,
+            child: SymbolQuizWidget(
+              pathSource: PathSourceType.text('ToyosuMarket', 50),
+              animationType: PathAnimationType.progressiveDraw(),
+              duration: const Duration(seconds: 30),
+              loop: true,
+              strokeColor: Colors.black,
+            ),
+          ),
+          SizedBox(
+            height: 500,
+            child: SymbolQuizWidget(
+              pathSource: PathSourceType.assetPath(
+                'assets/images/origami.svg',
+              ),
+              animationType: PathAnimationType.progressiveDraw(),
+              duration: const Duration(seconds: 30),
+              loop: true,
+              strokeColor: Colors.black,
+            ),
+          ),
           const SizedBox(
             height: 300,
+            width: double.infinity,
+            child: IconPathAnimationWidget(),
+          ),
+          const SizedBox(
+            height: 500,
             child: FlightRouteAnimationWidget(),
           ),
           const Text(

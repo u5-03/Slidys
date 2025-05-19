@@ -26,29 +26,6 @@ extension on StringCharacterType {
 }
 
 extension StringExt on String {
-  int get charactersLength {
-    // 絵文字と見なされるパターン
-    // (\p{Emoji_Presentation}|\p{Extended_Pictographic}): 単一絵文字のマッチパターン
-    // \p{Emoji_Presentation}は標準の絵文字を表し、\p{Extended_Pictographic}はより広範な絵文字や記号をカバーする
-    // (\u200D(\p{Emoji_Presentation}|\p{Extended_Pictographic}))*: これはゼロ幅結合子（\u200D）を使用して複数の絵文字が結合されたシーケンス(e.g.家族の絵文字)をマッチさせるためのパターン
-    final emojiPattern = RegExp(
-      r'(\p{Emoji_Presentation}|\p{Extended_Pictographic})(\u200D(\p{Emoji_Presentation}|\p{Extended_Pictographic}))*',
-      unicode: true,
-    );
-    // 改行を削除するロジックはサーバーチームとの調整で見送り
-    // final newlineRemovedText = newlineRemoved;
-
-    // 絵文字をカウント
-    final emojiMatches = emojiPattern.allMatches(this);
-
-    // 絵文字以外の文字をカウント
-    final nonEmojiText = replaceAll(emojiPattern, '');
-    final nonEmojiCount = nonEmojiText.runes.length;
-
-    // 絵文字と非絵文字の合計を返す
-    return emojiMatches.length + nonEmojiCount;
-  }
-
   static String random(
     int length, {
     List<StringCharacterType> characterTypes = StringCharacterType.values,
