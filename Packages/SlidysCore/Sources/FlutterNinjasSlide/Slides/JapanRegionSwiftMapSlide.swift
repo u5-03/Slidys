@@ -12,7 +12,7 @@ import SlidesCore
 @Slide
 struct JapanRegionSwiftMapSlide: View {
     var body: some View {
-        HeaderSlide("最近SwiftコミュニティでもJapan-\\\\(region).swiftの地域イベントが流行") {
+        HeaderSlide("Recently Japan-\\\\(region).swift regional events are trending in the Swift community") {
             Image(.japanRegionSwiftMap)
                 .resizable()
                 .scaledToFit()

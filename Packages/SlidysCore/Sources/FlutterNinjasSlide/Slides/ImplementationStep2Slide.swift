@@ -12,10 +12,10 @@ import SlidesCore
 @Slide
 struct ImplementationStep2Slide: View {
     var body: some View {
-        HeaderSlide("ステップ2 そのPathを表示するWidgetを実装する") {
-            Item("ステップ1で生成したFlutterのPathオブジェクトを用意する", accessory: .number(1))
-            Item("PathオブジェクトをCustomPainterのpaintメソッドでcanvas.drawPath(path, paint)として描画する", accessory: .number(2))
-            Item(" CustomPainterをCustomPaintウィジェットにセットし、画面上にSVGのパスを表示する", accessory: .number(3))
+        HeaderSlide("Step 2: Implement a Widget to display the Path") {
+            Item("Prepare the Flutter Path object generated in Step 1", accessory: .number(1))
+            Item("Draw the Path object as canvas.drawPath(path, paint) in the CustomPainter's paint method", accessory: .number(2))
+            Item("Set the CustomPainter to a CustomPaint widget and display the SVG path on the screen", accessory: .number(3))
         }
     }
 }

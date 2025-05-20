@@ -20,9 +20,9 @@ struct TextAnimationSampleSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("アルファベットをアニメーションで表示") {
+        HeaderSlide("Displaying alphabet with animation") {
             VStack(alignment: .leading, spacing: 0) {
-                Text("システムフォント")
+                Text("System Font")
                     .foregroundStyle(.defaultForegroundColor)
                     .font(.mediumFont)
                 StrokeAnimationShapeView(
@@ -37,7 +37,7 @@ struct TextAnimationSampleSlide: View {
                     shapeAspectRatio: 8
                 )
                 if phase.isAfter(.second) {
-                    Text("SinglePathのフォント")
+                    Text("SinglePath Font")
                         .foregroundStyle(.defaultForegroundColor)
                         .font(.mediumFont)
 

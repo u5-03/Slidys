@@ -12,11 +12,11 @@ import SlidesCore
 @Slide
 struct SvgConverterDescriptionSlideswift: View {
     var body: some View {
-        HeaderSlide("自作したsvgからFlutterのPathへの変換ロジック") {
-            Item("xmlプラグインを使って、SVGファイルをテキストとして読み込み、XMLとしてパースする", accessory: .number(1))
-            Item("<path>要素を抽出し、各要素のd属性(パスデータ)を取得する", accessory: .number(2))
-            Item("path_drawingプラグインを使って、d属性のパスデータをFlutterのPathオブジェクトに変換する", accessory: .number(3))
-            Item("addPath()を使って、必要に応じて複数のPathを1つに統合する", accessory: .number(4))
+        HeaderSlide("Custom conversion logic from SVG to Flutter Path") {
+            Item("Use the xml plugin to load SVG files as text and parse them as XML", accessory: .number(1))
+            Item("Extract <path> elements and get the d attribute (path data) of each element", accessory: .number(2))
+            Item("Use the path_drawing plugin to convert the d attribute path data to Flutter Path objects", accessory: .number(3))
+            Item("Use addPath() to integrate multiple Paths into one as needed", accessory: .number(4))
         }
     }
 }

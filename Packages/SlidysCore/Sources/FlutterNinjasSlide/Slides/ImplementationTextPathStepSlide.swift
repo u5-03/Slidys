@@ -12,11 +12,11 @@ import SlidesCore
 @Slide
 struct ImplementationTextPathStepSlide: View {
     var body: some View {
-        HeaderSlide("Textのdrawアニメーション") {
-            Item("PathオブジェクトからcomputeMetrics()でPathMetric(サブパス情報)を取得する", accessory: .number(1))
-            Item("PathMetricのgetTangentForOffset()を使って、Path上の任意の位置(offset)での座標(position)や進行方向の角度(angle)を取得する", accessory: .number(2))
-            Item("offset値はPathの全長(length)にprogress値(0.0〜1.0)を掛けて計算することで、アニメーションの進捗に応じた位置を動的に決定できる", accessory: .number(3))
-            Item("取得した座標にPositionedなどで表示したいWidgetなどを配置する", accessory: .number(4))
+        HeaderSlide("Text drawing animation") {
+            Item("Get PathMetric (subpath information) from Path object using computeMetrics()", accessory: .number(1))
+            Item("Use PathMetric's getTangentForOffset() to get coordinates (position) and angle of direction at any position (offset) on the Path", accessory: .number(2))
+            Item("The offset value can be calculated by multiplying the total length of the Path by the progress value (0.0-1.0) to dynamically determine the position according to the animation progress", accessory: .number(3))
+            Item("Place widgets to be displayed at the obtained coordinates using Positioned etc.", accessory: .number(4))
         }
     }
 }

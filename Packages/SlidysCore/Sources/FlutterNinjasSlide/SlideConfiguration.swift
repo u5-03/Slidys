@@ -14,17 +14,17 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
 
     public let slideIndexController = SlideIndexController(index: 0) {
         CenterTextSlide(text: "FlutterNinjas2025")
-        CenterTextSlide(text: "早速ですが質問です！")
-        ContentSlide(headerTitle: "どうやって実装しますか？ Part1") {
+        CenterTextSlide(text: "Let me ask you a question!")
+        ContentSlide(headerTitle: "How would you implement this? Part1") {
             FlutterView(type: .icon)
         }
-        ContentSlide(headerTitle: "どうやって実装しますか？ Part2") {
+        ContentSlide(headerTitle: "How would you implement this? Part2") {
             HelloAnimationView()
         }
-        ContentSlide(headerTitle: "どうやって実装しますか？ Part3") {
+        ContentSlide(headerTitle: "How would you implement this? Part3") {
             FlutterView(type: .flightRouter)
         }
-        CenterTextSlide(text: "Pathのアニメーションを使ってみよう！")
+        CenterTextSlide(text: "Let's use path animation!")
         TitleSlide()
         ReadmeSlide(
             title: "README",
@@ -34,27 +34,27 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
                 firstText: "Developing Flutter live streaming app, play-by-sports at DeNA",
                 secondText: "I'm originally and currently iOS developer, but develop Flutter app for work",
                 thirdText: "First time to speak and participate in FlutterNinjas!",
-                fourthText: "Interested in 脱single-app対応",
-                fifthText: "来月から私が買った注文住宅の工事が始まります"
+                fourthText: "Interested in multi-app support",
+                fifthText: "Construction of my newly purchased custom home will start next month"
             )
         )
         ImplementationStepSlide()
-        CenterTextSlide(text: "詳細なソースコードについては、\n後ほどブログやGitHubで確認できます")
+        CenterTextSlide(text: "Detailed source code will be available\non blog and GitHub later")
         ImplementationStep1Slide()
         SvgConverterDescriptionSlideswift()
         PathCodeScrollSlide()
         ImplementationStep2Slide()
         ImplementationStep3Slide()
         ImplementationStep4Slide()
-        CenterTextSlide(text: "実装の方針はこんな感じ！")
-        CenterTextSlide(text: "ここで実際にどのように動くかのデモと\nインターバルを兼ねてこんなことをしてみましょう")
+        CenterTextSlide(text: "This is the implementation approach!")
+        CenterTextSlide(text: "Let's see a demo of how it actually works\nand take a short break")
         CenterTextSlide(text: "Japan Symbol Quiz")
         JapanRegionSwiftMapSlide()
         SymbolsGridSlide()
         ContentSlide(headerTitle: "Japan Symbol Quiz 1") {
             FlutterView(type: .symbolQuiz1)
         }
-        ContentSlide(headerTitle: "折り紙") {
+        ContentSlide(headerTitle: "Origami") {
             Image(.origami)
                 .resizable()
                 .scaledToFit()
@@ -63,22 +63,22 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         SymbolsGridSlide()
         ImplementationFixedLengthStepSlide()
         ImplementationFixedLengthCodeSlide()
-        ContentSlide(headerTitle: "こんな感じに動きます！") {
+        ContentSlide(headerTitle: "It works like this!") {
             FlutterView(type: .waveFixedLength)
         }
         SymbolsGridSlide()
         TextAnimationSampleSlide()
         ImplementationTextPathStepSlide()
-        CenterTextSlide(text: "では動作確認をしましょう！")
+        CenterTextSlide(text: "Let's check how it works!")
         ContentSlide(headerTitle: "Japan Symbol Quiz 2") {
             FlutterView(type: .symbolQuiz2)
         }
-        CenterTextSlide(text: "これでSwiftで実装したことの\n確認は終わりました！")
-        ContentSlide(headerTitle: "この実装について忘れてました！") {
+        CenterTextSlide(text: "That concludes our review\nof the Swift implementation!")
+        ContentSlide(headerTitle: "I forgot about this implementation!") {
             FlutterView(type: .flightRouter)
         }
         ImplementationTextPathStepSlide()
-        ContentSlide(headerTitle: "こんなこともできる") {
+        ContentSlide(headerTitle: "You can also do this") {
             FlutterView(type: .iconMove)
         }
         ViewSlide {

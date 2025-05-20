@@ -12,7 +12,7 @@ import SlidesCore
 @Slide
 struct ImplementationFixedLengthCodeSlide: View {
     var body: some View {
-        CodeSlide(title: "固定長のPathのアニメーションのコード", code: CodeConstants.fixedLengthAnimationCode)
+        CodeSlide(title: "Code for fixed length Path animation", code: CodeConstants.fixedLengthAnimationCode)
     }
 }
 

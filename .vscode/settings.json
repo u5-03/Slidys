@@ -10,11 +10,7 @@
   },
   "files.insertFinalNewline": true,
   // Ref: https://zenn.dev/inari_sushio/articles/0f4c606c8340ee
-  "editor.quickSuggestions": {
-    "comments": false,
-    "strings": false,
-    "other": true
-  },
+  "editor.quickSuggestions": false,
   "editor.formatOnSave": true,
   "editor.suggestSelection": "first",
   "editor.guides.bracketPairs": true,

@@ -12,13 +12,13 @@ import SlidesCore
 @Slide
 struct ImplementationStep3Slide: View {
     var body: some View {
-        HeaderSlide("ステップ3 Pathを進捗率によって、Pathを部分的に表示できるようにする") {
-            Item("PathオブジェクトからcomputeMetrics()でPathMetricの配列を取得する", accessory: .number(1)) {
-                Item("PathMetricは、パスの長さや区間情報の情報を持つ", accessory: .number(1))
+        HeaderSlide("Step 3: Make the Path display partially based on progress") {
+            Item("Get an array of PathMetric from the Path object using computeMetrics()", accessory: .number(1)) {
+                Item("PathMetric contains information about path length and interval information", accessory: .number(1))
             }
-            Item("PathMetricのextractPath(0, totalLength * progress)を使って、進捗率（progress: 0.0〜1.0）に応じた部分パスを生成する", accessory: .number(2))
-            Item("そのPathをaddPath()で1つのPathにする", accessory: .number(3))
-            Item("パスをCustomPainterのcanvas.drawPathで描画する", accessory: .number(4))
+            Item("Use PathMetric's extractPath(0, totalLength * progress) to generate partial paths according to the progress rate (progress: 0.0-1.0)", accessory: .number(2))
+            Item("Combine those Paths into a single Path using addPath()", accessory: .number(3))
+            Item("Draw the path with canvas.drawPath in the CustomPainter", accessory: .number(4))
         }
     }
 }

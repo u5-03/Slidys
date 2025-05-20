@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum Constants {
-    static let presentationName = "iOSDCのスライドで使ったアニメーションを深掘る"
+    static let presentationName = "Deep dive into animations used in iOSDC slides"
     static let strokeAnimatableShapeCodeCode = """
 struct StrokeAnimatableShape<S: Shape> {
     var animationProgress: CGFloat = 0

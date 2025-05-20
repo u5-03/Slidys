@@ -12,13 +12,13 @@ import SlidesCore
 @Slide
 struct ImplementationFixedLengthStepSlide: View {
     var body: some View {
-        HeaderSlide("Pathの長さを固定したままのアニメーション") {
-            Item("Path全体の長さをPathMetricで取得し、Pathの長さや進捗率から表示範囲を計算する", accessory: .number(1))
-            Item("ループでPathMetricを順に処理し、それぞれの表示範囲を計算する", accessory: .number(2)) {
-                Item("この表示範囲で、全体の表示範囲に含まれている範囲のPathのみ、addPathする", accessory: .number(1))
-                Item("範囲外のPathはaddPathしないようにする", accessory: .number(3))
+        HeaderSlide("Animation with fixed Path length") {
+            Item("Get the total length of the Path with PathMetric, and calculate the display range from the Path length and progress rate", accessory: .number(1))
+            Item("Process PathMetrics in a loop, calculating display range for each", accessory: .number(2)) {
+                Item("Within this display range, only addPath for Paths included in the overall display range", accessory: .number(1))
+                Item("Do not addPath for Paths outside the range", accessory: .number(3))
             }
-            Item("抽出した部分Pathを合成し、アニメーションを実行する", accessory: .number(3))
+            Item("Combine the extracted partial Paths and execute the animation", accessory: .number(3))
         }
     }
 }

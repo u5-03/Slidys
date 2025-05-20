@@ -12,11 +12,11 @@ import SlidesCore
 @Slide
 struct ImplementationStepSlide: View {
     var body: some View {
-        HeaderSlide("実装ステップ") {
-            Item("実現したい形のPathを用意する", accessory: .number(1))
-            Item("そのPathを表示するWidgetを実装する", accessory: .number(2))
-            Item("Pathを進捗率によって、Pathを部分的に表示できるようにする", accessory: .number(3))
-            Item("進捗率に応じて、アニメーションできるようにする", accessory: .number(4))
+        HeaderSlide("Implementation Steps") {
+            Item("Prepare a Path for the desired shape", accessory: .number(1))
+            Item("Implement a Widget to display the Path", accessory: .number(2))
+            Item("Make the Path display partially based on progress", accessory: .number(3))
+            Item("Enable animation according to progress", accessory: .number(4))
         }
     }
 }

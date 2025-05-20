@@ -12,14 +12,14 @@ import SlidesCore
 @Slide
 struct ImplementationStep1Slide: View {
     var body: some View {
-        HeaderSlide("ステップ1 実現したい形のPathを用意する") {
-            Item("簡単なPathの場合、そのまま自作するか、生成AIに任せる", accessory: .number(1))
-            Item("複雑なもの場合、svgファイルとして作成し、そのPathの情報をFlutterのPathに変換するのがおすすめ", accessory: .number(2)) {
-                Item("私はFigmaを使って、svgファイルの画像を作ることが多いです", accessory: .number(1))
-                Item("Webの変換ツールを利用するのもあり", accessory: .number(2))
-                Item("svgファイルから、PathDataを抽出し、Pathを生成する仕組みを作るのもあり", accessory: .number(3))
+        HeaderSlide("Step 1: Prepare a Path for the desired shape") {
+            Item("For simple Paths, create them yourself or use generative AI", accessory: .number(1))
+            Item("For complex ones, recommend creating as svg files and converting that Path information to Flutter's Path", accessory: .number(2)) {
+                Item("I often use Figma to create svg file images", accessory: .number(1))
+                Item("Using web conversion tools is also an option", accessory: .number(2))
+                Item("Another option is to build a mechanism to extract PathData from svg files and generate Paths", accessory: .number(3))
             }
-            Item("これらのsvgやPathはoutlineされておらず、閉じていないものである必要があります", accessory: .number(3))
+            Item("These svg and Path files need to be not outlined and not closed", accessory: .number(3))
         }
     }
 }

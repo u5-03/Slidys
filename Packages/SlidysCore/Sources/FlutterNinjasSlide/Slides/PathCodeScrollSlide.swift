@@ -11,7 +11,7 @@ import SlidesCore
 struct PathCodeScrollSlide: View {
     var body: some View {
         VStack {
-            Text("元のPathと生成されたFlutterのPath")
+            Text("Original Path and generated Flutter Path")
                 .font(.mediumFont)
                 .lineLimit(1)
                 .minimumScaleFactor(0.1)

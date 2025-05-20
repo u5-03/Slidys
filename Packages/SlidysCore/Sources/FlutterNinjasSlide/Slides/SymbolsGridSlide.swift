@@ -11,7 +11,7 @@ import SlidesCore
 struct SymbolsGridSlide: View {
 
     var body: some View {
-        HeaderSlide("私がこれまで実施してきた地域イベントでのシンボルクイズ") {
+        HeaderSlide("Symbol quizzes from regional events I've conducted") {
             RegionSymbolQuizView()
         }
     }
