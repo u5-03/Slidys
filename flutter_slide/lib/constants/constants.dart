@@ -1,5 +1,5 @@
 String? get packageName {
   // exampleアプリをビルドするときはnullにしない
-  // return null;
-  return 'flutter_slide';
+  return null;
+  // return 'flutter_slide';
 }
