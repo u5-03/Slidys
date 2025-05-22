@@ -35,6 +35,7 @@ class TextPathWidget extends HookWidget {
         'lib/assets/fonts/HeftyRewardSingleLine-JRqWx.ttf', // 固定フォント
         32.0, // フォントサイズ
         const Size(300, 300), // サイズを固定
+        randomizeGlyphOrder: true,
       ),
       builder: (context, snapshot) {
         if (snapshot.hasData) {

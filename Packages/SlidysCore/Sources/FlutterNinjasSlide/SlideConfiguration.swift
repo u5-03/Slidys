@@ -13,6 +13,9 @@ import SlidesCore
 public struct SlideConfiguration: SlideConfigurationProtocol {
 
     public let slideIndexController = SlideIndexController(index: 0) {
+        ContentSlide(headerTitle: "Japan Symbol Quiz 2") {
+            FlutterView(type: .symbolQuiz2)
+        }
         CenterTextSlide(text: "FlutterNinjas2025")
         CenterTextSlide(text: "Let me ask you a question!")
         ContentSlide(headerTitle: "How would you implement this? Part1") {

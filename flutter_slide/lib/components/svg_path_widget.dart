@@ -115,6 +115,7 @@ final class AnimatedSvgPathWidget extends HookWidget {
           'lib/assets/fonts/HeftyRewardSingleLine-JRqWx.ttf', // 固定フォント
           fontSize, // フォントサイズ
           const Size(300, 300), // サイズを固定
+          randomizeGlyphOrder: true,
         );
     }
   }

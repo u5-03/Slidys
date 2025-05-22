@@ -20,6 +20,7 @@ final class TextPathConverter {
     double fontSize,
     Size targetSize, {
     double letterSpacing = 4,
+    bool randomizeGlyphOrder = false,
   }) async {
     // 1) フォントアセットを ByteData として読み込み → PMFont をパース
     final byteData = await rootBundle.load(fontAssetPath);
@@ -64,13 +65,26 @@ final class TextPathConverter {
     final glyphPxPaths =
         glyphUnitsPaths.map((p) => p.transform(invertMatrix)).toList();
 
-    // 5) px 単位で文字を横に積み重ね (letterSpacing も px 単位なのでそのまま足す)
-    final combinedPx = Path();
+    // --- 各グリフのPathとxOffsetPxをペアでリスト化 ---
+    final List<_GlyphWithOffset> glyphsWithOffset = [];
     double xOffsetPx = 0;
     for (final charPath in glyphPxPaths) {
-      combinedPx.addPath(charPath, Offset(xOffsetPx, 0));
+      glyphsWithOffset.add(_GlyphWithOffset(charPath, xOffsetPx));
       final wb = charPath.getBounds().width;
       xOffsetPx += wb + letterSpacing;
+    }
+
+    // --- シャッフル（冪等性あり） ---
+    if (randomizeGlyphOrder) {
+      int seed = text.hashCode;
+      final rand = math.Random(seed);
+      glyphsWithOffset.shuffle(rand);
+    }
+
+    // --- シャッフル順でaddPath ---
+    final combinedPx = Path();
+    for (final g in glyphsWithOffset) {
+      combinedPx.addPath(g.path, Offset(g.offset, 0));
     }
 
     // 6) 最後に「targetSize にフィット ＋ 中央寄せ」の変換行列をかける
@@ -104,4 +118,11 @@ final class TextPathConverter {
 
     return combinedPx.transform(fitMatrix);
   }
+}
+
+// ヘルパークラス
+class _GlyphWithOffset {
+  final Path path;
+  final double offset;
+  _GlyphWithOffset(this.path, this.offset);
 }

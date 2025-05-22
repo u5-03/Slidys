@@ -39,27 +39,53 @@ final class SymbolQuizWidget extends HookWidget {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 40,
           children: [
-            if (!isAnimatingState.value ||
-                !animationController.isForwardOrCompleted)
-              IconButton(
-                icon: const Icon(Icons.play_arrow),
-                onPressed: () {
-                  isAnimatingState.value = true;
-                  animationController.duration = duration;
-                  animationController.forward();
-                },
-              )
-            else
-              IconButton(
-                icon: const Icon(Icons.pause),
-                onPressed: () {
-                  isAnimatingState.value = false;
-                  animationController.stop();
+            SizedBox.square(
+              dimension: 120,
+              child: Builder(
+                builder: (context) {
+                  if (!isAnimatingState.value ||
+                      !animationController.isForwardOrCompleted) {
+                    return IconButton(
+                      icon: const Icon(
+                        Icons.play_arrow,
+                        size: 120,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        isAnimatingState.value = true;
+                        animationController.duration = duration;
+                        animationController.forward();
+                      },
+                    );
+                  } else {
+                    return IconButton(
+                      icon: const Icon(
+                        Icons.pause,
+                        size: 120,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        isAnimatingState.value = false;
+                        animationController.stop();
+                      },
+                    );
+                  }
                 },
               ),
+            ),
             ElevatedButton(
-              child: const Text('Show Answer'),
+              child: const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                  'Show Answer',
+                  style: TextStyle(
+                    fontSize: 64,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               onPressed: () async {
                 animationController.stop();
                 animationController.value = 0;
