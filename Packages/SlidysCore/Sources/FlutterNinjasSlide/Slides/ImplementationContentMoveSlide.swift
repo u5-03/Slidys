@@ -12,11 +12,12 @@ import SlidesCore
 @Slide
 struct ImplementationContentMoveSlide: View {
     var body: some View {
-        HeaderSlide("Textのdrawアニメーション") {
-            Item("PathオブジェクトからcomputeMetrics()でPathMetric(サブパス情報)を取得する", accessory: .number(1))
-            Item("PathMetricのgetTangentForOffset()を使って、Path上の任意の位置(offset)での座標を取得する", accessory: .number(2))
-            Item("offset値はPathの全長やアニメーションの進捗率から、アニメーションの進捗に応じた位置を動的に決定できる", accessory: .number(3))
-            Item("取得した座標を使い、ウィジェットやアイコンをPath上に沿って移動・回転させることができる", accessory: .number(4))
+        HeaderSlide("Content move animation along a Path") {
+            Item("Pass the widget you want to run move-animation along path", accessory: .number(1))
+            Item("With getTangentForOffset(), get the coordinates at the last computeMetric object", accessory: .number(2))
+            Item("Position the content to the coordinates", accessory: .number(3))
+            Item("By animating the path, the coordinates will change and also move the content along the path", accessory: .number(4))
+            Item("If necessary, we can change content rotations or detailed coordinates using offset", accessory: .number(4))
         }
     }
 }

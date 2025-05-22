@@ -84,6 +84,8 @@ public struct CustomItemStyle: ItemStyle {
 
             if let child = configuration.child {
                 child
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading, 60)
             }
         }

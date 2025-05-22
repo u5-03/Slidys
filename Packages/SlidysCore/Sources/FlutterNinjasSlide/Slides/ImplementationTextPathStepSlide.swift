@@ -13,13 +13,22 @@ import SlidesCore
 struct ImplementationTextPathStepSlide: View {
     var body: some View {
         HeaderSlide("Text drawing animation") {
-            Item("Get PathMetric (subpath information) from Path object using computeMetrics()", accessory: .number(1))
-            Item("Use PathMetric's getTangentForOffset() to get coordinates (position) and angle of direction at any position (offset) on the Path", accessory: .number(2))
-            Item("The offset value can be calculated by multiplying the total length of the Path by the progress value (0.0-1.0) to dynamically determine the position according to the animation progress", accessory: .number(3))
-            Item("Place widgets to be displayed at the obtained coordinates using Positioned etc.", accessory: .number(4))
+            Item("Load single-path font asset and parsed text using text_to_path_maker plugin", accessory: .number(1))
+            Item("Extranct each character's glyph path and measure their bounds to determine scaling", accessory: .number(2))
+            Item("Transform Glyph paths to pixel space, including Y-axis inversion and baseline adjustment", accessory: .number(3))
+            Item("Place the glyphs horizontally with specified letter spacing", accessory: .number(4))
+            Item("Scale the combined path and centered to fit the target area", accessory: .number(4))
         }
     }
 }
+
+
+
+
+
+
+
+
 
 #Preview {
     SlidePreview {

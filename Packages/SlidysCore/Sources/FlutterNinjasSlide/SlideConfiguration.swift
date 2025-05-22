@@ -32,10 +32,10 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
                 name: "Sugiy",
                 image: .icon,
                 firstText: "Developing Flutter live streaming app, play-by-sports at DeNA",
-                secondText: "I'm originally and currently iOS developer, but develop Flutter app for work",
+                secondText: "Originally iOS developer, but develop Flutter app for work",
                 thirdText: "First time to speak and participate in FlutterNinjas!",
-                fourthText: "Interested in multi-app support",
-                fifthText: "Construction of my newly purchased custom home will start next month"
+                fourthText: "Interested in iOS/Android platform-optimized UX in Flutter app",
+                fifthText: "Building my new home—starting next month."
             )
         )
         ImplementationStepSlide()
@@ -73,7 +73,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         ContentSlide(headerTitle: "Japan Symbol Quiz 2") {
             FlutterView(type: .symbolQuiz2)
         }
-        CenterTextSlide(text: "That concludes our review\nof the Swift implementation!")
+        CenterTextSlide(text: "That wraps up the Swift implementation I did!")
         ContentSlide(headerTitle: "I forgot about this implementation!") {
             FlutterView(type: .flightRouter)
         }
@@ -85,7 +85,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
             FlutterView(type: .moveTab)
         }
         WrapUpSlide()
-        ReferenceSlide()
+//        ReferenceSlide()
         CenterTextSlide(text: "Thank you for listening!")
     }
 

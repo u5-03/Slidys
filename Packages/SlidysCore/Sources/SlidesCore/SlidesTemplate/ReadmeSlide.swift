@@ -42,7 +42,7 @@ public struct ReadmeSlide: View {
         HeaderSlide(.init(stringLiteral: title)) {
             Text(.init(stringLiteral: info.name))
                 .font(.largeFont)
-                .padding(.bottom, 60)
+                .padding(.bottom, 40)
             Item(.init(stringLiteral: info.firstText), accessory: .number(1))
             Item(.init(stringLiteral: info.secondText), accessory: .number(2))
             Item(.init(stringLiteral: info.thirdText), accessory: .number(3))
@@ -52,7 +52,7 @@ public struct ReadmeSlide: View {
         .overlay {
             Image(info.image)
                 .resizable()
-                .frame(width: 360, height: 360)
+                .frame(width: 340, height: 340)
                 .aspectRatio(contentMode: .fit)
                 .clipShape(Circle())
                 .padding(40)

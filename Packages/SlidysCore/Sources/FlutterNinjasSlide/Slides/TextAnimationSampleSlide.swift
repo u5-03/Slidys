@@ -22,7 +22,7 @@ struct TextAnimationSampleSlide: View {
     var body: some View {
         HeaderSlide("Displaying alphabet with animation") {
             VStack(alignment: .leading, spacing: 0) {
-                Text("System Font")
+                Text("iOS System Font")
                     .foregroundStyle(.defaultForegroundColor)
                     .font(.mediumFont)
                 StrokeAnimationShapeView(
