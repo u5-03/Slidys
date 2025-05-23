@@ -10,6 +10,7 @@ import SwiftUI
 public enum FlutterNinjasViewType: String {
     case flightRouter
     case icon
+    case iconWithoutLoop
     case waveFixedLength
     case iconMove
     case moveTab

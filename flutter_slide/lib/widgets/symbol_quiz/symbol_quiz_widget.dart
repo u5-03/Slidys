@@ -27,14 +27,17 @@ final class SymbolQuizWidget extends HookWidget {
     return Column(
       children: [
         Expanded(
-          child: AnimatedSvgPathWidget(
-            pathSource: pathSource,
-            animationType: animationType,
-            duration: duration,
-            loop: loop,
-            strokeWidth: strokeWidth,
-            strokeColor: strokeColor,
-            externalController: animationController,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 80),
+            child: AnimatedSvgPathWidget(
+              pathSource: pathSource,
+              animationType: animationType,
+              duration: duration,
+              loop: loop,
+              strokeWidth: strokeWidth,
+              strokeColor: strokeColor,
+              externalController: animationController,
+            ),
           ),
         ),
         Row(

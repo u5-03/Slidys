@@ -41,7 +41,7 @@
   "dart.previewFlutterUiGuides": true,
   "dart.previewFlutterUiGuidesCustomTracking": true,
   "dart.closingLabels": false,
-  "dart.flutterSdkPath": ".fvm/versions/3.29.3",
+  "dart.flutterSdkPath": ".fvm/versions/3.29.2",
   "[dart]": {
     "editor.tabSize": 2,
     "editor.codeActionsOnSave": {

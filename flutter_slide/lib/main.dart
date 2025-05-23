@@ -19,6 +19,7 @@ enum PageType {
   circleAnimation,
   flightRouter,
   icon,
+  iconWithoutLoop,
   waveFixedLength,
   iconMove,
   moveTab,
@@ -46,6 +47,14 @@ enum PageType {
           animationType: PathAnimationType.progressiveDraw(),
           duration: const Duration(seconds: 5),
           loop: true,
+        );
+      case PageType.iconWithoutLoop:
+        return AnimatedSvgPathWidget(
+          pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
+          animationType: PathAnimationType.progressiveDraw(),
+          duration: const Duration(seconds: 5),
+          strokeWidth: 6,
+          loop: false,
         );
       case PageType.waveFixedLength:
         return AnimatedSvgPathWidget(

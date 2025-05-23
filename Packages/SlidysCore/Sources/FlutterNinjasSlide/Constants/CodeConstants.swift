@@ -25,7 +25,6 @@ for (final pathMetric in pathMetrics) {
 
 
     static let iconPathStringCode = """
-      Paint paint = Paint();
       Path path = Path();  
       path.lineTo(size.width * 0.05, size.height * 0.57);
       path.cubicTo(size.width * 0.05, size.height * 0.57, size.width * 0.03, size.height * 0.68, size.width * 0.03, size.height * 0.68);
