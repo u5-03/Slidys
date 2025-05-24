@@ -13,7 +13,6 @@ import SlidesCore
 public struct SlideConfiguration: SlideConfigurationProtocol {
 
     public let slideIndexController = SlideIndexController(index: 0) {
-        ComparePlatformAnimationSlide()
         CenterTextSlide(text: "FlutterNinjas2025")
         CenterTextSlide(text: "Let me ask you a question!")
         ContentSlide(headerTitle: "How would you implement this? Part1") {

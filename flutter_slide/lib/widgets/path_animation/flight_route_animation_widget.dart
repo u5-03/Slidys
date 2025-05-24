@@ -29,6 +29,7 @@ final class FlightRouteAnimationWidget extends HookWidget {
         }
 
         return Stack(
+          alignment: Alignment.center,
           children: [
             // 背景の世界地図
             Positioned.fill(
@@ -39,8 +40,8 @@ final class FlightRouteAnimationWidget extends HookWidget {
               ),
             ),
             Positioned(
-              left: constraints.maxWidth * 0.25,
-              top: constraints.maxHeight * 0.4,
+              left: constraints.maxWidth * 0.2,
+              top: constraints.maxHeight * 0.43,
               child: SizedBox(
                 width: imageWidth * 0.5,
                 height: imageHeight * 0.2,

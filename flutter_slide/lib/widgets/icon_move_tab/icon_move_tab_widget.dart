@@ -9,6 +9,7 @@ final class IconMoveTabWidget extends HookWidget {
   static final _rootKey = GlobalKey();
   static final _tabKey = GlobalKey();
   static final _centerWidgetKey = GlobalKey();
+  double get _padding => 80;
 
   @override
   Widget build(BuildContext context) {
@@ -105,60 +106,33 @@ final class IconMoveTabWidget extends HookWidget {
           if (pathState.value != null &&
               startState.value != null &&
               endState.value != null) ...[
-            IgnorePointer(
-                child: CustomPaint(
-              painter: MyPainter(
-                pathState.value!,
-              ),
-              child: const SizedBox.expand(),
-            )),
             Positioned(
-              top: startState.value!.dy - 10,
-              left: startState.value!.dx - 10,
+              top: startState.value!.dy - 10 - _padding,
+              left: startState.value!.dx - 10 - _padding,
               child: SizedBox(
-                height: endState.value!.dy - startState.value!.dy + 20,
-                width: endState.value!.dx - startState.value!.dx + 20,
-                child: ColoredBox(
-                  color: Colors.blue.withValues(alpha: 0.2),
-                  child: PathContentMoveAnimationWidget(
-                    path: pathState.value!,
-                    externalController: animationController,
-                    content: Image.asset(
-                      'assets/images/icon.png',
-                      width: 100,
-                      height: 100,
-                      package: packageName,
-                    ),
+                height: endState.value!.dy -
+                    startState.value!.dy -
+                    40 +
+                    _padding * 2,
+                width: endState.value!.dx -
+                    startState.value!.dx +
+                    20 +
+                    _padding * 2,
+                child: PathContentMoveAnimationWidget(
+                  path: pathState.value!,
+                  padding: EdgeInsets.fromLTRB(
+                    _padding - 20,
+                    _padding - 80,
+                    _padding - 60,
+                    _padding,
                   ),
-                ),
-              ),
-            ),
-          ],
-          // Path描画
-          if (startState.value != null && endState.value != null) ...[
-            // startのPointに⚪︎
-            Positioned(
-              left: startState.value!.dx - 12,
-              top: startState.value!.dy - 12,
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-            // endのPointに⚪︎
-            Positioned(
-              left: endState.value!.dx - 12,
-              top: endState.value!.dy - 12,
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: const BoxDecoration(
-                  color: Colors.orange,
-                  shape: BoxShape.circle,
+                  externalController: animationController,
+                  content: Image.asset(
+                    'assets/images/icon.png',
+                    width: 100,
+                    height: 100,
+                    package: packageName,
+                  ),
                 ),
               ),
             ),
@@ -167,24 +141,4 @@ final class IconMoveTabWidget extends HookWidget {
       );
     });
   }
-}
-
-class MyPainter extends CustomPainter {
-  final Path path;
-
-  MyPainter(this.path);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.red
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant MyPainter oldDelegate) =>
-      oldDelegate.path != path;
 }

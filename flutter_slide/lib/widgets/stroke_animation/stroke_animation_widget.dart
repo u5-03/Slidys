@@ -38,9 +38,5 @@ class _StrokeAnimationWidgetState extends State<StrokeAnimationWidget>
         );
       },
     );
-    return CustomPaint(
-      size: const Size(100, 100), // 描画領域のサイズを指定
-      painter: PianoNotePainter(_controller),
-    );
   }
 }

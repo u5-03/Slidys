@@ -18,28 +18,6 @@ final class PathAnimationListScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          SizedBox(
-            height: 500,
-            child: SymbolQuizWidget(
-              pathSource: PathSourceType.text('ToyosuMarket', 50),
-              animationType: PathAnimationType.progressiveDraw(),
-              duration: const Duration(seconds: 30),
-              loop: true,
-              strokeColor: Colors.black,
-            ),
-          ),
-          SizedBox(
-            height: 500,
-            child: SymbolQuizWidget(
-              pathSource: PathSourceType.assetPath(
-                'assets/images/origami.svg',
-              ),
-              animationType: PathAnimationType.progressiveDraw(),
-              duration: const Duration(seconds: 30),
-              loop: true,
-              strokeColor: Colors.black,
-            ),
-          ),
           const SizedBox(
             height: 300,
             width: double.infinity,
@@ -83,6 +61,28 @@ final class PathAnimationListScreen extends StatelessWidget {
             width: 200,
             height: 200,
             fit: BoxFit.contain,
+          ),
+          SizedBox(
+            height: 500,
+            child: SymbolQuizWidget(
+              pathSource: PathSourceType.text('ToyosuMarket', 50),
+              animationType: PathAnimationType.progressiveDraw(),
+              duration: const Duration(seconds: 30),
+              loop: true,
+              strokeColor: Colors.black,
+            ),
+          ),
+          SizedBox(
+            height: 500,
+            child: SymbolQuizWidget(
+              pathSource: PathSourceType.assetPath(
+                'assets/images/origami.svg',
+              ),
+              animationType: PathAnimationType.progressiveDraw(),
+              duration: const Duration(seconds: 30),
+              loop: true,
+              strokeColor: Colors.black,
+            ),
           ),
         ],
       ),

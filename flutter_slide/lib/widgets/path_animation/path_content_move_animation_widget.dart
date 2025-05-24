@@ -11,6 +11,7 @@ class PathContentMoveAnimationWidget extends StatelessWidget {
   final double offsetX;
   final double offsetY;
   final double? rotateAngle; // nullの場合は進行方向に自動回転
+  final EdgeInsets padding;
   final AnimationController? externalController;
 
   const PathContentMoveAnimationWidget({
@@ -22,13 +23,14 @@ class PathContentMoveAnimationWidget extends StatelessWidget {
     this.offsetX = 0,
     this.offsetY = 0,
     this.rotateAngle,
+    this.padding = const EdgeInsets.all(0),
     this.externalController,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = externalController;
-    if (controller == null) {
+    final animationController = externalController;
+    if (animationController == null) {
       return const SizedBox.shrink();
     }
     return LayoutBuilder(
@@ -38,13 +40,23 @@ class PathContentMoveAnimationWidget extends StatelessWidget {
 
         // PathをWidgetサイズにフィットさせる
         final bounds = path.getBounds();
-        final scaleX = widgetWidth / bounds.width;
-        final scaleY = widgetHeight / bounds.height;
+
+        // paddingを考慮した表示可能領域を計算
+        final availableWidth = widgetWidth - padding.left - padding.right;
+        final availableHeight = widgetHeight - padding.top - padding.bottom;
+
+        final scaleX = availableWidth / bounds.width;
+        final scaleY = availableHeight / bounds.height;
         final scale = min(scaleX, scaleY);
-        final dx =
-            -bounds.left * scale + (widgetWidth - bounds.width * scale) / 2;
-        final dy =
-            -bounds.top * scale + (widgetHeight - bounds.height * scale) / 2;
+
+        // paddingを考慮した中央配置のための平行移動量計算
+        final dx = -bounds.left * scale +
+            padding.left +
+            (availableWidth - bounds.width * scale) / 2;
+        final dy = -bounds.top * scale +
+            padding.top +
+            (availableHeight - bounds.height * scale) / 2;
+
         final matrix = Matrix4.identity()
           ..translate(dx, dy)
           ..scale(scale, scale);
@@ -54,12 +66,12 @@ class PathContentMoveAnimationWidget extends StatelessWidget {
             pathMetrics.fold<double>(0, (sum, m) => sum + m.length);
 
         return AnimatedBuilder(
-          animation: controller,
+          animation: animationController,
           builder: (context, child) {
             if (pathMetrics.isEmpty) {
               return const SizedBox.shrink();
             }
-            final progress = controller.value;
+            final progress = animationController.value;
             double currentLength = 0.0;
             Offset? position;
             for (final metric in pathMetrics) {
@@ -79,8 +91,16 @@ class PathContentMoveAnimationWidget extends StatelessWidget {
               return const SizedBox.shrink();
             }
             final angle = rotateAngle ?? 0.0;
-            final clampedX = (position.dx + offsetX).clamp(0.0, widgetWidth);
-            final clampedY = (position.dy + offsetY).clamp(0.0, widgetHeight);
+
+            // paddingを考慮した範囲でクランプ
+            final minX = padding.left;
+            final maxX = widgetWidth - padding.right;
+            final minY = padding.top;
+            final maxY = widgetHeight - padding.bottom;
+
+            final clampedX = (position.dx + offsetX).clamp(minX, maxX);
+            final clampedY = (position.dy + offsetY).clamp(minY, maxY);
+
             return Stack(
               children: [
                 Positioned(
