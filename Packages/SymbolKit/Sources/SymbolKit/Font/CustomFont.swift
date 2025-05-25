@@ -8,7 +8,7 @@
 #if os(macOS)
 import AppKit
 public typealias AppFont = NSFont
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
 import UIKit
 public typealias AppFont = UIFont
 #endif

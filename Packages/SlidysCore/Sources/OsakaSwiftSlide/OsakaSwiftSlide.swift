@@ -13,6 +13,7 @@ public struct OsakaSwiftSlideView: SlideViewProtocol {
 }
 
 struct SlideConfiguration: SlideConfigurationProtocol {
+    @MainActor
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "Osaka.swift始まりました")
         ReadmeSlide()

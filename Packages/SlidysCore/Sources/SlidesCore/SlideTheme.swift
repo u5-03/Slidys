@@ -8,6 +8,7 @@
 import SwiftUI
 import SlideKit
 
+@MainActor
 public struct CustomSlideTheme: SlideTheme {
     public let headerSlideStyle = CustomHeaderSlideStyle()
     public let itemStyle = CustomItemStyle()
@@ -51,7 +52,6 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
                 VStack(alignment: .leading, spacing: 30) {
                     configuration.content
                         .font(.system(size: 60, weight: .medium))
-//                        .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(.defaultForegroundColor)
                 }
             }
@@ -80,11 +80,13 @@ public struct CustomItemStyle: ItemStyle {
                     EmptyView()
                 }
                 configuration.label
-                    .lineLimit(2)
+                    .lineLimit(4)
             }
 
             if let child = configuration.child {
                 child
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading, 60)
             }
         }
@@ -95,11 +97,15 @@ public struct CustomIndexStyle: IndexStyle {
     public init() {}
 
     public func makeBody(configuration: Configuration) -> some View {
+#if os(visionOS)
+        EmptyView()
+#else
         Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
             .foregroundColor(.gray)
             .font(.system(size: 30))
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             .padding()
+#endif
     }
 }
 

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum InfoSectionType: String, CaseIterable, Identifiable {
+public enum InfoSectionType: String, CaseIterable, Identifiable, Codable, Equatable, Hashable {
     case sampleViews
     case share
     case howToUse
@@ -17,6 +17,8 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
 #if DEBUG
     case debugPage
 #endif
+
+    public static let infoSectionWindowKey = "infoSectionWindowKey"
 
     public var id: String {
         return rawValue
@@ -35,7 +37,7 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
         case .symbolKit:
             return "SymbolKit"
         case .japanRegionSwift:
-            return "japan-region-swift"
+            return "Japan-\\(region).swift"
 #if DEBUG
         case .debugPage:
             return "Debug Page"

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		68E4E4062DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E4E4052DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift */; };
+		68E4E4082DD0B476003DF419 /* FlutterNinjasSlide in Frameworks */ = {isa = PBXBuildFile; productRef = 68E4E4072DD0B476003DF419 /* FlutterNinjasSlide */; };
 		6B5E7DB9A7832371F1CCAEE3 /* Pods_SlidysFlutter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63485D03684691BD8F920A33 /* Pods_SlidysFlutter.framework */; };
 		C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C3286A402CDBB41B007367BC /* opening_input.mp4 */; };
 		C359A8A32CCE309E00370A72 /* SlidysFlutterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A22CCE309E00370A72 /* SlidysFlutterApp.swift */; };
@@ -17,7 +19,7 @@
 		C383EDEA2D296F8D00D84F6F /* SlidysCommon in Frameworks */ = {isa = PBXBuildFile; productRef = C383EDE92D296F8D00D84F6F /* SlidysCommon */; };
 		C383EDEC2D29720700D84F6F /* FlutterKaigiSlide in Frameworks */ = {isa = PBXBuildFile; productRef = C383EDEB2D29720700D84F6F /* FlutterKaigiSlide */; };
 		C3D0D6B02CE049AA0055F861 /* FlutterAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */; };
-		C3D0D6B52CE055F60055F861 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D0D6B42CE055F60055F861 /* Router.swift */; };
+		C3D0D6B52CE055F60055F861 /* FlutterKaigiRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D0D6B42CE055F60055F861 /* FlutterKaigiRouter.swift */; };
 		C3D0D6B72CE077530055F861 /* FlutterEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +41,9 @@
 		4B89B0599B99B529A58C3667 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
 		63485D03684691BD8F920A33 /* Pods_SlidysFlutter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlidysFlutter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		665115867B42FE5CE46AC762 /* Pods-FlutterKaigiSlide.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlutterKaigiSlide.debug.xcconfig"; path = "Target Support Files/Pods-FlutterKaigiSlide/Pods-FlutterKaigiSlide.debug.xcconfig"; sourceTree = "<group>"; };
+		68B303A62DD24EA900D9A424 /* icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = icon.svg; sourceTree = "<group>"; };
+		68B303A72DD24EA900D9A424 /* map.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = map.png; sourceTree = "<group>"; };
+		68E4E4052DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterNinjasTokyoRouter.swift; sourceTree = "<group>"; };
 		99CA147A46BF6E71A48DACEC /* Pods_FlutterKaigiSlide.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FlutterKaigiSlide.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
 		A51152F78CD5ADA3B98EF2DC /* Pods-SlidysFlutter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlidysFlutter.release.xcconfig"; path = "Target Support Files/Pods-SlidysFlutter/Pods-SlidysFlutter.release.xcconfig"; sourceTree = "<group>"; };
@@ -55,7 +60,7 @@
 		C3B94A252CE65C5A0024632E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C3D0D6AC2CDFBD350055F861 /* SlidysFlutterRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SlidysFlutterRelease.entitlements; sourceTree = "<group>"; };
 		C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterAppDelegate.swift; sourceTree = "<group>"; };
-		C3D0D6B42CE055F60055F861 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		C3D0D6B42CE055F60055F861 /* FlutterKaigiRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterKaigiRouter.swift; sourceTree = "<group>"; };
 		C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlutterEngineManager.swift; sourceTree = "<group>"; };
 		E9619B77083A30446359AF03 /* Pods-FlutterKaigiSlide.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlutterKaigiSlide.release.xcconfig"; path = "Target Support Files/Pods-FlutterKaigiSlide/Pods-FlutterKaigiSlide.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -65,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68E4E4082DD0B476003DF419 /* FlutterNinjasSlide in Frameworks */,
 				C383EDEC2D29720700D84F6F /* FlutterKaigiSlide in Frameworks */,
 				C383EDEA2D296F8D00D84F6F /* SlidysCommon in Frameworks */,
 				6B5E7DB9A7832371F1CCAEE3 /* Pods_SlidysFlutter.framework in Frameworks */,
@@ -74,6 +80,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		68B303A82DD24EA900D9A424 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				68B303A62DD24EA900D9A424 /* icon.svg */,
+				68B303A72DD24EA900D9A424 /* map.png */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
+		68B303A92DD24EA900D9A424 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				68B303A82DD24EA900D9A424 /* images */,
+			);
+			name = assets;
+			path = ../../../flutter_slide/assets;
+			sourceTree = "<group>";
+		};
 		9DA90DF292DA18BA8A96F5B1 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -128,7 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				C3B94A252CE65C5A0024632E /* Info.plist */,
-				C3D0D6B32CE055E90055F861 /* FlutterKaigiSlide */,
+				C3D0D6B32CE055E90055F861 /* Router */,
 				C3D0D6AE2CE03D3F0055F861 /* Flutter */,
 				C3D0D6AC2CDFBD350055F861 /* SlidysFlutterRelease.entitlements */,
 				C3286A3F2CDBB417007367BC /* Assets */,
@@ -137,6 +161,7 @@
 				C359A8A62CCE309F00370A72 /* Assets.xcassets */,
 				C359A8A82CCE309F00370A72 /* SlidysFlutter.entitlements */,
 				C359A8A92CCE309F00370A72 /* Preview Content */,
+				68B303A92DD24EA900D9A424 /* assets */,
 			);
 			path = SlidysFlutter;
 			sourceTree = "<group>";
@@ -167,12 +192,13 @@
 			path = Flutter;
 			sourceTree = "<group>";
 		};
-		C3D0D6B32CE055E90055F861 /* FlutterKaigiSlide */ = {
+		C3D0D6B32CE055E90055F861 /* Router */ = {
 			isa = PBXGroup;
 			children = (
-				C3D0D6B42CE055F60055F861 /* Router.swift */,
+				C3D0D6B42CE055F60055F861 /* FlutterKaigiRouter.swift */,
+				68E4E4052DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift */,
 			);
-			path = FlutterKaigiSlide;
+			path = Router;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,12 +209,12 @@
 			buildConfigurationList = C359A8AE2CCE309F00370A72 /* Build configuration list for PBXNativeTarget "SlidysFlutter" */;
 			buildPhases = (
 				4E12D9ABCAFB5E34DF1D13F6 /* [CP] Check Pods Manifest.lock */,
-				8406CA16DD8F7808634BE19A /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */,
+				8406CA16DD8F7808634BE19A /* [CP-User] Run Flutter Build flutter_slide Script */,
 				C359A89B2CCE309E00370A72 /* Sources */,
 				C359A89C2CCE309E00370A72 /* Frameworks */,
 				C359A89D2CCE309E00370A72 /* Resources */,
 				C3E9A1AF2CDFB8430022F34A /* Embed Frameworks */,
-				ED3B39026F70BE9BAD71E520 /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */,
+				ED3B39026F70BE9BAD71E520 /* [CP-User] Embed Flutter Build flutter_slide Script */,
 			);
 			buildRules = (
 			);
@@ -198,6 +224,7 @@
 			packageProductDependencies = (
 				C383EDE92D296F8D00D84F6F /* SlidysCommon */,
 				C383EDEB2D29720700D84F6F /* FlutterKaigiSlide */,
+				68E4E4072DD0B476003DF419 /* FlutterNinjasSlide */,
 			);
 			productName = Slidys;
 			productReference = C359A89F2CCE309E00370A72 /* SlidysFlutter.app */;
@@ -272,25 +299,25 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8406CA16DD8F7808634BE19A /* [CP-User] Run Flutter Build flutter_kaigi_slide Script */ = {
+		8406CA16DD8F7808634BE19A /* [CP-User] Run Flutter Build flutter_slide Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			name = "[CP-User] Run Flutter Build flutter_kaigi_slide Script";
+			name = "[CP-User] Run Flutter Build flutter_slide Script";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh build";
+			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../../flutter_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh build";
 		};
-		ED3B39026F70BE9BAD71E520 /* [CP-User] Embed Flutter Build flutter_kaigi_slide Script */ = {
+		ED3B39026F70BE9BAD71E520 /* [CP-User] Embed Flutter Build flutter_slide Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			name = "[CP-User] Embed Flutter Build flutter_kaigi_slide Script";
+			name = "[CP-User] Embed Flutter Build flutter_slide Script";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../../flutter_kaigi_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh embed_and_thin";
+			shellScript = "set -e\nset -u\nsource \"${SRCROOT}/../../flutter_slide/.ios/Flutter/flutter_export_environment.sh\"\nexport VERBOSE_SCRIPT_LOGGING=1 && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/xcode_backend.sh embed_and_thin";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -302,7 +329,8 @@
 				C3D0D6B72CE077530055F861 /* FlutterEngineManager.swift in Sources */,
 				C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */,
 				C3D0D6B02CE049AA0055F861 /* FlutterAppDelegate.swift in Sources */,
-				C3D0D6B52CE055F60055F861 /* Router.swift in Sources */,
+				68E4E4062DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift in Sources */,
+				C3D0D6B52CE055F60055F861 /* FlutterKaigiRouter.swift in Sources */,
 				C359A8A32CCE309E00370A72 /* SlidysFlutterApp.swift in Sources */,
 				C359A8B62CCE3D3D00370A72 /* FlutterView.swift in Sources */,
 			);
@@ -539,6 +567,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		68E4E4072DD0B476003DF419 /* FlutterNinjasSlide */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FlutterNinjasSlide;
+		};
 		C383EDE92D296F8D00D84F6F /* SlidysCommon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SlidysCommon;

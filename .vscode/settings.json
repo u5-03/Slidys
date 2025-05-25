@@ -1,8 +1,79 @@
 {
-    "editor.quickSuggestions": false,
-    "cSpell.words": [
-        "kaigi",
-        "Slidys",
-        "unstroked"
-    ]
+  "gopls": {
+    // Ref: https://staticcheck.dev/docs/checks/
+    "staticcheck": true,
+    "ui.diagnostic.analyses": {
+      "ST1020": true,
+      "ST1021": true,
+      "ST1022": true
+    }
+  },
+  "files.insertFinalNewline": true,
+  // Ref: https://zenn.dev/inari_sushio/articles/0f4c606c8340ee
+  "editor.quickSuggestions": false,
+  "editor.formatOnSave": true,
+  "editor.suggestSelection": "first",
+  "editor.guides.bracketPairs": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "cSpell.words": [
+    "kaigi",
+    "Slidys",
+    "unstroked"
+  ],
+  "cSpell.ignorePaths": [
+    "**/firebase_options/**",
+    "**/google-services.json",
+    ".vscode",
+    "**/pubspec.lock",
+    "**/Podfile.lock",
+    "**/*.xcodeproj",
+    "**/packages/**",
+    "**/fvm/**",
+    "**/.pub-cache/**",
+    "**/.gitignore",
+    "Podfile",
+    "AndroidManifest.xml"
+  ],
+  "dart.renameFilesWithClasses": "always",
+  "dart.previewFlutterUiGuides": true,
+  "dart.previewFlutterUiGuidesCustomTracking": true,
+  "dart.closingLabels": false,
+  "dart.flutterSdkPath": ".fvm/versions/3.29.2",
+  "[dart]": {
+    "editor.tabSize": 2,
+    "editor.codeActionsOnSave": {
+      "quickfix.insertSemicolon": "explicit"
+    },
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.rulers": [
+      120
+    ],
+    "editor.selectionHighlight": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off",
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnPaste": true
+  },
+  "editor.formatOnSaveMode": "file",
+  "notebook.formatOnSave.enabled": true,
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  // VSCodeの検索結果から以下の項目を除外する
+  "search.exclude": {},
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.formatOnSave": false
+  },
+  "dart.enableSnippets": true
 }

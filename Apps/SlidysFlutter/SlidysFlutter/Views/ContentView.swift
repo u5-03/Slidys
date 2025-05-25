@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FlutterKaigiSlide
+import FlutterNinjasSlide
 import ChibaSwiftSlide
 import KanagawaSwiftSlide
 import iOSDCSlide
@@ -15,6 +16,7 @@ import SlidysCommon
 
 enum FlutterSlideType: CaseIterable, Identifiable, SlideTypeProtocol {
     case flutterKaigi
+    case FlutterNinjas
 
     var id: String {
         return displayValue
@@ -24,13 +26,17 @@ enum FlutterSlideType: CaseIterable, Identifiable, SlideTypeProtocol {
         switch self {
         case .flutterKaigi:
             return "FlutterKaigi2024"
+        case .FlutterNinjas:
+            return "FlutterNinjas2025"
         }
     }
 
     public var view: any SlideViewProtocol {
         switch self {
         case .flutterKaigi:
-            FlutterKaigiSlideView(router: Router())
+            FlutterKaigiSlideView(router: FlutterKaigiRouter())
+        case .FlutterNinjas:
+            FlutterNinjasSlideView(router: FlutterNinjasRouter())
         }
     }
 }

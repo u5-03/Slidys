@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FlutterView: View {
     @Environment(\.router) var router
-    let type: FlutterViewType
+    let type: FlutterKaigiViewType
 
     var body: some View {
         router.build(viewType: type)

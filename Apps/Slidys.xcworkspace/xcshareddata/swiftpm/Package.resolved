@@ -1,22 +1,13 @@
 {
-  "originHash" : "5e76151ac05f4181f16f1699e93580c7cb4d6f282ef8fab8f1edbcf8f7e72d3d",
+  "originHash" : "c82c66a12b662ec5adfddf68f08765e004f5ed193d0131aa3a0c6e4f064eb896",
   "pins" : [
     {
       "identity" : "slidekit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mtj0928/SlideKit",
       "state" : {
-        "revision" : "53c354da986efe0dba624c074765417744bc6aa3",
-        "version" : "0.4.0"
-      }
-    },
-    {
-      "identity" : "splash",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/JohnSundell/Splash",
-      "state" : {
-        "revision" : "7f4df436eb78fe64fe2c32c58006e9949fa28ad8",
-        "version" : "0.16.0"
+        "revision" : "4921d605e0fcd8cc58b9d0f50c52625930274be6",
+        "version" : "0.6.1"
       }
     },
     {
@@ -40,19 +31,19 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
+      "location" : "https://github.com/swiftlang/swift-syntax",
       "state" : {
-        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
-        "version" : "509.1.1"
+        "revision" : "f99ae8aa18f0cf0d53481901f88a0991dc3bd4a2",
+        "version" : "601.0.1"
       }
     },
     {
-      "identity" : "webui",
+      "identity" : "syntaxink",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/cybozu/WebUI",
+      "location" : "https://github.com/mtj0928/SyntaxInk",
       "state" : {
-        "revision" : "9579095605b6e2d8c0712cbf6fb37dc04b7fe173",
-        "version" : "2.3.0"
+        "revision" : "66fea7139f8e27cc2ac7c42fa9a5167c59685e16",
+        "version" : "0.0.2"
       }
     },
     {

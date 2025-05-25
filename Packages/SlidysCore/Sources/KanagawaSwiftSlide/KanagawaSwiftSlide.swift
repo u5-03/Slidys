@@ -13,6 +13,7 @@ public struct KanagawaSwiftSlideView: SlideViewProtocol {
 }
 
 struct SlideConfiguration: SlideConfigurationProtocol {
+    @MainActor
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "Kanagawa.swift始まりました")
         ReadmeSlide()
