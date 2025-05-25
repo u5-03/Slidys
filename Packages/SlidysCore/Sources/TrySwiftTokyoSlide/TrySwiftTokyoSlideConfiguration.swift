@@ -21,6 +21,7 @@ public struct TrySwiftTokyoSlideView: SlideViewProtocol {
 }
 
 struct SlideConfiguration: SlideConfigurationProtocol {
+    @MainActor
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "try! Swift Tokyo 2025")
         CenterTextSlide(text: "Question!")
@@ -73,7 +74,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
             Image(.nagoyaSwift)
                 .resizable()
         }
-        ShareEndSlide()
+        ShareEndSlide(qrCodeType: .native)
     }
 }
 

@@ -16,7 +16,7 @@ import GoToNextPlatformSlide
 import TrySwiftTokyoSlide
 import NagoyaSwiftSlide
 
-public protocol SlideTypeProtocol: CaseIterable, Identifiable {
+public protocol SlideTypeProtocol: CaseIterable, Identifiable, Codable, Equatable, Hashable {
     var id: String { get }
     var displayValue: String { get }
     var view: any SlideViewProtocol { get }
@@ -31,6 +31,8 @@ public enum SlideType: SlideTypeProtocol {
     case goToNextPlatform
     case trySwiftTokyo
     case nagoyaSwift
+
+    public static let slideWindowKey = "SlideWindowKey"
 
     public var id: String {
         return displayValue
@@ -79,7 +81,7 @@ public enum SlideType: SlideTypeProtocol {
     }
 }
 
-public enum SlideSectionType {
+public enum SlideSectionType: Equatable {
     case slides(any SlideTypeProtocol)
     case info(InfoSectionType)
 
@@ -127,6 +129,8 @@ extension SlideSectionType: Identifiable, Hashable  {
 
 public struct SlidysCommonView: View {
     @State private var selectedSectionType: SlideSectionType?
+    @Environment(\.openWindow) private var openWindow
+
     private let slideTypes: [any SlideTypeProtocol]
 
     public init(slideTypes: [any SlideTypeProtocol]) {
@@ -175,6 +179,18 @@ public struct SlidysCommonView: View {
                     closeButton
                         .padding()
                 }
+            }
+#elseif os(visionOS)
+            .onChange(of: selectedSectionType) { _, newValue in
+                switch newValue {
+                case .slides(let slideType):
+                    openWindow(id: SlideType.slideWindowKey, value: slideType)
+                case .info(let infoSectionType):
+                    openWindow(id: InfoSectionType.infoSectionWindowKey, value: infoSectionType)
+                case nil:
+                    break
+                }
+                selectedSectionType = nil
             }
 #endif
         }

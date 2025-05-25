@@ -10,6 +10,8 @@ import iOSDCSlide
 import ChibaSwiftSlide
 import KanagawaSwiftSlide
 import SlidysCommon
+import SlidesCore
+
 
 @main
 struct SlidysApp: App {
@@ -17,6 +19,23 @@ struct SlidysApp: App {
         WindowGroup {
             ContentView()
         }
+#if os(visionOS)
+        WindowGroup(id: SlideType.slideWindowKey, for: SlideType.self) { slideTypeBinding in
+            if let slideType = slideTypeBinding.wrappedValue {
+                AnyView(slideType.view)
+            }
+        }
+        WindowGroup(id: InfoSectionType.infoSectionWindowKey, for: InfoSectionType.self) { infoSectionTypeBinding in
+            if let infoSectionType = infoSectionTypeBinding.wrappedValue {
+                AnyView(infoSectionType.view)
+            }
+        }
+        WindowGroup(id: SamplePageType.samplePageWindowKey, for: SamplePageType.self) { samplePageTypeBinding in
+            if let samplePageType = samplePageTypeBinding.wrappedValue {
+                AnyView(samplePageType.view)
+            }
+        }
+#endif
         WindowGroup(id: SlideType.iosdcSlide.id) {
             iOSDCSlideView()
         }

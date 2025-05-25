@@ -15,6 +15,7 @@ public struct ChibaSwiftSlideView: SlideViewProtocol {
 
 struct SlideConfiguration: SlideConfigurationProtocol {
 
+    @MainActor
     let slideIndexController = SlideIndexController(index: 0) {
         CenterTextSlide(text: "iOSDC2024")
         CenterTextSlide(text: "今年はLTをしました")
@@ -56,6 +57,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
     }
 }
 
+@MainActor
 struct CustomSlideTheme: SlideTheme {
     let headerSlideStyle = CustomHeaderSlideStyle()
     let itemStyle = CustomItemStyle()

@@ -32,9 +32,9 @@ extension StrokeAnimatableShape: Shape {
 struct StrokeAnimatableShapeCodeSlide: View {
     var body: some View {
         HeaderSlide("実際のコード1") {
-            Code(code,
-                 colorTheme: .defaultDark,
-                 fontSize: 40
+            Code(
+                code,
+                syntaxHighlighter: .presentation(fontSize: 40)
             )
         }
     }

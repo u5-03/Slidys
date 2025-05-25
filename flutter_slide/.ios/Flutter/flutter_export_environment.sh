@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/yugo.a.sugiyama/fvm/versions/3.29.2"
-export "FLUTTER_APPLICATION_PATH=/Users/yugo.a.sugiyama/Dev/Swift/Slidys/flutter_slide"
+export "FLUTTER_ROOT=/Users/yugo.sugiyama/fvm/versions/3.29.2"
+export "FLUTTER_APPLICATION_PATH=/Users/yugo.sugiyama/Dev/Swift/Slidys/flutter_slide"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import WebUI
 import WebKit
 
 public struct WebPageView: View {

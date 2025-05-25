@@ -14,7 +14,7 @@ import Algorithms
 import AppKit
 public typealias AppFont = NSFont
 public typealias AppColor = NSColor
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
 import UIKit
 public typealias AppFont = UIFont
 public typealias AppColor = UIColor

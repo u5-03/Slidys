@@ -19,6 +19,7 @@ public struct iOSDCSlideView: SlideViewProtocol {
 struct SlideConfiguration: SlideConfigurationProtocol {
 
     ///  「ある日」の分のスライドはスキップする
+    @MainActor
     let slideIndexController = SlideIndexController(index: 1) {
         CenterTextSlide(text: .init(localized: "someday", defaultValue: "ある日..."))
         TitleImageSlide()
