@@ -18,6 +18,9 @@ How would we create this drawing animation in Flutter?
 
 This is part 2
 
+part2
+This animation recreates the animation displayed when an iPhone starts up.
+
 ## How would you implement this? Part3
 
 And part 3
@@ -120,11 +123,10 @@ Finally, to make it animate:
 ## This is the implementation approach!
 
 That's the basic approach!
-It's simple but very powerful.
 
 ## Let's see a demo of how it actually works and take a short break
 
-Let's see a demo of how it actually works and take a short break
+Let's take a short break while watching a demo of how it actually works
 
 ## Japan Symbol Quiz
 

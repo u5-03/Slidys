@@ -47,7 +47,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         ImplementationStep3Slide()
         ImplementationStep4Slide()
         CenterTextSlide(text: "This is the implementation approach!")
-        CenterTextSlide(text: "Let's see a demo of how it actually works\nand take a short break")
+        CenterTextSlide(text: "Let's take a short break while watching a demo of how it actually works")
         CenterTextSlide(text: "Japan Symbol Quiz")
         JapanRegionSwiftMapSlide()
         SymbolsGridSlide()
@@ -74,7 +74,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         ContentSlide(headerTitle: "Japan Symbol Quiz 2") {
             FlutterView(type: .symbolQuiz2)
         }
-        WebTitleSlide(title: "Toyosu Marget", url: URL(string: "https://www.toyosu-market.or.jp/en/")!)
+        WebTitleSlide(title: "Toyosu Market", url: URL(string: "https://www.toyosu-market.or.jp/en/")!)
         CenterTextSlide(text: "That wraps up \nthe Swift implementation I did!")
         ContentSlide(headerTitle: "I forgot about this implementation!") {
             FlutterView(type: .flightRouter)
@@ -87,9 +87,8 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
             FlutterView(type: .moveTab)
         }
         WrapUpSlide()
-//        ReferenceSlide()
+        ReferenceSlide()
         ShareEndSlide()
-        CenterTextSlide(text: "Thank you for listening!")
     }
 
     public init() {}

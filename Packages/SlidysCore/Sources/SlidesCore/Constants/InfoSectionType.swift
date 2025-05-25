@@ -35,7 +35,7 @@ public enum InfoSectionType: String, CaseIterable, Identifiable {
         case .symbolKit:
             return "SymbolKit"
         case .japanRegionSwift:
-            return "japan-region-swift"
+            return "Japan-\\(region).swift"
 #if DEBUG
         case .debugPage:
             return "Debug Page"

@@ -18,7 +18,7 @@ struct ComparePlatformAnimationSlide: View {
                         shape: SugiyShape(),
                         lineWidth: 6,
                         lineColor: .white,
-                        duration: .seconds(5),
+                        duration: .seconds(30),
                         shapeAspectRatio: SugiyShape.aspectRatio,
                         viewModel: .init(animationType: .progressiveDraw)
                     )

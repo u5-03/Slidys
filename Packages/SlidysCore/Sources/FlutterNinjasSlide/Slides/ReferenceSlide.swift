@@ -13,11 +13,8 @@ import SlidesCore
 struct ReferenceSlide: View {
     var body: some View {
         HeaderSlide("Reference") {
-            Item("CustomMultiChildLayout class", accessory: .number(1)) {
-                Item("https://api.flutter.dev/flutter/widgets/CustomMultiChildLayout-class.html", accessory: .number(1))
-            }
-            Item("FlutterのCustomMultiChildLayoutとCustomSingleChildLayoutの使い方", accessory: .number(2)) {
-                Item("https://zenn.dev/tmhk_tnht/articles/633b93fd685f7a", accessory: .number(1))
+            Item("【Flutter】TextをPathに追従させて動かす", accessory: .number(1)) {
+                Item("https://zenn.dev/s134/articles/follow_path_text", accessory: .number(1))
             }
         }
     }

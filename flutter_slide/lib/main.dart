@@ -52,7 +52,7 @@ enum PageType {
         return AnimatedSvgPathWidget(
           pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
           animationType: PathAnimationType.progressiveDraw(),
-          duration: const Duration(seconds: 5),
+          duration: const Duration(seconds: 30),
           strokeWidth: 6,
           loop: false,
         );

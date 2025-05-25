@@ -57,7 +57,7 @@ private extension RegionSymbolQuizView {
                 shape: shape,
                 lineWidth: 4,
                 lineColor: .white,
-                duration: .seconds(5),
+                duration: .seconds(30),
                 shapeAspectRatio: aspectRatio,
                 viewModel: .init(animationType: animationType)
             )
