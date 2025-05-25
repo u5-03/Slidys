@@ -21,6 +21,7 @@ public struct GoToNextPlatformSlideView: SlideViewProtocol {
 }
 
 struct SlideConfiguration: SlideConfigurationProtocol {
+    @MainActor
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "突撃！隣のモバイルプラットフォーム！")
         QuizDescriptionSlide()

@@ -7,7 +7,6 @@
 
 import SwiftUI
 import SlideKit
-import WebUI
 import WebKit
 
 @Slide
@@ -24,17 +23,7 @@ public struct WebViewSlide: View {
     }
 
     public var body: some View {
-        WebViewReader { proxy in
-            ZStack {
-                WebView(configuration: configuration)
-                    .onAppear {
-                        proxy.load(request: URLRequest(url: url))
-                    }
-                if proxy.isLoading {
-                    ProgressView()
-                }
-            }
-        }
+        CrossPlatformWebView(url: url, configuration: configuration)
     }
 }
 
@@ -43,4 +32,3 @@ public struct WebViewSlide: View {
         WebViewSlide(url: URL(string: "https://twitter.com/totokit4/status/1780083727789686992")!)
     }
 }
-

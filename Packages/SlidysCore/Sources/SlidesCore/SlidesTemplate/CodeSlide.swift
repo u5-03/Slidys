@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SlideKit
+import SyntaxInk
 
 @Slide
 public struct CodeSlide: View {
@@ -22,9 +23,9 @@ public struct CodeSlide: View {
 
     public var body: some View {
         HeaderSlide(LocalizedStringKey(title)) {
-            Code(code,
-                 colorTheme: .defaultDark,
-                 fontSize: fontSize
+            Code(
+                code,
+                syntaxHighlighter: .presentationDark(fontSize: fontSize)
             )
         }
     }
@@ -38,8 +39,7 @@ public struct CodeSlide: View {
 final class Hoge {
     let hoge: String
 }
-""",
-            fontSize: 38
+"""
         )
     }
     .headerSlideStyle(CustomHeaderSlideStyle())

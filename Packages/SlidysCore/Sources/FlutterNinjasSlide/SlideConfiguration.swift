@@ -12,6 +12,7 @@ import SlidesCore
 
 public struct SlideConfiguration: SlideConfigurationProtocol {
 
+    @MainActor
     public let slideIndexController = SlideIndexController(index: 0) {
         CenterTextSlide(text: "FlutterNinjas2025")
         CenterTextSlide(text: "Let me ask you a question!")

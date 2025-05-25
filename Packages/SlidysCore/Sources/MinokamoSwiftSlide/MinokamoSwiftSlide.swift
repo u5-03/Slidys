@@ -14,6 +14,7 @@ public struct MinokamoSwiftSlideView: SlideViewProtocol {
 }
 
 struct SlideConfiguration: SlideConfigurationProtocol {
+    @MainActor
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "Minokamo.swift！")
         ReadmeSlide()

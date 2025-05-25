@@ -8,12 +8,14 @@
 import SwiftUI
 import SymbolKit
 
-enum SamplePageType: String, CaseIterable, Identifiable {
+public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatable, Hashable {
     case yugiohEffect
     case japanSymbolQuizExtra1
     case japanSymbolQuizExtra2
     case japanSymbolQuizExtra3
     case pixelImage
+
+    public static let samplePageWindowKey = "samplePageWindowKey"
 
     public var id: String {
         return rawValue
@@ -82,6 +84,7 @@ enum SamplePageType: String, CaseIterable, Identifiable {
 
 struct SamplePageView: View {
     @State private var selectedType: SamplePageType?
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         GeometryReader { proxy in
@@ -113,6 +116,12 @@ struct SamplePageView: View {
                     closeButton
                         .padding()
                 }
+            }
+#elseif os(visionOS)
+            .onChange(of: selectedType) { _, newValue in
+                guard let samplePageType = newValue else { return }
+                openWindow(id: SamplePageType.samplePageWindowKey, value: samplePageType)
+                selectedType = nil
             }
 #endif
         }

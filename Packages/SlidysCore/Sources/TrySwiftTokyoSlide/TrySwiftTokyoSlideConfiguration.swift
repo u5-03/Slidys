@@ -21,6 +21,7 @@ public struct TrySwiftTokyoSlideView: SlideViewProtocol {
 }
 
 struct SlideConfiguration: SlideConfigurationProtocol {
+    @MainActor
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "try! Swift Tokyo 2025")
         CenterTextSlide(text: "Question!")

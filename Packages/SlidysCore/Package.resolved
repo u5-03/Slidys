@@ -47,15 +47,6 @@
       }
     },
     {
-      "identity" : "webui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/cybozu/WebUI",
-      "state" : {
-        "revision" : "9579095605b6e2d8c0712cbf6fb37dc04b7fe173",
-        "version" : "2.3.0"
-      }
-    },
-    {
       "identity" : "yugiohcardeffect",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/u5-03/YugiohCardEffect",

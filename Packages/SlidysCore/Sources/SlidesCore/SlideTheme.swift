@@ -8,6 +8,7 @@
 import SwiftUI
 import SlideKit
 
+@MainActor
 public struct CustomSlideTheme: SlideTheme {
     public let headerSlideStyle = CustomHeaderSlideStyle()
     public let itemStyle = CustomItemStyle()
@@ -96,11 +97,15 @@ public struct CustomIndexStyle: IndexStyle {
     public init() {}
 
     public func makeBody(configuration: Configuration) -> some View {
+#if os(visionOS)
+        EmptyView()
+#else
         Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
             .foregroundColor(.gray)
             .font(.system(size: 30))
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             .padding()
+#endif
     }
 }
 

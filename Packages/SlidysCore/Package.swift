@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SlidysCore",
-    platforms: [.iOS(.v17), .macOS(.v15)],
+    platforms: [.iOS(.v17), .macOS(.v15), .visionOS(.v2)],
     products: [
         .library(
             name: "SlidesCore",
@@ -57,8 +57,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/mtj0928/SlideKit", from: "0.4.0"),
-        .package(url: "https://github.com/cybozu/WebUI", from: "2.3.0"),
+        .package(url: "https://github.com/mtj0928/SlideKit", from: "0.6.1"),
         .package(url: "https://github.com/u5-03/YugiohCardEffect", from: "0.3.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
         .package(path: "../PianoUI"),
@@ -69,7 +68,6 @@ let package = Package(
             name: "SlidesCore",
             dependencies: [
                 "SlideKit",
-                "WebUI",
                 "YugiohCardEffect",
                 "SymbolKit",
                 .product(name: "Algorithms", package: "swift-algorithms"),
