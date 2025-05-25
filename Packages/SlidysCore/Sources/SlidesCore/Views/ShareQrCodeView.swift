@@ -7,31 +7,48 @@
 
 import SwiftUI
 
+public enum QrCodeType {
+    case native
+    case flutter
+    case all
+
+    @ViewBuilder
+    var view: some View {
+        switch self {
+        case .native:
+            Image(.qrCodeTestFlight)
+                .resizable()
+                .scaledToFit()
+        case .flutter:
+            Image(.qrCodeTestFlightFlutter)
+                .resizable()
+                .scaledToFit()
+        case .all:
+            AnyView(
+                HStack {
+                    VStack {
+                        Text("Slidys")
+                            .font(.mediumFont)
+                        QrCodeType.native.view
+                    }
+                    VStack {
+                        Text("Slidys for Flutter")
+                            .font(.mediumFont)
+                        QrCodeType.flutter.view
+                    }
+                }
+            )
+        }
+    }
+}
+
 public struct ShareQrCodeView: View {
     public init() {}
 
     public var body: some View {
-        GeometryReader { proxy in
-            HStack(alignment: .center) {
-                VStack(spacing: 0) {
-                    Text("Slidys")
-                        .font(.system(size: 120, weight: .bold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.1)
-                    Image(.appIcon)
-                        .resizable()
-                        .scaledToFit()
-                }
-                .frame(width: proxy.size.width / 2, alignment: .center)
-                Image(.qrCode)
-                    .resizable()
-                    .scaledToFit()
-                    .border(.black)
-                    .frame(width: proxy.size.width / 2)
-            }
+        QrCodeType.all.view
             .frame(maxHeight: .infinity)
-        }
-        .padding(20)
+            .padding(20)
     }
 }
 

@@ -8,17 +8,20 @@
 import SwiftUI
 import SlideKit
 
+
+
 @Slide
 public struct ShareEndSlide: View {
+    private let qrCodeType: QrCodeType
 
-    public init() {}
+    public init(qrCodeType: QrCodeType) {
+        self.qrCodeType = qrCodeType
+    }
 
     public var body: some View {
         HeaderSlide(.init("You can download this slide app from TestFlight")) {
             VStack {
-                Image(.qrCode)
-                    .resizable()
-                    .scaledToFit()
+                qrCodeType.view
                 HStack(spacing: 0) {
                     Text("This app depends on ")
                         .font(.smallFont)
@@ -34,7 +37,13 @@ public struct ShareEndSlide: View {
 }
 
 #Preview {
-    ShareEndSlide()
+    ShareEndSlide(qrCodeType: .native)
+        .headerSlideStyle(CustomHeaderSlideStyle())
+        .itemStyle(CustomItemStyle())
+    ShareEndSlide(qrCodeType: .flutter)
+        .headerSlideStyle(CustomHeaderSlideStyle())
+        .itemStyle(CustomItemStyle())
+    ShareEndSlide(qrCodeType: .all)
         .headerSlideStyle(CustomHeaderSlideStyle())
         .itemStyle(CustomItemStyle())
 }

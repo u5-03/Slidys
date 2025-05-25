@@ -89,7 +89,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         }
         WrapUpSlide()
 //        ReferenceSlide()
-        ShareEndSlide()
+        ShareEndSlide(qrCodeType: .flutter)
         CenterTextSlide(text: "Thank you for listening!")
     }
 

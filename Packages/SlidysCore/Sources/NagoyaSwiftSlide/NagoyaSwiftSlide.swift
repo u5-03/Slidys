@@ -61,7 +61,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         ReferenceSlide()
         JapanRegionSwiftMapSlide()
         CenterTextSlide(text: "またどこかの\nJapan-\\(region).swiftで\n会いましょう！")
-        ShareEndSlide()
+        ShareEndSlide(qrCodeType: .native)
         OneMoreThingSlide()
         CenterTextSlide(text: "Japan-\\(region).swiftの特別イベントが...")
         CenterImageSlide(imageResource: .regionWwdcRecap)

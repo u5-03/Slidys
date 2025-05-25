@@ -74,7 +74,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
             Image(.nagoyaSwift)
                 .resizable()
         }
-        ShareEndSlide()
+        ShareEndSlide(qrCodeType: .native)
     }
 }
 
