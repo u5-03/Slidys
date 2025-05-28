@@ -1,5 +1,5 @@
 //
-//  SvgConverterDescriptionSlideswift.swift
+//  SvgConverterDescriptionSlide.swift
 //  Slidys
 //
 //  Created by Yugo Sugiyama on 2024/11/06.
@@ -10,7 +10,7 @@ import SlideKit
 import SlidesCore
 
 @Slide
-struct SvgConverterDescriptionSlideswift: View {
+struct SvgConverterDescriptionSlide: View {
     var body: some View {
         HeaderSlide("Custom conversion logic from SVG to Flutter Path") {
             Item("Use the xml package to load SVG files as text and parse them as XML", accessory: .number(1))
@@ -23,7 +23,7 @@ struct SvgConverterDescriptionSlideswift: View {
 
 #Preview {
     SlidePreview {
-        SvgConverterDescriptionSlideswift()
+        SvgConverterDescriptionSlide()
     }
     .headerSlideStyle(CustomHeaderSlideStyle())
     .itemStyle(CustomItemStyle())

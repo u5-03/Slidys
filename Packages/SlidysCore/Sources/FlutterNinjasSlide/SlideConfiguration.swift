@@ -42,7 +42,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         ImplementationStepSlide()
         CenterTextSlide(text: "Detailed source code will be available\non blog and GitHub later")
         ImplementationStep1Slide()
-        SvgConverterDescriptionSlideswift()
+        SvgConverterDescriptionSlide()
         PathCodeScrollSlide()
         ImplementationStep2Slide()
         ImplementationStep3Slide()
