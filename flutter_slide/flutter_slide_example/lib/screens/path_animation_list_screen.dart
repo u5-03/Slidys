@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slide/components/svg_path_widget.dart';
+import 'package:flutter_slide/components/animated_svg_path_widget.dart';
 import 'package:flutter_slide/components/text_path_widget.dart';
 import 'package:flutter_slide/widgets/path_animation/flight_route_animation_widget.dart';
 import 'package:flutter_slide/widgets/path_animation/icon_path_animation_widget.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slide/components/animated_svg_path_widget.dart';
 import 'package:flutter_slide/components/svg_path_widget.dart';
 import 'package:flutter_slide/widgets/calendar_ui/calendar_ui_widget.dart';
 import 'package:flutter_slide/widgets/icon_move_tab/icon_move_tab_widget.dart';
@@ -20,6 +21,8 @@ enum PageType {
   flightRouter,
   icon,
   iconWithoutLoop,
+  iconWithoutAnimation,
+  iconWithAnimationHalf,
   waveFixedLength,
   iconMove,
   moveTab,
@@ -56,6 +59,17 @@ enum PageType {
           strokeWidth: 6,
           loop: false,
         );
+      case PageType.iconWithoutAnimation:
+        return SvgPathWidget(
+          pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
+          strokeWidth: 3,
+        );
+      case PageType.iconWithAnimationHalf:
+        return SvgPathWidget(
+          pathSource: PathSourceType.assetPath('assets/images/icon.svg'),
+          strokeWidth: 3,
+          defaultProgress: 0.3, // アニメーションの進捗率を30%に設定
+        );
       case PageType.waveFixedLength:
         return AnimatedSvgPathWidget(
           pathSource: PathSourceType.path(_generateWavePath(const Size(100, 20),
@@ -82,7 +96,7 @@ enum PageType {
         return SymbolQuizWidget(
           pathSource: PathSourceType.text('ToyosuMarket', 50),
           animationType: PathAnimationType.progressiveDraw(),
-          duration: const Duration(seconds: 30),
+          duration: const Duration(seconds: 20),
           loop: true,
           strokeColor: Colors.white,
         );

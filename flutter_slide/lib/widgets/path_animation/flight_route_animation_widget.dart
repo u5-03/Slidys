@@ -50,7 +50,7 @@ final class FlightRouteAnimationWidget extends HookWidget {
                     angle: pi / 2,
                     child: const Icon(
                       Icons.flight,
-                      size: 60,
+                      size: 100,
                       color: Colors.red,
                     ),
                   ),

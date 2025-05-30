@@ -25,7 +25,9 @@ public struct WebTitleSlide: View {
     }
 
     public var body: some View {
-        CrossPlatformWebView(url: url, configuration: configuration) 
+        HeaderSlide(.init(title)) {
+            CrossPlatformWebView(url: url, configuration: configuration)
+        }
     }
 }
 

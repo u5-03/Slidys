@@ -6,8 +6,19 @@
 import SwiftUI
 import SymbolKit
 
+public enum SymbolPosition {
+    case topLeft
+    case topRight
+    case bottomLeft
+    case bottomRight
+}
+
 public struct RegionSymbolQuizView: View {
-    public init() {}
+    private let selectedSymbolPosition: SymbolPosition?
+
+    public init(selectedSymbolPosition: SymbolPosition? = nil) {
+        self.selectedSymbolPosition = selectedSymbolPosition
+    }
 
     public var body: some View {
         VStack(spacing: 4) {
@@ -15,12 +26,16 @@ public struct RegionSymbolQuizView: View {
                 symbolView(
                     title: "Chiba.swift",
                     shape: UhooiShape(),
-                    aspectRatio: UhooiShape.aspectRatio
+                    aspectRatio: UhooiShape.aspectRatio,
+                    symbolPosition: .topLeft,
+                    selectedSymbolPosition: selectedSymbolPosition
                 )
                 symbolView(
                     title: "Kanagawa.swift",
                     shape: TrainShape(),
-                    aspectRatio: TrainShape.aspectRatio
+                    aspectRatio: TrainShape.aspectRatio,
+                    symbolPosition: .topRight,
+                    selectedSymbolPosition: selectedSymbolPosition
                 )
             }
             HStack(spacing: 0) {
@@ -30,12 +45,16 @@ public struct RegionSymbolQuizView: View {
                         "UniversalStudioJapan",
                         textAnimationOrder: .random
                     ),
-                    aspectRatio: 546 / 297
+                    aspectRatio: 546 / 297,
+                    symbolPosition: .bottomLeft,
+                    selectedSymbolPosition: selectedSymbolPosition
                 )
                 symbolView(
                     title: "Minokamo.swift",
                     shape: NobunagaShape(),
                     aspectRatio: NobunagaShape.aspectRatio,
+                    symbolPosition: .bottomRight,
+                    selectedSymbolPosition: selectedSymbolPosition,
                     animationType: .fixedRatioMove(strokeLengthRatio: 0.2)
                 )
             }
@@ -50,6 +69,8 @@ private extension RegionSymbolQuizView {
         title: String,
         shape: any Shape,
         aspectRatio: CGFloat,
+        symbolPosition: SymbolPosition,
+        selectedSymbolPosition: SymbolPosition? = nil,
         animationType: PathAnimationType = .progressiveDraw
     ) -> some View {
         VStack(spacing: 6) {
@@ -66,9 +87,11 @@ private extension RegionSymbolQuizView {
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.defaultForegroundColor)
         }
+        .padding()
+        .border(.strokeColor, width: selectedSymbolPosition == symbolPosition ? 8 : 0)
     }
 }
 
 #Preview {
-    RegionSymbolQuizView()
+    RegionSymbolQuizView(selectedSymbolPosition: .topRight)
 }

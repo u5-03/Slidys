@@ -13,6 +13,8 @@ struct FlutterView: View {
 
     var body: some View {
         router.build(viewType: type)
+            // 連続のページで表示しようとすると、同じFlutterのWidgetになってしまうため、IDを指定
+            .id(type.path)
     }
 }
 

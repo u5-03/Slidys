@@ -14,15 +14,12 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
 
     @MainActor
     public let slideIndexController = SlideIndexController(index: 0) {
-        CenterTextSlide(text: "FlutterNinjas2025")
+        CenterTextSlide(text: "FlutterNinjas2025 LightingTalk!")
         CenterTextSlide(text: "Let me ask you a question!")
         ContentSlide(headerTitle: "How would you implement this? Part1") {
             FlutterView(type: .icon)
         }
         ContentSlide(headerTitle: "How would you implement this? Part2") {
-            HelloAnimationView()
-        }
-        ContentSlide(headerTitle: "How would you implement this? Part3") {
             FlutterView(type: .flightRouter)
         }
         CenterTextSlide(text: "Let's use path animation!")
@@ -45,8 +42,17 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         SvgConverterDescriptionSlide()
         PathCodeScrollSlide()
         ImplementationStep2Slide()
+        ContentSlide(headerTitle: "After Step2: Display Path") {
+            FlutterView(type: .iconWithoutAnimation)
+        }
         ImplementationStep3Slide()
+        ContentSlide(headerTitle: "After Step3: Trimmed Path") {
+            FlutterView(type: .iconWithAnimationHalf)
+        }
         ImplementationStep4Slide()
+        ContentSlide(headerTitle: "After Step4: Path animation!") {
+            FlutterView(type: .icon)
+        }
         CenterTextSlide(text: "This is the implementation approach!")
         CenterTextSlide(text: "Let's take a short break while watching a demo of how it actually works")
         CenterTextSlide(text: "Japan Symbol Quiz")
@@ -62,13 +68,13 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
                 .scaledToFit()
         }
 
-        SymbolsGridSlide()
+        SymbolsGridSlide(selectedSymbolPosition: .bottomRight)
         ImplementationFixedLengthStepSlide()
         ImplementationFixedLengthCodeSlide()
         ContentSlide(headerTitle: "It works like this!") {
             FlutterView(type: .waveFixedLength)
         }
-        SymbolsGridSlide()
+        SymbolsGridSlide(selectedSymbolPosition: .bottomLeft)
         TextAnimationSampleSlide()
         ImplementationTextPathStepSlide()
         CenterTextSlide(text: "Let's check how it works!")
@@ -88,10 +94,8 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
             FlutterView(type: .moveTab)
         }
         WrapUpSlide()
-
         ReferenceSlide()
         ShareEndSlide(qrCodeType: .flutter)
-        CenterTextSlide(text: "Thank you for listening!")
     }
 
     public init() {}

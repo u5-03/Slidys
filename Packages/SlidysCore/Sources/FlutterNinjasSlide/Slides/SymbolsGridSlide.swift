@@ -10,16 +10,22 @@ import SlidesCore
 @Slide
 struct SymbolsGridSlide: View {
 
+    private let selectedSymbolPosition: SymbolPosition?
+
+    init(selectedSymbolPosition: SymbolPosition? = nil) {
+        self.selectedSymbolPosition = selectedSymbolPosition
+    }
+
     var body: some View {
         HeaderSlide("Symbol quizzes from regional events I've conducted") {
-            RegionSymbolQuizView()
+            RegionSymbolQuizView(selectedSymbolPosition: selectedSymbolPosition)
         }
     }
 }
 
 #Preview {
     SlidePreview {
-        SymbolsGridSlide()
+        SymbolsGridSlide(selectedSymbolPosition: .bottomLeft)
     }
     .headerSlideStyle(CustomHeaderSlideStyle())
     .itemStyle(CustomItemStyle())

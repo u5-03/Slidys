@@ -11,6 +11,8 @@ public enum FlutterNinjasViewType: String {
     case flightRouter
     case icon
     case iconWithoutLoop
+    case iconWithoutAnimation
+    case iconWithAnimationHalf
     case waveFixedLength
     case iconMove
     case moveTab

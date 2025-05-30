@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_slide/components/svg_path_widget.dart';
+import 'package:flutter_slide/components/animated_svg_path_widget.dart';
 
 final class SymbolQuizWidget extends HookWidget {
   const SymbolQuizWidget({
