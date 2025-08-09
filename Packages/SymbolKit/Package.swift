@@ -14,7 +14,8 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SymbolKit"),
+            name: "SymbolKit",
+            resources: [.process("Media.xcassets")]),
         .testTarget(
             name: "SymbolKitTests",
             dependencies: ["SymbolKit"]

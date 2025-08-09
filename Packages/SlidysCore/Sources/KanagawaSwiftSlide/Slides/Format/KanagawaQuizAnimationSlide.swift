@@ -7,9 +7,14 @@
 
 import SwiftUI
 import SlideKit
+import SlidesCore
 
 @Slide
 struct KanagawaQuizAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let symbolType: SymbolType
 
     var body: some View {

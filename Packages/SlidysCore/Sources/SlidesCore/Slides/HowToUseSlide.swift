@@ -10,6 +10,9 @@ import SlideKit
 
 @Slide
 public struct HowToUseSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
 
     public init() {}
 

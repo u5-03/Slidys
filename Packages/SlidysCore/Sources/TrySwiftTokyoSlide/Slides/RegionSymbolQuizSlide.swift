@@ -9,6 +9,9 @@ import SlidesCore
 
 @Slide
 struct RegionSymbolQuizSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
 
     var body: some View {
         HeaderSlide("I worked quizzes to guess the symbols of the region") {

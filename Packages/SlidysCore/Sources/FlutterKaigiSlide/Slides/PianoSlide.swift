@@ -7,10 +7,15 @@
 
 import SwiftUI
 import SlideKit
+import SlidesCore
 import PianoUI
 
 @Slide
 struct PianoSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         VStack {
             Text("FlutterのPianoUI")

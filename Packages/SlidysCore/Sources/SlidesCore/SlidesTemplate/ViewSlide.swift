@@ -12,6 +12,10 @@ import SlideKit
 public struct ViewSlide<Content: View>: View {
     let view: () -> Content
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(
         @ViewBuilder view: @escaping () -> Content
     ) {

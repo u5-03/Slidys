@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct ReadmeSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("README") {
             HStack(spacing: 32) {

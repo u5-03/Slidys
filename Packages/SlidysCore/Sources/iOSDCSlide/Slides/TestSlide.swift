@@ -13,6 +13,10 @@ import SlidesCore
 
 @Slide
 struct TestSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     @State private var audioPlayer: AVAudioPlayer?
     @State private var isPlaying = false
 

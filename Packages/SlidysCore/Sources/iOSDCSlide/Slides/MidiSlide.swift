@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct MidiSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("MIDI規格とは？") {
             Item("デバイスと電子ピアノなどの電子楽器間で音楽情報をやり取りするための規格", accessory: .number(1))

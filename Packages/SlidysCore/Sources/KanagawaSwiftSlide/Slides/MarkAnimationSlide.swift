@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct MarkAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("こんなアニメーションも完全SwiftUIで作れる！") {
             HStack {

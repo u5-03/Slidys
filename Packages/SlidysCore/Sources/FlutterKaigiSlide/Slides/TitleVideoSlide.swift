@@ -13,6 +13,10 @@ import SlidesCore
 // Frameworks, Libraries, and Embedded ContentにAVKitを追加しないと、Previewでクラッシュする
 @Slide
 struct TitleVideoSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let title: String
     let videoType: VideoType
 

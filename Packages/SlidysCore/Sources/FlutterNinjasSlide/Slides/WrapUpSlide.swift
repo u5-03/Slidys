@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct WrapUpSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Wrap up") {
             Item("Explained how to animate Flutter Paths", accessory: .number(1))

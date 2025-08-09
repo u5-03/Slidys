@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct GaussianBlurSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("GaussianBlurとは？") {
             Item("Blurの処理で一般的に使用されているロジック", accessory: .number(1))

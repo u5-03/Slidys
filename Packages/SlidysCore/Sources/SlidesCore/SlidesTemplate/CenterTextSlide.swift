@@ -12,6 +12,10 @@ import SlideKit
 public struct CenterTextSlide: View {
     let text: String
     let alignment: Alignment
+    
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
 
     public init(text: String, alignment: Alignment = .center) {
         self.text = text

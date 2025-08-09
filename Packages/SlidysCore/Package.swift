@@ -57,7 +57,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/mtj0928/SlideKit", from: "0.6.1"),
+        .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
         .package(url: "https://github.com/u5-03/YugiohCardEffect", from: "0.3.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
         .package(path: "../PianoUI"),

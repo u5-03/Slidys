@@ -10,6 +10,10 @@ import SlideKit
 
 @Slide
 public struct OneMoreThingSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init() {}
 
     public var body: some View {

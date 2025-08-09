@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct HospitalSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         GeometryReader { proxy in
             HeaderSlide("try!SwiftTokyo2024の翌々日~の入院中") {

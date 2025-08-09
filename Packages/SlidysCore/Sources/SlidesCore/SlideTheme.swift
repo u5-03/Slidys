@@ -19,6 +19,10 @@ public struct CustomSlideTheme: SlideTheme {
 
 @Slide
 public struct CustomStyleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init() {}
 
     public var body: some View {
@@ -111,6 +115,10 @@ public struct CustomIndexStyle: IndexStyle {
 
 @Slide
 struct AnimationStructureSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Structure of animation implementation") {
             Item("Explained how to animate SwiftUI Paths", accessory: .number(1))

@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct TrySwiftSymbolQuizSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         QuizAnimationSlide(
             title: "Japan Symbol Quiz!",

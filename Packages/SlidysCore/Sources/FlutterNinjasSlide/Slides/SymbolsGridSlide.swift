@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct SymbolsGridSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
 
     private let selectedSymbolPosition: SymbolPosition?
 

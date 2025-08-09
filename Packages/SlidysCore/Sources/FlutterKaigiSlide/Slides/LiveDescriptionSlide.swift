@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct LiveDescriptionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         SplitContentSlide(leadingWidthRatio: 0.65) {
             HeaderSlide("play-by-sportsの配信・視聴画面") {

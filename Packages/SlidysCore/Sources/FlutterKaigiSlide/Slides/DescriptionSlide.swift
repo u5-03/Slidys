@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct DescriptionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("CustomMultiChildLayoutとは？") {
             Item("複数のWidgetのレイアウトを制御し、それぞれ任意の位置に配置するWidget", accessory: .number(1))

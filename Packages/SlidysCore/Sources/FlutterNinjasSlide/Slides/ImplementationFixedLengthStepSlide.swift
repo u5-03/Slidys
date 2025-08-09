@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationFixedLengthStepSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Animation with fixed Path length") {
             Item("Get the total length of the Path with PathMetric, and calculate the display range from the Path length and progress rate", accessory: .number(1))

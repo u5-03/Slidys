@@ -12,6 +12,10 @@ import SlideKit
 public struct CenterImageSlide: View {
     let imageResource: ImageResource
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(imageResource: ImageResource) {
         self.imageResource = imageResource
     }

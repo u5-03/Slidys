@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct ConnectionChartSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     private let connectionHeight: CGFloat = 120
     private let animationDuration: CGFloat = 1
     @State private var inputAlignment: Alignment = .trailing

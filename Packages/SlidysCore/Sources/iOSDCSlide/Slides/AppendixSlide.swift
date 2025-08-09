@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct AppendixSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("さきほど↓の補足で...") {
             Item("「この電子ピアノは追加のアダプターを購入すれば、BluetoothでのMIDI通信も実現できます。」")

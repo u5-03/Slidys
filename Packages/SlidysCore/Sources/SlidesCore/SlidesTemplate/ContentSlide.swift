@@ -12,6 +12,10 @@ import SlideKit
 public struct ContentSlide<Content: View>: View {
     let headerTitle: String
     let content: () -> Content
+    
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
 
     public init(
         headerTitle: String,

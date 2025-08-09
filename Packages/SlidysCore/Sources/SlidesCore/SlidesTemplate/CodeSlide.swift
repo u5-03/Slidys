@@ -15,6 +15,10 @@ public struct CodeSlide: View {
     let code: String
     let fontSize: CGFloat
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(title: String, code: String, fontSize: CGFloat = 40) {
         self.title = title
         self.code = code

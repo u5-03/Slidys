@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ChibaContentSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     @Phase var phase: SlidePhase
     enum SlidePhase: Int, PhasedState {
         case initial

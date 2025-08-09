@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct AnimationStructureSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("アニメーションの実装の仕組み") {
             Item("描きたい画像をPathで描く", accessory: .number(1)) {

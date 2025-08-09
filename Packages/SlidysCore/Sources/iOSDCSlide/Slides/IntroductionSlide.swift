@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct IntroductionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("SlideKit") {
             Item("SlideKit helps you make presentation slides by SwiftUI")

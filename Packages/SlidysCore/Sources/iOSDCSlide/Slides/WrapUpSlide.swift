@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct WrapUpSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             HeaderSlide("まとめ・感想") {

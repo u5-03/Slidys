@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationFixedLengthCodeSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         CodeSlide(title: "Code for fixed length Path animation", code: CodeConstants.fixedLengthAnimationCode)
     }

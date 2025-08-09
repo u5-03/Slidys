@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct PianoViewStructureSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("ピアノUIの仕組み") {
             Item("PianoKeyView", accessory: .number(1)) {

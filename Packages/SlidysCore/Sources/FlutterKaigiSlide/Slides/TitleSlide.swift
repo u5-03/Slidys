@@ -7,9 +7,14 @@
 
 import SwiftUI
 import SlideKit
+import SlidesCore
 
 @Slide
 struct TitleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     private let title1 = String(localized: "titlePianoCame", defaultValue: "CustomMultiChildLayoutを")
     private let title2 = String(localized: "titleDevelopedApp", defaultValue: "使って、あなたの思い描く自由な")
     private let title3 = String(localized: "titleDevelopedApp", defaultValue: "レイアウトを作ろう！")

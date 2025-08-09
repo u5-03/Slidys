@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationTextPathStepSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Text drawing animation") {
             Item("Load single-path font asset and parsed text using text_to_path_maker package", accessory: .number(1))

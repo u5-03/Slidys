@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct BlurSummarySlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Blurとは？ UIにおける役割") {
             Item("背景との視認性のバランス", accessory: .number(1)) {

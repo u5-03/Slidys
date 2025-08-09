@@ -7,9 +7,14 @@
 
 import SwiftUI
 import SlideKit
+import SlidesCore
 
 @Slide
 struct QuestionCircleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             Text("このUIを作ってくださいと言われたら、\nどうしますか？")

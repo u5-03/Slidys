@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ReferenceSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("参考資料") {
             Item("Core Midi", accessory: .number(1)) {

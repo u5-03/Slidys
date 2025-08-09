@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct QuizViewSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     static let verticalAspectRatio: CGFloat = 9 / 16
     static let horizontalAspectRatio: CGFloat = 16.0 / 9
 

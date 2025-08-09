@@ -14,6 +14,10 @@ public struct WebViewSlide: View {
     let url: URL
     let configuration: WKWebViewConfiguration
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(url: URL) {
         self.url = url
         let configuration = WKWebViewConfiguration()

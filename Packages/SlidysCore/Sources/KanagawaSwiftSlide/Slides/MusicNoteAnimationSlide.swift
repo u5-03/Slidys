@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct MusicNoteAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("例えばこんなアニメーション") {
             HStack {

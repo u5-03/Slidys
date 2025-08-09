@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct NagoyaQuizAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let symbolInfo: SymbolInfo
 
     var body: some View {

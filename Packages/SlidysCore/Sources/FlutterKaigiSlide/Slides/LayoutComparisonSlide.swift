@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct LayoutComparisonSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let datas: [TableData] = [
         TableData(
             leading: "各SubviewのIDをhasChildに渡すことで、存在確認ができる",

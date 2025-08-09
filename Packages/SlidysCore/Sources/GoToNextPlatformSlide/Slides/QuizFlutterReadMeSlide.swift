@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct QuizFlutterReadMeSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
 
     var body: some View {
         MultiIntroductionSlide(

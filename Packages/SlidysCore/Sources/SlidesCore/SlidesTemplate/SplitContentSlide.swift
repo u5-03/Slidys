@@ -14,6 +14,10 @@ public struct SplitContentSlide<Content1: View, Content2: View>: View {
     let leadingContent: Content1
     let trailingContent: Content2
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(
         leadingWidthRatio: CGFloat = 0.5,
         @ViewBuilder leadingContent: () -> Content1,

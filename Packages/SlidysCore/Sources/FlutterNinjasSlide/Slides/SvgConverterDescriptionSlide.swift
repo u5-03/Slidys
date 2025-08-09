@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct SvgConverterDescriptionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Custom conversion logic from SVG to Flutter Path") {
             Item("Use the xml package to load SVG files as text and parse them as XML", accessory: .number(1))

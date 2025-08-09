@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct MinokamoQuizAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let symbolInfo: SymbolInfo
 
     var body: some View {

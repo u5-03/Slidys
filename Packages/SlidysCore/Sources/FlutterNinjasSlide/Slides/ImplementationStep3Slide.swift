@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationStep3Slide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Step 3: Make the Path display partially based on progress") {
             Item("Get an list of PathMetric from the Path using computeMetrics()", accessory: .number(1)) {

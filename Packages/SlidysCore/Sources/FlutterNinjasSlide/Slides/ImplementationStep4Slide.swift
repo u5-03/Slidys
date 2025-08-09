@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationStep4Slide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Step 4: Enable animation according to progress") {
             Item("Prepare an AnimationController and animation progress value", accessory: .number(1))

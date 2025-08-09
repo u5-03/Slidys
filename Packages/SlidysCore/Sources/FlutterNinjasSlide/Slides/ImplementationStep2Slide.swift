@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationStep2Slide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Step 2: Implement a Widget to display the Path") {
             Item("Prepare the Flutter Path object generated in Step 1", accessory: .number(1))
