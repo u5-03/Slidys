@@ -5,7 +5,10 @@
       "Bash(swift build)",
       "Bash(xcodebuild:*)",
       "Bash(swift package:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(git config:*)",
+      "Bash(ssh:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

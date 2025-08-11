@@ -55,6 +55,10 @@ let package = Package(
             name: "FlutterNinjasSlide",
             targets: ["FlutterNinjasSlide"]
         ),
+        .library(
+            name: "iOSDC2025Slide",
+            targets: ["iOSDC2025Slide"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
@@ -89,6 +93,7 @@ let package = Package(
                 "GoToNextPlatformSlide",
                 "TrySwiftTokyoSlide",
                 "NagoyaSwiftSlide",
+                "iOSDC2025Slide",
             ]
         ),
         .target(
@@ -164,6 +169,13 @@ let package = Package(
             name: "FlutterNinjasSlide",
             dependencies: [
                 "SlidesCore",
+            ]
+        ),
+        .target(
+            name: "iOSDC2025Slide",
+            dependencies: [
+                "SlidesCore",
+                "SymbolKit",
             ]
         ),
         .testTarget(
