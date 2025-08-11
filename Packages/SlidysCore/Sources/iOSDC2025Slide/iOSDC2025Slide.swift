@@ -9,7 +9,7 @@ public struct iOSDC2025SlideView: SlideViewProtocol {
     public init() {}
 
     public var body: some View {
-        SlideBaseView(slideConfiguration: configuration)
+        SlideBaseView(slideConfiguration: configuration, timerDuration: Duration.seconds(60 * 20))
     }
 }
 
