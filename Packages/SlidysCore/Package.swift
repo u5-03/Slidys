@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SlidysCore",
-    platforms: [.iOS(.v17), .macOS(.v15), .visionOS(.v2)],
+    platforms: [.iOS(.v18), .macOS(.v15), .visionOS(.v2)],
     products: [
         .library(
             name: "SlidesCore",
@@ -66,6 +66,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
         .package(path: "../PianoUI"),
         .package(path: "../SymbolKit"),
+        .package(path: "../HandGesturePackage"),
+        .package(path: "../HandGestureKit"),
     ],
     targets: [
         .target(
@@ -74,6 +76,7 @@ let package = Package(
                 "SlideKit",
                 "YugiohCardEffect",
                 "SymbolKit",
+                .product(name: "HandGesturePackage", package: "HandGesturePackage", condition: .when(platforms: [.visionOS])),
                 .product(name: "Algorithms", package: "swift-algorithms"),
             ],
             resources: [
@@ -101,7 +104,7 @@ let package = Package(
             dependencies: [
                 "SlidesCore",
                 "PianoUI",
-                .product(name: "Algorithms", package: "swift-algorithms")
+                .product(name: "Algorithms", package: "swift-algorithms"),
             ]
         ),
         .target(
@@ -126,7 +129,7 @@ let package = Package(
                 "PianoUI",
             ],
             resources: [
-                .process("Resources/vision_pro_piano_demo.mp4"),
+                .process("Resources/vision_pro_piano_demo.mp4")
             ]
         ),
         .target(
@@ -148,13 +151,13 @@ let package = Package(
         .target(
             name: "GoToNextPlatformSlide",
             dependencies: [
-                "SlidesCore",
+                "SlidesCore"
             ]
         ),
         .target(
             name: "TrySwiftTokyoSlide",
             dependencies: [
-                "SlidesCore",
+                "SlidesCore"
             ]
         ),
         .target(
@@ -168,7 +171,7 @@ let package = Package(
         .target(
             name: "FlutterNinjasSlide",
             dependencies: [
-                "SlidesCore",
+                "SlidesCore"
             ]
         ),
         .target(
@@ -185,4 +188,3 @@ let package = Package(
     ],
     swiftLanguageModes: [.v5]
 )
-

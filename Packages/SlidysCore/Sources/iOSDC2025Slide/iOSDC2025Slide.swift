@@ -2,6 +2,9 @@ import SwiftUI
 import SlideKit
 import SlidesCore
 import SymbolKit
+#if canImport(HandGesturePackage)
+import HandGesturePackage
+#endif
 
 public struct iOSDC2025SlideView: SlideViewProtocol {
     let configuration = SlideConfiguration()
@@ -24,7 +27,14 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         TitleSlide()
         TalkPlanSlide()
         GestureDetectionStructionSlide()
-        
+        ContentSlide(headerTitle: "visionOS用のデモを開始する") {
+#if canImport(HandGesturePackage)
+            StartDemoButton(fontSize: 80)
+#else
+            Text("visionOSでのみデモは開始できます")
+#endif
+        }
+
         // HandSkeletonとEntityの基礎
         HandSkeletonStructureSlide()
         EntityPlacementSlide()

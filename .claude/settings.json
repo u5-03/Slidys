@@ -1,0 +1,28 @@
+{
+    "model": "opus",
+    "permissions": {
+        "allow": [
+            "Bash(fvm flutter *)",
+            "Bash(flutter *)",
+            "Bash(dart *)",
+            "Bash(git *)",
+            "Bash(ls *)",
+            "Bash(cd *)",
+            "Bash(mkdir *)",
+            "Bash(rm -rf build/)",
+            "Bash(pwd)"
+        ],
+        "deny": [
+            "Bash(rm -rf /)",
+            "Bash(rm -rf --no-preserve-root *)",
+            "Bash(rm -rf ~)",
+            "Bash(sudo *)",
+            "Bash(dd if=*)",
+            "Bash(:(){ :|:& };:)",
+            "Bash(reboot)",
+            "Bash(shutdown)",
+            "Bash(mkfs.*)",
+            "Bash(chmod 000 *)"
+        ]
+    }
+}

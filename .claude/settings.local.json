@@ -1,14 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)",
-      "Bash(swift build)",
+      "Bash(find:*)",
       "Bash(xcodebuild:*)",
-      "Bash(swift package:*)",
-      "Bash(python3:*)",
-      "Bash(git config:*)",
-      "Bash(ssh:*)",
-      "Bash(cat:*)"
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(swift build)",
+      "Bash(swift build:*)",
+      "Bash(true)",
+      "Bash(open:*)",
+      "Bash(grep:*)",
+      "Bash(cp:*)",
+      "Bash(for file in *.swift)",
+      "Bash(do sed -i '' '/^import RealityKit$/d' \"$file\")",
+      "Bash(done)",
+      "Bash(for:*)",
+      "Bash(do)",
+      "Bash(if ! grep -q \"import HandGestureKit\" \"$file\")",
+      "Bash(then)",
+      "Bash(sed:*)",
+      "Bash(fi)",
+      "Bash(swift:*)"
     ],
     "deny": []
   }

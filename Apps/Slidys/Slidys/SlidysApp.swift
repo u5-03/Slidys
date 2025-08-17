@@ -11,7 +11,9 @@ import ChibaSwiftSlide
 import KanagawaSwiftSlide
 import SlidysCommon
 import SlidesCore
-
+#if canImport(HandGesturePackage)
+import HandGesturePackage
+#endif
 
 @main
 struct SlidysApp: App {
@@ -48,5 +50,8 @@ struct SlidysApp: App {
         WindowGroup(id: SlideType.kanagawaSwift.id) {
             KanagawaSwiftSlideView()
         }
+#if canImport(HandGesturePackage)
+        HandGestureScene()
+#endif
     }
 }
