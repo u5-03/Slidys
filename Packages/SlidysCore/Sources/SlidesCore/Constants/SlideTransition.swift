@@ -9,5 +9,5 @@ import SwiftUI
 
 public enum SlideTransition {
     /// Default transition for all slides
-    public static let defaultTransition: AnyTransition = .push(from: .trailing)
+    public static let defaultTransition: AnyTransition = .identity //.push(from: .trailing)
 }

@@ -40,6 +40,19 @@ struct SafariView: UIViewControllerRepresentable {
         // 更新ロジックが必要ならここに記述
     }
 }
+#elseif os(macOS)
+// macOS用のWebView
+struct WebView: NSViewRepresentable {
+    let request: URLRequest
+    
+    func makeNSView(context: Context) -> WKWebView {
+        WKWebView()
+    }
+    
+    func updateNSView(_ nsView: WKWebView, context: Context) {
+        nsView.load(request)
+    }
+}
 #endif
 
 #Preview {

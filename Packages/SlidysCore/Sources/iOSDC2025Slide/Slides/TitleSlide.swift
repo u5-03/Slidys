@@ -7,9 +7,7 @@
 
 import SwiftUI
 import SlideKit
-import PianoUI
 import SlidesCore
-import SymbolKit
 
 @Slide
 struct TitleSlide: View {
@@ -17,9 +15,9 @@ struct TitleSlide: View {
         SlideTransition.defaultTransition
     }
 
-    private let title = "Blurってなに？"
-    private let dateString = "2025/04/26"
-    private let eventName = "Nagoya.swift#1"
+    private let title = "手話ジェスチャーの検知と翻訳\n~ハンドトラッキングの可能性と限界~"
+    private let dateString = "2025/09/19"
+    private let eventName = "iOSDC Japan 2025"
     private let authorName = "Sugiy/すぎー"
     private let interval: TimeInterval = 0.2
     private let startDate = Date()
@@ -27,7 +25,7 @@ struct TitleSlide: View {
     var body: some View {
         VStack(spacing: 0) {
             Text(title)
-                .font(.system(size: 160, weight: .heavy))
+                .font(.system(size: 100, weight: .heavy))
                 .minimumScaleFactor(0.1)
                 .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundStyle(.themeColor)
@@ -46,15 +44,6 @@ struct TitleSlide: View {
                 }
                 .padding(.leading)
                 HStack(alignment: .top, spacing: 20) {
-                    StrokeAnimationShapeView(
-                        shape: SugiyShape(),
-                        lineWidth: 6,
-                        lineColor: .strokeColor,
-                        duration: .seconds(4),
-                        shapeAspectRatio: SugiyShape.aspectRatio,
-                        viewModel: .init(animationType: .progressiveDraw)
-                    )
-                    .padding()
                     Spacer()
                     Text(authorName)
                         .font(.system(size: 100, weight: .heavy))
