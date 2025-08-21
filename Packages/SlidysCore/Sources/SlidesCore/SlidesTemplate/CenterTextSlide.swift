@@ -24,6 +24,7 @@ public struct CenterTextSlide: View {
 
     public var body: some View {
         Text(text)
+            .lineSpacing(24)
             .font(.largeFont)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
             .foregroundStyle(.defaultForegroundColor)

@@ -21,10 +21,22 @@ struct SlideConfiguration: SlideConfigurationProtocol {
     let slideIndexController = SlideIndexController() {
         CenterTextSlide(text: "iOSDC Japan 2025")
         CenterTextSlide(text: "これは何を示しているか、分かりますか？")
-        CenterTextSlide(text: "手話/Sign Languageは普段触れる機会が少ない")
-        CenterTextSlide(text: "テクノロジーの力でそのハードルを少しでも越えられる？？")
-        CenterTextSlide(text: "今回はApple Vision Proのハンドジェスチャー\n検知を使って、その可能性と限界を探ります！")
+        CenterTextSlide(text: "手話/Sign Languageは\n普段触れる機会が少ない")
+        CenterTextSlide(text: "テクノロジーの力でそのハードルを\n少しでも下げることができる？？")
+        CenterTextSlide(text: "今回はApple Vision Proの\nハンドジェスチャー検知を使って、\nその可能性と限界を探ります！")
         TitleSlide()
+        ReadmeSlide(
+            title: "README",
+            info: .init(
+                name: "すぎー/Sugiy",
+                image: .icon,
+                firstText: "DeNAでFlutterのスポーツ系ライブ配信アプリplay-by-sports開発中",
+                secondText: "11月にやるKanagawa.swift #2の運営をしています",
+                thirdText: "iOSDCのスタッフもしてます",
+                fourthText: "来月末に戸建て新居ができるので、引越しします",
+                fifthText: "明後日の夜に羽田空港からドイツで別のカンファレンスで登壇しにいきます"
+            )
+        )
         TalkPlanSlide()
         GestureDetectionStructionSlide()
         ContentSlide(headerTitle: "visionOS用のデモを開始する") {
@@ -37,9 +49,9 @@ struct SlideConfiguration: SlideConfigurationProtocol {
 
         // HandSkeletonとEntityの基礎
         HandSkeletonStructureSlide()
+        HandSkeletonDiagramSlide()
         EntityPlacementSlide()
         RealityKitSystemSlide()
-        EntityDemoSlide()
         
         // フレームワーク比較
         FrameworkComparisonSlide()
@@ -48,10 +60,12 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         TrackingSystemImplementationSlide()
         CustomGestureDemoSlide()
         GestureDetectorLogicSlide()
+        SerialGestureSystemSlide()
         
         // 手話ジェスチャー
         SignLanguageDemoSlide()
         LimitationsSlide()
+        PossibilitiesSlide()
 
         WrapUpSlide()
         ReferenceSlide()

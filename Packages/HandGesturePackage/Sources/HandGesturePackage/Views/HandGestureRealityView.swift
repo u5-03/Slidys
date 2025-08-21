@@ -9,7 +9,7 @@ public struct HandGestureRealityView: View {
     // SpatialTrackingSession関連
     @State private var spatialTrackingSession = SpatialTrackingSession()
     // 手のエンティティを管理するためのEntity
-    @State private var handEntitiesContainer = Entity()
+    @State private var handEntitiesContainerEntity = Entity()
 
     public init() {}
 
@@ -28,9 +28,9 @@ public struct HandGestureRealityView: View {
             createHandEntities()
             
             // 手のエンティティコンテナをルートに追加
-            handEntitiesContainer.name = "HandEntitiesContainer"
-            handEntitiesContainer.isEnabled = gestureInfoStore.showHandEntities
-            rootEntity.addChild(handEntitiesContainer)
+            handEntitiesContainerEntity.name = "HandEntitiesContainer"
+            handEntitiesContainerEntity.isEnabled = gestureInfoStore.showHandEntities
+            rootEntity.addChild(handEntitiesContainerEntity)
             
             // HandGestureTrackingSystemがRealityKitに登録されている
             // システムは自動的にシーンで動作を開始する
@@ -40,7 +40,7 @@ public struct HandGestureRealityView: View {
         .upperLimbVisibility(.hidden)
         .onChange(of: gestureInfoStore.showHandEntities) { _, newValue in
             // トグルの状態に応じてエンティティの表示/非表示を切り替え
-            handEntitiesContainer.isEnabled = newValue
+            handEntitiesContainerEntity.isEnabled = newValue
         }
         .onDisappear {
             HandGestureLogger.logUI("HandGestureRealityView disappeared")
@@ -129,7 +129,7 @@ public struct HandGestureRealityView: View {
                 handComponent.fingers[handJoint] = anchorEntity
 
                 // AnchorEntityを手のエンティティコンテナに追加
-                handEntitiesContainer.addChild(anchorEntity)
+                handEntitiesContainerEntity.addChild(anchorEntity)
 
                 // 作成直後の座標を確認
                 HandGestureLogger.logDebug("  初期座標 transform.translation: (\(String(format: "%.3f", anchorEntity.transform.translation.x)), \(String(format: "%.3f", anchorEntity.transform.translation.y)), \(String(format: "%.3f", anchorEntity.transform.translation.z)))")
@@ -158,7 +158,7 @@ public struct HandGestureRealityView: View {
 
             // HandTrackingComponentを設定
             handEntity.components.set(handComponent)
-            handEntitiesContainer.addChild(handEntity)
+            handEntitiesContainerEntity.addChild(handEntity)
 
             // デバッグ: HandTrackingComponentが正しく設定されたか確認
             HandGestureLogger.logDebug("✅ HandTrackingComponent set for \(chirality == .left ? "Left" : "Right") hand entity")
@@ -370,7 +370,7 @@ public struct HandGestureRealityView: View {
             )
 
             boneContainer.addChild(cylinder)
-            handEntitiesContainer.addChild(boneContainer)
+            handEntitiesContainerEntity.addChild(boneContainer)
         }
     }
 

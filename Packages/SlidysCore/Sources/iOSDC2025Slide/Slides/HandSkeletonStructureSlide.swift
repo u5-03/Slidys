@@ -24,7 +24,7 @@ struct HandSkeletonStructureSlide: View {
                 }
                 Item("取得可能な関節情報", accessory: .number(2)) {
                     Item("手首（wrist）", accessory: .bullet)
-                    Item("各指の関節（metacarpal, proximal, intermediate, distal, tip）", accessory: .bullet)
+                    Item("各指の関節（metacarpal(中手骨), proximal(基節骨), intermediate(中節骨), distal(末節骨), tip(指先)）", accessory: .bullet)
                     Item("前腕（forearmArm）", accessory: .bullet)
                 }
                 Item("各関節から取得できるデータ", accessory: .number(3)) {
@@ -33,7 +33,7 @@ struct HandSkeletonStructureSlide: View {
                     Item("親関節からの相対位置", accessory: .bullet)
                 }
                 Item("座標系", accessory: .number(4)) {
-                    Item("右手系座標（右:+X, 上:+Y, 手前:+Z）", accessory: .bullet)
+                    Item("右手系座標(右:+X, 上:+Y, 手前:+Z)", accessory: .bullet)
                     Item("単位はメートル", accessory: .bullet)
                 }
             }

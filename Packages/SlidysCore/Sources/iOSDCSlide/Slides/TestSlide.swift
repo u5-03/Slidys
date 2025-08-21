@@ -23,7 +23,7 @@ struct TestSlide: View {
     var body: some View {
         VStack(alignment: .center) {
             Text("テスト中...")
-                .font(.system(size: 100, weight: .heavy))
+                .font(.largeFont)
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.defaultForegroundColor)
             if isPlaying {

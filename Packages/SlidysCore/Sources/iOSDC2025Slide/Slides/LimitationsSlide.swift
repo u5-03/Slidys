@@ -35,13 +35,9 @@ struct LimitationsSlide: View {
                 }
                 Item("技術的な制約", accessory: .number(4)) {
                     Item("❌ 両手の同時トラッキング精度", accessory: .bullet)
-                    Item("❌ 連続的な動作の認識", accessory: .bullet)
+                    Item("❌ パフォーマンスとのバランス", accessory: .bullet)
                     Item("❌ 個人差（手の大きさ・柔軟性）への対応", accessory: .bullet)
-                }
-                Item("それでも...", accessory: .number(5)) {
-                    Item("✅ 基本的な手話単語の認識は可能！", accessory: .bullet)
-                    Item("✅ 学習ツールとしての可能性", accessory: .bullet)
-                    Item("✅ アクセシビリティ向上への第一歩", accessory: .bullet)
+                    Item("❌ 認識パターンの登録が大変", accessory: .bullet)
                 }
             }
         }
