@@ -18,7 +18,7 @@ struct TalkPlanSlide: View {
     var body: some View {
         HeaderSlide("今日話すこと") {
             Item("RealityKitを使って手の関節にマーカーを表示する方法", accessory: .number(1))
-            Item("SpatialTrackingSession を用いたハンドトラッキングの基礎", accessory: .number(2))
+            Item("SpatialTrackingSession/AnchorEntityを用いたハンドトラッキングの基礎", accessory: .number(2))
             Item("カスタムジェスチャーの検知手法", accessory: .number(3))
         }
     }

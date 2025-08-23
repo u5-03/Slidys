@@ -5,20 +5,20 @@
 //  Created by yugo.sugiyama on 2025/06/05.
 //
 
-import RealityKit
-import simd
 import Foundation
 import HandGestureKit
+import RealityKit
+import simd
 
 #if os(visionOS)
-import ARKit
+    import ARKit
 #endif
 
 // MARK: - HandSkeleton Extensions
 
 extension HandSkeleton {
 
-    /// デフォルトの許容誤差（5%）
+    /// デフォルトの許容誤差(5%)
     static let defaultTolerance: Float = 0.05
 
     // MARK: - 手全体の分析
@@ -29,7 +29,8 @@ extension HandSkeleton {
         let wristJoint = joint(.wrist)
         let middleMetacarpalJoint = joint(.middleFingerMetacarpal)
 
-        return forearmJoint.isAlignedWith(wristJoint, and: middleMetacarpalJoint, tolerance: tolerance)
+        return forearmJoint.isAlignedWith(
+            wristJoint, and: middleMetacarpalJoint, tolerance: tolerance)
     }
 
     /// 手のひらの法線ベクトルを取得
@@ -63,30 +64,33 @@ extension HandSkeleton {
         }
     }
 
-    /// ピースサイン（Vサイン）を作っているかを判定
+    /// ピースサイン(Vサイン)を作っているかを判定
     func isPeaceSign(tolerance: Float = defaultTolerance) -> Bool {
         // 人差し指と中指がまっすぐ
-        guard isFingerStraight(.index, tolerance: tolerance) &&
-              isFingerStraight(.middle, tolerance: tolerance) else {
+        guard
+            isFingerStraight(.index, tolerance: tolerance)
+                && isFingerStraight(.middle, tolerance: tolerance)
+        else {
             return false
         }
 
         // 薬指と小指が曲がっている
-        guard isFingerBent(.ring, tolerance: tolerance) &&
-              isFingerBent(.little, tolerance: tolerance) else {
+        guard
+            isFingerBent(.ring, tolerance: tolerance) && isFingerBent(.little, tolerance: tolerance)
+        else {
             return false
         }
 
-        // 親指の状態は自由（曲がっていても伸びていても良い）
+        // 親指の状態は自由(曲がっていても伸びていても良い)
 
         // 人差し指と中指が適度に開いているかを確認
         let indexTip = getFingerTipPosition(.index)
         let middleTip = getFingerTipPosition(.middle)
         let distance = simd_distance(indexTip, middleTip)
 
-        // 指先間の距離が適度に開いている（2-5cm程度）
-        let minDistance: Float = 0.02 // 2cm
-        let maxDistance: Float = 0.05 // 5cm
+        // 指先間の距離が適度に開いている(2-5cm程度)
+        let minDistance: Float = 0.02  // 2cm
+        let maxDistance: Float = 0.05  // 5cm
 
         return distance >= minDistance && distance <= maxDistance
     }
@@ -103,9 +107,9 @@ extension HandSkeleton {
         guard distance <= maxDistance else { return false }
 
         // 中指、薬指、小指がまっすぐ
-        return isFingerStraight(.middle, tolerance: tolerance) &&
-               isFingerStraight(.ring, tolerance: tolerance) &&
-               isFingerStraight(.little, tolerance: tolerance)
+        return isFingerStraight(.middle, tolerance: tolerance)
+            && isFingerStraight(.ring, tolerance: tolerance)
+            && isFingerStraight(.little, tolerance: tolerance)
     }
 
     /// 指を1本だけ立てているかを判定
@@ -134,7 +138,7 @@ extension HandSkeleton {
         return isPointingFinger(.index, tolerance: tolerance)
     }
 
-    /// サムズアップ（親指立て）を作っているかを判定
+    /// サムズアップ(親指立て)を作っているかを判定
     func isThumbsUp(tolerance: Float = defaultTolerance) -> Bool {
         return isPointingFinger(.thumb, tolerance: tolerance)
     }
@@ -170,9 +174,13 @@ extension HandSkeleton {
     }
 
     /// 指定した関節が指定された角度範囲で曲がっているかを判定
-    func isJointBent(_ jointName: JointName, minAngle: Float, maxAngle: Float, tolerance: Float = defaultTolerance) -> Bool {
+    func isJointBent(
+        _ jointName: JointName, minAngle: Float, maxAngle: Float,
+        tolerance: Float = defaultTolerance
+    ) -> Bool {
         guard let parentJointName = getParentJoint(for: jointName),
-              let childJointName = getChildJoint(for: jointName) else {
+            let childJointName = getChildJoint(for: jointName)
+        else {
             return false
         }
 
@@ -227,7 +235,9 @@ extension HandSkeleton.Joint {
     }
 
     /// 他の2つの関節と直線状に並んでいるかを判定
-    func isAlignedWith(_ joint2: HandSkeleton.Joint, and joint3: HandSkeleton.Joint, tolerance: Float) -> Bool {
+    func isAlignedWith(
+        _ joint2: HandSkeleton.Joint, and joint3: HandSkeleton.Joint, tolerance: Float
+    ) -> Bool {
         let pos1 = self.position
         let pos2 = joint2.position
         let pos3 = joint3.position
@@ -241,11 +251,14 @@ extension HandSkeleton.Joint {
 
         let toleranceInDegrees = tolerance * 180.0 / Float.pi * 100
 
-        return abs(angleInDegrees) <= toleranceInDegrees || abs(180 - angleInDegrees) <= toleranceInDegrees
+        return abs(angleInDegrees) <= toleranceInDegrees
+            || abs(180 - angleInDegrees) <= toleranceInDegrees
     }
 
     /// 3つの関節で法線ベクトルを計算
-    func calculateNormal(with joint2: HandSkeleton.Joint, and joint3: HandSkeleton.Joint) -> SIMD3<Float> {
+    func calculateNormal(with joint2: HandSkeleton.Joint, and joint3: HandSkeleton.Joint) -> SIMD3<
+        Float
+    > {
         let pos1 = self.position
         let pos2 = joint2.position
         let pos3 = joint3.position
@@ -257,7 +270,10 @@ extension HandSkeleton.Joint {
     }
 
     /// 指定された角度範囲で曲がっているかを判定
-    func isBent(between minAngle: Float, and maxAngle: Float, relativeTo parentJoint: HandSkeleton.Joint, and childJoint: HandSkeleton.Joint, tolerance: Float) -> Bool {
+    func isBent(
+        between minAngle: Float, and maxAngle: Float, relativeTo parentJoint: HandSkeleton.Joint,
+        and childJoint: HandSkeleton.Joint, tolerance: Float
+    ) -> Bool {
         let parentPos = parentJoint.position
         let currentPos = self.position
         let childPos = childJoint.position
@@ -271,7 +287,8 @@ extension HandSkeleton.Joint {
 
         let toleranceInDegrees = tolerance * (maxAngle - minAngle)
 
-        return angleInDegrees >= (minAngle - toleranceInDegrees) && angleInDegrees <= (maxAngle + toleranceInDegrees)
+        return angleInDegrees >= (minAngle - toleranceInDegrees)
+            && angleInDegrees <= (maxAngle + toleranceInDegrees)
     }
 }
 
@@ -319,13 +336,25 @@ extension HandSkeleton {
         case .thumb:
             return [.thumbKnuckle, .thumbIntermediateBase, .thumbIntermediateTip, .thumbTip]
         case .index:
-            return [.indexFingerMetacarpal, .indexFingerKnuckle, .indexFingerIntermediateBase, .indexFingerIntermediateTip, .indexFingerTip]
+            return [
+                .indexFingerMetacarpal, .indexFingerKnuckle, .indexFingerIntermediateBase,
+                .indexFingerIntermediateTip, .indexFingerTip,
+            ]
         case .middle:
-            return [.middleFingerMetacarpal, .middleFingerKnuckle, .middleFingerIntermediateBase, .middleFingerIntermediateTip, .middleFingerTip]
+            return [
+                .middleFingerMetacarpal, .middleFingerKnuckle, .middleFingerIntermediateBase,
+                .middleFingerIntermediateTip, .middleFingerTip,
+            ]
         case .ring:
-            return [.ringFingerMetacarpal, .ringFingerKnuckle, .ringFingerIntermediateBase, .ringFingerIntermediateTip, .ringFingerTip]
+            return [
+                .ringFingerMetacarpal, .ringFingerKnuckle, .ringFingerIntermediateBase,
+                .ringFingerIntermediateTip, .ringFingerTip,
+            ]
         case .little:
-            return [.littleFingerMetacarpal, .littleFingerKnuckle, .littleFingerIntermediateBase, .littleFingerIntermediateTip, .littleFingerTip]
+            return [
+                .littleFingerMetacarpal, .littleFingerKnuckle, .littleFingerIntermediateBase,
+                .littleFingerIntermediateTip, .littleFingerTip,
+            ]
         }
     }
 

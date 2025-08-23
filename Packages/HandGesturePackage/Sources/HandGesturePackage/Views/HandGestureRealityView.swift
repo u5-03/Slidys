@@ -1,7 +1,7 @@
-import SwiftUI
-import RealityKit
 import ARKit
 import HandGestureKit
+import RealityKit
+import SwiftUI
 
 public struct HandGestureRealityView: View {
     @Environment(\.gestureInfoStore) private var gestureInfoStore
@@ -17,7 +17,7 @@ public struct HandGestureRealityView: View {
         RealityView { content in
             // GestureInfoStoreをHandGestureTrackingSystemに設定
             HandGestureTrackingSystem.setGestureInfoStore(gestureInfoStore)
-            
+
             // ルートエンティティをシーンに追加
             content.add(rootEntity)
 
@@ -26,12 +26,12 @@ public struct HandGestureRealityView: View {
 
             // SpatialTrackingSessionベースの手のエンティティを作成
             createHandEntities()
-            
+
             // 手のエンティティコンテナをルートに追加
             handEntitiesContainerEntity.name = "HandEntitiesContainer"
             handEntitiesContainerEntity.isEnabled = gestureInfoStore.showHandEntities
             rootEntity.addChild(handEntitiesContainerEntity)
-            
+
             // HandGestureTrackingSystemがRealityKitに登録されている
             // システムは自動的にシーンで動作を開始する
             HandGestureLogger.logSystem("HandGestureTrackingSystem is active in the scene")
@@ -80,20 +80,20 @@ public struct HandGestureRealityView: View {
     private func setupHandAnchorEntities() async {
         HandGestureLogger.logSystem("Setting up hand AnchorEntities for SpatialTrackingSession")
 
-        // 手の形検知に必要最小限の関節のみ（50個制限対応）
+        // 手の形検知に必要最小限の関節のみ(50個制限対応)
         let handJoints: [HandSkeleton.JointName] = [
-            // 親指（4関節）
+            // 親指(4関節)
             .thumbKnuckle, .thumbIntermediateBase, .thumbIntermediateTip, .thumbTip,
-            // 人差し指（3関節 - metacarpalを除外）
+            // 人差し指(3関節 - metacarpalを除外)
             .indexFingerKnuckle, .indexFingerIntermediateTip, .indexFingerTip,
-            // 中指（3関節 - metacarpalを除外）
+            // 中指(3関節 - metacarpalを除外)
             .middleFingerKnuckle, .middleFingerIntermediateTip, .middleFingerTip,
-            // 薬指（3関節 - metacarpalを除外）
+            // 薬指(3関節 - metacarpalを除外)
             .ringFingerKnuckle, .ringFingerIntermediateTip, .ringFingerTip,
-            // 小指（3関節 - metacarpalを除外）
+            // 小指(3関節 - metacarpalを除外)
             .littleFingerKnuckle, .littleFingerIntermediateTip, .littleFingerTip,
             // 手首
-            .wrist
+            .wrist,
         ]
 
         // 左手と右手の両方に対してAnchorEntityを作成
@@ -101,22 +101,26 @@ public struct HandGestureRealityView: View {
             // HandTrackingComponentを持つメインの手エンティティを作成
             let handEntity = Entity()
             handEntity.name = "\(chirality == .left ? "Left" : "Right")_Hand"
-            var handComponent = HandTrackingComponent(chirality: chirality == .left ? .left : .right)
+            var handComponent = HandTrackingComponent(
+                chirality: chirality == .left ? .left : .right)
 
             // 各関節にAnchorEntityを作成
             for handJoint in handJoints {
                 // 関節の球体エンティティを作成
-                let jointSphere = createJointSphere(for: handJoint, chirality: chirality == .left ? .left : .right)
+                let jointSphere = createJointSphere(
+                    for: handJoint, chirality: chirality == .left ? .left : .right)
 
                 // HandSkeleton.JointNameをHandJointに変換
                 guard let handJointConverted = convertToHandJoint(handJoint) else {
-                    HandGestureLogger.logDebug("Warning: Could not convert joint \(handJoint) to HandJoint")
+                    HandGestureLogger.logDebug(
+                        "Warning: Could not convert joint \(handJoint) to HandJoint")
                     continue
                 }
 
                 // 関節のAnchorEntityを作成
                 let joint = AnchoringComponent.Target.HandLocation.joint(for: handJointConverted)
-                let anchorEntity = AnchorEntity(.hand(chirality, location: joint), trackingMode: .predicted)
+                let anchorEntity = AnchorEntity(
+                    .hand(chirality, location: joint), trackingMode: .predicted)
                 anchorEntity.name = "\(chirality == .left ? "Left" : "Right")_\(handJoint)"
 
                 // デバッグ: AnchorEntity作成確認
@@ -132,26 +136,48 @@ public struct HandGestureRealityView: View {
                 handEntitiesContainerEntity.addChild(anchorEntity)
 
                 // 作成直後の座標を確認
-                HandGestureLogger.logDebug("  初期座標 transform.translation: (\(String(format: "%.3f", anchorEntity.transform.translation.x)), \(String(format: "%.3f", anchorEntity.transform.translation.y)), \(String(format: "%.3f", anchorEntity.transform.translation.z)))")
-                HandGestureLogger.logDebug("  初期座標 position: (\(String(format: "%.3f", anchorEntity.position.x)), \(String(format: "%.3f", anchorEntity.position.y)), \(String(format: "%.3f", anchorEntity.position.z)))")
+                HandGestureLogger.logDebug(
+                    "  初期座標 transform.translation: (\(String(format: "%.3f", anchorEntity.transform.translation.x)), \(String(format: "%.3f", anchorEntity.transform.translation.y)), \(String(format: "%.3f", anchorEntity.transform.translation.z)))"
+                )
+                HandGestureLogger.logDebug(
+                    "  初期座標 position: (\(String(format: "%.3f", anchorEntity.position.x)), \(String(format: "%.3f", anchorEntity.position.y)), \(String(format: "%.3f", anchorEntity.position.z)))"
+                )
 
-                // 座標系の軸方向を確認（手首と親指の場合）
+                // 座標系の軸方向を確認(手首と親指の場合)
                 if joint == .wrist || joint == .thumbTip {
                     let transform = anchorEntity.transform
-                    HandGestureLogger.logDebug("  🧭 \(chirality == .left ? "Left" : "Right") \(joint == .wrist ? "手首" : "親指先")の座標系:")
-                    HandGestureLogger.logDebug("    X軸方向 (columns.0): (\(String(format: "%.3f", transform.matrix.columns.0.x)), \(String(format: "%.3f", transform.matrix.columns.0.y)), \(String(format: "%.3f", transform.matrix.columns.0.z)))")
-                    HandGestureLogger.logDebug("    Y軸方向 (columns.1): (\(String(format: "%.3f", transform.matrix.columns.1.x)), \(String(format: "%.3f", transform.matrix.columns.1.y)), \(String(format: "%.3f", transform.matrix.columns.1.z)))")
-                    HandGestureLogger.logDebug("    Z軸方向 (columns.2): (\(String(format: "%.3f", transform.matrix.columns.2.x)), \(String(format: "%.3f", transform.matrix.columns.2.y)), \(String(format: "%.3f", transform.matrix.columns.2.z)))")
+                    HandGestureLogger.logDebug(
+                        "  🧭 \(chirality == .left ? "Left" : "Right") \(joint == .wrist ? "手首" : "親指先")の座標系:"
+                    )
+                    HandGestureLogger.logDebug(
+                        "    X軸方向 (columns.0): (\(String(format: "%.3f", transform.matrix.columns.0.x)), \(String(format: "%.3f", transform.matrix.columns.0.y)), \(String(format: "%.3f", transform.matrix.columns.0.z)))"
+                    )
+                    HandGestureLogger.logDebug(
+                        "    Y軸方向 (columns.1): (\(String(format: "%.3f", transform.matrix.columns.1.x)), \(String(format: "%.3f", transform.matrix.columns.1.y)), \(String(format: "%.3f", transform.matrix.columns.1.z)))"
+                    )
+                    HandGestureLogger.logDebug(
+                        "    Z軸方向 (columns.2): (\(String(format: "%.3f", transform.matrix.columns.2.x)), \(String(format: "%.3f", transform.matrix.columns.2.y)), \(String(format: "%.3f", transform.matrix.columns.2.z)))"
+                    )
 
                     // グローバル座標系との一致度を確認
                     let identityThreshold: Float = 0.1
-                    let isXAligned = abs(transform.matrix.columns.0.x - 1.0) < identityThreshold && abs(transform.matrix.columns.0.y) < identityThreshold && abs(transform.matrix.columns.0.z) < identityThreshold
-                    let isYAligned = abs(transform.matrix.columns.1.y - 1.0) < identityThreshold && abs(transform.matrix.columns.1.x) < identityThreshold && abs(transform.matrix.columns.1.z) < identityThreshold
-                    let isZAligned = abs(transform.matrix.columns.2.z - 1.0) < identityThreshold && abs(transform.matrix.columns.2.x) < identityThreshold && abs(transform.matrix.columns.2.y) < identityThreshold
+                    let isXAligned =
+                        abs(transform.matrix.columns.0.x - 1.0) < identityThreshold
+                        && abs(transform.matrix.columns.0.y) < identityThreshold
+                        && abs(transform.matrix.columns.0.z) < identityThreshold
+                    let isYAligned =
+                        abs(transform.matrix.columns.1.y - 1.0) < identityThreshold
+                        && abs(transform.matrix.columns.1.x) < identityThreshold
+                        && abs(transform.matrix.columns.1.z) < identityThreshold
+                    let isZAligned =
+                        abs(transform.matrix.columns.2.z - 1.0) < identityThreshold
+                        && abs(transform.matrix.columns.2.x) < identityThreshold
+                        && abs(transform.matrix.columns.2.y) < identityThreshold
 
                     if isXAligned && isYAligned && isZAligned {
                         HandGestureLogger.logDebug("    ✅ グローバル座標系とほぼ一致しています！")
-                        HandGestureLogger.logDebug("    📝 基準姿勢: 指先↑、手のひら→\(chirality == .left ? "右" : "左")、親指→前")
+                        HandGestureLogger.logDebug(
+                            "    📝 基準姿勢: 指先↑、手のひら→\(chirality == .left ? "右" : "左")、親指→前")
                     }
                 }
             }
@@ -161,11 +187,14 @@ public struct HandGestureRealityView: View {
             handEntitiesContainerEntity.addChild(handEntity)
 
             // デバッグ: HandTrackingComponentが正しく設定されたか確認
-            HandGestureLogger.logDebug("✅ HandTrackingComponent set for \(chirality == .left ? "Left" : "Right") hand entity")
+            HandGestureLogger.logDebug(
+                "✅ HandTrackingComponent set for \(chirality == .left ? "Left" : "Right") hand entity"
+            )
             HandGestureLogger.logDebug("   - Entity ID: \(handEntity.id)")
-            HandGestureLogger.logDebug("   - Component fingers count: \(handComponent.fingers.count)")
+            HandGestureLogger.logDebug(
+                "   - Component fingers count: \(handComponent.fingers.count)")
 
-            // 骨（関節間の接続）を作成
+            // 骨(関節間の接続)を作成
             createBones(for: chirality, handJoints: handJoints, handComponent: handComponent)
         }
 
@@ -173,7 +202,9 @@ public struct HandGestureRealityView: View {
     }
     // MARK: - 型変換ヘルパー関数
 
-    private func convertToHandJoint(_ joint: HandSkeleton.JointName) -> AnchoringComponent.Target.HandLocation.HandJoint? {
+    private func convertToHandJoint(_ joint: HandSkeleton.JointName) -> AnchoringComponent.Target
+        .HandLocation.HandJoint?
+    {
         switch joint {
         case .thumbKnuckle: return .thumbKnuckle
         case .thumbIntermediateBase: return .thumbIntermediateBase
@@ -209,7 +240,9 @@ public struct HandGestureRealityView: View {
     // MARK: - エンティティ作成
 
     @MainActor
-    func createJointSphere(for joint: HandSkeleton.JointName, chirality: HandAnchor.Chirality) -> ModelEntity {
+    func createJointSphere(for joint: HandSkeleton.JointName, chirality: HandAnchor.Chirality)
+        -> ModelEntity
+    {
         // 関節の種類に応じてサイズと色を調整
         var radius: Float = 0.003
         var height: Float = 0.015
@@ -229,14 +262,15 @@ public struct HandGestureRealityView: View {
         let container = ModelEntity()
         container.name = "\(chirality == .left ? "Left" : "Right")_\(joint)_Container"
 
-        // 円錐で方向を可視化（先端が指先方向を示す）
+        // 円錐で方向を可視化(先端が指先方向を示す)
         let cone = ModelEntity(
             mesh: .generateCone(height: height, radius: radius),
             materials: [UnlitMaterial(color: color)]
         )
 
         // 関節の種類に応じて円錐の向きを設定
-        let rotation = getConeRotationForJoint(joint, chirality: chirality == .left ? .left : .right)
+        let rotation = getConeRotationForJoint(
+            joint, chirality: chirality == .left ? .left : .right)
         cone.transform.rotation = rotation
         cone.name = "\(chirality == .left ? "Left" : "Right")_\(joint)_Cone"
 
@@ -252,38 +286,42 @@ public struct HandGestureRealityView: View {
         return container
     }
 
-    private func getConeRotationForJoint(_ joint: HandSkeleton.JointName, chirality: AnchoringComponent.Target.Chirality) -> simd_quatf {
+    private func getConeRotationForJoint(
+        _ joint: HandSkeleton.JointName, chirality: AnchoringComponent.Target.Chirality
+    ) -> simd_quatf {
         // 実験結果に基づく正しい回転設定
         // 円錐のデフォルト向きはY軸上向き
 
         switch joint {
-            // 手首: デフォルトのY軸上向きのまま
+        // 手首: デフォルトのY軸上向きのまま
         case .wrist:
             return simd_quatf(ix: 0, iy: 0, iz: 0, r: 1)
 
-            // 親指: 左右の手で回転方向を調整
+        // 親指: 左右の手で回転方向を調整
         case .thumbTip, .thumbIntermediateTip, .thumbKnuckle, .thumbIntermediateBase:
             // 右手: Z軸周りに90度回転、左手: Z軸周りに-90度回転
-            let angle: Float = chirality == .right ? .pi/2 : -.pi/2
+            let angle: Float = chirality == .right ? .pi / 2 : -.pi / 2
             return simd_quatf(angle: angle, axis: [0, 0, 1])
 
-            // 他の指: 左右の手で回転方向を逆にする
+        // 他の指: 左右の手で回転方向を逆にする
         case .indexFingerTip, .indexFingerIntermediateTip, .indexFingerKnuckle,
-                .middleFingerTip, .middleFingerIntermediateTip, .middleFingerKnuckle,
-                .ringFingerTip, .ringFingerIntermediateTip, .ringFingerKnuckle,
-                .littleFingerTip, .littleFingerIntermediateTip, .littleFingerKnuckle:
+            .middleFingerTip, .middleFingerIntermediateTip, .middleFingerKnuckle,
+            .ringFingerTip, .ringFingerIntermediateTip, .ringFingerKnuckle,
+            .littleFingerTip, .littleFingerIntermediateTip, .littleFingerKnuckle:
             // 右手: Z軸周りに90度回転、左手: Z軸周りに-90度回転
-            let angle: Float = chirality == .right ? .pi/2 : -.pi/2
+            let angle: Float = chirality == .right ? .pi / 2 : -.pi / 2
             return simd_quatf(angle: angle, axis: [0, 0, 1])
 
         default:
-            // デフォルトの向き（Y軸上向き）
+            // デフォルトの向き(Y軸上向き)
             return simd_quatf(ix: 0, iy: 0, iz: 0, r: 1)
         }
     }
 
     @MainActor
-    private func createCoordinateAxes(for joint: HandSkeleton.JointName, chirality: HandAnchor.Chirality) -> [ModelEntity] {
+    private func createCoordinateAxes(
+        for joint: HandSkeleton.JointName, chirality: HandAnchor.Chirality
+    ) -> [ModelEntity] {
         var axes: [ModelEntity] = []
 
         // 軸の長さとシリンダーの半径を設定
@@ -294,38 +332,38 @@ public struct HandGestureRealityView: View {
         let length = joint == .wrist ? axisLength * 1.3 : axisLength
         let radius = joint == .wrist ? axisRadius * 2.0 : axisRadius
 
-        // X軸（赤色）
+        // X軸(赤色)
         let xAxis = ModelEntity(
             mesh: .generateCylinder(height: length, radius: radius),
             materials: [UnlitMaterial(color: .red)]
         )
-        // X軸方向に向ける（Z軸周りに90度回転）
-        xAxis.transform.rotation = simd_quatf(angle: .pi/2, axis: [0, 0, 1])
-        // 0の座標からプラス方向に配置（シリンダーの中心をプラス方向にずらす）
-        xAxis.transform.translation = [length/2, 0, 0]
+        // X軸方向に向ける(Z軸周りに90度回転)
+        xAxis.transform.rotation = simd_quatf(angle: .pi / 2, axis: [0, 0, 1])
+        // 0の座標からプラス方向に配置(シリンダーの中心をプラス方向にずらす)
+        xAxis.transform.translation = [length / 2, 0, 0]
         xAxis.name = "\(chirality == .left ? "Left" : "Right")_\(joint)_XAxis"
         axes.append(xAxis)
 
-        // Y軸（緑色）
+        // Y軸(緑色)
         let yAxis = ModelEntity(
             mesh: .generateCylinder(height: length, radius: radius),
             materials: [UnlitMaterial(color: .green)]
         )
         // Y軸方向はデフォルトのまま
         // 0の座標からプラス方向に配置
-        yAxis.transform.translation = [0, length/2, 0]
+        yAxis.transform.translation = [0, length / 2, 0]
         yAxis.name = "\(chirality == .left ? "Left" : "Right")_\(joint)_YAxis"
         axes.append(yAxis)
 
-        // Z軸（青色）
+        // Z軸(青色)
         let zAxis = ModelEntity(
             mesh: .generateCylinder(height: length, radius: radius),
             materials: [UnlitMaterial(color: .blue)]
         )
-        // Z軸方向に向ける（X軸周りに90度回転）
-        zAxis.transform.rotation = simd_quatf(angle: .pi/2, axis: [1, 0, 0])
+        // Z軸方向に向ける(X軸周りに90度回転)
+        zAxis.transform.rotation = simd_quatf(angle: .pi / 2, axis: [1, 0, 0])
         // 0の座標からプラス方向に配置
-        zAxis.transform.translation = [0, 0, length/2]
+        zAxis.transform.translation = [0, 0, length / 2]
         zAxis.name = "\(chirality == .left ? "Left" : "Right")_\(joint)_ZAxis"
         axes.append(zAxis)
 
@@ -333,35 +371,39 @@ public struct HandGestureRealityView: View {
     }
 
     @MainActor
-    private func createBones(for chirality: AnchoringComponent.Target.Chirality, handJoints: [HandSkeleton.JointName], handComponent: HandTrackingComponent) {
-        // 骨の接続定義（簡略化）
+    private func createBones(
+        for chirality: AnchoringComponent.Target.Chirality, handJoints: [HandSkeleton.JointName],
+        handComponent: HandTrackingComponent
+    ) {
+        // 骨の接続定義(簡略化)
         let boneConnections: [(parent: HandSkeleton.JointName, child: HandSkeleton.JointName)] = [
             // 親指
             (.thumbKnuckle, .thumbIntermediateBase),
             (.thumbIntermediateBase, .thumbIntermediateTip),
             (.thumbIntermediateTip, .thumbTip),
 
-            // 人差し指（簡略化）
+            // 人差し指(簡略化)
             (.indexFingerKnuckle, .indexFingerIntermediateTip),
             (.indexFingerIntermediateTip, .indexFingerTip),
 
-            // 中指（簡略化）
+            // 中指(簡略化)
             (.middleFingerKnuckle, .middleFingerIntermediateTip),
             (.middleFingerIntermediateTip, .middleFingerTip),
 
-            // 薬指（簡略化）
+            // 薬指(簡略化)
             (.ringFingerKnuckle, .ringFingerIntermediateTip),
             (.ringFingerIntermediateTip, .ringFingerTip),
 
-            // 小指（簡略化）
+            // 小指(簡略化)
             (.littleFingerKnuckle, .littleFingerIntermediateTip),
-            (.littleFingerIntermediateTip, .littleFingerTip)
+            (.littleFingerIntermediateTip, .littleFingerTip),
         ]
 
         // 各骨に対してコンテナエンティティを作成
         for (parentJoint, childJoint) in boneConnections {
             let boneContainer = Entity()
-            boneContainer.name = "\(chirality == .left ? "Left" : "Right")_Bone_\(parentJoint)_to_\(childJoint)"
+            boneContainer.name =
+                "\(chirality == .left ? "Left" : "Right")_Bone_\(parentJoint)_to_\(childJoint)"
 
             // 骨の円柱を作成
             let cylinder = ModelEntity(
@@ -373,8 +415,6 @@ public struct HandGestureRealityView: View {
             handEntitiesContainerEntity.addChild(boneContainer)
         }
     }
-
-
 
     // MARK: - ヘルパー関数
 
@@ -402,11 +442,14 @@ public struct HandGestureRealityView: View {
         // SpatialTrackingSessionでも、ARKitSessionと同様の権限リクエストが必要
         let session = ARKitSession()
 
-        let authorizationResult = await session.requestAuthorization(for: [ARKitSession.AuthorizationType.handTracking])
+        let authorizationResult = await session.requestAuthorization(for: [
+            ARKitSession.AuthorizationType.handTracking
+        ])
 
         switch authorizationResult[ARKitSession.AuthorizationType.handTracking] {
         case .allowed:
-            HandGestureLogger.logSystem("Hand tracking authorization granted for SpatialTrackingSession")
+            HandGestureLogger.logSystem(
+                "Hand tracking authorization granted for SpatialTrackingSession")
         case .denied:
             HandGestureLogger.logError("Hand tracking authorization denied")
         case .notDetermined:

@@ -11,9 +11,9 @@ public struct AvailableGestures {
         ThumbsUpGesture(),
         PointingGesture(),
         // 両手ジェスチャー
-        PrayerGesture()
+        PrayerGesture(),
     ]
-    
+
     /// すべての利用可能な手話ジェスチャーインスタンス
     public static let allSignLanguageInstances: [BaseGestureProtocol] = [
         // 手話ジェスチャー
@@ -23,16 +23,16 @@ public struct AvailableGestures {
         SignLanguageLGesture(),
         SignLanguageOGesture(),
         SignLanguageWGesture(),
-        // シリアル手話ジェスチャー（初期位置→最終位置の移動で検出）
-        SignLanguageArigatouGesture()
+        // シリアル手話ジェスチャー(初期位置→最終位置の移動で検出)
+        SignLanguageArigatouGesture(),
     ]
-    
+
     /// すべてのシリアルジェスチャーインスタンス
     public static let allSerialGestureInstances: [SerialGestureProtocol] = [
         SignLanguageArigatouGesture()
     ]
-    
-    /// デフォルトで有効なジェスチャーのIDセット（全てのジェスチャーをデフォルトで有効にする）
+
+    /// デフォルトで有効なジェスチャーのIDセット(全てのジェスチャーをデフォルトで有効にする)
     public static let defaultEnabledGestureIds: Set<String> = {
         Set(allGestureInstances.map { $0.id })
     }()

@@ -15,7 +15,7 @@ public struct HandGestureScene: Scene {
     public init() {}
 
     public var body: some Scene {
-        // メインウィンドウ（初回起動時のWelcomeView）
+        // メインウィンドウ(初回起動時のWelcomeView)
         WindowGroup(id: "WelcomeWindow") {
             StartDemoView()
                 .environment(\.appModel, appModel)
@@ -34,7 +34,7 @@ public struct HandGestureScene: Scene {
         .defaultSize(width: 500, height: 1000)
         .windowResizability(.contentSize)
 
-        // ImmersiveSpace（ハンドジェスチャー体験）
+        // ImmersiveSpace(ハンドジェスチャー体験)
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
             HandGestureImmersiveView()
                 .environment(\.appModel, appModel)

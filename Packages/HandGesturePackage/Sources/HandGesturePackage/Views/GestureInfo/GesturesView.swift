@@ -1,15 +1,15 @@
-import SwiftUI
 import HandGestureKit
+import SwiftUI
 
 /// ジェスチャー検出結果を表示するビュー
 public struct GesturesView: View {
     @Environment(\.gestureInfoStore) private var gestureStore
-    
+
     public init() {}
-    
+
     public var body: some View {
         List {
-            // シリアルジェスチャー進行状況（進行中の場合のみ表示）
+            // シリアルジェスチャー進行状況(進行中の場合のみ表示)
             if gestureStore.serialGestureInProgress {
                 Section {
                     SerialGestureProgressView(gestureStore: gestureStore)
@@ -17,14 +17,14 @@ public struct GesturesView: View {
                         .listRowBackground(Color.clear)
                 }
             }
-            
+
             // セクション1: 検出されたジェスチャー
             DetectedGesturesSection(detectedGestures: gestureStore.detectedGestures)
-            
+
             // セクション2: 左右の手の詳細情報
             HandDetailsSection(gestureStore: gestureStore)
-            
-            // セクション3: デバッグ情報（開発時のみ表示）
+
+            // セクション3: デバッグ情報(開発時のみ表示)
             if HandGestureLogger.isDebugEnabled {
                 DebugSection(gestureStore: gestureStore)
             }
@@ -40,7 +40,7 @@ public struct GesturesView: View {
             }
         }
     }
-    
+
     // タイムスタンプのフォーマット
     private var formattedTimestamp: String {
         let formatter = DateFormatter()
@@ -53,7 +53,7 @@ public struct GesturesView: View {
 
 private struct DetectedGesturesSection: View {
     let detectedGestures: [DetectedGesture]
-    
+
     var body: some View {
         Section("検出中のジェスチャー") {
             if detectedGestures.isEmpty {
@@ -76,34 +76,37 @@ private struct DetectedGesturesSection: View {
 
 private struct DetectedGestureRow: View {
     let detected: DetectedGesture
-    
+
     var body: some View {
         HStack {
             // アイコン
-            Image(systemName: detected.gesture.gestureType == .singleHand ? "hand.raised.fill" : "hands.clap.fill")
-                .foregroundColor(.green)
-                .font(.title2)
-            
+            Image(
+                systemName: detected.gesture.gestureType == .singleHand
+                    ? "hand.raised.fill" : "hands.clap.fill"
+            )
+            .foregroundColor(.green)
+            .font(.title2)
+
             // ジェスチャー情報
             VStack(alignment: .leading, spacing: 4) {
                 Text(detected.gesture.gestureName)
                     .font(.headline)
                     .foregroundColor(.primary)
-                
+
                 Text(gestureTypeDescription(for: detected))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-            
+
             Spacer()
-            
+
             // 信頼度
             VStack(alignment: .trailing) {
                 Text("\(Int(detected.confidence * 100))%")
                     .font(.caption)
                     .fontWeight(.medium)
                     .foregroundColor(confidenceColor(detected.confidence))
-                
+
                 Text("信頼度")
                     .font(.caption2)
                     .foregroundColor(.secondary)
@@ -111,7 +114,7 @@ private struct DetectedGestureRow: View {
         }
         .padding(.vertical, 4)
     }
-    
+
     private func gestureTypeDescription(for detected: DetectedGesture) -> String {
         switch detected.gesture.gestureType {
         case .singleHand:
@@ -126,7 +129,7 @@ private struct DetectedGestureRow: View {
             return "両手"
         }
     }
-    
+
     private func confidenceColor(_ confidence: Float) -> Color {
         if confidence > 0.8 {
             return .green
@@ -142,7 +145,7 @@ private struct DetectedGestureRow: View {
 
 private struct HandDetailsSection: View {
     let gestureStore: GestureInfoStore
-    
+
     var body: some View {
         Section("手の状態") {
             // 左手
@@ -155,7 +158,7 @@ private struct HandDetailsSection: View {
                 fingerDirections: gestureStore.leftFingerDirections,
                 chirality: .left
             )
-            
+
             // 右手
             HandDetailRow(
                 hand: "右手",
@@ -166,7 +169,7 @@ private struct HandDetailsSection: View {
                 fingerDirections: gestureStore.rightFingerDirections,
                 chirality: .right
             )
-            
+
             // 両手の関係
             if gestureStore.twoHandPalmDistance > 0 {
                 TwoHandsRelationRow(
@@ -186,9 +189,9 @@ private struct HandDetailRow: View {
     let fingerBendLevels: [FingerType: SingleHandGestureData.FingerBendLevel]
     let fingerDirections: [FingerType: GestureDetectionDirection]
     let chirality: HandKind
-    
+
     @State private var isExpanded = true
-    
+
     var body: some View {
         DisclosureGroup(isExpanded: $isExpanded) {
             VStack(alignment: .leading, spacing: 8) {
@@ -201,36 +204,37 @@ private struct HandDetailRow: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                
+
                 Divider()
-                
+
                 // 指の状態
                 VStack(alignment: .leading, spacing: 4) {
                     Text("指の状態")
                         .font(.caption)
                         .fontWeight(.medium)
-                    
-                    ForEach([FingerType.thumb, .index, .middle, .ring, .little], id: \.self) { finger in
+
+                    ForEach([FingerType.thumb, .index, .middle, .ring, .little], id: \.self) {
+                        finger in
                         if let bendLevel = fingerBendLevels[finger] {
                             VStack(alignment: .leading, spacing: 2) {
                                 HStack {
                                     Text(finger.description)
                                         .font(.caption)
                                         .frame(width: 60, alignment: .leading)
-                                    
+
                                     // 曲がり具合レベル
                                     HStack(spacing: 4) {
                                         Image(systemName: bendLevelIcon(bendLevel))
                                             .foregroundColor(bendLevelColor(bendLevel))
                                             .font(.caption)
-                                        
+
                                         Text(bendLevelDescription(bendLevel))
                                             .font(.caption)
                                             .foregroundColor(bendLevelColor(bendLevel))
                                     }
-                                    
+
                                     Spacer()
-                                    
+
                                     // 指の向き
                                     if let direction = fingerDirections[finger] {
                                         HStack(spacing: 2) {
@@ -258,9 +262,9 @@ private struct HandDetailRow: View {
             }
         }
     }
-    
+
     // MARK: - Helper Functions
-    
+
     private func bendLevelIcon(_ level: SingleHandGestureData.FingerBendLevel) -> String {
         switch level {
         case .straight:
@@ -275,7 +279,7 @@ private struct HandDetailRow: View {
             return "circle.fill"
         }
     }
-    
+
     private func bendLevelColor(_ level: SingleHandGestureData.FingerBendLevel) -> Color {
         switch level {
         case .straight:
@@ -290,7 +294,7 @@ private struct HandDetailRow: View {
             return .purple
         }
     }
-    
+
     private func bendLevelDescription(_ level: SingleHandGestureData.FingerBendLevel) -> String {
         switch level {
         case .straight:
@@ -305,7 +309,7 @@ private struct HandDetailRow: View {
             return "完全に曲がる"
         }
     }
-    
+
     private func directionIcon(_ direction: GestureDetectionDirection) -> String {
         switch direction {
         case .top:
@@ -322,7 +326,7 @@ private struct HandDetailRow: View {
             return "arrow.turn.up.left"
         }
     }
-    
+
     private func directionShortDescription(_ direction: GestureDetectionDirection) -> String {
         switch direction {
         case .top:
@@ -344,7 +348,7 @@ private struct HandDetailRow: View {
 private struct TwoHandsRelationRow: View {
     let distance: Float
     let areFacing: Bool
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -353,7 +357,7 @@ private struct TwoHandsRelationRow: View {
                 Text("両手の関係")
                     .font(.body)
             }
-            
+
             HStack {
                 Label("距離", systemImage: "ruler")
                     .font(.caption)
@@ -362,7 +366,7 @@ private struct TwoHandsRelationRow: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-            
+
             HStack {
                 Label("向かい合い", systemImage: "arrow.left.and.right")
                     .font(.caption)
@@ -383,7 +387,7 @@ private struct TwoHandsRelationRow: View {
 
 private struct DebugSection: View {
     let gestureStore: GestureInfoStore
-    
+
     var body: some View {
         Section("デバッグ情報") {
             // デバッグメッセージ
@@ -399,13 +403,13 @@ private struct DebugSection: View {
                 }
                 .padding(.vertical, 4)
             }
-            
+
             // パフォーマンス統計
             if let stats = gestureStore.performanceStats, stats.searchCount > 0 {
                 PerformanceStatsRow(stats: stats)
             }
-            
-            // 指同士の距離（重要なもののみ表示）
+
+            // 指同士の距離(重要なもののみ表示)
             if !gestureStore.fingerDistances.isEmpty {
                 FingerDistancesRow(distances: gestureStore.fingerDistances)
             }
@@ -415,16 +419,17 @@ private struct DebugSection: View {
 
 private struct PerformanceStatsRow: View {
     let stats: SearchStats
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("パフォーマンス")
                 .font(.caption)
                 .fontWeight(.medium)
-            
+
             HStack(spacing: 16) {
                 StatItem(label: "検索回数", value: "\(stats.searchCount)")
-                StatItem(label: "平均時間", value: String(format: "%.1fms", stats.averageSearchTime * 1000))
+                StatItem(
+                    label: "平均時間", value: String(format: "%.1fms", stats.averageSearchTime * 1000))
                 StatItem(label: "マッチ率", value: String(format: "%.0f%%", stats.matchRate * 100))
             }
         }
@@ -435,7 +440,7 @@ private struct PerformanceStatsRow: View {
 private struct StatItem: View {
     let label: String
     let value: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
@@ -450,14 +455,14 @@ private struct StatItem: View {
 
 private struct FingerDistancesRow: View {
     let distances: [(finger1: FingerType, finger2: FingerType, distance: Float, hand: HandKind)]
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("指同士の距離")
                 .font(.caption)
                 .fontWeight(.medium)
-            
-            // 重要な距離のみ表示（親指と他の指、隣接する指）
+
+            // 重要な距離のみ表示(親指と他の指、隣接する指)
             let importantDistances = distances.filter { distance in
                 // 親指との距離
                 if distance.finger1 == .thumb || distance.finger2 == .thumb {
@@ -467,41 +472,45 @@ private struct FingerDistancesRow: View {
                 let adjacentPairs: [(FingerType, FingerType)] = [
                     (.index, .middle),
                     (.middle, .ring),
-                    (.ring, .little)
+                    (.ring, .little),
                 ]
                 return adjacentPairs.contains { pair in
-                    (distance.finger1 == pair.0 && distance.finger2 == pair.1) ||
-                    (distance.finger1 == pair.1 && distance.finger2 == pair.0)
+                    (distance.finger1 == pair.0 && distance.finger2 == pair.1)
+                        || (distance.finger1 == pair.1 && distance.finger2 == pair.0)
                 }
             }
-            
+
             ForEach(Array(importantDistances.enumerated()), id: \.offset) { _, distance in
                 HStack {
                     Image(systemName: distance.hand == .left ? "l.circle" : "r.circle")
                         .font(.caption2)
                         .foregroundColor(distance.hand == .left ? .orange : .blue)
-                    
-                    Text("\(distance.finger1.shortDescription)-\(distance.finger2.shortDescription)")
-                        .font(.caption2)
-                        .frame(width: 50, alignment: .leading)
-                    
+
+                    Text(
+                        "\(distance.finger1.shortDescription)-\(distance.finger2.shortDescription)"
+                    )
+                    .font(.caption2)
+                    .frame(width: 50, alignment: .leading)
+
                     // 距離を視覚的に表示
                     let distanceInCm = distance.distance * 100
                     let isClose = distanceInCm < 2.0
                     let isMedium = distanceInCm >= 2.0 && distanceInCm < 5.0
-                    
+
                     HStack(spacing: 2) {
-                        Image(systemName: isClose ? "arrow.left.and.right.circle.fill" : 
-                                        isMedium ? "arrow.left.and.right.circle" : 
-                                        "arrow.left.and.right")
-                            .font(.caption2)
-                            .foregroundColor(isClose ? .green : isMedium ? .orange : .secondary)
-                        
+                        Image(
+                            systemName: isClose
+                                ? "arrow.left.and.right.circle.fill"
+                                : isMedium ? "arrow.left.and.right.circle" : "arrow.left.and.right"
+                        )
+                        .font(.caption2)
+                        .foregroundColor(isClose ? .green : isMedium ? .orange : .secondary)
+
                         Text("\(String(format: "%.1f", distanceInCm))cm")
                             .font(.caption2)
                             .foregroundColor(isClose ? .green : isMedium ? .orange : .secondary)
                     }
-                    
+
                     Spacer()
                 }
             }

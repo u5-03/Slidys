@@ -23,16 +23,7 @@ struct CustomGestureDemoSlide: View {
             
             Text("カスタムジェスチャーの検知")
                 .font(.system(size: 80, weight: .bold))
-                .foregroundStyle(.defaultForegroundColor)
-            
-            VStack(spacing: 35) {
-                GestureItem(emoji: "✌️", name: "ピースサイン", description: "人差し指と中指を立てる")
-                GestureItem(emoji: "👍", name: "サムズアップ", description: "親指を立てる")
-                GestureItem(emoji: "👉", name: "ポインティング", description: "人差し指で指す")
-                GestureItem(emoji: "✋", name: "フラットハンド", description: "手のひらを開く")
-                GestureItem(emoji: "✊", name: "グー", description: "握りこぶし")
-            }
-            .padding(.horizontal, 100)
+                .foregroundStyle(.defaultForegroundColor)            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(80)
@@ -68,4 +59,6 @@ struct GestureItem: View {
     SlidePreview {
         CustomGestureDemoSlide()
     }
+    .headerSlideStyle(CustomHeaderSlideStyle())
+    .itemStyle(CustomItemStyle())
 }

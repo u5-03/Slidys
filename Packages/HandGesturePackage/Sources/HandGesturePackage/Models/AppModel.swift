@@ -6,13 +6,13 @@
 //
 
 import Foundation
-import simd
 import Observation
+import simd
 
 /// アプリケーション全体の状態を管理するモデル
 @Observable
 public final class AppModel: @unchecked Sendable {
-    
+
     // MARK: - ImmersiveSpace管理
 
     /// ImmersiveSpaceのID
@@ -36,10 +36,10 @@ public final class AppModel: @unchecked Sendable {
     /// 右手がピンチしているかどうか
     public var isPinchingRightHand = false
 
-    /// 左手のピンチ位置（ワールド座標）
+    /// 左手のピンチ位置(ワールド座標)
     public var leftPinchPosition: SIMD3<Float> = .zero
 
-    /// 右手のピンチ位置（ワールド座標）
+    /// 右手のピンチ位置(ワールド座標)
     public var rightPinchPosition: SIMD3<Float> = .zero
 
     public init() {}

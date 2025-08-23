@@ -5,11 +5,11 @@
 //  Created by yugo.sugiyama on 2025/06/05.
 //
 
-import RealityKit
 import Foundation
+import RealityKit
 
 #if os(visionOS)
-import ARKit
+    import ARKit
 #endif
 
 /// 手のトラッキング情報を保持するコンポーネント
@@ -20,7 +20,7 @@ public struct HandTrackingComponent: Component {
     /// 各関節のエンティティを保持する辞書
     public var fingers: [HandSkeleton.JointName: Entity] = [:]
 
-    /// 骨（関節間の接続）のエンティティを保持する辞書
+    /// 骨(関節間の接続)のエンティティを保持する辞書
     public var bones: [HandSkeleton.JointName: ModelEntity] = [:]
 
     public init(chirality: HandAnchor.Chirality) {

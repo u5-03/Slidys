@@ -3,10 +3,10 @@
 //  Copyright ©Sugiy All rights reserved.
 //
 
-import SwiftUI
+import Algorithms
 import CoreGraphics
 import DeveloperToolsSupport
-import Algorithms
+import SwiftUI
 
 /// グリッド上にピクセルを描画するビュー
 /// - Note: columns/rows は変換サイズと一致している必要があります。
@@ -15,12 +15,13 @@ struct PixelImageView: View {
     let dimension: Int
     let isBlurred: Bool
     let blurDistance: Int  // 周囲ピクセルのサンプリング範囲
-    let weight: Double = 0.03  // 重み係数（固定）
+    let weight: Double = 0.03  // 重み係数(固定)
 
     var body: some View {
         GeometryReader { geometry in
             let pixelSize = geometry.size.width / CGFloat(dimension)
-            let gridItems = Array(repeating: GridItem(.fixed(pixelSize), spacing: 0), count: dimension)
+            let gridItems = Array(
+                repeating: GridItem(.fixed(pixelSize), spacing: 0), count: dimension)
 
             LazyVGrid(columns: gridItems, spacing: 0) {
                 ForEach(pixels.indexed(), id: \.index) { (index, pixel) in
@@ -44,7 +45,6 @@ struct PixelImageView: View {
         }
     }
 }
-
 
 #Preview {
     @Previewable @State var pixels: [Pixel] = []

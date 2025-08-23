@@ -55,7 +55,7 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
                     .frame(height: 100)
                 VStack(alignment: .leading, spacing: 30) {
                     configuration.content
-                        .font(.system(size: 60, weight: .medium))
+                        .font(.regularFont)
                         .foregroundStyle(.defaultForegroundColor)
                 }
             }

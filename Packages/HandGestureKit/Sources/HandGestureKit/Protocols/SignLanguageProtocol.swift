@@ -14,10 +14,10 @@ public protocol SignLanguageProtocol: SingleHandGestureProtocol {
 }
 
 /// デフォルト実装
-public extension SignLanguageProtocol {
+extension SignLanguageProtocol {
     /// デフォルトのカテゴリは手話
-    var category: GestureCategory { .custom }
-    
-    /// デフォルトの優先度（高めに設定して通常ジェスチャーより優先）
-    var priority: Int { 10 }
+    public var category: GestureCategory { .custom }
+
+    /// デフォルトの優先度(高めに設定して通常ジェスチャーより優先)
+    public var priority: Int { 10 }
 }

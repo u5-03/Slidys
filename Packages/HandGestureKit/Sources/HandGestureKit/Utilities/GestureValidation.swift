@@ -9,10 +9,10 @@ import Foundation
 
 /// ジェスチャー検出で頻繁に使用される共通パターンを提供するユーティリティ
 public enum GestureValidation {
-    
+
     // MARK: - Finger Configuration Patterns
-    
-    /// 指定した指の組み合わせが正しい状態（伸びている/曲がっている）かを検証
+
+    /// 指定した指の組み合わせが正しい状態(伸びている/曲がっている)かを検証
     /// - Parameters:
     ///   - gestureData: 手のジェスチャーデータ
     ///   - straightFingers: 伸びている必要がある指の配列
@@ -27,15 +27,15 @@ public enum GestureValidation {
         for finger in straightFingers {
             guard gestureData.isFingerStraight(finger) else { return false }
         }
-        
+
         // Check bent fingers
         for finger in bentFingers {
             guard gestureData.isFingerBent(finger) else { return false }
         }
-        
+
         return true
     }
-    
+
     /// 指定した指のみが伸びていて、他の指が曲がっているかを検証
     /// - Parameters:
     ///   - gestureData: 手のジェスチャーデータ
@@ -48,16 +48,16 @@ public enum GestureValidation {
         let allFingers = FingerType.allCases
         let targetSet = Set(targetFingers)
         let otherFingers = allFingers.filter { !targetSet.contains($0) }
-        
+
         return validateFingerConfiguration(
             gestureData,
             straight: targetFingers,
             bent: otherFingers
         )
     }
-    
+
     // MARK: - Direction Validation
-    
+
     /// 指定した指が全て同じ方向を向いているかを検証
     /// - Parameters:
     ///   - gestureData: 手のジェスチャーデータ
@@ -73,9 +73,9 @@ public enum GestureValidation {
             gestureData.isFingerPointing(finger, direction: direction)
         }
     }
-    
+
     // MARK: - Complex Gesture Patterns
-    
+
     /// 握り拳の状態を検証
     /// - Parameter gestureData: 手のジェスチャーデータ
     /// - Returns: 握り拳状態の場合true
@@ -84,8 +84,8 @@ public enum GestureValidation {
             gestureData.isFingerBent(finger)
         }
     }
-    
-    /// 開いた手（パー）の状態を検証
+
+    /// 開いた手(パー)の状態を検証
     /// - Parameter gestureData: 手のジェスチャーデータ
     /// - Returns: 開いた手の状態の場合true
     public static func validateOpenHandGesture(_ gestureData: SingleHandGestureData) -> Bool {
@@ -93,8 +93,8 @@ public enum GestureValidation {
             gestureData.isFingerStraight(finger)
         }
     }
-    
-    /// 指差しジェスチャーの状態を検証（人差し指のみ伸びている）
+
+    /// 指差しジェスチャーの状態を検証(人差し指のみ伸びている)
     /// - Parameter gestureData: 手のジェスチャーデータ
     /// - Returns: 指差し状態の場合true
     public static func validatePointingGesture(_ gestureData: SingleHandGestureData) -> Bool {

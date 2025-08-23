@@ -11,34 +11,34 @@ import Foundation
 public struct SearchStats {
     /// 検索実行回数
     public var searchCount = 0
-    
+
     /// チェックしたジェスチャー総数
     public var gesturesChecked = 0
-    
+
     /// 見つかったマッチ総数
     public var matchesFound = 0
-    
-    /// 総検索時間（秒）
+
+    /// 総検索時間(秒)
     public var totalSearchTime = 0.0
-    
-    /// 平均検索時間（秒）
+
+    /// 平均検索時間(秒)
     public var averageSearchTime: TimeInterval {
         return searchCount > 0 ? totalSearchTime / Double(searchCount) : 0.0
     }
-    
-    /// 平均チェック効率（マッチ率）
+
+    /// 平均チェック効率(マッチ率)
     public var matchRate: Double {
         return gesturesChecked > 0 ? Double(matchesFound) / Double(gesturesChecked) : 0.0
     }
-    
+
     public init() {}
 }
 
 // MARK: - Formatting Extensions
 
-public extension SearchStats {
+extension SearchStats {
     /// フォーマットされた統計情報を取得
-    var formattedSummary: String {
+    public var formattedSummary: String {
         """
         検索数: \(searchCount)
         チェック数: \(gesturesChecked)
@@ -47,14 +47,14 @@ public extension SearchStats {
         マッチ率: \(String(format: "%.1f", matchRate * 100))%
         """
     }
-    
+
     /// パフォーマンスレベルを判定
-    enum PerformanceLevel {
+    public enum PerformanceLevel {
         case excellent  // < 5ms
-        case good      // < 10ms
-        case fair      // < 20ms
-        case poor      // >= 20ms
-        
+        case good  // < 10ms
+        case fair  // < 20ms
+        case poor  // >= 20ms
+
         var description: String {
             switch self {
             case .excellent: return "優秀"
@@ -64,9 +64,9 @@ public extension SearchStats {
             }
         }
     }
-    
+
     /// 現在のパフォーマンスレベル
-    var performanceLevel: PerformanceLevel {
+    public var performanceLevel: PerformanceLevel {
         let avgTimeMs = averageSearchTime * 1000
         if avgTimeMs < 5 {
             return .excellent

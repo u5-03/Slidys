@@ -1,0 +1,50 @@
+//
+//  PerformanceOptimizationSlide.swift
+//  iOSDC2025Slide
+//
+//  Created by Claude on 2025/01/21.
+//
+
+import SlideKit
+import SlidesCore
+import SwiftUI
+
+@Slide
+struct PerformanceOptimizationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
+    var body: some View {
+        HeaderSlide("手ジェスチャー検知のパフォーマンス最適化") {
+            ScrollView {
+                Item("trackingModeの使い分け", accessory: .number(1)) {
+                    Item("精度重視の判定: .continuous(ピンチ閾値など)", accessory: .bullet)
+                    Item("UI追従の見た目: .predicted(体感遅延を低減)", accessory: .bullet)
+                }
+
+                Item("更新頻度の最適化", accessory: .number(2)) {
+                    Item("手データ更新: 90Hz(visionOS2)", accessory: .bullet)
+                    Item("ジェスチャー判定: 30-60Hzで十分", accessory: .bullet)
+                }
+
+                Item("計算の早期リジェクト", accessory: .number(3)) {
+                    Item("前提条件チェック(手の可視判定・距離閾値)", accessory: .bullet)
+                    Item("必要時のみSpatialTrackingSessionを開始/停止", accessory: .bullet)
+                }
+
+                Item("追跡するEntityの数を最小限にする", accessory: .number(4)) {
+                    Item("追跡するEntityが少ない方が、計算リソースが少なくて済む", accessory: .bullet)
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    SlidePreview {
+        PerformanceOptimizationSlide()
+    }
+    .headerSlideStyle(CustomHeaderSlideStyle())
+    .itemStyle(CustomItemStyle())
+}

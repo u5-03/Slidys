@@ -18,9 +18,9 @@ struct WrapUpSlide: View {
     var body: some View {
         HeaderSlide("まとめ・補足") {
             Item("visionOSを使ったハンドジェスチャーの仕組みの基礎について確認", accessory: .number(1))
-            Item("静的・動的ジェスチャーの検知も可能", accessory: .number(2))
+            Item("静的・動的ジェスチャーの検知についても確認", accessory: .number(2))
             Item("パフォーマンスや精度などで課題もある", accessory: .number(3)) {
-                Item("手話との距離を繋げるきっかけにはなるかも？", accessory: .number(1)) {
+                Item("手話との距離を縮めるきっかけにはなるかも？", accessory: .number(1)) {
                 }
             }
             Item("EyeSightのような機能はコミュニケーションをする上では大事", accessory: .number(4))

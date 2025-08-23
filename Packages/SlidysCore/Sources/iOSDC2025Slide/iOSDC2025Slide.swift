@@ -55,6 +55,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         
         // フレームワーク比較
         FrameworkComparisonSlide()
+        PerformanceOptimizationSlide()
         
         // 実装詳細
         TrackingSystemImplementationSlide()

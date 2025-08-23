@@ -5,23 +5,22 @@
 //  Created by Claude on 2025/01/21.
 //
 
-import SwiftUI
 import SlideKit
 import SlidesCore
+import SwiftUI
 
 @Slide
 struct PossibilitiesSlide: View {
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }
-    
+
     var body: some View {
         HeaderSlide("それでも広がる可能性") {
             ScrollView {
                 Item("基本的な手話単語の認識は可能！", accessory: .number(1)) {
-                    Item("✅ 日常的な挨拶（ありがとう）", accessory: .bullet)
+                    Item("✅ 定型的な表現(ありがとう)", accessory: .bullet)
                     Item("✅ 数字や簡単な単語", accessory: .bullet)
-                    Item("✅ Yes/Noなどの基本的な応答", accessory: .bullet)
                 }
                 Item("アクセシビリティ向上への第一歩", accessory: .number(3)) {
                     Item("✅ 聴覚障害者と健聴者のコミュニケーション支援", accessory: .bullet)

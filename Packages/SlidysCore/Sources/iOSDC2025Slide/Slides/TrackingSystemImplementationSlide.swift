@@ -51,7 +51,6 @@ struct TrackingSystemImplementationSlide: View {
                 )
                 """)
                 }
-                .padding(.horizontal, 60)
             }
         }
     }
@@ -61,4 +60,6 @@ struct TrackingSystemImplementationSlide: View {
     SlidePreview {
         TrackingSystemImplementationSlide()
     }
+    .headerSlideStyle(CustomHeaderSlideStyle())
+    .itemStyle(CustomItemStyle())
 }

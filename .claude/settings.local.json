@@ -21,7 +21,8 @@
       "Bash(then)",
       "Bash(sed:*)",
       "Bash(fi)",
-      "Bash(swift:*)"
+      "Bash(swift:*)",
+      "WebSearch"
     ],
     "deny": []
   }

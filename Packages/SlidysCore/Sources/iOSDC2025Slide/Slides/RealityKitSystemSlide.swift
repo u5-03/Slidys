@@ -5,9 +5,9 @@
 //  Created by Claude on 2025/01/09.
 //
 
-import SwiftUI
 import SlideKit
 import SlidesCore
+import SwiftUI
 
 @Slide
 struct RealityKitSystemSlide: View {
@@ -19,13 +19,13 @@ struct RealityKitSystemSlide: View {
         HeaderSlide("RealityKit Systemの仕組み") {
             ScrollView {
                 Item("Systemプロトコルとは？", accessory: .number(1)) {
-                    Item("ECS（Entity Component System）アーキテクチャの一部", accessory: .bullet)
+                    Item("ECS(Entity Component System)アーキテクチャの一部", accessory: .bullet)
                     Item("フレームごとにEntityを処理する仕組み", accessory: .bullet)
                     Item("自動的にRealityKitランタイムに登録", accessory: .bullet)
                 }
                 Item("update(context:)メソッド", accessory: .number(2)) {
                     Item("毎フレーム自動的に呼ばれる", accessory: .bullet)
-                    Item("約90Hz（Vision Pro）で更新", accessory: .bullet)
+                    Item("約90Hz(Vision Pro)で更新", accessory: .bullet)
                     Item("SceneUpdateContextから必要な情報を取得", accessory: .bullet)
                 }
                 Item("HandGestureTrackingSystem", accessory: .number(3)) {
