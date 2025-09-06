@@ -17,7 +17,6 @@ public struct PeaceSignGesture: SingleHandGestureProtocol {
     
     public var gestureName: String { "ピースサイン" }
     public var priority: Int { 10 }
-    public var category: GestureCategory { .counting }
 
     // MARK: - ジェスチャー検出実装
     

@@ -22,7 +22,6 @@ public struct FlatHandGesture: SingleHandGestureProtocol {
     
     public var gestureName: String { customName }
     public var priority: Int { 5 }
-    public var category: GestureCategory { .hand }
     
     public func matches(_ gestureData: SingleHandGestureData) -> Bool {
         return Self.gesturePattern.validate(gestureData)

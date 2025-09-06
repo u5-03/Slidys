@@ -74,7 +74,7 @@ public final class GestureInfoStore: @unchecked Sendable {
     public var showHandEntities = true
 
     /// 手話検知を有効にするかどうか
-    public var isHandLanguageDetectionEnabled = true
+    public var isHandLanguageDetectionEnabled = false
 
     /// 有効なジェスチャーのセット(ジェスチャーIDで管理)
     public var enabledGestureIds: Set<String> = AvailableGestures.defaultEnabledGestureIds

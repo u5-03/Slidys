@@ -24,7 +24,6 @@ public struct ImprovedPeaceSignGesture: SingleHandGestureProtocol {
 
     public var gestureName: String { "改良版ピースサイン" }
     public var priority: Int { 9 }  // Original より少し高い優先度
-    public var category: GestureCategory { .counting }
 
     // MARK: - Optimized Matching Implementation
 

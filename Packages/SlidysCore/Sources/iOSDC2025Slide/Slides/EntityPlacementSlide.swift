@@ -16,7 +16,7 @@ struct EntityPlacementSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("HandSkeletonにEntityを配置する") {
+        HeaderSlide("HandSkeletonのJointにEntityを配置する") {
             ScrollView {
                 VStack(alignment: .leading, spacing: 40) {
                     VStack(alignment: .leading, spacing: 15) {
@@ -31,8 +31,8 @@ struct EntityPlacementSlide: View {
                                 content.add(rootEntity)
                                 
                                 // 手のエンティティコンテナを作成
-                                let handEntitiesContainer = Entity()
-                                rootEntity.addChild(handEntitiesContainer)
+                                let handEntitiesContainerEntity = Entity()
+                                rootEntity.addChild(handEntitiesContainerEntity)
                             }
                             """)
                     }
@@ -49,13 +49,13 @@ struct EntityPlacementSlide: View {
                             await session.run(config)
 
                             // AnchorEntityで関節を自動追跡
-                            let anchorEntity = AnchorEntity(
+                            let anchorEntity = AnchorEntity( // visionOS2~
                                 .hand(.left, location: .palm),
                                 trackingMode: .predicted  // 遅延を低減
                             )
 
                             // シーンに追加するだけで自動追跡開始
-                            handEntitiesContainer.addChild(anchorEntity)
+                            handEntitiesContainerEntity.addChild(anchorEntity)
                             """)
                     }
 

@@ -5,9 +5,9 @@
 //  Created by Claude on 2025/01/09.
 //
 
-import SwiftUI
 import SlideKit
 import SlidesCore
+import SwiftUI
 
 @Slide
 struct TrackingSystemImplementationSlide: View {
@@ -21,35 +21,39 @@ struct TrackingSystemImplementationSlide: View {
                 VStack(alignment: .leading, spacing: 25) {
                     Text("1. EntityQueryで手のEntityを取得")
                         .font(.regularFont)
-                
-                CodeBlockView("""
-                let handEntities = context.scene.performQuery(
-                    EntityQuery(where: .has(HandTrackingComponent.self))
-                )
-                """)
-                
+
+                    CodeBlockView(
+                        """
+                        let handEntities = context.scene.performQuery(
+                            EntityQuery(where: .has(HandTrackingComponent.self))
+                        )
+                        """)
+
                     Text("2. HandTrackingComponentから情報を抽出")
                         .font(.regularFont)
                         .padding(.top, 10)
-                
-                CodeBlockView("""
-                for entity in handEntities {
-                    if let component = entity.components[HandTrackingComponent.self] {
-                        let chirality = component.chirality  // .left or .right
-                        let handSkeleton = component.handSkeleton
-                    }
-                }
-                """)
-                
+
+                    CodeBlockView(
+                        """
+                        for entity in handEntities {
+                            if let component = entity.components[HandTrackingComponent.self] {
+                                let chirality = component.chirality  // .left or .right
+                                let handSkeleton = component.handSkeleton
+                            }
+                        }
+                        """)
+
                     Text("3. ジェスチャー検出処理")
                         .font(.regularFont)
                         .padding(.top, 10)
-                
-                CodeBlockView("""
-                let detectedGestures = unifiedDetector.detectGestures(
-                    from: handTrackingComponents
-                )
-                """)
+
+                    CodeBlockView(
+                        """
+                        let detectedGestures = GestureDetector.detectGestures(
+                            from: handTrackingComponents,
+                            targetGestures: targetGestures
+                        )
+                        """)
                 }
             }
         }

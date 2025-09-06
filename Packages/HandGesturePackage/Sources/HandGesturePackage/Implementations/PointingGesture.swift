@@ -18,7 +18,6 @@ public struct PointingGesture: SingleHandGestureProtocol {
     
     public var gestureName: String { "指差し" }
     public var priority: Int { 5 }
-    public var category: GestureCategory { .pointing }
     
     public func matches(_ gestureData: SingleHandGestureData) -> Bool {
         return Self.gesturePattern.validate(gestureData)

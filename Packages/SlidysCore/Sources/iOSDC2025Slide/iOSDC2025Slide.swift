@@ -34,7 +34,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 secondText: "11月にやるKanagawa.swift #2の運営をしています",
                 thirdText: "iOSDCのスタッフもしてます",
                 fourthText: "来月末に戸建て新居ができるので、引越しします",
-                fifthText: "明後日の夜に羽田空港からドイツで別のカンファレンスで登壇しにいきます"
+                fifthText: "明後日の夜に羽田空港からドイツに行き、別のカンファレンスで登壇してきます"
             )
         )
         TalkPlanSlide()

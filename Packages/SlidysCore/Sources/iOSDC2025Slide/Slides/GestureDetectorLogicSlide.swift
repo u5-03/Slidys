@@ -19,9 +19,32 @@ struct GestureDetectorLogicSlide: View {
         HeaderSlide("GestureDetectorの処理ロジック") {
             ScrollView {
                 VStack(alignment: .leading, spacing: 30) {
+                    // プロトコル階層
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("1. プロトコル階層")
+                            .font(.regularFont)
+
+                        CodeBlockView(
+                            """
+                            protocol BaseGestureProtocol {
+                                var gestureName: String { get }
+                                var priority: Int { get }
+                                var gestureType: GestureType { get }
+                            }
+
+                            protocol SingleHandGestureProtocol: BaseGestureProtocol {
+                                func matches(_ gestureData: SingleHandGestureData) -> Bool
+                            }
+
+                            protocol TwoHandGestureProtocol: BaseGestureProtocol {
+                                func matches(_ gestureData: HandsGestureData) -> Bool
+                            }
+                            """)
+                    }
+
                     // 検出アーキテクチャ
                     VStack(alignment: .leading, spacing: 15) {
-                        Text("1. 検出アーキテクチャ")
+                        Text("2. 検出アーキテクチャ")
                             .font(.regularFont)
 
                         CodeBlockView(
@@ -33,15 +56,37 @@ struct GestureDetectorLogicSlide: View {
                                 // シリアルジェスチャー専用トラッカー
                                 private let serialTracker = SerialGestureTracker()
                                 
-                                // カテゴリ別インデックス(高速検索用)
-                                private var categoryIndex: [GestureCategory: [Int]]
+                                // タイプ別インデックス(高速検索用)
+                                private var typeIndex: [GestureType: [Int]]
                             }
+                            """)
+                    }
+
+                    // 便利な判定メソッド
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("3. 便利な判定メソッド")
+                            .font(.regularFont)
+
+                        CodeBlockView(
+                            """
+                            // SingleHandGestureDataで提供される便利メソッド
+                            gestureData.isFingerStraight(.index)     // 人差し指が伸びているか
+                            gestureData.isFingerBent(.thumb)         // 親指が曲がっているか  
+                            gestureData.isPalmFacing(.forward)       // 手のひらが前向きか
+                            gestureData.areAllFingersExtended()      // 全指が伸びているか
+                            gestureData.isAllFingersBent             // 握り拳状態か
+
+                            // 複数条件の組み合わせ例
+                            guard gestureData.isFingerStraight(.index),
+                                  gestureData.isFingerStraight(.middle),
+                                  gestureData.areAllFingersBentExcept([.index, .middle])
+                            else { return false }
                             """)
                     }
 
                     // 判定条件の種類
                     VStack(alignment: .leading, spacing: 15) {
-                        Text("2. ジェスチャー判定条件")
+                        Text("4. ジェスチャー判定条件")
                             .font(.regularFont)
 
                         HStack(spacing: 20) {
@@ -65,12 +110,12 @@ struct GestureDetectorLogicSlide: View {
 
                     // 検出フロー
                     VStack(alignment: .leading, spacing: 15) {
-                        Text("3. 検出フロー")
+                        Text("5. 検出フロー")
                             .font(.regularFont)
 
                         CodeBlockView(
                             """
-                            func detectGestures(from components: [HandTrackingComponent]) -> [String] {
+                            func detectGestures(from components: [HandTrackingComponent]) -> GestureDetectionResult {
                                 // 1. シリアルジェスチャーのタイムアウトチェック
                                 if serialTracker.isTimedOut() {
                                     serialTracker.reset()
@@ -89,32 +134,6 @@ struct GestureDetectorLogicSlide: View {
                                 }
                             }
                             """)
-                    }
-
-                    // パフォーマンス最適化
-                    VStack(alignment: .leading, spacing: 15) {
-                        Text("4. パフォーマンス最適化")
-                            .font(.regularFont)
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            OptimizationItem(
-                                icon: "bolt.fill",
-                                title: "カテゴリインデックス",
-                                description: "O(1)でカテゴリ別ジェスチャーを取得"
-                            )
-
-                            OptimizationItem(
-                                icon: "chart.line.uptrend.xyaxis",
-                                title: "優先度ソート",
-                                description: "頻度の高いジェスチャーを優先的に判定"
-                            )
-
-                            OptimizationItem(
-                                icon: "scissors",
-                                title: "早期リターン",
-                                description: "マッチした時点で即座に処理を終了"
-                            )
-                        }
                     }
                 }
             }

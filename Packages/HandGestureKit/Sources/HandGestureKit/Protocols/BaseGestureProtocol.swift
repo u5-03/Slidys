@@ -7,14 +7,6 @@
 
 import Foundation
 
-/// ジェスチャーのカテゴリ分類(検索効率化のため)
-public enum GestureCategory: CaseIterable {
-    case pointing  // 指差し系(人差し指、ポインティング)
-    case counting  // 数字系(ピースサイン、3本指など)
-    case hand  // 手全体系(握り拳、パーなど)
-    case gesture  // 特殊ジェスチャー(サムズアップ、OKサインなど)
-    case custom  // カスタムジェスチャー
-}
 
 /// すべてのジェスチャーの基底となるプロトコル
 public protocol BaseGestureProtocol {
@@ -33,8 +25,6 @@ public protocol BaseGestureProtocol {
     /// ジェスチャーの優先度(小さい値ほど高優先度)
     var priority: Int { get }
 
-    /// ジェスチャーのカテゴリ
-    var category: GestureCategory { get }
 
     /// ジェスチャータイプ(片手/両手)
     var gestureType: GestureType { get }
@@ -106,7 +96,4 @@ extension BaseGestureProtocol {
         return gestureName
     }
 
-    public var category: GestureCategory {
-        return .custom
-    }
 }

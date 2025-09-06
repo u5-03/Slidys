@@ -18,7 +18,6 @@ public struct ThumbsUpGesture: SingleHandGestureProtocol {
     
     public var gestureName: String { "サムズアップ" }
     public var priority: Int { 15 }
-    public var category: GestureCategory { .gesture }
     
     public func matches(_ gestureData: SingleHandGestureData) -> Bool {
         return Self.gesturePattern.validate(gestureData)

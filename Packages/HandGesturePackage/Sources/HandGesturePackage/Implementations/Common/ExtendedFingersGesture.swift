@@ -41,7 +41,6 @@ public struct ExtendedFingersGesture: SingleHandGestureProtocol {
 
     public var gestureName: String { customName }
     public var priority: Int { 5 }
-    public var category: GestureCategory { .gesture }
 
     public func matches(_ gestureData: SingleHandGestureData) -> Bool {
         return gesturePattern.validate(gestureData)

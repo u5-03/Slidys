@@ -12,7 +12,7 @@
 │  ┌─────────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │ Gesture Registry │  │ Index System │  │ Search Engine │  │
 │  │                 │  │              │  │               │  │
-│  │ • Priority Sort │  │ • Category   │  │ • Early Exit  │  │
+│  │ • Priority Sort │  │ • Type       │  │ • Early Exit  │  │
 │  │ • Registration  │  │ • Type       │  │ • Filtering   │  │
 │  │                 │  │              │  │ • Statistics  │  │
 │  └─────────────────┘  └──────────────┘  └───────────────┘  │
@@ -51,18 +51,6 @@ sortedGestures = gestures.sorted { $0.priority < $1.priority }
 
 ### 1.2 インデックスシステム
 
-#### カテゴリインデックス
-```swift
-private var categoryIndex: [GestureCategory: [Int]] = [:]
-```
-
-**構造例:**
-```
-pointing: [0, 5, 8]     // ポインティング系のジェスチャーのインデックス
-counting: [1, 2, 3, 4]  // 数字系のジェスチャーのインデックス
-hand: [6, 7, 9]         // 手全体系のジェスチャーのインデックス
-```
-
 #### タイプインデックス
 ```swift
 private var typeIndex: [GestureType: [Int]] = [:]
@@ -83,7 +71,7 @@ twoHand: [6, 7, 8, 9]           // 両手ジェスチャーのインデックス
   ↓
 [2] 検索対象の絞り込み
   • targetGestures指定 → 指定ジェスチャーのみ
-  • カテゴリ指定 → カテゴリインデックスから取得
+  • タイプ指定 → タイプインデックスから取得
   • デフォルト → 全ジェスチャー（優先度順）
   ↓
 [3] ジェスチャーマッチング

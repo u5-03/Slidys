@@ -28,7 +28,6 @@ public struct RockSignGesture: SingleHandGestureProtocol {
     public var gestureName: String { "Rock Sign" }
     public var description: String { "人差し指と小指を伸ばすロックサイン" }
     public var priority: Int { 50 }
-    public var category: GestureCategory { .gesture }
     
     public init() {}
     
@@ -57,7 +56,6 @@ public struct OKSignGesture: SingleHandGestureProtocol {
     public var gestureName: String { "OK Sign" }
     public var description: String { "親指と人差し指で輪を作るOKサイン" }
     public var priority: Int { 60 }
-    public var category: GestureCategory { .gesture }
     
     public init() {}
     
@@ -87,7 +85,6 @@ public struct TimeoutGesture: TwoHandGestureProtocol {
     public var gestureName: String { "Timeout" }
     public var description: String { "両手でT字を作るタイムアウトサイン" }
     public var priority: Int { 40 }
-    public var category: GestureCategory { .gesture }
     
     public init() {}
     

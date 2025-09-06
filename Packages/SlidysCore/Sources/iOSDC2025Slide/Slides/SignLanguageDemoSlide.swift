@@ -20,7 +20,7 @@ struct SignLanguageDemoSlide: View {
         Text("Demo")
             .font(.system(size: 120, weight: .heavy))
             .foregroundStyle(.themeColor)
-        Text("手話ジェスチャーの検知")
+        Text("手話ジェスチャーの検知\n冒頭の手話の答え合わせ")
             .font(.system(size: 80, weight: .bold))
             .foregroundStyle(.defaultForegroundColor)
         }

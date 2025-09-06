@@ -15,6 +15,7 @@ public struct HandGestureRealityView: View {
 
     public var body: some View {
         RealityView { content in
+            HandGestureTrackingSystem.registerSystem()
             // GestureInfoStoreをHandGestureTrackingSystemに設定
             HandGestureTrackingSystem.setGestureInfoStore(gestureInfoStore)
 
@@ -32,9 +33,7 @@ public struct HandGestureRealityView: View {
             handEntitiesContainerEntity.isEnabled = gestureInfoStore.showHandEntities
             rootEntity.addChild(handEntitiesContainerEntity)
 
-            // HandGestureTrackingSystemがRealityKitに登録されている
-            // システムは自動的にシーンで動作を開始する
-            HandGestureLogger.logSystem("HandGestureTrackingSystem is active in the scene")
+            HandGestureLogger.logSystem("🎯 HandGestureTrackingSystem is now active in the scene")
 
         }
         .upperLimbVisibility(.hidden)
@@ -184,6 +183,9 @@ public struct HandGestureRealityView: View {
 
             // HandTrackingComponentを設定
             handEntity.components.set(handComponent)
+            
+            // 手のエンティティをルートエンティティに追加（重要：SystemがEntityQueryで見つけられるように）
+            rootEntity.addChild(handEntity)
             handEntitiesContainerEntity.addChild(handEntity)
 
             // デバッグ: HandTrackingComponentが正しく設定されたか確認
@@ -193,6 +195,7 @@ public struct HandGestureRealityView: View {
             HandGestureLogger.logDebug("   - Entity ID: \(handEntity.id)")
             HandGestureLogger.logDebug(
                 "   - Component fingers count: \(handComponent.fingers.count)")
+            HandGestureLogger.logDebug("   - Entity added to rootEntity and handEntitiesContainer")
 
             // 骨(関節間の接続)を作成
             createBones(for: chirality, handJoints: handJoints, handComponent: handComponent)

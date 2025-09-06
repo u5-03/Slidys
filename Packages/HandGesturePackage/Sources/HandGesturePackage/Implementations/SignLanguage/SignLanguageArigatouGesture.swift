@@ -19,7 +19,6 @@ public struct ArigatouInitialPositionGesture: TwoHandGestureProtocol {
 
     public var gestureName: String { "ありがとう初期位置" }
     public var priority: Int { 50 }
-    public var category: GestureCategory { .custom }
     public var gestureType: GestureType { .twoHand }
 
     public func matches(_ gestureData: HandsGestureData) -> Bool {
@@ -73,7 +72,6 @@ public struct ArigatouFinalPositionGesture: TwoHandGestureProtocol {
 
     public var gestureName: String { "ありがとう最終位置" }
     public var priority: Int { 50 }
-    public var category: GestureCategory { .custom }
     public var gestureType: GestureType { .twoHand }
 
     public func matches(_ gestureData: HandsGestureData) -> Bool {

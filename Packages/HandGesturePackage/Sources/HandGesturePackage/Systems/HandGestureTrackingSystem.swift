@@ -59,15 +59,18 @@ public struct HandGestureTrackingSystem: System {
     }
 
     public func update(context: SceneUpdateContext) {
+        HandGestureLogger.logDebug("🔄 HandGestureTrackingSystem.update() called")
+        
         let handEntities = context.scene.performQuery(
             EntityQuery(where: .has(HandTrackingComponent.self)))
-
+        
         // シリアルジェスチャーの処理
         processSerialGestures(handEntities: Array(handEntities))
 
         // GestureInfoStoreから有効なジェスチャーをフィルタリング
         var filteredGestures: [BaseGestureProtocol]? = nil
         if let gestureInfoStore = Self.sharedGestureInfoStore {
+            HandGestureLogger.logDebug("📊 GestureInfoStore available, filtering gestures")
             // 手話モードが有効かどうかで使用するジェスチャーを切り替え
             if gestureInfoStore.isHandLanguageDetectionEnabled {
                 // 手話モード: 手話ジェスチャーのみを使用(シリアルジェスチャーを除く)
@@ -91,7 +94,7 @@ public struct HandGestureTrackingSystem: System {
                 // HandGestureLogger.logDebug("フィルタリング後のジェスチャー数: \(filteredGestures?.count ?? 0)")
             }
         } else {
-            // HandGestureLogger.logDebug("GestureInfoStore が設定されていません")
+            HandGestureLogger.logDebug("⚠️ GestureInfoStore が設定されていません")
         }
 
         // 統合ジェスチャー検出器を使用
@@ -103,8 +106,10 @@ public struct HandGestureTrackingSystem: System {
         // 検出結果を処理
         switch result {
         case .success(let detectedGestures):
+            HandGestureLogger.logDebug("✅ Gesture detection successful: \(detectedGestures.count) gestures detected")
             processDetectedGestures(detectedGestures, handEntities: Array(handEntities))
         case .failure(let error):
+            HandGestureLogger.logDebug("❌ Gesture detection failed: \(error)")
             handleDetectionError(error)
         }
 

@@ -94,8 +94,6 @@ extension SingleHandGestureProtocol {
     /// デフォルトの優先度(低優先度)
     public var priority: Int { 1000 }
 
-    /// デフォルトのカテゴリ
-    public var category: GestureCategory { .custom }
 
     /// デフォルトのジェスチャータイプ
     public var gestureType: GestureType { .singleHand }

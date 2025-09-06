@@ -22,8 +22,6 @@ public protocol SerialGestureProtocol: SignLanguageProtocol {
 
 /// デフォルト実装
 extension SerialGestureProtocol {
-    /// デフォルトのカテゴリは手話
-    public var category: GestureCategory { .custom }
 
     /// デフォルトの優先度(高めに設定)
     public var priority: Int { 5 }

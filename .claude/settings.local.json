@@ -1,29 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find:*)",
       "Bash(xcodebuild:*)",
-      "Bash(mkdir:*)",
-      "Bash(mv:*)",
-      "Bash(rm:*)",
-      "Bash(swift build)",
-      "Bash(swift build:*)",
-      "Bash(true)",
-      "Bash(open:*)",
-      "Bash(grep:*)",
-      "Bash(cp:*)",
-      "Bash(for file in *.swift)",
-      "Bash(do sed -i '' '/^import RealityKit$/d' \"$file\")",
-      "Bash(done)",
-      "Bash(for:*)",
-      "Bash(do)",
-      "Bash(if ! grep -q \"import HandGestureKit\" \"$file\")",
-      "Bash(then)",
-      "Bash(sed:*)",
-      "Bash(fi)",
-      "Bash(swift:*)",
-      "WebSearch"
+      "Read(//Users/yugo.a.sugiyama/Dev/**)",
+      "Bash(find:*)"
     ],
-    "deny": []
+    "deny": [],
+    "ask": []
   }
 }

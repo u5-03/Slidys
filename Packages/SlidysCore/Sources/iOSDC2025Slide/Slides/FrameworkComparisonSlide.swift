@@ -18,7 +18,7 @@ struct FrameworkComparisonSlide: View {
     private let itemColumnWidth: CGFloat = 264
 
     var body: some View {
-        HeaderSlide("RealityKitとARKitの実装比較") {
+        HeaderSlide("RealityKitとARKitのEntity配置の実装比較") {
             // 比較表
             VStack(spacing: 0) {
                 // ヘッダー

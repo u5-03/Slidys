@@ -220,7 +220,7 @@ extension SingleHandGestureData {
 
     /// 指定した指以外がすべて曲がっているかを判定する
     /// 例：人差し指だけを立てて他を曲げている状態の検出に使用
-    public func areAllFingersExceptBent(_ exceptFingers: [FingerType]) -> Bool {
+    public func areAllFingersBentExcept(_ exceptFingers: [FingerType]) -> Bool {
         let allFingers: [FingerType] = [.thumb, .index, .middle, .ring, .little]
         let fingersToCheck = allFingers.filter { !exceptFingers.contains($0) }
         return fingersToCheck.allSatisfy { isFingerBent($0) }

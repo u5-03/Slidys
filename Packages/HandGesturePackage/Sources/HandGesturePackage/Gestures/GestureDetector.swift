@@ -19,8 +19,6 @@ public class GestureDetector {
     /// 登録されたジェスチャー(優先度順)
     private var sortedGestures: [BaseGestureProtocol] = []
 
-    /// カテゴリ別のジェスチャーインデックス
-    private var categoryIndex: [GestureCategory: [Int]] = [:]
 
     /// ジェスチャータイプ別のインデックス
     private var typeIndex: [GestureType: [Int]] = [:]
@@ -191,28 +189,6 @@ public class GestureDetector {
         return .success(detectedGestures)
     }
 
-    /// カテゴリ別にジェスチャーを検出
-    public func detectGesturesByCategory(
-        from handEntities: [Entity],
-        categories: [GestureCategory],
-        maxResultsPerCategory: Int = 3
-    ) -> [GestureCategory: [DetectedGesture]] {
-        var resultsByCategory: [GestureCategory: [DetectedGesture]] = [:]
-
-        for category in categories {
-            let categoryGestures = getCategoryGestures(category)
-            let result = detectGestures(from: handEntities, targetGestures: categoryGestures)
-
-            if case .success(let detected) = result {
-                let limited = Array(detected.prefix(maxResultsPerCategory))
-                if !limited.isEmpty {
-                    resultsByCategory[category] = limited
-                }
-            }
-        }
-
-        return resultsByCategory
-    }
 
     // MARK: - Utility Methods
 
@@ -225,13 +201,6 @@ public class GestureDetector {
     public func getRegisteredGesturesInfo() -> [String: Any] {
         var info: [String: Any] = [:]
         info["totalGestures"] = sortedGestures.count
-
-        // カテゴリ別カウント
-        var categoryCount: [String: Int] = [:]
-        for category in GestureCategory.allCases {
-            categoryCount["\(category)"] = categoryIndex[category]?.count ?? 0
-        }
-        info["categoryCounts"] = categoryCount
 
         // タイプ別カウント
         var typeCount: [String: Int] = [:]
@@ -246,16 +215,9 @@ public class GestureDetector {
 
     /// インデックスを構築
     private func buildIndices() {
-        categoryIndex.removeAll()
         typeIndex.removeAll()
 
         for (index, gesture) in sortedGestures.enumerated() {
-            // カテゴリインデックス
-            if categoryIndex[gesture.category] == nil {
-                categoryIndex[gesture.category] = []
-            }
-            categoryIndex[gesture.category]?.append(index)
-
             // タイプインデックス
             if typeIndex[gesture.gestureType] == nil {
                 typeIndex[gesture.gestureType] = []
@@ -264,22 +226,9 @@ public class GestureDetector {
         }
     }
 
-    /// カテゴリのジェスチャーを取得
-    private func getCategoryGestures(_ category: GestureCategory) -> [BaseGestureProtocol] {
-        guard let indices = categoryIndex[category] else { return [] }
-        return indices.map { sortedGestures[$0] }
-    }
 
     /// ジェスチャー情報をログ出力
     private func logGestureInfo() {
-        // カテゴリ別
-        for category in GestureCategory.allCases {
-            let count = categoryIndex[category]?.count ?? 0
-            if count > 0 {
-                HandGestureLogger.logDebug("  📂 \(category): \(count)個")
-            }
-        }
-
         // タイプ別
         HandGestureLogger.logDebug("  🤚 片手: \(typeIndex[.singleHand]?.count ?? 0)個")
         HandGestureLogger.logDebug("  🙌 両手: \(typeIndex[.twoHand]?.count ?? 0)個")
@@ -342,13 +291,6 @@ public class GestureDetector {
 // MARK: - Convenience Extensions
 
 extension GestureDetector {
-    /// よく使用されるカテゴリの組み合わせ
-    public static let commonCategories: [GestureCategory] = [
-        .pointing,
-        .counting,
-        .hand,
-    ]
-    public static let allCategories: [GestureCategory] = GestureCategory.allCases
 
     /// 高優先度ジェスチャーのみを検出
     public func detectHighPriorityGestures(
