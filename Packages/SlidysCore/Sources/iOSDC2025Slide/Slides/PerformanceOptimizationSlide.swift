@@ -29,12 +29,8 @@ struct PerformanceOptimizationSlide: View {
                     Item("ジェスチャー判定: 30-60Hzで十分", accessory: .bullet)
                 }
 
-                Item("計算の早期リジェクト", accessory: .number(3)) {
-                    Item("前提条件チェック(手の可視判定・距離閾値)", accessory: .bullet)
-                }
-                Item("必要時のみSpatialTrackingSessionを開始/停止", accessory: .number(4))
-                Item("追跡するEntityの数を最小限にする", accessory: .number(5)) {
-                    Item("追跡するEntityが少ない方が、計算リソースが少なくて済む", accessory: .bullet)
+                Item("追跡するEntity/Anchorの数を最小限にする", accessory: .number(3)) {
+                    Item("追跡するEntity/Anchorが少ない方が、計算リソースが少なくて済む", accessory: .bullet)
                 }
             }
         }

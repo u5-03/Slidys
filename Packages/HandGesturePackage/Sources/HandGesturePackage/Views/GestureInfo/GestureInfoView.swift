@@ -1,5 +1,4 @@
 import SwiftUI
-import HandGestureKit
 
 /// メニュー項目を定義
 enum MenuItem: String, CaseIterable, Identifiable {
@@ -35,6 +34,11 @@ public struct GestureInfoView: View {
                     .tag(item)
             }
             .navigationTitle("メニュー")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    ImmersiveSpaceControlButton(fontSize: 16)
+                }
+            }
         } detail: {
             // 詳細ビュー
             NavigationStack {

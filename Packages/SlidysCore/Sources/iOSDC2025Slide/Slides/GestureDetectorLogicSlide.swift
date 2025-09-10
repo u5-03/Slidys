@@ -36,7 +36,7 @@ struct GestureDetectorLogicSlide: View {
                                 func matches(_ gestureData: SingleHandGestureData) -> Bool
                             }
 
-                            protocol TwoHandGestureProtocol: BaseGestureProtocol {
+                            protocol TwoHandsGestureProtocol: BaseGestureProtocol {
                                 func matches(_ gestureData: HandsGestureData) -> Bool
                             }
                             """)

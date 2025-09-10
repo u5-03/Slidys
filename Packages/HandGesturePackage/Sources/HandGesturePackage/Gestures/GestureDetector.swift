@@ -157,7 +157,7 @@ public class GestureDetector {
                 }
 
             case .twoHand:
-                if let twoHandGesture = gesture as? TwoHandGestureProtocol,
+                if let twoHandGesture = gesture as? TwoHandsGestureProtocol,
                     let hands = handsGestureData
                 {
                     matches = twoHandGesture.matches(hands)

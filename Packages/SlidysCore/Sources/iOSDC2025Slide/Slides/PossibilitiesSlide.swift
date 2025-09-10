@@ -31,7 +31,6 @@ struct PossibilitiesSlide: View {
                     Item("✅ ハードウェアの進化による精度向上", accessory: .bullet)
                     Item("✅ 機械学習・AIとの組み合わせ?", accessory: .bullet)
                     Item("✅ 表情の重要性: EyeSightにより、表情が分かりやすい", accessory: .bullet)
-                    Item("✅ より多くの手話表現への対応", accessory: .bullet)
                 }
             }
         }

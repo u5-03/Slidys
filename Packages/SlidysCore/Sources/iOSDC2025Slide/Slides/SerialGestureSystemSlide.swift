@@ -84,13 +84,13 @@ struct SerialGestureSystemSlide: View {
                             """
                             // 例：「ありがとう」の手話
                             let arigatouGesture = SignLanguageArigatouGesture()
-                            // gestures = [
-                            //   ArigatouInitialPositionGesture(),  // 両手を同じ高さに
-                            //   ArigatouFinalPositionGesture()     // 上に移動した位置に右手を移動
-                            // ]
+                            gestures = [
+                                // Step 1: 初期位置検出
+                                ArigatouInitialPositionGesture(),  // 両手を同じ高さに
+                                // Step 2: 最終位置検出 → completed ✅
+                                ArigatouFinalPositionGesture()     // 上に移動した位置に右手を移動
+                            ]
 
-                            // Step 1: 初期位置検出
-                            // Step 2: 最終位置検出 → completed ✅
                             """)
                     }
 

@@ -5,6 +5,9 @@ import SwiftUI
 
 public struct HandGestureRealityView: View {
     @Environment(\.gestureInfoStore) private var gestureInfoStore
+    @Environment(\.appModel) private var appModel
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
+    @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @State private var rootEntity = Entity()
     // SpatialTrackingSession関連
     @State private var spatialTrackingSession = SpatialTrackingSession()
@@ -41,12 +44,50 @@ public struct HandGestureRealityView: View {
             // トグルの状態に応じてエンティティの表示/非表示を切り替え
             handEntitiesContainerEntity.isEnabled = newValue
         }
+        .onChange(of: gestureInfoStore.resetHandEntitiesEventId) { _, _ in
+            // ImmersiveSpaceを再起動して座標系をリセット
+            Task {
+                await restartImmersiveSpace()
+            }
+        }
         .onDisappear {
             HandGestureLogger.logUI("HandGestureRealityView disappeared")
             // SpatialTrackingSessionを停止
             Task {
                 await spatialTrackingSession.stop()
             }
+        }
+    }
+
+    @MainActor
+    private func restartImmersiveSpace() async {
+        HandGestureLogger.logSystem("🔄 Restarting ImmersiveSpace to reset coordinate system...")
+        
+        // 現在の状態を保存
+        let wasImmersiveSpaceOpen = (appModel.immersiveSpaceState == .open)
+        
+        if wasImmersiveSpaceOpen {
+            // ImmersiveSpaceを一旦終了
+            appModel.updateImmersiveSpaceState(.inTransition)
+            await dismissImmersiveSpace()
+            
+            // 少し待って座標系がクリアされることを保証
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
+            
+            // ImmersiveSpaceを再開
+            switch await openImmersiveSpace(id: appModel.immersiveSpaceID) {
+            case .opened:
+                appModel.updateImmersiveSpaceState(.open)
+                HandGestureLogger.logSystem("✅ ImmersiveSpace restart completed")
+            case .userCancelled, .error:
+                appModel.updateImmersiveSpaceState(.closed)
+                HandGestureLogger.logError("❌ Failed to restart ImmersiveSpace")
+            @unknown default:
+                appModel.updateImmersiveSpaceState(.closed)
+                HandGestureLogger.logError("❌ Unknown error while restarting ImmersiveSpace")
+            }
+        } else {
+            HandGestureLogger.logSystem("⚠️ ImmersiveSpace is not open, skipping restart")
         }
     }
 
@@ -186,7 +227,6 @@ public struct HandGestureRealityView: View {
             
             // 手のエンティティをルートエンティティに追加（重要：SystemがEntityQueryで見つけられるように）
             rootEntity.addChild(handEntity)
-            handEntitiesContainerEntity.addChild(handEntity)
 
             // デバッグ: HandTrackingComponentが正しく設定されたか確認
             HandGestureLogger.logDebug(

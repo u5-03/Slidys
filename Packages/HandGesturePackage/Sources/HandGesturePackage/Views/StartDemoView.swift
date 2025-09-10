@@ -53,7 +53,7 @@ public struct StartDemoView: View {
                     .fill(.regularMaterial)
                     .stroke(.separator, lineWidth: 1)
             }
-            StartDemoButton()
+            ImmersiveSpaceControlButton(fontSize: 18)
             Spacer(minLength: 20)
         }
         .padding(40)

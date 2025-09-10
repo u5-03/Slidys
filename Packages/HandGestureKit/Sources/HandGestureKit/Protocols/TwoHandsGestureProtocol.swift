@@ -1,5 +1,5 @@
 //
-//  TwoHandGestureProtocol.swift
+//  TwoHandsGestureProtocol.swift
 //  HandGesturePackage
 //
 //  Created by Claude on 2025/07/26.
@@ -8,8 +8,8 @@
 import Foundation
 
 /// 両手ジェスチャーを定義するためのプロトコル
-public protocol TwoHandGestureProtocol: BaseGestureProtocol {
-    
+public protocol TwoHandsGestureProtocol: BaseGestureProtocol {
+
     /// 両手のジェスチャーデータがこのジェスチャーに一致するかを判定
     /// - Parameter gestureData: 両手のジェスチャーデータ
     /// - Returns: ジェスチャーが一致する場合はtrue
@@ -17,16 +17,16 @@ public protocol TwoHandGestureProtocol: BaseGestureProtocol {
 }
 
 // MARK: - デフォルト実装
-public extension TwoHandGestureProtocol {
-    var description: String {
+extension TwoHandsGestureProtocol {
+    public var description: String {
         return gestureName
     }
-    
-    var priority: Int {
+
+    public var priority: Int {
         return 0
     }
-    
-    var gestureType: GestureType {
+
+    public var gestureType: GestureType {
         return .twoHand
     }
 }

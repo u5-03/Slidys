@@ -17,7 +17,14 @@ struct ReferenceSlide: View {
 
     var body: some View {
         HeaderSlide("参考情報") {
-            Item("http://www.expo2005.or.jp/jp/A0/A1/A1.10/index.html", accessory: .number(1))
+            Item("WWDC24: Explore object tracking for visionOS", accessory: .number(1))
+            Item("https://developer.apple.com/videos/play/wwdc2024/10101/", accessory: .bullet)
+            
+            Item("WWDC24: Explore object tracking for visionOS", accessory: .number(2))
+            Item("https://developer.apple.com/videos/play/wwdc2024/10101/", accessory: .bullet)
+
+            Item("TAAT『Apple Vision Proのハンドトラッキングでスペースシップを操縦しよう』", accessory: .number(3))
+            Item("https://note.com/taatn0te/n/n3fa336d21252", accessory: .bullet)
         }
     }
 }

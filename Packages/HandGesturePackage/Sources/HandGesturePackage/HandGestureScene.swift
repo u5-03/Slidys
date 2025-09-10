@@ -15,8 +15,8 @@ public struct HandGestureScene: Scene {
     public init() {}
 
     public var body: some Scene {
-        // メインウィンドウ(初回起動時のWelcomeView)
-        WindowGroup(id: "WelcomeWindow") {
+        // メインウィンドウ(初回起動時のStartDemoView)
+        WindowGroup(id: "StartDemoView") {
             StartDemoView()
                 .environment(\.appModel, appModel)
                 .environment(\.gestureInfoStore, gestureInfoStore)

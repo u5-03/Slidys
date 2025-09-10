@@ -73,6 +73,9 @@ public final class GestureInfoStore: @unchecked Sendable {
     /// 手のエンティティを表示するかどうか
     public var showHandEntities = true
 
+    /// 手のエンティティを再登録するイベントID
+    public var resetHandEntitiesEventId = UUID()
+
     /// 手話検知を有効にするかどうか
     public var isHandLanguageDetectionEnabled = false
 

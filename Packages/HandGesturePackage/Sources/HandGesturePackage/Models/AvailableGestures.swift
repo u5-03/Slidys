@@ -7,7 +7,6 @@ public struct AvailableGestures {
     public static let allGestureInstances: [BaseGestureProtocol] = [
         // 片手ジェスチャー
         PeaceSignGesture(),
-        ImprovedPeaceSignGesture(),
         ThumbsUpGesture(),
         PointingGesture(),
         // 両手ジェスチャー

@@ -45,6 +45,8 @@ public struct HandGestureTrackingSystem: System {
     /// すべてのシリアルジェスチャー
     private let serialGestures: [SerialGestureProtocol]
 
+    private let handTrackingComponentQuery = EntityQuery(where: .has(HandTrackingComponent.self))
+
     // MARK: - System Lifecycle
 
     public init(scene: RealityKit.Scene) {
@@ -61,8 +63,7 @@ public struct HandGestureTrackingSystem: System {
     public func update(context: SceneUpdateContext) {
         HandGestureLogger.logDebug("🔄 HandGestureTrackingSystem.update() called")
         
-        let handEntities = context.scene.performQuery(
-            EntityQuery(where: .has(HandTrackingComponent.self)))
+        let handEntities = context.scene.performQuery(handTrackingComponentQuery)
         
         // シリアルジェスチャーの処理
         processSerialGestures(handEntities: Array(handEntities))

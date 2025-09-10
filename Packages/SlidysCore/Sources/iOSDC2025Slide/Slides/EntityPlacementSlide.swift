@@ -51,10 +51,10 @@ struct EntityPlacementSlide: View {
                             // AnchorEntityで関節を自動追跡
                             let anchorEntity = AnchorEntity( // visionOS2~
                                 .hand(.left, location: .palm),
-                                trackingMode: .predicted  // 遅延を低減
+                                trackingMode: .predicted  // 予測補正で追跡遅延を低減
                             )
 
-                            // シーンに追加するだけで自動追跡開始
+                            // 追加するだけで自動追跡開始
                             handEntitiesContainerEntity.addChild(anchorEntity)
                             """)
                     }
@@ -65,7 +65,7 @@ struct EntityPlacementSlide: View {
 
                         CodeBlockView(
                             """
-                            // 球体マーカーを作成
+                            // 球体マーカー用のEntityを作成
                             let sphere = ModelEntity(
                                 mesh: .generateSphere(radius: 0.005),
                                 materials: [UnlitMaterial(color: .yellow)]
@@ -82,11 +82,11 @@ struct EntityPlacementSlide: View {
 
                         CodeBlockView(
                             """
-                            // カスタムコンポーネントを作成
+                            // カスタムのComponentを作成
                             var handComponent = HandTrackingComponent(chirality: .left)
                             handComponent.fingers[.thumbTip] = anchorEntity
 
-                            // Entityにコンポーネントを設定
+                            // EntityにComponentを設定
                             handEntity.components.set(handComponent)
 
                             // これでSystemから検索・処理可能に！

@@ -9,7 +9,7 @@ import Foundation
 import HandGestureKit
 
 /// 祈りのジェスチャー(両手を合わせるジェスチャー)
-public struct PrayerGesture: TwoHandGestureProtocol {
+public struct PrayerGesture: TwoHandsGestureProtocol {
     public var gestureName: String { "Prayer" }
     public var description: String { "両手を合わせた祈りのジェスチャー" }
     public var priority: Int { 10 }  // 優先度を高く設定

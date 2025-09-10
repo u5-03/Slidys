@@ -13,7 +13,7 @@ import HandGestureKit
 /// ありがとうの初期位置
 /// - 左手: 全指伸展、手のひら下向き、指先右向き
 /// - 右手: 全指伸展、手のひら左向き、指先前向き、左手の近くに配置
-public struct ArigatouInitialPositionGesture: TwoHandGestureProtocol {
+public struct ArigatouInitialPositionGesture: TwoHandsGestureProtocol {
 
     public init() {}
 
@@ -66,7 +66,7 @@ public struct ArigatouInitialPositionGesture: TwoHandGestureProtocol {
 /// ありがとうの最終位置
 /// - 初期位置と同じ手の形
 /// - 右手が上に移動している
-public struct ArigatouFinalPositionGesture: TwoHandGestureProtocol {
+public struct ArigatouFinalPositionGesture: TwoHandsGestureProtocol {
 
     public init() {}
 

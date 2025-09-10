@@ -3,7 +3,8 @@
     "allow": [
       "Bash(xcodebuild:*)",
       "Read(//Users/yugo.a.sugiyama/Dev/**)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(swift build)"
     ],
     "deny": [],
     "ask": []

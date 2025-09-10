@@ -8,6 +8,9 @@
 import SwiftUI
 import SlideKit
 import SlidesCore
+#if canImport(HandGesturePackage)
+import HandGesturePackage
+#endif
 
 @Slide
 struct CustomGestureDemoSlide: View {
@@ -23,7 +26,15 @@ struct CustomGestureDemoSlide: View {
             
             Text("カスタムジェスチャーの検知")
                 .font(.system(size: 80, weight: .bold))
-                .foregroundStyle(.defaultForegroundColor)            
+                .foregroundStyle(.defaultForegroundColor)
+            
+#if canImport(HandGesturePackage)
+            ImmersiveSpaceControlButton(fontSize: 60)
+#else
+            Text("visionOSでのみデモは開始できます")
+                .font(.system(size: 40))
+                .foregroundStyle(.gray)
+#endif
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(80)

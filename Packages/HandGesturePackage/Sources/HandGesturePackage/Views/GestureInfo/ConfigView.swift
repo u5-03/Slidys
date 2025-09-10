@@ -22,6 +22,14 @@ public struct ConfigView: View {
                 Text("有効にすると、各関節の位置と座標軸が3D空間に表示されます")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    
+                Button("体験を再起動") {
+                    gestureInfoStore.resetHandEntitiesEventId = UUID()
+                }
+                .buttonStyle(.borderedProminent)
+                Text("ウィンドウを移動した場合にタップして、体験を再起動し座標系を現在の位置に再設定します")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
             
             Section("手話機能") {

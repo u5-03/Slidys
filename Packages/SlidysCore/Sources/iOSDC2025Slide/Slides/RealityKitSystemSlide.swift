@@ -16,28 +16,21 @@ struct RealityKitSystemSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("RealityKit Systemの仕組み") {
+        HeaderSlide("RealityKitでの実装") {
             ScrollView {
-                Item("Systemプロトコルとは？", accessory: .number(1)) {
-                    Item("ECS(Entity Component System)アーキテクチャの一部", accessory: .bullet) {
-                        Item("Entity: 表示するオブジェクトを格納", accessory: .number(1))
-                        Item("Component: Entityに付与する性質や情報", accessory: .number(2))
-                        Item("System: Entity/Componentを処理するロジックを記載", accessory: .number(3))
-                    }
-                    Item("フレームごとにEntity/Componentを処理する仕組み", accessory: .bullet)
+                Item("ECS(Entity/Component/System)とは？", accessory: .number(1)) {
+                    Item("Entity: 3D空間のオブジェクト(球体、文字、手など)", accessory: .number(1))
+                    Item("Component: オブジェクトの機能(見た目、動き、物理など)", accessory: .number(2))
+                    Item("System: 特定のComponentを持つEntityを毎フレーム処理", accessory: .number(3))
                 }
                 Item("update(context:)メソッド", accessory: .number(2)) {
                     Item("毎フレーム自動的に呼ばれる", accessory: .bullet)
                     Item("SceneUpdateContextから必要な情報を取得", accessory: .bullet)
                 }
                 Item("HandGestureTrackingSystem", accessory: .number(3)) {
-                    Item("struct HandGestureTrackingSystem: System", accessory: .bullet)
+                    Item("Systemに準拠した自作のSystem", accessory: .bullet)
                     Item("update(context:)で手の状態を継続的に監視", accessory: .bullet)
-                }
-                Item("パフォーマンスの利点", accessory: .number(4)) {
-                    Item("RealityKitが最適化された更新サイクルを管理", accessory: .bullet)
-                    Item("必要な時だけ処理が実行される", accessory: .bullet)
-                    Item("複数のSystemを効率的に並列実行", accessory: .bullet)
+                    Item("関節の位置や向きから、手の形を判定する", accessory: .bullet)
                 }
             }
         }

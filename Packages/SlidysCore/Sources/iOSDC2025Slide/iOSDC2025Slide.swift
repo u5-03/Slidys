@@ -39,32 +39,44 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         )
         TalkPlanSlide()
         GestureDetectionStructionSlide()
-        ContentSlide(headerTitle: "visionOS用のデモを開始する") {
-#if canImport(HandGesturePackage)
-            StartDemoButton(fontSize: 80)
-#else
-            Text("visionOSでのみデモは開始できます")
-#endif
-        }
 
         // HandSkeletonとEntityの基礎
         HandSkeletonStructureSlide()
         HandSkeletonDiagramSlide()
-        EntityPlacementSlide()
+        ViewSlide {
+            Text("デモ")
+                .font(.extraLargeFont)
+                .padding()
+            Text("手の関節にマーカーを表示")
+                .font(.largeFont)
+                .padding()
+        }
         RealityKitSystemSlide()
-        
-        // フレームワーク比較
-        FrameworkComparisonSlide()
-        PerformanceOptimizationSlide()
-        
+        ContentSlide(headerTitle: "偉大なパンフレット記事が...!") {
+            Image(.ecsPamphlet)
+                .resizable()
+                .scaledToFit()
+        }
+        EntityPlacementSlide()
+
+//        PerformanceOptimizationSlide()
         // 実装詳細
         TrackingSystemImplementationSlide()
-        CustomGestureDemoSlide()
+        ViewSlide {
+            Text("デモ")
+                .font(.extraLargeFont)
+                .padding()
+            Text("ジェスチャーや手話の検知")
+                .font(.largeFont)
+                .padding()
+            Text("冒頭の手話の答え合わせ")
+                .font(.largeFont)
+                .padding()
+        }
         GestureDetectorLogicSlide()
         SerialGestureSystemSlide()
         
         // 手話ジェスチャー
-        SignLanguageDemoSlide()
         LimitationsSlide()
         PossibilitiesSlide()
 
