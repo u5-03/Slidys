@@ -1,7 +1,7 @@
 import Foundation
 import simd
 
-/// 手のひらの向きを表す列挙型
+/// Enumeration representing palm direction
 public enum PalmDirection: String, CaseIterable {
     case up
     case down
@@ -11,7 +11,7 @@ public enum PalmDirection: String, CaseIterable {
     case backward
     case unknown
 
-    /// 方向を表す単位ベクトル
+    /// Unit vector representing direction
     public var vector: SIMD3<Float> {
         switch self {
         case .up:
@@ -27,27 +27,27 @@ public enum PalmDirection: String, CaseIterable {
         case .backward:
             return SIMD3<Float>(0, 0, 1)  // Z+
         case .unknown:
-            return SIMD3<Float>(0, 0, 0)  // 不明
+            return SIMD3<Float>(0, 0, 0)  // Unknown
         }
     }
 
-    /// 方向の説明文
+    /// Direction description
     public var description: String {
         switch self {
         case .up:
-            return "上"
+            return "Up"
         case .down:
-            return "下"
+            return "Down"
         case .left:
-            return "左"
+            return "Left"
         case .right:
-            return "右"
+            return "Right"
         case .forward:
-            return "前"
+            return "Forward"
         case .backward:
-            return "後ろ"
+            return "Backward"
         case .unknown:
-            return "不明"
+            return "Unknown"
         }
     }
 }

@@ -1,42 +1,42 @@
 import Foundation
 
-/// 指の種類を表す列挙型
+/// Enumeration representing finger types
 public enum FingerType: CaseIterable {
-    case thumb  // 親指
-    case index  // 人差し指
-    case middle  // 中指
-    case ring  // 薬指
-    case little  // 小指
+    case thumb  // Thumb
+    case index  // Index finger
+    case middle  // Middle finger
+    case ring  // Ring finger
+    case little  // Little finger
 
-    /// 指の名前(日本語)
+    /// Finger name (English)
     public var description: String {
         switch self {
         case .thumb:
-            return "親指"
+            return "Thumb"
         case .index:
-            return "人差し"
+            return "Index"
         case .middle:
-            return "中"
+            return "Middle"
         case .ring:
-            return "薬"
+            return "Ring"
         case .little:
-            return "小"
+            return "Little"
         }
     }
 
-    /// 指の短縮名(距離表示用)
+    /// Short finger name (for distance display)
     public var shortDescription: String {
         switch self {
         case .thumb:
-            return "親"
+            return "T"
         case .index:
-            return "人"
+            return "I"
         case .middle:
-            return "中"
+            return "M"
         case .ring:
-            return "薬"
+            return "R"
         case .little:
-            return "小"
+            return "L"
         }
     }
 }

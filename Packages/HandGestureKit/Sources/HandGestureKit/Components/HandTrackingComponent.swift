@@ -12,15 +12,15 @@ import RealityKit
     import ARKit
 #endif
 
-/// 手のトラッキング情報を保持するコンポーネント
+/// Component that holds hand tracking information
 public struct HandTrackingComponent: Component {
-    /// 左手か右手かを示す
+    /// Indicates whether it's left or right hand
     public var chirality: HandAnchor.Chirality
 
-    /// 各関節のエンティティを保持する辞書
+    /// Dictionary holding entities for each joint
     public var fingers: [HandSkeleton.JointName: Entity] = [:]
 
-    /// 骨(関節間の接続)のエンティティを保持する辞書
+    /// Dictionary holding entities for bones (connections between joints)
     public var bones: [HandSkeleton.JointName: ModelEntity] = [:]
 
     public init(chirality: HandAnchor.Chirality) {

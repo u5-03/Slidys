@@ -7,21 +7,21 @@
 
 import Foundation
 
-/// シリアルジェスチャーの検出結果を表す列挙型
+/// Enumeration representing the detection result of serial gestures
 public enum SerialGestureDetectionResult {
-    /// 進行中(現在のインデックスと全体のジェスチャー数を含む)
+    /// In progress (includes current index and total gesture count)
     case progress(currentIndex: Int, totalGestures: Int, gesture: SerialGestureProtocol)
 
-    /// 完了(すべてのジェスチャーがマッチした)
+    /// Completed (all gestures matched)
     case completed(gesture: SerialGestureProtocol)
 
-    /// タイムアウト(インターバルを超過した)
+    /// Timeout (exceeded interval)
     case timeout
 
-    /// マッチしない(現在のジェスチャーが期待と異なる)
+    /// Not matched (current gesture differs from expected)
     case notMatched
 
-    /// 進行状況のパーセンテージを取得
+    /// Get progress percentage
     public var progressPercentage: Float {
         switch self {
         case .progress(let current, let total, _):
@@ -34,7 +34,7 @@ public enum SerialGestureDetectionResult {
         }
     }
 
-    /// 現在のステップ番号を取得(1ベース)
+    /// Get current step number (1-based)
     public var currentStep: Int {
         switch self {
         case .progress(let current, _, _):
@@ -46,7 +46,7 @@ public enum SerialGestureDetectionResult {
         }
     }
 
-    /// 総ステップ数を取得
+    /// Get total number of steps
     public var totalSteps: Int {
         switch self {
         case .progress(_, let total, _):

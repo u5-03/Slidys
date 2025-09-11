@@ -7,10 +7,10 @@
 
 import Foundation
 
-/// 頻繁に使用されるジェスチャーパターンのファクトリー
+/// Factory for frequently used gesture patterns
 public enum CommonGesturePatterns {
 
-    /// ピースサインのビルダーを作成
+    /// Create peace sign builder
     public static func peaceSign() -> GestureBuilder {
         return GestureBuilder()
             .withStraightFingers(.index, .middle)
@@ -20,7 +20,7 @@ public enum CommonGesturePatterns {
             .withPalmFacing(.forward)
     }
 
-    /// サムズアップのビルダーを作成
+    /// Create thumbs up builder
     public static func thumbsUp() -> GestureBuilder {
         return GestureBuilder()
             .withStraightFingers(.thumb)
@@ -28,26 +28,26 @@ public enum CommonGesturePatterns {
             .withFingerPointing(.thumb, direction: .top)
     }
 
-    /// 指差しのビルダーを作成
+    /// Create pointing builder
     public static func pointing() -> GestureBuilder {
         return GestureBuilder()
             .withStraightFingers(.index)
             .withBentFingers(.thumb, .middle, .ring, .little)
     }
 
-    /// 握り拳のビルダーを作成
+    /// Create fist builder
     public static func fist() -> GestureBuilder {
         return GestureBuilder()
             .withBentFingers(.thumb, .index, .middle, .ring, .little)
     }
 
-    /// 開いた手(パー)のビルダーを作成
+    /// Create open hand (paper) builder
     public static func openHand() -> GestureBuilder {
         return GestureBuilder()
             .withStraightFingers(.thumb, .index, .middle, .ring, .little)
     }
 
-    /// 握り拳＋特定の指を伸ばすパターン(手話Iなどで使用)
+    /// Fist + extend specific finger pattern (used for sign language I, etc.)
     public static func fistWithExtendedFinger(_ extendedFinger: FingerType) -> GestureBuilder {
         var bentFingers: [FingerType] = [.thumb, .index, .middle, .ring, .little]
         bentFingers.removeAll { $0 == extendedFinger }
@@ -57,19 +57,19 @@ public enum CommonGesturePatterns {
             .withBentFingers(bentFingers[0], bentFingers[1], bentFingers[2], bentFingers[3])
     }
 
-    /// 複数の指を伸ばすパターン(手話W, Lなどで使用)
+    /// Multiple extended fingers pattern (used for sign language W, L, etc.)
     public static func extendedFingers(_ fingers: FingerType...) -> GestureBuilder {
         let allFingers: [FingerType] = [.thumb, .index, .middle, .ring, .little]
         let bentFingers = allFingers.filter { !fingers.contains($0) }
 
         var builder = GestureBuilder()
 
-        // 伸ばす指を設定
+        // Set fingers to extend
         for finger in fingers {
             builder = builder.withStraightFingers(finger)
         }
 
-        // 曲げる指を設定
+        // Set fingers to bend
         for finger in bentFingers {
             builder = builder.withBentFingers(finger)
         }
@@ -77,14 +77,14 @@ public enum CommonGesturePatterns {
         return builder
     }
 
-    /// 平らな手(手話Bなどで使用)- 親指は手のひらに添える
+    /// Flat hand (used for sign language B, etc.) - thumb touches palm
     public static func flatHand() -> GestureBuilder {
         return GestureBuilder()
             .withStraightFingers(.index, .middle, .ring, .little)
             .withBentFingers(.thumb)
     }
 
-    /// 水平方向の指差し(手話Gなどで使用)
+    /// Horizontal pointing (used for sign language G, etc.)
     public static func horizontalPointing(_ pointingFinger: FingerType = .index) -> GestureBuilder {
         var bentFingers: [FingerType] = [.thumb, .index, .middle, .ring, .little]
         bentFingers.removeAll { $0 == pointingFinger }

@@ -10,25 +10,25 @@ import Foundation
 import RealityKit
 import simd
 
-/// 両手のジェスチャーデータを保持する構造体
+/// Structure that holds gesture data for both hands
 public struct HandsGestureData {
-    /// 左手のジェスチャーデータ
+    /// Gesture data for the left hand
     public let leftHand: SingleHandGestureData
 
-    /// 右手のジェスチャーデータ
+    /// Gesture data for the right hand
     public let rightHand: SingleHandGestureData
 
-    /// 初期化メソッド
+    /// Initialization method
     public init(leftHand: SingleHandGestureData, rightHand: SingleHandGestureData) {
         self.leftHand = leftHand
         self.rightHand = rightHand
     }
 }
 
-// MARK: - 両手間の関係性を計算するメソッド
+// MARK: - Methods for calculating relationships between both hands
 extension HandsGestureData {
 
-    /// 両手の手のひらの間の距離を取得
+    /// Get the distance between both palms
     public var palmDistance: Float {
         let leftPalmPos =
             leftHand.handTrackingComponent.fingers[.wrist]?.position(relativeTo: nil) ?? .zero
@@ -37,14 +37,14 @@ extension HandsGestureData {
         return simd_distance(leftPalmPos, rightPalmPos)
     }
 
-    /// 特定の関節の3D位置を取得
+    /// Get the 3D position of a specific joint
     public func getJointPosition(hand: HandKind, joint: HandSkeleton.JointName) -> SIMD3<Float>? {
         let component =
             hand == .left ? leftHand.handTrackingComponent : rightHand.handTrackingComponent
         return component.fingers[joint]?.position(relativeTo: nil)
     }
 
-    /// 両手の同じ関節間の距離を取得
+    /// Get the distance between the same joints on both hands
     public func jointDistance(joint: HandSkeleton.JointName) -> Float {
         guard let leftPos = getJointPosition(hand: .left, joint: joint),
             let rightPos = getJointPosition(hand: .right, joint: joint)
@@ -54,7 +54,7 @@ extension HandsGestureData {
         return simd_distance(leftPos, rightPos)
     }
 
-    /// 両手の対応する指の関節間の距離を取得
+    /// Get the distance between corresponding finger joints on both hands
     public func correspondingFingerJointDistance(
         leftJoint: HandSkeleton.JointName, rightJoint: HandSkeleton.JointName
     ) -> Float {
@@ -66,10 +66,10 @@ extension HandsGestureData {
         return simd_distance(leftPos, rightPos)
     }
 
-    /// 両手の手のひらの中心位置間の距離を取得(より正確な手のひらの距離)
+    /// Get the distance between the center positions of both palms (more accurate palm distance)
     public var palmCenterDistance: Float {
-        // 手のひらの中心を指の付け根の平均位置として計算
-        // 注: knuckleは指の最初の関節(MCP関節)を指す
+        // Calculate the palm center as the average position of finger bases
+        // Note: knuckle refers to the first joint of fingers (MCP joint)
         guard let leftThumbKnuckle = getJointPosition(hand: .left, joint: .thumbKnuckle),
             let leftIndexKnuckle = getJointPosition(hand: .left, joint: .indexFingerKnuckle),
             let leftMiddleKnuckle = getJointPosition(hand: .left, joint: .middleFingerKnuckle),
@@ -84,12 +84,12 @@ extension HandsGestureData {
             return Float.infinity
         }
 
-        // 左手の手のひら中心(5本の指の付け根の平均)
+        // Left palm center (average of 5 finger bases)
         let leftPalmCenter =
             (leftThumbKnuckle + leftIndexKnuckle + leftMiddleKnuckle + leftRingKnuckle
                 + leftLittleKnuckle) / 5
 
-        // 右手の手のひら中心(5本の指の付け根の平均)
+        // Right palm center (average of 5 finger bases)
         let rightPalmCenter =
             (rightThumbKnuckle + rightIndexKnuckle + rightMiddleKnuckle + rightRingKnuckle
                 + rightLittleKnuckle) / 5
@@ -97,12 +97,12 @@ extension HandsGestureData {
         return simd_distance(leftPalmCenter, rightPalmCenter)
     }
 
-    /// 両手の中指の付け根間の距離(シンプルな手のひら距離)
+    /// Distance between both middle finger bases (simple palm distance)
     public var middleKnuckleDistance: Float {
         return jointDistance(joint: .middleFingerKnuckle)
     }
 
-    /// 両手の垂直方向のズレを取得(Y軸の差)
+    /// Get the vertical offset between both hands (Y-axis difference)
     public var verticalOffset: Float {
         guard let leftWrist = getJointPosition(hand: .left, joint: .wrist),
             let rightWrist = getJointPosition(hand: .right, joint: .wrist)
@@ -112,7 +112,7 @@ extension HandsGestureData {
         return abs(leftWrist.y - rightWrist.y)
     }
 
-    /// 両手の特定の指先間の距離を取得
+    /// Get the distance between specific fingertips on both hands
     public func fingerTipDistance(leftFinger: FingerType, rightFinger: FingerType) -> Float {
         guard let leftJoint = getFingerTipJoint(for: leftFinger),
             let rightJoint = getFingerTipJoint(for: rightFinger),
@@ -127,28 +127,28 @@ extension HandsGestureData {
         return simd_distance(leftPos, rightPos)
     }
 
-    /// 両手の手のひらが向かい合っているかを判定
+    /// Determine if both palms are facing each other
     public var arePalmsFacingEachOther: Bool {
-        // 左手の法線と右手の法線の内積が負の場合、向かい合っている
+        // When the dot product of left and right palm normals is negative, they are facing each other
         let leftNormal = getNormalizedPalmNormal(for: leftHand)
         let rightNormal = getNormalizedPalmNormal(for: rightHand)
         let dotProduct = simd_dot(leftNormal, rightNormal)
 
-        // -0.7以下なら約135度以上の角度で向かい合っている
+        // -0.7 or less means facing each other at approximately 135 degrees or more
         return dotProduct < -0.7
     }
 
-    /// 両手が平行になっているかを判定
+    /// Determine if both hands are parallel
     public var areHandsParallel: Bool {
         let leftNormal = getNormalizedPalmNormal(for: leftHand)
         let rightNormal = getNormalizedPalmNormal(for: rightHand)
         let dotProduct = abs(simd_dot(leftNormal, rightNormal))
 
-        // 0.9以上なら約25度以内で平行
+        // 0.9 or more means parallel within approximately 25 degrees
         return dotProduct > 0.9
     }
 
-    /// 両手の中心位置を取得
+    /// Get the center position between both hands
     public var centerPosition: SIMD3<Float> {
         let leftPos =
             leftHand.handTrackingComponent.fingers[.wrist]?.position(relativeTo: nil) ?? .zero
@@ -185,10 +185,10 @@ extension HandsGestureData {
         let v2 = littlePos - wristPos
         let normal = simd_cross(v1, v2)
 
-        // 左右の手で法線の向きを調整
+        // Adjust normal direction for left and right hands
         let normalizedNormal = simd_normalize(normal)
 
-        // 右手の場合は法線を反転(手のひらが内側を向くように)
+        // For right hand, invert the normal (so palm faces inward)
         if hand.handKind == .right {
             return -normalizedNormal
         }
@@ -196,34 +196,34 @@ extension HandsGestureData {
         return normalizedNormal
     }
 
-    // MARK: - 位置検証ヘルパーメソッド
+    // MARK: - Position validation helper methods
 
-    /// 手が目線から指定の距離にあるかをチェック
+    /// Check if a hand is at a specified distance from eye level
     /// - Parameters:
-    ///   - hand: 対象の手(左右)
-    ///   - fromEyeLevel: 目線からの距離(メートル)
-    ///   - tolerance: 許容誤差(メートル)
-    /// - Returns: 指定範囲内にある場合true
+    ///   - hand: Target hand (left or right)
+    ///   - fromEyeLevel: Distance from eye level (meters)
+    ///   - tolerance: Tolerance error (meters)
+    /// - Returns: true if within the specified range
     public func isHandAtRelativeHeight(hand: HandKind, fromEyeLevel: Float, tolerance: Float = 0.05)
         -> Bool
     {
-        // 注意: 実際の目線の高さは取得できないため、相対的な位置で判定
-        // デバイスの基準点(通常は初期位置)からの高さを使用
+        // Note: Since actual eye level height cannot be obtained, use relative position
+        // Use height from device reference point (usually initial position)
         guard let wristPos = getJointPosition(hand: hand, joint: .wrist) else {
             return false
         }
 
-        // 基準となる高さ(仮に1.5mを目線の高さとする)
+        // Reference height (assume 1.5m as eye level height)
         let eyeLevel: Float = 1.5
         let targetHeight = eyeLevel - fromEyeLevel
 
-        // Y座標で判定
+        // Judge by Y coordinate
         let difference = abs(wristPos.y - targetHeight)
         return difference <= tolerance
     }
 
-    /// 両手の垂直方向の距離を取得
-    /// - Returns: 垂直方向の距離(メートル)。右手が上の場合は正の値
+    /// Get the vertical distance between both hands
+    /// - Returns: Vertical distance (meters). Positive value when right hand is above
     public func handVerticalSeparation() -> Float {
         guard let leftWrist = getJointPosition(hand: .left, joint: .wrist),
             let rightWrist = getJointPosition(hand: .right, joint: .wrist)
@@ -233,14 +233,14 @@ extension HandsGestureData {
         return rightWrist.y - leftWrist.y
     }
 
-    /// 指定した関節が別の関節の近くにあるかをチェック
+    /// Check if a specified joint is near another joint
     /// - Parameters:
-    ///   - joint1: 最初の関節
-    ///   - hand1: 最初の手
-    ///   - joint2: 二番目の関節
-    ///   - hand2: 二番目の手
-    ///   - maxDistance: 最大距離(メートル)
-    /// - Returns: 指定距離内にある場合true
+    ///   - joint1: First joint
+    ///   - hand1: First hand
+    ///   - joint2: Second joint
+    ///   - hand2: Second hand
+    ///   - maxDistance: Maximum distance (meters)
+    /// - Returns: true if within the specified distance
     public func areJointsClose(
         joint1: HandSkeleton.JointName,
         hand1: HandKind,
@@ -256,13 +256,13 @@ extension HandsGestureData {
         return simd_distance(pos1, pos2) <= maxDistance
     }
 
-    /// 異なる手の特定の関節間の距離を取得
+    /// Get the distance between specific joints on different hands
     /// - Parameters:
-    ///   - joint1: 最初の関節
-    ///   - hand1: 最初の手
-    ///   - joint2: 二番目の関節
-    ///   - hand2: 二番目の手
-    /// - Returns: 関節間の距離(メートル)。関節が見つからない場合はFloat.infinity
+    ///   - joint1: First joint
+    ///   - hand1: First hand
+    ///   - joint2: Second joint
+    ///   - hand2: Second hand
+    /// - Returns: Distance between joints (meters). Float.infinity if joints are not found
     public func jointToJointDistance(
         joint1: HandSkeleton.JointName,
         hand1: HandKind,

@@ -8,41 +8,41 @@
 import Foundation
 
 
-/// すべてのジェスチャーの基底となるプロトコル
+/// Base protocol for all gesture types
 public protocol BaseGestureProtocol {
-    /// ジェスチャーの一意識別子
+    /// Unique identifier for the gesture
     var id: String { get }
 
-    /// ジェスチャーの表示名
+    /// Display name for the gesture
     var displayName: String { get }
 
-    /// ジェスチャーの名前(識別用)
+    /// Gesture name for identification
     var gestureName: String { get }
 
-    /// ジェスチャーの説明
+    /// Description of the gesture
     var description: String { get }
 
-    /// ジェスチャーの優先度(小さい値ほど高優先度)
+    /// Gesture priority (lower value means higher priority)
     var priority: Int { get }
 
 
-    /// ジェスチャータイプ(片手/両手)
+    /// Gesture type (single hand or two hands)
     var gestureType: GestureType { get }
 }
 
-/// ジェスチャーの種類
+/// Type of gesture
 public enum GestureType {
     case singleHand
     case twoHand
 }
 
-/// ジェスチャー検出結果
+/// Gesture detection result
 public enum GestureDetectionResult {
     case success([DetectedGesture])
     case failure(GestureDetectionError)
 }
 
-/// 検出されたジェスチャー情報
+/// Information about detected gesture
 public struct DetectedGesture {
     public let gesture: BaseGestureProtocol
     public let confidence: Float
@@ -57,7 +57,7 @@ public struct DetectedGesture {
     }
 }
 
-/// ジェスチャー検出エラー
+/// Gesture detection error
 public enum GestureDetectionError: Error, LocalizedError {
     case noHandDataAvailable
     case invalidHandData(String)
@@ -67,27 +67,27 @@ public enum GestureDetectionError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .noHandDataAvailable:
-            return "手のデータが利用できません"
+            return "Hand data is not available"
         case .invalidHandData(let detail):
-            return "無効な手のデータ: \(detail)"
+            return "Invalid hand data: \(detail)"
         case .processingError(let detail):
-            return "処理エラー: \(detail)"
+            return "Processing error: \(detail)"
         case .timeout:
-            return "タイムアウトが発生しました"
+            return "Timeout occurred"
         }
     }
 }
 
-/// デフォルト実装
+/// Default implementation
 extension BaseGestureProtocol {
-    /// デフォルトのid実装(型名を使用)
+    /// Default id implementation (using type name)
     public var id: String {
-        // 型名からモジュール名を除去してIDとして使用
+        // Remove module name from type name to use as ID
         let fullTypeName = String(describing: type(of: self))
         return fullTypeName.split(separator: ".").last.map(String.init) ?? fullTypeName
     }
 
-    /// デフォルトのdisplayName実装(gestureNameを使用)
+    /// Default displayName implementation (using gestureName)
     public var displayName: String {
         return gestureName
     }

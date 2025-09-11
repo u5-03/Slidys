@@ -7,35 +7,35 @@
 
 import Foundation
 
-/// 連続的な動作を持つジェスチャーを定義するプロトコル
-/// 複数のジェスチャーを順番に検出することで、モーションのあるジェスチャーを表現
+/// Protocol for defining gestures with continuous motion
+/// Expresses gestures with motion by detecting multiple gestures in sequence
 public protocol SerialGestureProtocol: SignLanguageProtocol {
-    /// 順番に検出すべきジェスチャーの配列
+    /// Array of gestures to be detected in sequence
     var gestures: [BaseGestureProtocol] { get }
 
-    /// ジェスチャー間の最大許容時間(秒)
+    /// Maximum allowable time between gestures (seconds)
     var intervalSeconds: TimeInterval { get }
 
-    /// 各ステップの説明(UI表示用)
+    /// Description of each step (for UI display)
     var stepDescriptions: [String] { get }
 }
 
-/// デフォルト実装
+/// Default implementation
 extension SerialGestureProtocol {
 
-    /// デフォルトの優先度(高めに設定)
+    /// Default priority (set high)
     public var priority: Int { 5 }
 
-    /// デフォルトのインターバル(1秒)
+    /// Default interval (1 second)
     public var intervalSeconds: TimeInterval { 1.0 }
 
-    /// デフォルトのジェスチャータイプ(シリアルジェスチャーは通常両手)
+    /// Default gesture type (serial gestures are typically two-handed)
     public var gestureType: GestureType { .twoHand }
 
-    /// SingleHandGestureProtocolのmatches実装(使用しない)
+    /// SingleHandGestureProtocol matches implementation (not used)
     public func matches(_ gestureData: SingleHandGestureData) -> Bool {
-        // SerialGestureProtocolは個別のmatchesメソッドを使用しない
-        // 代わりにgesturesプロパティの各要素が順番にマッチングされる
+        // SerialGestureProtocol does not use individual matches methods
+        // Instead, each element of the gestures property is matched in sequence
         return false
     }
 }

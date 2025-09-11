@@ -7,104 +7,104 @@
 
 import Foundation
 
-/// 片手ジェスチャーの条件を定義するプロトコル
-/// 各ジェスチャーはこのプロトコルを実装して、必要な条件だけを定義する
+/// Protocol defining conditions for single hand gestures
+/// Each gesture implements this protocol and defines only the necessary conditions
 public protocol SingleHandGestureProtocol: BaseGestureProtocol {
 
-    // MARK: - ジェスチャーマッチング
+    // MARK: - Gesture Matching
 
-    /// 指定されたSingleHandGestureDataがこのジェスチャーの条件を満たすかを判定
-    /// - Parameter gestureData: 判定対象の手のデータ
-    /// - Returns: 条件を満たす場合true
+    /// Determines if the specified SingleHandGestureData meets this gesture's conditions
+    /// - Parameter gestureData: Hand data to evaluate
+    /// - Returns: true if conditions are met
     func matches(_ gestureData: SingleHandGestureData) -> Bool
 
-    // MARK: - 指の状態判定関数
+    // MARK: - Finger State Determination Functions
 
-    /// 指定した指群が伸びている必要があるかを判定
-    /// - Parameter fingers: 判定対象の指の配列
-    /// - Returns: 指定した指群が伸びている必要がある場合true
+    /// Determines if the specified fingers need to be straight
+    /// - Parameter fingers: Array of fingers to check
+    /// - Returns: true if the specified fingers need to be straight
     func requiresFingersStraight(_ fingers: [FingerType]) -> Bool
 
-    /// 指定した指群が曲がっている必要があるかを判定
-    /// - Parameter fingers: 判定対象の指の配列
-    /// - Returns: 指定した指群が曲がっている必要がある場合true
+    /// Determines if the specified fingers need to be bent
+    /// - Parameter fingers: Array of fingers to check
+    /// - Returns: true if the specified fingers need to be bent
     func requiresFingersBent(_ fingers: [FingerType]) -> Bool
 
-    /// 指定した指が特定の方向を向いている必要があるかを判定
+    /// Determines if the specified finger needs to be pointing in a specific direction
     /// - Parameters:
-    ///   - finger: 判定対象の指
-    ///   - direction: 期待する方向
-    /// - Returns: 指定した指が特定の方向を向いている必要がある場合true
+    ///   - finger: The finger to check
+    ///   - direction: The expected direction
+    /// - Returns: true if the specified finger needs to be pointing in the specific direction
     func requiresFingerPointing(_ finger: FingerType, direction: GestureDetectionDirection) -> Bool
 
-    // MARK: - 手のひらの方向判定関数
+    // MARK: - Palm Direction Determination Functions
 
-    /// 手のひらが特定の方向を向いている必要があるかを判定
-    /// - Parameter direction: 期待する方向
-    /// - Returns: 手のひらが特定の方向を向いている必要がある場合true
+    /// Determines if the palm needs to be facing a specific direction
+    /// - Parameter direction: The expected direction
+    /// - Returns: true if the palm needs to be facing the specific direction
     func requiresPalmFacing(_ direction: GestureDetectionDirection) -> Bool
 
-    // MARK: - 腕の方向判定関数
+    // MARK: - Arm Direction Determination Functions
 
-    /// 腕が特定の方向に伸びている必要があるかを判定
-    /// - Parameter direction: 期待する方向
-    /// - Returns: 腕が特定の方向に伸びている必要がある場合true
+    /// Determines if the arm needs to be extended in a specific direction
+    /// - Parameter direction: The expected direction
+    /// - Returns: true if the arm needs to be extended in the specific direction
     func requiresArmExtendedInDirection(_ direction: GestureDetectionDirection) -> Bool
 
-    // MARK: - 複合的な指の条件(便利プロパティ)
+    // MARK: - Complex Finger Conditions (Convenience Properties)
 
-    /// すべての指が曲がっている必要があるか(握り拳状態)
+    /// Whether all fingers need to be bent (fist state)
     var requiresAllFingersBent: Bool { get }
 
-    /// 人差し指だけが伸びている必要があるか
+    /// Whether only the index finger needs to be straight
     var requiresOnlyIndexFingerStraight: Bool { get }
 
-    /// 人差し指と中指だけが伸びている必要があるか(ピースサインなど)
+    /// Whether only the index and middle fingers need to be straight (peace sign, etc.)
     var requiresOnlyIndexAndMiddleStraight: Bool { get }
 
-    /// 親指だけが伸びている必要があるか
+    /// Whether only the thumb needs to be straight
     var requiresOnlyThumbStraight: Bool { get }
 
-    /// 小指だけが伸びている必要があるか
+    /// Whether only the little finger needs to be straight
     var requiresOnlyLittleFingerStraight: Bool { get }
 
-    // MARK: - 手首の状態条件
+    // MARK: - Wrist State Conditions
 
-    /// 手首が外側(甲側)に曲がっている必要があるか
+    /// Whether the wrist needs to be bent outward (back side)
     var requiresWristBentOutward: Bool { get }
 
-    /// 手首が内側(手のひら側)に曲がっている必要があるか
+    /// Whether the wrist needs to be bent inward (palm side)
     var requiresWristBentInward: Bool { get }
 
-    /// 手首がまっすぐである必要があるか
+    /// Whether the wrist needs to be straight
     var requiresWristStraight: Bool { get }
 
-    // MARK: - 腕の状態条件
+    // MARK: - Arm State Conditions
 
-    /// 腕が伸びている必要があるか
+    /// Whether the arm needs to be extended
     var requiresArmExtended: Bool { get }
 }
 
-/// デフォルト実装：すべての条件をfalseに設定
-/// 各ジェスチャーは必要な条件だけをオーバーライドする
+/// Default implementation: All conditions set to false
+/// Each gesture overrides only the necessary conditions
 extension SingleHandGestureProtocol {
 
-    // MARK: - デフォルト識別情報
+    // MARK: - Default Identification Information
 
-    /// デフォルトの優先度(低優先度)
+    /// Default priority (low priority)
     public var priority: Int { 1000 }
 
 
-    /// デフォルトのジェスチャータイプ
+    /// Default gesture type
     public var gestureType: GestureType { .singleHand }
 
-    // MARK: - デフォルトマッチング実装
+    // MARK: - Default Matching Implementation
 
-    /// デフォルトのマッチング実装：すべての条件をチェック
+    /// Default matching implementation: Check all conditions
     public func matches(_ gestureData: SingleHandGestureData) -> Bool {
-        // 早期リターン：基本的な条件チェック
+        // Early return: Basic condition checks
 
-        // 1. 複合的な指の条件チェック
+        // 1. Complex finger condition checks
         if requiresAllFingersBent && !areAllFingersBent(gestureData) {
             return false
         }
@@ -125,7 +125,7 @@ extension SingleHandGestureProtocol {
             return false
         }
 
-        // 2. 手首の状態チェック
+        // 2. Wrist state checks
         if requiresWristBentOutward && !gestureData.isWristBentOutward {
             return false
         }
@@ -138,14 +138,14 @@ extension SingleHandGestureProtocol {
             return false
         }
 
-        // 3. 腕の状態チェック
+        // 3. Arm state checks
         if requiresArmExtended && !gestureData.armExtended {
             return false
         }
 
-        // 4. 個別の指の状態チェック(FingerType全てをチェック)
+        // 4. Individual finger state checks (check all FingerType)
         for finger in FingerType.allCases {
-            // 指の伸び状態チェック
+            // Finger extension state check
             if requiresFingersStraight([finger]) && !gestureData.isFingerStraight(finger) {
                 return false
             }
@@ -154,7 +154,7 @@ extension SingleHandGestureProtocol {
                 return false
             }
 
-            // 指の方向チェック(全方向をテスト)
+            // Finger direction check (test all directions)
             for direction in GestureDetectionDirection.allCases {
                 if requiresFingerPointing(finger, direction: direction)
                     && !gestureData.isFingerPointing(finger, direction: direction)
@@ -164,14 +164,14 @@ extension SingleHandGestureProtocol {
             }
         }
 
-        // 5. 手のひらの方向チェック
+        // 5. Palm direction checks
         for direction in GestureDetectionDirection.allCases {
             if requiresPalmFacing(direction) && !gestureData.isPalmFacing(direction) {
                 return false
             }
         }
 
-        // 6. 腕の方向チェック
+        // 6. Arm direction checks
         for direction in GestureDetectionDirection.allCases {
             if requiresArmExtendedInDirection(direction)
                 && !gestureData.isArmExtendedInDirection(direction)
@@ -183,40 +183,40 @@ extension SingleHandGestureProtocol {
         return true
     }
 
-    // MARK: - 指の状態判定関数(デフォルト実装)
+    // MARK: - Finger State Determination Functions (Default Implementation)
 
-    /// 指定した指群が伸びている必要があるか(デフォルト：不要)
+    /// Whether the specified fingers need to be straight (default: not required)
     public func requiresFingersStraight(_ fingers: [FingerType]) -> Bool {
         return false
     }
 
-    /// 指定した指群が曲がっている必要があるか(デフォルト：不要)
+    /// Whether the specified fingers need to be bent (default: not required)
     public func requiresFingersBent(_ fingers: [FingerType]) -> Bool {
         return false
     }
 
-    /// 指定した指が特定の方向を向いている必要があるか(デフォルト：不要)
+    /// Whether the specified finger needs to be pointing in a specific direction (default: not required)
     public func requiresFingerPointing(_ finger: FingerType, direction: GestureDetectionDirection)
         -> Bool
     {
         return false
     }
 
-    // MARK: - 手のひらの方向判定関数(デフォルト実装)
+    // MARK: - Palm Direction Determination Functions (Default Implementation)
 
-    /// 手のひらが特定の方向を向いている必要があるか(デフォルト：不要)
+    /// Whether the palm needs to be facing a specific direction (default: not required)
     public func requiresPalmFacing(_ direction: GestureDetectionDirection) -> Bool {
         return false
     }
 
-    // MARK: - 腕の方向判定関数(デフォルト実装)
+    // MARK: - Arm Direction Determination Functions (Default Implementation)
 
-    /// 腕が特定の方向に伸びている必要があるか(デフォルト：不要)
+    /// Whether the arm needs to be extended in a specific direction (default: not required)
     public func requiresArmExtendedInDirection(_ direction: GestureDetectionDirection) -> Bool {
         return false
     }
 
-    // MARK: - 複合的な指の条件(デフォルト値)
+    // MARK: - Complex Finger Conditions (Default Values)
 
     public var requiresAllFingersBent: Bool { false }
     public var requiresOnlyIndexFingerStraight: Bool { false }
@@ -224,45 +224,45 @@ extension SingleHandGestureProtocol {
     public var requiresOnlyThumbStraight: Bool { false }
     public var requiresOnlyLittleFingerStraight: Bool { false }
 
-    // MARK: - 手首の状態条件(デフォルト値)
+    // MARK: - Wrist State Conditions (Default Values)
 
     public var requiresWristBentOutward: Bool { false }
     public var requiresWristBentInward: Bool { false }
     public var requiresWristStraight: Bool { false }
 
-    // MARK: - 腕の状態条件(デフォルト値)
+    // MARK: - Arm State Conditions (Default Values)
 
     public var requiresArmExtended: Bool { false }
 
-    // MARK: - ヘルパーメソッド(デフォルト実装)
+    // MARK: - Helper Methods (Default Implementation)
 
-    /// すべての指が曲がっているかを判定
+    /// Determines if all fingers are bent
     private func areAllFingersBent(_ gestureData: SingleHandGestureData) -> Bool {
         return FingerType.allCases.allSatisfy { gestureData.isFingerBent($0) }
     }
 
-    /// 人差し指だけが伸びているかを判定
+    /// Determines if only the index finger is straight
     private func isOnlyIndexFingerStraight(_ gestureData: SingleHandGestureData) -> Bool {
         return gestureData.isFingerStraight(.index) && gestureData.isFingerBent(.thumb)
             && gestureData.isFingerBent(.middle) && gestureData.isFingerBent(.ring)
             && gestureData.isFingerBent(.little)
     }
 
-    /// 人差し指と中指だけが伸びているかを判定
+    /// Determines if only the index and middle fingers are straight
     private func isOnlyIndexAndMiddleStraight(_ gestureData: SingleHandGestureData) -> Bool {
         return gestureData.isFingerStraight(.index) && gestureData.isFingerStraight(.middle)
             && gestureData.isFingerBent(.thumb) && gestureData.isFingerBent(.ring)
             && gestureData.isFingerBent(.little)
     }
 
-    /// 親指だけが伸びているかを判定
+    /// Determines if only the thumb is straight
     private func isOnlyThumbStraight(_ gestureData: SingleHandGestureData) -> Bool {
         return gestureData.isFingerStraight(.thumb) && gestureData.isFingerBent(.index)
             && gestureData.isFingerBent(.middle) && gestureData.isFingerBent(.ring)
             && gestureData.isFingerBent(.little)
     }
 
-    /// 小指だけが伸びているかを判定
+    /// Determines if only the little finger is straight
     private func isOnlyLittleFingerStraight(_ gestureData: SingleHandGestureData) -> Bool {
         return gestureData.isFingerStraight(.little) && gestureData.isFingerBent(.thumb)
             && gestureData.isFingerBent(.index) && gestureData.isFingerBent(.middle)
@@ -276,9 +276,9 @@ extension SingleHandGestureProtocol {
 
     // MARK: - Performance Optimized Matching
 
-    /// 複数条件の高速検証(早期リターン最適化)
-    /// - Parameter gestureData: 検証対象のジェスチャーデータ
-    /// - Returns: 全条件を満たす場合true
+    /// Fast validation of multiple conditions (early return optimization)
+    /// - Parameter gestureData: Gesture data to validate
+    /// - Returns: true if all conditions are met
     public func matchesWithOptimization(_ gestureData: SingleHandGestureData) -> Bool {
         // 1. Most selective conditions first (finger configuration)
         if requiresOnlyIndexAndMiddleStraight {
@@ -350,9 +350,9 @@ extension SingleHandGestureProtocol {
 
     // MARK: - Gesture Confidence Scoring
 
-    /// ジェスチャーの一致度スコアを計算(0.0-1.0)
-    /// - Parameter gestureData: 評価対象のジェスチャーデータ
-    /// - Returns: 一致度スコア(1.0が完全一致)
+    /// Calculates gesture matching confidence score (0.0-1.0)
+    /// - Parameter gestureData: Gesture data to evaluate
+    /// - Returns: Confidence score (1.0 is perfect match)
     public func confidenceScore(for gestureData: SingleHandGestureData) -> Double {
         var totalConditions = 0
         var matchedConditions = 0
@@ -422,39 +422,39 @@ extension SingleHandGestureProtocol {
 
     // MARK: - Debugging Support
 
-    /// ジェスチャー条件の詳細情報を取得(デバッグ用)
+    /// Gets detailed information about gesture conditions (for debugging)
     public var conditionsDescription: String {
         var conditions: [String] = []
 
         if requiresOnlyIndexAndMiddleStraight {
-            conditions.append("人差し指と中指のみ伸ばす")
+            conditions.append("Extend only index and middle fingers")
         }
         if requiresOnlyIndexFingerStraight {
-            conditions.append("人差し指のみ伸ばす")
+            conditions.append("Extend only index finger")
         }
         if requiresOnlyThumbStraight {
-            conditions.append("親指のみ伸ばす")
+            conditions.append("Extend only thumb")
         }
         if requiresAllFingersBent {
-            conditions.append("全ての指を曲げる")
+            conditions.append("Bend all fingers")
         }
 
         for direction in GestureDetectionDirection.allCases {
             if requiresPalmFacing(direction) {
-                conditions.append("手のひらを\(direction)に向ける")
+                conditions.append("Face palm towards \(direction)")
             }
         }
 
-        return conditions.isEmpty ? "条件なし" : conditions.joined(separator: ", ")
+        return conditions.isEmpty ? "No conditions" : conditions.joined(separator: ", ")
     }
 
     // MARK: - Gesture Comparison
 
-    /// 他のジェスチャーとの類似度を計算
+    /// Calculates similarity with other gestures
     /// - Parameters:
-    ///   - other: 比較対象のジェスチャー
-    ///   - gestureData: テスト用のジェスチャーデータ
-    /// - Returns: 類似度スコア(0.0-1.0)
+    ///   - other: The gesture to compare with
+    ///   - gestureData: Gesture data for testing
+    /// - Returns: Similarity score (0.0-1.0)
     public func similarity(
         to other: SingleHandGestureProtocol, using gestureData: SingleHandGestureData
     ) -> Double {
@@ -471,18 +471,18 @@ extension SingleHandGestureProtocol {
 
 extension Collection where Element == SingleHandGestureProtocol {
 
-    /// 指定されたジェスチャーデータに対する全ジェスチャーの信頼度を計算
-    /// - Parameter gestureData: 評価対象のジェスチャーデータ
-    /// - Returns: ジェスチャー名と信頼度のタプル配列(信頼度降順)
+    /// Calculates confidence scores for all gestures against the specified gesture data
+    /// - Parameter gestureData: Gesture data to evaluate
+    /// - Returns: Array of tuples with gesture name and confidence score (sorted by confidence descending)
     public func confidenceScores(for gestureData: SingleHandGestureData) -> [(String, Double)] {
         return self.map { gesture in
             (gesture.gestureName, gesture.confidenceScore(for: gestureData))
         }.sorted { $0.1 > $1.1 }
     }
 
-    /// 最も信頼度の高いジェスチャーを取得
-    /// - Parameter gestureData: 評価対象のジェスチャーデータ
-    /// - Returns: 最高信頼度のジェスチャー(見つからない場合はnil)
+    /// Gets the gesture with the highest confidence
+    /// - Parameter gestureData: Gesture data to evaluate
+    /// - Returns: Gesture with highest confidence (nil if not found)
     public func mostConfidentGesture(for gestureData: SingleHandGestureData)
         -> SingleHandGestureProtocol?
     {

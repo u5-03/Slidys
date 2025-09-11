@@ -7,15 +7,15 @@
 
 import Foundation
 
-/// 手話ジェスチャーを定義するためのプロトコル
+/// Protocol for defining sign language gestures
 public protocol SignLanguageProtocol: SingleHandGestureProtocol {
-    /// 手話が示す意味のテキスト
+    /// Text representing the meaning of the sign language
     var meaning: String { get }
 }
 
-/// デフォルト実装
+/// Default implementation
 extension SignLanguageProtocol {
 
-    /// デフォルトの優先度(高めに設定して通常ジェスチャーより優先)
+    /// Default priority (set high to prioritize over regular gestures)
     public var priority: Int { 10 }
 }

@@ -8,52 +8,52 @@
 import Foundation
 import os
 
-/// ハンドジェスチャーパッケージのロガー
+/// Logger for the hand gesture package
 public enum HandGestureLogger {
 
     // MARK: - Debug Control
 
-    /// デバッグログ出力を制御する単一のフラグ
+    /// Single flag to control debug log output
     public static var isDebugEnabled = true
 
     // MARK: - Logger Categories
 
-    /// システム関連のログ
+    /// System-related logs
     public static let system = Logger(subsystem: "com.handgesture.package", category: "system")
 
-    /// ジェスチャー検出関連のログ
+    /// Gesture detection-related logs
     public static let gesture = Logger(subsystem: "com.handgesture.package", category: "gesture")
 
-    /// パフォーマンス関連のログ
+    /// Performance-related logs
     public static let performance = Logger(
         subsystem: "com.handgesture.package", category: "performance")
 
-    /// UI関連のログ
+    /// UI-related logs
     public static let ui = Logger(subsystem: "com.handgesture.package", category: "ui")
 
-    /// デバッグ用のログ
+    /// Debug logs
     public static let debug = Logger(subsystem: "com.handgesture.package", category: "debug")
 
     // MARK: - Configuration
 
-    /// ログ出力設定
+    /// Log output configuration
     public struct Configuration {
-        /// システムログを出力するか
+        /// Whether to output system logs
         public var enableSystemLogs = true
 
-        /// ジェスチャー検出ログを出力するか
+        /// Whether to output gesture detection logs
         public var enableGestureLogs = true
 
-        /// パフォーマンスログを出力するか
+        /// Whether to output performance logs
         public var enablePerformanceLogs = true
 
-        /// UIログを出力するか
+        /// Whether to output UI logs
         public var enableUILogs = true
 
-        /// デバッグログを出力するか
+        /// Whether to output debug logs
         public var enableDebugLogs = true
 
-        /// すべてのログを無効化
+        /// Disable all logs
         public mutating func disableAll() {
             enableSystemLogs = false
             enableGestureLogs = false
@@ -62,7 +62,7 @@ public enum HandGestureLogger {
             enableDebugLogs = false
         }
 
-        /// すべてのログを有効化
+        /// Enable all logs
         public mutating func enableAll() {
             enableSystemLogs = true
             enableGestureLogs = true
@@ -72,47 +72,47 @@ public enum HandGestureLogger {
         }
     }
 
-    /// 現在のログ設定
+    /// Current log configuration
     public static var configuration = Configuration() {
         didSet {
-            // isDebugEnabledフラグと同期
+            // Sync with isDebugEnabled flag
             configuration.enableDebugLogs = isDebugEnabled
         }
     }
 
     // MARK: - Convenience Methods
 
-    /// システムログを出力
+    /// Output system log
     public static func logSystem(_ message: String, type: OSLogType = .info) {
         guard configuration.enableSystemLogs else { return }
         system.log(level: type, "\(message)")
     }
 
-    /// ジェスチャー検出ログを出力
+    /// Output gesture detection log
     public static func logGesture(_ message: String, type: OSLogType = .info) {
         guard configuration.enableGestureLogs else { return }
         gesture.log(level: type, "\(message)")
     }
 
-    /// パフォーマンスログを出力
+    /// Output performance log
     public static func logPerformance(_ message: String, type: OSLogType = .info) {
         guard configuration.enablePerformanceLogs else { return }
         performance.log(level: type, "\(message)")
     }
 
-    /// UIログを出力
+    /// Output UI log
     public static func logUI(_ message: String, type: OSLogType = .info) {
         guard configuration.enableUILogs else { return }
         ui.log(level: type, "\(message)")
     }
 
-    /// デバッグログを出力
+    /// Output debug log
     public static func logDebug(_ message: String, type: OSLogType = .debug) {
         guard isDebugEnabled else { return }
         debug.log(level: type, "\(message)")
     }
 
-    /// エラーログを出力(常に出力)
+    /// Output error log (always output)
     public static func logError(_ message: String, error: Error? = nil) {
         if let error = error {
             system.error("❌ \(message): \(error.localizedDescription)")

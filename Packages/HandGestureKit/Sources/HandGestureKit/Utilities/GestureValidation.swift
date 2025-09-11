@@ -7,17 +7,17 @@
 
 import Foundation
 
-/// ジェスチャー検出で頻繁に使用される共通パターンを提供するユーティリティ
+/// Utility that provides common patterns frequently used in gesture detection
 public enum GestureValidation {
 
     // MARK: - Finger Configuration Patterns
 
-    /// 指定した指の組み合わせが正しい状態(伸びている/曲がっている)かを検証
+    /// Validate if the specified finger combination is in the correct state (straight/bent)
     /// - Parameters:
-    ///   - gestureData: 手のジェスチャーデータ
-    ///   - straightFingers: 伸びている必要がある指の配列
-    ///   - bentFingers: 曲がっている必要がある指の配列
-    /// - Returns: 条件を満たす場合true
+    ///   - gestureData: Hand gesture data
+    ///   - straightFingers: Array of fingers that need to be straight
+    ///   - bentFingers: Array of fingers that need to be bent
+    /// - Returns: true if conditions are met
     public static func validateFingerConfiguration(
         _ gestureData: SingleHandGestureData,
         straight straightFingers: [FingerType],
@@ -36,11 +36,11 @@ public enum GestureValidation {
         return true
     }
 
-    /// 指定した指のみが伸びていて、他の指が曲がっているかを検証
+    /// Validate that only the specified fingers are straight and other fingers are bent
     /// - Parameters:
-    ///   - gestureData: 手のジェスチャーデータ
-    ///   - targetFingers: 伸びている必要がある指の配列
-    /// - Returns: 条件を満たす場合true
+    ///   - gestureData: Hand gesture data
+    ///   - targetFingers: Array of fingers that need to be straight
+    /// - Returns: true if conditions are met
     public static func validateOnlyTargetFingersStraight(
         _ gestureData: SingleHandGestureData,
         targetFingers: [FingerType]
@@ -58,12 +58,12 @@ public enum GestureValidation {
 
     // MARK: - Direction Validation
 
-    /// 指定した指が全て同じ方向を向いているかを検証
+    /// Validate that all specified fingers are pointing in the same direction
     /// - Parameters:
-    ///   - gestureData: 手のジェスチャーデータ
-    ///   - fingers: 検証対象の指配列
-    ///   - direction: 期待する方向
-    /// - Returns: 全ての指が指定方向を向いている場合true
+    ///   - gestureData: Hand gesture data
+    ///   - fingers: Array of fingers to validate
+    ///   - direction: Expected direction
+    /// - Returns: true if all fingers are pointing in the specified direction
     public static func validateFingersPointingInDirection(
         _ gestureData: SingleHandGestureData,
         fingers: [FingerType],
@@ -76,27 +76,27 @@ public enum GestureValidation {
 
     // MARK: - Complex Gesture Patterns
 
-    /// 握り拳の状態を検証
-    /// - Parameter gestureData: 手のジェスチャーデータ
-    /// - Returns: 握り拳状態の場合true
+    /// Validate fist gesture state
+    /// - Parameter gestureData: Hand gesture data
+    /// - Returns: true if in fist state
     public static func validateFistGesture(_ gestureData: SingleHandGestureData) -> Bool {
         return FingerType.allCases.allSatisfy { finger in
             gestureData.isFingerBent(finger)
         }
     }
 
-    /// 開いた手(パー)の状態を検証
-    /// - Parameter gestureData: 手のジェスチャーデータ
-    /// - Returns: 開いた手の状態の場合true
+    /// Validate open hand (paper) gesture state
+    /// - Parameter gestureData: Hand gesture data
+    /// - Returns: true if in open hand state
     public static func validateOpenHandGesture(_ gestureData: SingleHandGestureData) -> Bool {
         return FingerType.allCases.allSatisfy { finger in
             gestureData.isFingerStraight(finger)
         }
     }
 
-    /// 指差しジェスチャーの状態を検証(人差し指のみ伸びている)
-    /// - Parameter gestureData: 手のジェスチャーデータ
-    /// - Returns: 指差し状態の場合true
+    /// Validate pointing gesture state (only index finger is straight)
+    /// - Parameter gestureData: Hand gesture data
+    /// - Returns: true if in pointing state
     public static func validatePointingGesture(_ gestureData: SingleHandGestureData) -> Bool {
         return validateOnlyTargetFingersStraight(
             gestureData,

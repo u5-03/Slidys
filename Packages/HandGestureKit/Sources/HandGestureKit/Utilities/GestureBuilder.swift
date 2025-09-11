@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// ジェスチャー定義を構築するためのビルダーパターン
+/// Builder pattern for constructing gesture definitions
 public struct GestureBuilder {
 
     // MARK: - Properties
@@ -25,21 +25,21 @@ public struct GestureBuilder {
 
     // MARK: - Builder Methods
 
-    /// 伸びている必要がある指を追加
+    /// Add fingers that need to be straight
     public func withStraightFingers(_ fingers: FingerType...) -> GestureBuilder {
         var builder = self
         builder.requiredStraightFingers.append(contentsOf: fingers)
         return builder
     }
 
-    /// 曲がっている必要がある指を追加
+    /// Add fingers that need to be bent
     public func withBentFingers(_ fingers: FingerType...) -> GestureBuilder {
         var builder = self
         builder.requiredBentFingers.append(contentsOf: fingers)
         return builder
     }
 
-    /// 指の方向要件を追加
+    /// Add finger direction requirements
     public func withFingerPointing(_ finger: FingerType, direction: GestureDetectionDirection)
         -> GestureBuilder
     {
@@ -48,21 +48,21 @@ public struct GestureBuilder {
         return builder
     }
 
-    /// 手のひらの方向要件を設定
+    /// Set palm direction requirements
     public func withPalmFacing(_ direction: GestureDetectionDirection) -> GestureBuilder {
         var builder = self
         builder.requiredPalmDirection = direction
         return builder
     }
 
-    /// 腕の方向要件を設定
+    /// Set arm direction requirements
     public func withArmExtendedIn(_ direction: GestureDetectionDirection) -> GestureBuilder {
         var builder = self
         builder.requiredArmDirection = direction
         return builder
     }
 
-    /// 指の曲がり具合レベルで要件を設定
+    /// Set requirements by finger bend level
     public func withBentFingersAtLevel(
         _ fingers: [FingerType], level: SingleHandGestureData.FingerBendLevel,
         minimumLevel: Bool = false
@@ -73,7 +73,7 @@ public struct GestureBuilder {
         return builder
     }
 
-    /// 指の接触要件を設定
+    /// Set finger contact requirements
     public func withFingersTouching(
         _ finger1: FingerType, _ finger2: FingerType, threshold: Float = 0.03
     ) -> GestureBuilder {
@@ -82,7 +82,7 @@ public struct GestureBuilder {
         return builder
     }
 
-    /// 複数の指を同時に伸ばす要件を設定(可変長引数版)
+    /// Set requirements for multiple fingers to be extended simultaneously (variadic version)
     public func withExtendedFingers(_ fingers: FingerType...) -> GestureBuilder {
         var builder = self
         builder.requiredStraightFingers.append(contentsOf: fingers)
@@ -91,9 +91,9 @@ public struct GestureBuilder {
 
     // MARK: - Validation
 
-    /// 構築した条件でジェスチャーデータを検証
-    /// - Parameter gestureData: 検証対象のジェスチャーデータ
-    /// - Returns: 全ての条件を満たす場合true
+    /// Validate gesture data with the constructed conditions
+    /// - Parameter gestureData: Gesture data to validate
+    /// - Returns: true if all conditions are met
     public func validate(_ gestureData: SingleHandGestureData) -> Bool {
         // Finger configuration validation
         guard

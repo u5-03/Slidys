@@ -2,7 +2,7 @@ import ARKit
 import RealityKit
 import simd
 
-// ベクトルの正規化関数
+// Vector normalization function
 func normalize(_ vector: SIMD3<Float>) -> SIMD3<Float> {
     let length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
     if length > 0 {
@@ -11,41 +11,41 @@ func normalize(_ vector: SIMD3<Float>) -> SIMD3<Float> {
     return vector
 }
 
-// MARK: - HandTrackingComponent拡張
+// MARK: - HandTrackingComponent Extension
 extension HandTrackingComponent {
 
-    // MARK: - 1. 指が曲がっているかどうかの判定
+    // MARK: - 1. Determining if fingers are bent
 
-    /// 指が真っ直ぐかどうかを判定
+    /// Determine if a finger is straight
     /// - Parameters:
-    ///   - finger: 判定したい指の種類
-    ///   - tolerance: 許容角度(ラジアン)。デフォルトは45度
-    /// - Returns: 指が真っ直ぐならtrue、曲がっていればfalse
+    ///   - finger: Type of finger to check
+    ///   - tolerance: Tolerance angle (radians). Default is 45 degrees
+    /// - Returns: true if finger is straight, false if bent
     public func isFingerStraight(_ finger: FingerType, tolerance: Float = .pi / 4) -> Bool {
         let joints = getFingerJoints(finger)
         guard joints.count >= 3 else {
             if finger == .index {
                 HandGestureLogger.logDebug(
-                    "⚠️ \(finger.description)指: 関節数が不足しています (\(joints.count)個)")
+                    "⚠️ \(finger.description) finger: Insufficient joint count (\(joints.count))")
             }
             return false
         }
 
-        // 人差し指以外の場合は詳細ログを出力しない
-        // 手話モードでは人差し指のログも抑制
+        // Don't output detailed logs for fingers other than index finger
+        // Suppress index finger logs in sign language mode too
         let shouldLogDetails = false  // finger == .index
 
-        // 指の根本から先端までの関節を順番に取得
+        // Get joints sequentially from finger base to tip
         var positions: [SIMD3<Float>] = []
 
         if shouldLogDetails {
-            HandGestureLogger.logDebug("🔍 \(finger.description)指の関節座標:")
+            HandGestureLogger.logDebug("🔍 \(finger.description) finger joint coordinates:")
         }
 
         for (i, joint) in joints.enumerated() {
             guard let entity = fingers[joint] else {
                 if shouldLogDetails {
-                    HandGestureLogger.logDebug("⚠️ \(finger.description)指: 関節 \(joint) が見つかりません")
+                    HandGestureLogger.logDebug("⚠️ \(finger.description) finger: Joint \(joint) not found")
                 }
                 return false
             }
@@ -59,9 +59,9 @@ extension HandTrackingComponent {
             }
         }
 
-        // 連続する3つの関節の角度をチェック
+        // Check angles of three consecutive joints
         var allAngles: [Float] = []
-        var deviationCount = 0  // 許容範囲を超える角度の数
+        var deviationCount = 0  // Number of angles exceeding tolerance
 
         for i in 0..<(positions.count - 2) {
             let angle = calculateAngleBetweenPoints(
@@ -73,29 +73,29 @@ extension HandTrackingComponent {
 
             if shouldLogDetails {
                 let angleDegrees = angle * 180 / .pi
-                // 180度からの差を計算
+                // Calculate difference from 180 degrees
                 let straightAngle: Float = .pi
                 let deviation = abs(angle - straightAngle)
                 let deviationDegrees = deviation * 180 / .pi
 
                 HandGestureLogger.logDebug(
-                    "  角度 \(i)-\(i+1)-\(i+2): \(String(format: "%.1f", angleDegrees))° (180°からの差: \(String(format: "%.1f", deviationDegrees))°, 許容: \(String(format: "%.1f", tolerance * 180 / .pi))°)"
+                    "  Angle \(i)-\(i+1)-\(i+2): \(String(format: "%.1f", angleDegrees))° (Diff from 180°: \(String(format: "%.1f", deviationDegrees))°, Tolerance: \(String(format: "%.1f", tolerance * 180 / .pi))°)"
                 )
             }
 
-            // 許容範囲を超える角度をカウント
+            // Count angles exceeding tolerance
             let straightAngle: Float = .pi
             let deviation = abs(angle - straightAngle)
             if deviation > tolerance {
                 deviationCount += 1
                 if shouldLogDetails {
-                    HandGestureLogger.logDebug("  ⚠️ 関節 \(i)-\(i+1)-\(i+2) の角度が許容範囲を超えています")
+                    HandGestureLogger.logDebug("  ⚠️ Joint \(i)-\(i+1)-\(i+2) angle exceeds tolerance")
                 }
             }
         }
 
-        // 複数の関節がある場合、1つだけ許容範囲を超えていても真っ直ぐと判定
-        // (指の付け根部分は曲がっていることが多いため)
+        // For multiple joints, consider straight even if only one exceeds tolerance
+        // (Finger base parts are often bent)
         let isStraight = allAngles.count > 2 ? deviationCount <= 1 : deviationCount == 0
 
         if shouldLogDetails {
@@ -104,11 +104,11 @@ extension HandTrackingComponent {
 
             if isStraight {
                 HandGestureLogger.logDebug(
-                    "📏 \(finger.description)指: 真っ直ぐ (平均角度: \(String(format: "%.1f", averageAngleDegrees))°)"
+                    "📏 \(finger.description) finger: Straight (Average angle: \(String(format: "%.1f", averageAngleDegrees))°)"
                 )
             } else {
                 HandGestureLogger.logDebug(
-                    "📏 \(finger.description)指: 曲がっている (平均角度: \(String(format: "%.1f", averageAngleDegrees))°, 許容範囲外の関節数: \(deviationCount))"
+                    "📏 \(finger.description) finger: Bent (Average angle: \(String(format: "%.1f", averageAngleDegrees))°, Joints exceeding tolerance: \(deviationCount))"
                 )
             }
         }
@@ -116,47 +116,47 @@ extension HandTrackingComponent {
         return isStraight
     }
 
-    /// 指が曲がっているかどうかを判定(isFingerStraightの逆)
+    /// Determine if a finger is bent (opposite of isFingerStraight)
     public func isFingerBent(_ finger: FingerType, tolerance: Float = .pi / 4) -> Bool {
         return !isFingerStraight(finger, tolerance: tolerance)
     }
 
-    // MARK: - 2. 手のひらの向き判定
+    // MARK: - 2. Palm orientation determination
 
-    /// 法線ベクトルから方向を判定する共通ロジック
+    /// Common logic to determine direction from normal vector
     private func getDirectionFromNormal(_ normal: SIMD3<Float>) -> PalmDirection {
-        // 左手と右手で異なる判定を行う
+        // Perform different judgments for left and right hands
         let isLeftHand = chirality == .left
 
-        // 各方向との角度を計算して最も近い方向を選択
+        // Calculate angles with each direction and select the closest
         var closestDirection = PalmDirection.backward
         var smallestAngle: Float = .pi
 
-        // 境界値の調整(45度から30度に変更)
+        // Boundary value adjustment (changed from 45 to 30 degrees)
 
         for direction in PalmDirection.allCases {
             var targetVector = direction.vector
 
-            // 左手の場合、方向ベクトルを調整
+            // For left hand, adjust direction vector
             if isLeftHand {
                 if direction == .forward || direction == .backward {
-                    // 左手の場合、前後方向を反転
+                    // For left hand, invert forward/backward direction
                     targetVector = -targetVector
                 } else if direction == .up || direction == .down {
-                    // 左手の場合、上下方向を反転
+                    // For left hand, invert up/down direction
                     targetVector = -targetVector
                 } else if direction == .left || direction == .right {
-                    // 左手の場合、左右方向を反転
+                    // For left hand, invert left/right direction
                     targetVector = -targetVector
                 }
             }
 
-            // 正規化したベクトル間の内積を計算(コサイン類似度)
+            // Calculate dot product between normalized vectors (cosine similarity)
             let dotProduct = simd_dot(normalize(normal), normalize(targetVector))
-            // 内積からラジアン角度を計算
+            // Calculate radian angle from dot product
             let angle = acos(max(-1.0, min(1.0, dotProduct)))
 
-            // 最小角度を更新
+            // Update minimum angle
             if angle < smallestAngle {
                 smallestAngle = angle
                 closestDirection = direction
@@ -166,165 +166,165 @@ extension HandTrackingComponent {
         return closestDirection
     }
 
-    /// 手のひらが特定の方向を向いているかを角度で判定(より柔軟)
+    /// Determine if palm is facing a specific direction using angle (more flexible)
     /// - Parameters:
-    ///   - direction: 判定したい方向
-    ///   - tolerance: 許容角度(ラジアン)。デフォルトは30度
-    /// - Returns: 指定した方向に向いていればtrue
+    ///   - direction: Direction to check
+    ///   - tolerance: Tolerance angle (radians). Default is 30 degrees
+    /// - Returns: true if facing the specified direction
     public func isPalmFacingDirection(_ direction: PalmDirection, tolerance: Float = .pi / 6)
         -> Bool
     {
         guard fingers[.wrist] != nil else { return false }
 
-        // 左手と右手で異なる判定を行う
+        // Perform different judgments for left and right hands
         let isLeftHand = chirality == .left
 
-        // 手のひらの法線ベクトルを取得
+        // Get palm normal vector
         let palmNormalToUse = calculatePalmNormal()
 
-        // 指定された方向のベクトル
+        // Vector for specified direction
         var targetVector = direction.vector
 
-        // 左手の場合、方向ベクトルを調整
+        // For left hand, adjust direction vector
         if isLeftHand {
             if direction == .forward || direction == .backward {
-                // 左手の場合、前後方向を反転
+                // For left hand, invert forward/backward direction
                 targetVector = -targetVector
             } else if direction == .up || direction == .down {
-                // 左手の場合、上下方向を反転
+                // For left hand, invert up/down direction
                 targetVector = -targetVector
             } else if direction == .left || direction == .right {
-                // 左手の場合、左右方向を反転
+                // For left hand, invert left/right direction
                 targetVector = -targetVector
             }
         }
 
-        // ベクトル間の角度を計算
+        // Calculate angle between vectors
         let dotProduct = simd_dot(normalize(palmNormalToUse), normalize(targetVector))
         let angle = acos(max(-1.0, min(1.0, dotProduct)))
 
-        // 許容角度内かどうかを判定
+        // Determine if within tolerance angle
         return angle <= tolerance
     }
 
-    /// 手のひらの法線ベクトルを計算する(複数の方法を試み、最も信頼性の高い結果を返す)
+    /// Calculate the palm normal vector (try multiple methods and return the most reliable result)
     private func calculatePalmNormal() -> SIMD3<Float> {
         guard let wrist = fingers[.wrist] else { return SIMD3<Float>(0, 0, 1) }
 
-        // 方法1: 手首のAnchorEntityの向きを取得
+        // Method 1: Get orientation from wrist AnchorEntity
         let wristTransform = wrist.transform
         let palmNormal1 = wristTransform.rotation.act(SIMD3<Float>(0, 0, 1))
 
-        // 方法2: 手の関節を使って計算(より正確)
+        // Method 2: Calculate using hand joints (more accurate)
         var palmNormal2: SIMD3<Float>? = nil
 
-        // 方法2a: 手のひらの平面を定義する3点を取得(メタカーパル関節)
+        // Method 2a: Get 3 points that define the palm plane (metacarpal joints)
         if let wristPos = fingers[.wrist]?.position(relativeTo: nil),
             let indexMCP = fingers[.indexFingerMetacarpal]?.position(relativeTo: nil),
             let littleMCP = fingers[.littleFingerMetacarpal]?.position(relativeTo: nil)
         {
 
-            // 手のひらの平面を定義する2つのベクトル
+            // Two vectors defining the palm plane
             let v1 = indexMCP - wristPos
             let v2 = littleMCP - wristPos
 
-            // 外積で法線ベクトルを計算
+            // Calculate normal vector using cross product
             let crossProduct = simd_cross(v1, v2)
             palmNormal2 = normalize(crossProduct)
         }
-        // 方法2b: ナックル(指の付け根)を使用
+        // Method 2b: Use knuckles (finger bases)
         else if let wristPos = fingers[.wrist]?.position(relativeTo: nil),
             let indexKnuckle = fingers[.indexFingerKnuckle]?.position(relativeTo: nil),
             let littleKnuckle = fingers[.littleFingerKnuckle]?.position(relativeTo: nil)
         {
 
-            // 手のひらの平面を定義する2つのベクトル
+            // Two vectors defining the palm plane
             let v1 = indexKnuckle - wristPos
             let v2 = littleKnuckle - wristPos
 
-            // 外積で法線ベクトルを計算
+            // Calculate normal vector using cross product
             let crossProduct = simd_cross(v1, v2)
             palmNormal2 = normalize(crossProduct)
         }
-        // 方法2c: 中指と親指のナックルを使用
+        // Method 2c: Use middle finger and thumb knuckles
         else if let wristPos = fingers[.wrist]?.position(relativeTo: nil),
             let middleKnuckle = fingers[.middleFingerKnuckle]?.position(relativeTo: nil),
             let thumbKnuckle = fingers[.thumbKnuckle]?.position(relativeTo: nil)
         {
 
-            // 手のひらの平面を定義する2つのベクトル
+            // Two vectors defining the palm plane
             let v1 = middleKnuckle - wristPos
             let v2 = thumbKnuckle - wristPos
 
-            // 外積で法線ベクトルを計算
+            // Calculate normal vector using cross product
             let crossProduct = simd_cross(v1, v2)
             palmNormal2 = normalize(crossProduct)
         }
 
-        // 使用する法線ベクトルを決定
+        // Determine which normal vector to use
         let palmNormalToUse: SIMD3<Float>
 
         if palmNormal1.x == 0 && palmNormal1.y == 0 && palmNormal1.z == 1,
             let normal2 = palmNormal2
         {
-            // 方法1の結果が固定値の場合、方法2を使用
+            // If method 1 result is a fixed value, use method 2
             palmNormalToUse = normal2
         } else if let normal2 = palmNormal2 {
-            // 両方の方法で計算できた場合、方法2を優先(より正確なため)
+            // If both methods are available, prioritize method 2 (more accurate)
             palmNormalToUse = normal2
         } else {
-            // 方法2が使えない場合、方法1を使用
+            // If method 2 is not available, use method 1
             palmNormalToUse = palmNormal1
         }
 
         return palmNormalToUse
     }
 
-    /// 手のひらが向いている方向を判定
-    /// - Returns: 手のひらの向き
+    /// Determine the direction the palm is facing
+    /// - Returns: Palm direction
     public func getPalmDirection() -> PalmDirection {
-        // 手のひらの法線ベクトルを計算
+        // Calculate palm normal vector
         let palmNormal = calculatePalmNormal()
 
-        // 法線ベクトルから方向を判定
+        // Determine direction from normal vector
         return getDirectionFromNormal(palmNormal)
     }
 
-    /// 手のひらが特定の方向を向いているかを判定
+    /// Determine if the palm is facing a specific direction
     public func isPalmFacing(_ direction: PalmDirection) -> Bool {
         return getPalmDirection() == direction
     }
 
-    /// 手のひらが奥向きかどうかを角度で判定(より柔軟)
-    /// - Parameter tolerance: 許容角度(ラジアン)。デフォルトは45度
-    /// - Returns: 奥向きであればtrue
+    /// Determine if the palm is facing backward based on angle (more flexible)
+    /// - Parameter tolerance: Tolerance angle (radians). Default is 45 degrees
+    /// - Returns: true if facing backward
     public func isPalmFacingBackward(tolerance: Float = .pi / 4) -> Bool {
         return isPalmFacingDirection(.backward, tolerance: tolerance)
     }
 
-    /// 手のひらが前向きかどうかを角度で判定(より柔軟)
+    /// Determine if palm is facing forward using angle (more flexible)
     public func isPalmFacingForward(tolerance: Float = .pi / 6) -> Bool {
         return isPalmFacingDirection(.forward, tolerance: tolerance)
     }
 
-    /// 手のひらが上向きかどうかを角度で判定(より柔軟)
+    /// Determine if palm is facing up using angle (more flexible)
     public func isPalmFacingUp(tolerance: Float = .pi / 6) -> Bool {
         return isPalmFacingDirection(.up, tolerance: tolerance)
     }
 
-    /// 手のひらが下向きかどうかを角度で判定(より柔軟)
+    /// Determine if palm is facing down using angle (more flexible)
     public func isPalmFacingDown(tolerance: Float = .pi / 6) -> Bool {
         return isPalmFacingDirection(.down, tolerance: tolerance)
     }
 
-    // MARK: - 3. 指先の接触判定
+    // MARK: - 3. Fingertip contact detection
 
-    /// 2つの指の先端が接触しているかを判定
+    /// Determine if two fingertips are touching
     /// - Parameters:
-    ///   - finger1: 1つ目の指
-    ///   - finger2: 2つ目の指
-    ///   - threshold: 接触判定の距離閾値(メートル)。デフォルトは2cm
-    /// - Returns: 接触していればtrue
+    ///   - finger1: First finger
+    ///   - finger2: Second finger
+    ///   - threshold: Distance threshold for contact detection (meters). Default is 2cm
+    /// - Returns: true if touching
     public func areFingerTipsTouching(
         _ finger1: FingerType, _ finger2: FingerType, threshold: Float = 0.02
     ) -> Bool {
@@ -344,50 +344,50 @@ extension HandTrackingComponent {
         return distance <= threshold
     }
 
-    /// 親指と他の指が接触しているかを判定(OKサインなどで使用)
+    /// Determine if thumb is touching another finger (used for OK sign, etc.)
     public func isThumbTouchingFinger(_ finger: FingerType, threshold: Float = 0.02) -> Bool {
         return areFingerTipsTouching(.thumb, finger, threshold: threshold)
     }
 
-    // MARK: - 4. 指の向き判定
+    // MARK: - 4. Finger direction detection
 
-    /// 指が向いている方向を判定
-    /// - Parameter finger: 判定したい指
-    /// - Returns: 指の向き
+    /// Determine the direction a finger is pointing
+    /// - Parameter finger: Finger to check
+    /// - Returns: Finger direction
     public func getFingerDirection(_ finger: FingerType) -> PalmDirection {
         let tipJoint = getFingerTipJoint(finger)
         guard let tipEntity = fingers[tipJoint] else { return .backward }
 
-        // 指先のAnchorEntityの向きを取得
+        // Get the orientation of the fingertip AnchorEntity
         let tipTransform = tipEntity.transform
 
-        // 指の向きベクトルを計算(指先から見てZ軸の負の方向が指の向き)
+        // Calculate finger direction vector (negative Z-axis from fingertip is the finger direction)
         let fingerDirection = tipTransform.rotation.act(SIMD3<Float>(0, 0, -1))
 
-        // 人差し指の場合のみデバッグ情報を表示
+        // Show debug information only for index finger
         if finger == .index {
-            // デバッグ用に法線ベクトルの値を表示
+            // Display normal vector values for debugging
             HandGestureLogger.logDebug(
-                "👆 \(finger)の向きベクトル: (\(String(format: "%.3f", fingerDirection.x)), \(String(format: "%.3f", fingerDirection.y)), \(String(format: "%.3f", fingerDirection.z)))"
+                "👆 \(finger) direction vector: (\(String(format: "%.3f", fingerDirection.x)), \(String(format: "%.3f", fingerDirection.y)), \(String(format: "%.3f", fingerDirection.z)))"
             )
 
-            // 各軸成分の絶対値を取得
+            // Get absolute values of each axis component
             let absX = abs(fingerDirection.x)
             let absY = abs(fingerDirection.y)
             let absZ = abs(fingerDirection.z)
 
-            // デバッグ用に絶対値を表示
+            // Display absolute values for debugging
             HandGestureLogger.logDebug(
-                "👆 \(finger)絶対値: X=\(String(format: "%.3f", absX)), Y=\(String(format: "%.3f", absY)), Z=\(String(format: "%.3f", absZ))"
+                "👆 \(finger) absolute values: X=\(String(format: "%.3f", absX)), Y=\(String(format: "%.3f", absY)), Z=\(String(format: "%.3f", absZ))"
             )
         }
 
-        // 各軸成分の絶対値を取得
+        // Get absolute values of each axis component
         let absX = abs(fingerDirection.x)
         let absY = abs(fingerDirection.y)
         let absZ = abs(fingerDirection.z)
 
-        // 最も大きな成分で方向を決定
+        // Determine direction based on the largest component
         let direction: PalmDirection
         if absY > absX && absY > absZ {
             direction = fingerDirection.y > 0 ? .up : .down
@@ -397,89 +397,89 @@ extension HandTrackingComponent {
             direction = fingerDirection.x > 0 ? .right : .left
         }
 
-        // 人差し指の場合のみ方向判定結果を表示
+        // Display direction determination result only for index finger
         if finger == .index {
-            HandGestureLogger.logDebug("👆 \(finger)方向判定結果: \(direction)")
+            HandGestureLogger.logDebug("👆 \(finger) direction determination result: \(direction)")
         }
 
         return direction
     }
 
-    /// 指が特定の方向を向いているかを判定
+    /// Determine if finger is pointing in a specific direction
     /// - Parameters:
-    ///   - finger: 判定したい指
-    ///   - direction: 期待する方向
-    /// - Returns: 指定した方向を向いていればtrue
+    ///   - finger: Finger to evaluate
+    ///   - direction: Expected direction
+    /// - Returns: true if pointing in the specified direction
     public func isFingerPointing(_ finger: FingerType, direction: PalmDirection) -> Bool {
         return getFingerDirection(finger) == direction
     }
 
-    /// 指が上方向を向いているかを判定
-    /// - Parameter finger: 判定したい指
-    /// - Returns: 上方向を向いていればtrue
+    /// Determine if finger is pointing upward
+    /// - Parameter finger: Finger to evaluate
+    /// - Returns: true if pointing upward
     public func isFingerPointingUp(_ finger: FingerType) -> Bool {
         return isFingerPointing(finger, direction: .up)
     }
 
-    /// 指が下方向を向いているかを判定
-    /// - Parameter finger: 判定したい指
-    /// - Returns: 下方向を向いていればtrue
+    /// Determine if finger is pointing downward
+    /// - Parameter finger: Finger to evaluate
+    /// - Returns: true if pointing downward
     public func isFingerPointingDown(_ finger: FingerType) -> Bool {
         return isFingerPointing(finger, direction: .down)
     }
 
-    /// 指が前方向を向いているかを判定
-    /// - Parameter finger: 判定したい指
-    /// - Returns: 前方向を向いていればtrue
+    /// Determine if finger is pointing forward
+    /// - Parameter finger: Finger to evaluate
+    /// - Returns: true if pointing forward
     public func isFingerPointingForward(_ finger: FingerType) -> Bool {
         return isFingerPointing(finger, direction: .forward)
     }
 
-    /// 指が後方向を向いているかを判定
-    /// - Parameter finger: 判定したい指
-    /// - Returns: 後方向を向いていればtrue
+    /// Determine if finger is pointing backward
+    /// - Parameter finger: Finger to evaluate
+    /// - Returns: true if pointing backward
     public func isFingerPointingBackward(_ finger: FingerType) -> Bool {
         return isFingerPointing(finger, direction: .backward)
     }
 
-    /// 指が左方向を向いているかを判定
-    /// - Parameter finger: 判定したい指
-    /// - Returns: 左方向を向いていればtrue
+    /// Determine if finger is pointing left
+    /// - Parameter finger: Finger to evaluate
+    /// - Returns: true if pointing left
     public func isFingerPointingLeft(_ finger: FingerType) -> Bool {
         return isFingerPointing(finger, direction: .left)
     }
 
-    /// 指が右方向を向いているかを判定
-    /// - Parameter finger: 判定したい指
-    /// - Returns: 右方向を向いていればtrue
+    /// Determine if finger is pointing right
+    /// - Parameter finger: Finger to evaluate
+    /// - Returns: true if pointing right
     public func isFingerPointingRight(_ finger: FingerType) -> Bool {
         return isFingerPointing(finger, direction: .right)
     }
 
-    // MARK: - ヘルパー関数
+    // MARK: - Helper Functions
 
-    /// 指の関節のリストを取得
+    /// Get list of finger joints
     private func getFingerJoints(_ finger: FingerType) -> [HandSkeleton.JointName] {
         switch finger {
         case .thumb:
-            // 親指は関節が少ないので、ナックルから先端までを使用
+            // Thumb has fewer joints, so use from knuckle to tip
             return [.thumbKnuckle, .thumbIntermediateTip, .thumbTip]
         case .index:
-            // 人差し指はナックルから先端までを使用(中間関節を減らして安定化)
+            // Index finger uses from knuckle to tip (reduce intermediate joints for stability)
             return [.indexFingerKnuckle, .indexFingerIntermediateTip, .indexFingerTip]
         case .middle:
-            // 中指はナックルから先端までを使用(中間関節を減らして安定化)
+            // Middle finger uses from knuckle to tip (reduce intermediate joints for stability)
             return [.middleFingerKnuckle, .middleFingerIntermediateTip, .middleFingerTip]
         case .ring:
-            // 薬指はナックルから先端までを使用(中間関節を減らして安定化)
+            // Ring finger uses from knuckle to tip (reduce intermediate joints for stability)
             return [.ringFingerKnuckle, .ringFingerIntermediateTip, .ringFingerTip]
         case .little:
-            // 小指はナックルから先端までを使用(中間関節を減らして安定化)
+            // Little finger uses from knuckle to tip (reduce intermediate joints for stability)
             return [.littleFingerKnuckle, .littleFingerIntermediateTip, .littleFingerTip]
         }
     }
 
-    /// 指の先端関節を取得
+    /// Get fingertip joint
     private func getFingerTipJoint(_ finger: FingerType) -> HandSkeleton.JointName {
         switch finger {
         case .thumb: return .thumbTip
@@ -490,27 +490,27 @@ extension HandTrackingComponent {
         }
     }
 
-    /// 3点間の角度を計算(ラジアン)
+    /// Calculate angle between three points (radians)
     private func calculateAngleBetweenPoints(p1: SIMD3<Float>, p2: SIMD3<Float>, p3: SIMD3<Float>)
         -> Float
     {
-        // 2つのベクトルを計算
+        // Calculate two vectors
         let v1 = normalize(p1 - p2)
         let v2 = normalize(p3 - p2)
 
-        // 内積からコサインを計算
+        // Calculate cosine from dot product
         let cosine = simd_dot(v1, v2)
 
-        // アークコサインで角度(ラジアン)を取得
-        // 数値誤差対策で-1.0〜1.0の範囲に制限
+        // Get angle (radians) using arccosine
+        // Limit to -1.0 to 1.0 range to prevent numerical errors
         return acos(max(-1.0, min(1.0, cosine)))
     }
 
-    /// 特定の指が指している方向を取得
-    /// - Parameter finger: 方向を取得したい指
-    /// - Returns: 指の方向
+    /// Get the direction a specific finger is pointing
+    /// - Parameter finger: Finger to get direction for
+    /// - Returns: Finger direction
     public func getPointingDirection(for finger: FingerType) -> PalmDirection {
-        // 指の先端と関節の位置を取得
+        // Get fingertip and joint positions
         let tipJoint: HandSkeleton.JointName
         let middleJoint: HandSkeleton.JointName
 
@@ -532,27 +532,27 @@ extension HandTrackingComponent {
             middleJoint = .littleFingerIntermediateTip
         }
 
-        // 指の先端と関節の位置を取得
+        // Get fingertip and joint positions
         guard let tipEntity = fingers[tipJoint] else { return .backward }
         guard let middleEntity = fingers[middleJoint] else { return .backward }
 
-        // 指の方向ベクトルを計算
+        // Calculate finger direction vector
         let tipPosition = tipEntity.position(relativeTo: nil)
         let middlePosition = middleEntity.position(relativeTo: nil)
         let directionVector = normalize(tipPosition - middlePosition)
 
-        // 方向ベクトルから最も近い方向を判定
+        // Determine closest direction from direction vector
         return getDirectionFromNormal(directionVector)
     }
 
-    // MARK: - 5. 指先の距離判定
+    // MARK: - 5. Fingertip Distance Detection
 
-    /// 2つの指先が十分に離れているかを判定
+    /// Determine if two fingertips are sufficiently separated
     /// - Parameters:
-    ///   - fingerA: 1つ目の指
-    ///   - fingerB: 2つ目の指
-    ///   - minSpacing: 最小間隔(メートル)。デフォルトは1.5cm
-    /// - Returns: 指先が最小間隔以上離れていればtrue
+    ///   - fingerA: First finger
+    ///   - fingerB: Second finger
+    ///   - minSpacing: Minimum spacing (meters). Default is 1.5cm
+    /// - Returns: true if fingertips are separated by at least the minimum spacing
     public func areTwoFingersSeparated(
         _ fingerA: FingerType, _ fingerB: FingerType, minSpacing: Float = 0.03
     ) -> Bool {

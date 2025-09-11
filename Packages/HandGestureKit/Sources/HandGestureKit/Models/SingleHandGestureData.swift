@@ -27,30 +27,30 @@ public struct SingleHandGestureData {
     public let handTrackingComponent: HandTrackingComponent
     public let handKind: HandKind
 
-    // 閾値設定 - ジェスチャー判定の精度を調整するためのパラメータ
-    public let angleToleranceRadians: Float  // 角度判定の許容範囲(指の曲がり、腕の伸展など)
-    public let distanceThreshold: Float  // 距離判定の閾値(指先接触判定など)
-    public let directionToleranceRadians: Float  // 方向判定の許容角度(指差し、手のひら向きなど)
+    // Threshold settings - Parameters for adjusting gesture detection accuracy
+    public let angleToleranceRadians: Float  // Angle tolerance for finger bend and arm extension detection
+    public let distanceThreshold: Float  // Distance threshold for fingertip contact detection
+    public let directionToleranceRadians: Float  // Direction tolerance angle for pointing and palm orientation
 
-    // パフォーマンス最適化のための事前計算値 - 初期化時に計算して再利用
-    private let palmNormal: SIMD3<Float>  // 手のひらの法線ベクトル
-    private let forearmDirection: SIMD3<Float>  // 前腕の方向ベクトル
-    private let wristPosition: SIMD3<Float>  // 手首の位置
-    private let isArmExtended: Bool  // 腕の伸展状態(事前判定済み)
+    // Pre-calculated values for performance optimization - Computed at initialization and reused
+    private let palmNormal: SIMD3<Float>  // Palm normal vector
+    private let forearmDirection: SIMD3<Float>  // Forearm direction vector
+    private let wristPosition: SIMD3<Float>  // Wrist position
+    private let isArmExtended: Bool  // Arm extension state (pre-determined)
 
-    /// SingleHandGestureDataの初期化メソッド
+    /// Initializer for SingleHandGestureData
     /// - Parameters:
-    ///   - handTrackingComponent: 手のトラッキング情報を含むコンポーネント
-    ///   - handKind: 左手か右手かを示す識別子
-    ///   - angleToleranceRadians: 角度判定の許容範囲(デフォルト30度)- 指の曲がりや腕の伸展判定に使用
-    ///   - distanceThreshold: 距離判定の閾値(デフォルト2cm)- 指先の接触判定などに使用
-    ///   - directionToleranceRadians: 方向判定の許容角度(デフォルト45度)- 指差しや手のひらの向き判定に使用
+    ///   - handTrackingComponent: Component containing hand tracking information
+    ///   - handKind: Identifier indicating left or right hand
+    ///   - angleToleranceRadians: Angle tolerance range (default 30 degrees) - Used for finger bend and arm extension detection
+    ///   - distanceThreshold: Distance threshold (default 2cm) - Used for fingertip contact detection
+    ///   - directionToleranceRadians: Direction tolerance angle (default 45 degrees) - Used for pointing and palm orientation detection
     public init(
         handTrackingComponent: HandTrackingComponent,
         handKind: HandKind,
-        angleToleranceRadians: Float = .pi / 6,  // 30度
+        angleToleranceRadians: Float = .pi / 6,  // 30 degrees
         distanceThreshold: Float = 0.02,  // 2cm
-        directionToleranceRadians: Float = .pi / 4  // 45度
+        directionToleranceRadians: Float = .pi / 4  // 45 degrees
     ) {
         self.handTrackingComponent = handTrackingComponent
         self.handKind = handKind
@@ -58,7 +58,7 @@ public struct SingleHandGestureData {
         self.distanceThreshold = distanceThreshold
         self.directionToleranceRadians = directionToleranceRadians
 
-        // 事前計算
+        // Pre-calculate values
         self.palmNormal = Self.calculatePalmNormal(from: handTrackingComponent)
         self.forearmDirection = Self.calculateForearmDirection(from: handTrackingComponent)
         self.wristPosition = Self.getWristPosition(from: handTrackingComponent)
@@ -70,15 +70,15 @@ public struct SingleHandGestureData {
 // MARK: - 1. Public Getters and Functions Extension
 extension SingleHandGestureData {
 
-    // MARK: - 指や手のひらの方向判定
+    // MARK: - Finger and palm direction detection
 
-    /// 手のひらが現在向いている方向を取得する
-    /// 例：手のひらを上に向けている場合は.topを返す
+    /// Get the current direction the palm is facing
+    /// Example: Returns .top when palm is facing upward
     public var palmDirection: GestureDetectionDirection {
-        // HandTrackingComponentのgetPalmDirection()と同じロジックを使用
+        // Use the same logic as HandTrackingComponent's getPalmDirection()
         let palmDir = handTrackingComponent.getPalmDirection()
 
-        // PalmDirectionからGestureDetectionDirectionに変換
+        // Convert from PalmDirection to GestureDetectionDirection
         switch palmDir {
         case .up: return .top
         case .down: return .bottom
@@ -86,26 +86,26 @@ extension SingleHandGestureData {
         case .right: return .right
         case .forward: return .forward
         case .backward: return .backward
-        case .unknown: return .forward  // デフォルト
+        case .unknown: return .forward  // Default
         }
     }
 
-    /// 手のひらが指定した方向を向いているかを判定する
-    /// 例：isPalmFacing(.top)で手のひらが上向きかチェック
+    /// Determine if the palm is facing a specified direction
+    /// Example: Check if palm is facing upward with isPalmFacing(.top)
     public func isPalmFacing(_ direction: GestureDetectionDirection) -> Bool {
-        // palmDirectionプロパティと同じ判定を使用して一貫性を保つ
+        // Use the same logic as palmDirection property to maintain consistency
         return palmDirection == direction
     }
 
-    /// 指定した指が向いている方向を取得する
-    /// 指先と中間関節の位置から指の向きベクトルを計算する
+    /// Get the direction a specified finger is pointing
+    /// Calculate finger direction vector from fingertip and intermediate joint positions
     public func fingerDirection(for finger: FingerType) -> GestureDetectionDirection {
         guard let tipJoint = getFingerTipJoint(for: finger),
             let intermediateJoint = getFingerIntermediateJoint(for: finger),
             let tipEntity = handTrackingComponent.fingers[tipJoint],
             let intermediateEntity = handTrackingComponent.fingers[intermediateJoint]
         else {
-            return .forward  // デフォルト値
+            return .forward  // Default value
         }
 
         let tipPos = tipEntity.position(relativeTo: nil)
@@ -115,12 +115,12 @@ extension SingleHandGestureData {
         return vectorToGestureDirection(fingerVector)
     }
 
-    /// 指定した指が特定の方向を指しているかを判定する
-    /// 例：isFingerPointing(.index, direction: .top)で人差し指が上を指しているかチェック
+    /// Determine if a specified finger is pointing in a specific direction
+    /// Example: Check if index finger is pointing upward with isFingerPointing(.index, direction: .top)
     /// - Parameters:
-    ///   - finger: 判定したい指
-    ///   - direction: 期待する方向
-    ///   - tolerance: 許容角度(ラジアン)。nilの場合はdirectionToleranceRadiansを使用
+    ///   - finger: The finger to check
+    ///   - direction: The expected direction
+    ///   - tolerance: Tolerance angle in radians. Uses directionToleranceRadians if nil
     public func isFingerPointing(
         _ finger: FingerType, direction: GestureDetectionDirection, tolerance: Float? = nil
     ) -> Bool {
@@ -139,66 +139,66 @@ extension SingleHandGestureData {
         return isVectorFacing(fingerVector, direction: direction, tolerance: tolerance)
     }
 
-    // MARK: - 指の曲がり判定
+    // MARK: - Finger bend detection
 
-    /// 指定した指が曲がっているかを判定する(握り拳のような状態)
-    /// 関節角度が設定した許容値を超えて曲がっている場合にtrueを返す
+    /// Determine if a specified finger is bent (like in a closed fist)
+    /// Returns true when joint angle exceeds the configured tolerance value
     public func isFingerBent(_ finger: FingerType) -> Bool {
         return handTrackingComponent.isFingerBent(finger, tolerance: angleToleranceRadians)
     }
 
-    /// 指定した指が真っ直ぐ伸びているかを判定する
-    /// 関節角度が設定した許容値以内で直線に近い場合にtrueを返す
+    /// Determine if a specified finger is straight and extended
+    /// Returns true when joint angle is within tolerance and close to straight
     public func isFingerStraight(_ finger: FingerType) -> Bool {
-        // HandTrackingComponent拡張のisFingerStraightメソッドを呼び出す
-        // toleranceは45度(.pi/4)に統一
+        // Call HandTrackingComponent extension's isFingerStraight method
+        // Tolerance unified to 45 degrees (.pi/4)
         return handTrackingComponent.isFingerStraight(finger, tolerance: .pi / 4)
     }
 
-    /// 指の曲がり具合を段階的に判定する
+    /// Determine finger bend level in stages
     public enum FingerBendLevel {
-        case straight  // 完全に伸びている(0〜30度)
-        case slightlyBent  // 軽く曲がっている(30〜60度)
-        case moderatelyBent  // 中程度に曲がっている(60〜90度)
-        case heavilyBent  // かなり曲がっている(90〜120度)
-        case fullyBent  // 完全に曲がっている(120度以上)
+        case straight  // Fully extended (0-30 degrees)
+        case slightlyBent  // Slightly bent (30-60 degrees)
+        case moderatelyBent  // Moderately bent (60-90 degrees)
+        case heavilyBent  // Heavily bent (90-120 degrees)
+        case fullyBent  // Fully bent (120+ degrees)
     }
 
-    /// 指定した指の曲がり具合レベルを取得する
+    /// Get the bend level of a specified finger
     public func getFingerBendLevel(_ finger: FingerType) -> FingerBendLevel {
-        // 完全に伸びている(30度以内)
+        // Fully extended (within 30 degrees)
         if handTrackingComponent.isFingerStraight(finger, tolerance: .pi / 6) {
             return .straight
         }
-        // 軽く曲がっている(60度以内)
+        // Slightly bent (within 60 degrees)
         else if handTrackingComponent.isFingerStraight(finger, tolerance: .pi / 3) {
             return .slightlyBent
         }
-        // 中程度に曲がっている(90度以内)
+        // Moderately bent (within 90 degrees)
         else if handTrackingComponent.isFingerStraight(finger, tolerance: .pi / 2) {
             return .moderatelyBent
         }
-        // かなり曲がっている(120度以内)
+        // Heavily bent (within 120 degrees)
         else if handTrackingComponent.isFingerStraight(finger, tolerance: 2 * .pi / 3) {
             return .heavilyBent
         }
-        // 完全に曲がっている(120度以上)
+        // Fully bent (120+ degrees)
         else {
             return .fullyBent
         }
     }
 
-    /// 指定した指が特定の曲がり具合レベルかを判定する
+    /// Determine if a specified finger is at a specific bend level
     public func isFingerAtBendLevel(_ finger: FingerType, level: FingerBendLevel) -> Bool {
         return getFingerBendLevel(finger) == level
     }
 
-    /// 指定した指が最小レベル以上に曲がっているかを判定する
+    /// Determine if a specified finger is bent at least to the minimum level
     public func isFingerBentAtLeast(_ finger: FingerType, minimumLevel: FingerBendLevel) -> Bool {
         let currentLevel = getFingerBendLevel(finger)
         switch minimumLevel {
         case .straight:
-            return true  // 常にtrue
+            return true  // Always true
         case .slightlyBent:
             return currentLevel != .straight
         case .moderatelyBent:
@@ -211,25 +211,25 @@ extension SingleHandGestureData {
         }
     }
 
-    /// すべての指が曲がっているかを判定する(握り拳状態の検出)
-    /// 親指、人差し指、中指、薬指、小指すべてが曲がっている場合にtrueを返す
+    /// Determine if all fingers are bent (closed fist detection)
+    /// Returns true when thumb, index, middle, ring, and little fingers are all bent
     public var isAllFingersBent: Bool {
         let fingers: [FingerType] = [.thumb, .index, .middle, .ring, .little]
         return fingers.allSatisfy { isFingerBent($0) }
     }
 
-    /// 指定した指以外がすべて曲がっているかを判定する
-    /// 例：人差し指だけを立てて他を曲げている状態の検出に使用
+    /// Determine if all fingers except specified ones are bent
+    /// Example: Used to detect pointing with index finger while other fingers are bent
     public func areAllFingersBentExcept(_ exceptFingers: [FingerType]) -> Bool {
         let allFingers: [FingerType] = [.thumb, .index, .middle, .ring, .little]
         let fingersToCheck = allFingers.filter { !exceptFingers.contains($0) }
         return fingersToCheck.allSatisfy { isFingerBent($0) }
     }
 
-    // MARK: - 手首の曲がり判定
+    // MARK: - Wrist bend detection
 
-    /// 手首が外側(甲側)に曲がっているかを判定する
-    /// 前腕と手のひらの角度が90度より大きく開いている状態を検出
+    /// Determine if wrist is bent outward (back of hand side)
+    /// Detects when forearm and palm angle is greater than 90 degrees
     public var isWristBentOutward: Bool {
         guard let wrist = handTrackingComponent.fingers[.wrist],
             let middleMCP = handTrackingComponent.fingers[.middleFingerMetacarpal]
@@ -240,16 +240,16 @@ extension SingleHandGestureData {
         let wristPos = wrist.position(relativeTo: nil)
         let middlePos = middleMCP.position(relativeTo: nil)
 
-        // 手の向きと前腕の向きを比較
+        // Compare hand direction with forearm direction
         let handVector = simd_normalize(middlePos - wristPos)
         let angle = acos(max(-1.0, min(1.0, simd_dot(handVector, forearmDirection))))
 
-        // 90度より大きく曲がっている場合を外側とみなす
+        // Consider angles greater than 90 degrees as outward bending
         return angle > (.pi / 2 + angleToleranceRadians)
     }
 
-    /// 手首が内側(手のひら側)に曲がっているかを判定する
-    /// 前腕と手のひらの角度が90度より小さく折れている状態を検出
+    /// Determine if wrist is bent inward (palm side)
+    /// Detects when forearm and palm angle is less than 90 degrees
     public var isWristBentInward: Bool {
         guard let wrist = handTrackingComponent.fingers[.wrist],
             let middleMCP = handTrackingComponent.fingers[.middleFingerMetacarpal]
@@ -260,39 +260,39 @@ extension SingleHandGestureData {
         let wristPos = wrist.position(relativeTo: nil)
         let middlePos = middleMCP.position(relativeTo: nil)
 
-        // 手の向きと前腕の向きを比較
+        // Compare hand direction with forearm direction
         let handVector = simd_normalize(middlePos - wristPos)
         let angle = acos(max(-1.0, min(1.0, simd_dot(handVector, forearmDirection))))
 
-        // 90度より小さく曲がっている場合を内側とみなす
+        // Consider angles less than 90 degrees as inward bending
         return angle < (.pi / 2 - angleToleranceRadians)
     }
 
-    /// 手首がまっすぐ(自然な位置)かを判定する
-    /// 内側にも外側にも曲がっていない中立的な状態を検出
+    /// Determine if wrist is straight (natural position)
+    /// Detects neutral state where wrist is not bent inward or outward
     public var isWristStraight: Bool {
         return !isWristBentInward && !isWristBentOutward
     }
 
-    // MARK: - 腕の伸展状態
+    // MARK: - Arm extension state
 
-    /// 腕が伸ばされているかを判定する(事前計算済み)
-    /// 前腕-手首-手のひらが直線に近い状態(180度に近い角度)の場合にtrueを返す
+    /// Determine if arm is extended (pre-calculated)
+    /// Returns true when forearm-wrist-palm are in a near-straight line (close to 180 degrees)
     public var armExtended: Bool {
         return isArmExtended
     }
 
-    // MARK: - 腕の伸展方向
+    // MARK: - Arm extension direction
 
-    /// 腕が伸ばされている方向を取得する
-    /// 前腕の向きベクトルから最も強い方向成分を判定して返す
+    /// Get the direction the arm is extended
+    /// Determine and return the strongest directional component from forearm direction vector
     public var armDirection: GestureDetectionDirection {
         return vectorToGestureDirection(forearmDirection)
     }
 
-    /// 腕が特定の方向に伸ばされているかを判定する
-    /// 腕が伸展状態かつ指定した方向を向いている場合にtrueを返す
-    /// 例：isArmExtendedInDirection(.top)で腕を上に挙げているかチェック
+    /// Determine if arm is extended in a specific direction
+    /// Returns true when arm is in extended state and facing specified direction
+    /// Example: Check if arm is raised upward with isArmExtendedInDirection(.top)
     public func isArmExtendedInDirection(_ direction: GestureDetectionDirection) -> Bool {
         return armExtended && isVectorFacing(forearmDirection, direction: direction)
     }
@@ -301,10 +301,10 @@ extension SingleHandGestureData {
 // MARK: - 2. Static Helper Methods Extension (Private)
 extension SingleHandGestureData {
 
-    // MARK: - Private Static Helper Methods for Pre-computation(事前計算用メソッド)
+    // MARK: - Private Static Helper Methods for Pre-computation
 
-    /// 手のひらの法線ベクトルを計算する(初期化時に実行)
-    /// 手首、人差し指の付け根、小指の付け根の3点から手のひら平面の法線を求める
+    /// Calculate palm normal vector (executed at initialization)
+    /// Determine palm plane normal from three points: wrist, index finger base, little finger base
     fileprivate static func calculatePalmNormal(from component: HandTrackingComponent) -> SIMD3<
         Float
     > {
@@ -312,7 +312,7 @@ extension SingleHandGestureData {
             let indexMCP = component.fingers[.indexFingerMetacarpal],
             let littleMCP = component.fingers[.littleFingerMetacarpal]
         else {
-            return SIMD3<Float>(0, 0, 1)  // デフォルト値
+            return SIMD3<Float>(0, 0, 1)  // Default value
         }
 
         let wristPos = wrist.position(relativeTo: nil)
@@ -326,15 +326,15 @@ extension SingleHandGestureData {
         return simd_normalize(normal)
     }
 
-    /// 前腕の方向ベクトルを計算する(初期化時に実行)
-    /// 前腕関節から手首への方向を求めて、腕の向きとして使用
+    /// Calculate forearm direction vector (executed at initialization)
+    /// Determine direction from forearm joint to wrist, used as arm orientation
     fileprivate static func calculateForearmDirection(from component: HandTrackingComponent)
         -> SIMD3<Float>
     {
         guard let wrist = component.fingers[.wrist],
             let forearm = component.fingers[.forearmArm]
         else {
-            return SIMD3<Float>(0, 1, 0)  // デフォルト値(上向き)
+            return SIMD3<Float>(0, 1, 0)  // Default value (upward)
         }
 
         let wristPos = wrist.position(relativeTo: nil)
@@ -343,15 +343,15 @@ extension SingleHandGestureData {
         return simd_normalize(wristPos - forearmPos)
     }
 
-    /// 手首の位置を取得する(初期化時に実行)
-    /// 各種計算で基準点として使用される
+    /// Get wrist position (executed at initialization)
+    /// Used as reference point for various calculations
     fileprivate static func getWristPosition(from component: HandTrackingComponent) -> SIMD3<Float>
     {
         return component.fingers[.wrist]?.position(relativeTo: nil) ?? SIMD3<Float>.zero
     }
 
-    /// 腕の伸展状態を計算する(初期化時に実行)
-    /// 前腕-手首-手のひらの3点が直線に近いかどうかを角度で判定
+    /// Calculate arm extension state (executed at initialization)
+    /// Determine if three points (forearm-wrist-palm) are close to a straight line using angle
     fileprivate static func calculateArmExtension(
         from component: HandTrackingComponent, tolerance: Float
     ) -> Bool {
@@ -366,30 +366,30 @@ extension SingleHandGestureData {
         let forearmPos = forearm.position(relativeTo: nil)
         let middlePos = middleMCP.position(relativeTo: nil)
 
-        // 前腕-手首-手のひらの角度を計算
+        // Calculate angle between forearm-wrist-palm
         let v1 = simd_normalize(forearmPos - wristPos)
         let v2 = simd_normalize(middlePos - wristPos)
 
         let angle = acos(max(-1.0, min(1.0, simd_dot(v1, v2))))
 
-        // 直線に近い場合(180度に近い)を伸展とみなす
+        // Consider near-straight line (close to 180 degrees) as extended
         return abs(angle - .pi) <= tolerance
     }
 
-    /// すべての指が伸びているかをチェック
-    /// - Returns: すべての指が伸びている場合true
+    /// Check if all fingers are extended
+    /// - Returns: true if all fingers are extended
     public func areAllFingersExtended() -> Bool {
         let fingers: [FingerType] = [.thumb, .index, .middle, .ring, .little]
         return fingers.allSatisfy { isFingerStraight($0) }
     }
 
-    /// 指先の一般的な方向を取得(複数の指の平均)
-    /// - Returns: 指先の平均的な方向
+    /// Get general direction of fingertips (average of multiple fingers)
+    /// - Returns: Average direction of fingertips
     public func fingerTipsGeneralDirection() -> GestureDetectionDirection {
-        let fingers: [FingerType] = [.index, .middle, .ring, .little]  // 親指を除く
+        let fingers: [FingerType] = [.index, .middle, .ring, .little]  // Excluding thumb
         let directions = fingers.map { fingerDirection(for: $0) }
 
-        // 最も頻出する方向を返す
+        // Return the most frequent direction
         let directionCounts = directions.reduce(into: [:]) { counts, direction in
             counts[direction, default: 0] += 1
         }
@@ -401,16 +401,16 @@ extension SingleHandGestureData {
 // MARK: - 3. Private Instance Helper Methods Extension
 extension SingleHandGestureData {
 
-    // MARK: - 方向変換ヘルパー
+    // MARK: - Direction conversion helpers
 
-    /// 3Dベクトルから最も強い方向成分を判定してGestureDetectionDirectionに変換する
-    /// 例：上向きのベクトル(0, 1, 0)なら.topを返す
+    /// Determine strongest directional component from 3D vector and convert to GestureDetectionDirection
+    /// Example: Returns .top for upward vector (0, 1, 0)
     fileprivate func vectorToGestureDirection(_ vector: SIMD3<Float>) -> GestureDetectionDirection {
         let absX = abs(vector.x)
         let absY = abs(vector.y)
         let absZ = abs(vector.z)
 
-        // 最も大きな成分で方向を決定
+        // Determine direction by largest component
         if absY > absX && absY > absZ {
             return vector.y > 0 ? .top : .bottom
         } else if absZ > absX && absZ > absY {
@@ -420,19 +420,19 @@ extension SingleHandGestureData {
         }
     }
 
-    /// 指定したベクトルが特定の方向を向いているかを角度で判定する
-    /// 設定した許容角度(directionToleranceRadians)以内なら一致とみなす
+    /// Determine if specified vector is facing a specific direction using angle
+    /// Consider as match if within configured tolerance angle (directionToleranceRadians)
     fileprivate func isVectorFacing(
         _ vector: SIMD3<Float>, direction: GestureDetectionDirection, tolerance: Float? = nil
     ) -> Bool {
         let targetVector: SIMD3<Float>
         switch direction {
-        case .top: targetVector = SIMD3<Float>(0, 1, 0)  // 上方向
-        case .bottom: targetVector = SIMD3<Float>(0, -1, 0)  // 下方向
-        case .forward: targetVector = SIMD3<Float>(0, 0, -1)  // 前方向
-        case .backward: targetVector = SIMD3<Float>(0, 0, 1)  // 後方向
-        case .right: targetVector = SIMD3<Float>(1, 0, 0)  // 右方向
-        case .left: targetVector = SIMD3<Float>(-1, 0, 0)  // 左方向
+        case .top: targetVector = SIMD3<Float>(0, 1, 0)  // Upward direction
+        case .bottom: targetVector = SIMD3<Float>(0, -1, 0)  // Downward direction
+        case .forward: targetVector = SIMD3<Float>(0, 0, -1)  // Forward direction
+        case .backward: targetVector = SIMD3<Float>(0, 0, 1)  // Backward direction
+        case .right: targetVector = SIMD3<Float>(1, 0, 0)  // Right direction
+        case .left: targetVector = SIMD3<Float>(-1, 0, 0)  // Left direction
         }
 
         let normalizedVector = simd_normalize(vector)
@@ -443,10 +443,10 @@ extension SingleHandGestureData {
         return angle <= effectiveTolerance
     }
 
-    // MARK: - Helper Methods(内部補助メソッド)
+    // MARK: - Helper Methods (Internal auxiliary methods)
 
-    /// 指定した指の先端関節名を取得するヘルパーメソッド
-    /// 指の向きを計算する際に使用される
+    /// Helper method to get the fingertip joint name for a specified finger
+    /// Used when calculating finger direction
     fileprivate func getFingerTipJoint(for finger: FingerType) -> HandSkeleton.JointName? {
         switch finger {
         case .thumb: return .thumbTip
@@ -457,8 +457,8 @@ extension SingleHandGestureData {
         }
     }
 
-    /// 指定した指の中間関節名を取得するヘルパーメソッド
-    /// 指の向きベクトルを計算する際に先端関節とペアで使用される
+    /// Helper method to get the intermediate joint name for a specified finger
+    /// Used in pair with fingertip joint when calculating finger direction vector
     fileprivate func getFingerIntermediateJoint(for finger: FingerType) -> HandSkeleton.JointName? {
         switch finger {
         case .thumb: return .thumbIntermediateTip

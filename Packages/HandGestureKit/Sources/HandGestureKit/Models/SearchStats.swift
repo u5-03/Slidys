@@ -7,26 +7,26 @@
 
 import Foundation
 
-/// ジェスチャー検索の統計情報
+/// Statistical information for gesture search
 public struct SearchStats {
-    /// 検索実行回数
+    /// Number of search executions
     public var searchCount = 0
 
-    /// チェックしたジェスチャー総数
+    /// Total number of gestures checked
     public var gesturesChecked = 0
 
-    /// 見つかったマッチ総数
+    /// Total number of matches found
     public var matchesFound = 0
 
-    /// 総検索時間(秒)
+    /// Total search time (seconds)
     public var totalSearchTime = 0.0
 
-    /// 平均検索時間(秒)
+    /// Average search time (seconds)
     public var averageSearchTime: TimeInterval {
         return searchCount > 0 ? totalSearchTime / Double(searchCount) : 0.0
     }
 
-    /// 平均チェック効率(マッチ率)
+    /// Average check efficiency (match rate)
     public var matchRate: Double {
         return gesturesChecked > 0 ? Double(matchesFound) / Double(gesturesChecked) : 0.0
     }
@@ -37,18 +37,18 @@ public struct SearchStats {
 // MARK: - Formatting Extensions
 
 extension SearchStats {
-    /// フォーマットされた統計情報を取得
+    /// Get formatted statistical information
     public var formattedSummary: String {
         """
-        検索数: \(searchCount)
-        チェック数: \(gesturesChecked)
-        マッチ数: \(matchesFound)
-        平均時間: \(String(format: "%.3f", averageSearchTime * 1000))ms
-        マッチ率: \(String(format: "%.1f", matchRate * 100))%
+        Searches: \(searchCount)
+        Checked: \(gesturesChecked)
+        Matches: \(matchesFound)
+        Avg Time: \(String(format: "%.3f", averageSearchTime * 1000))ms
+        Match Rate: \(String(format: "%.1f", matchRate * 100))%
         """
     }
 
-    /// パフォーマンスレベルを判定
+    /// Determine performance level
     public enum PerformanceLevel {
         case excellent  // < 5ms
         case good  // < 10ms
@@ -57,15 +57,15 @@ extension SearchStats {
 
         var description: String {
             switch self {
-            case .excellent: return "優秀"
-            case .good: return "良好"
-            case .fair: return "普通"
-            case .poor: return "要改善"
+            case .excellent: return "Excellent"
+            case .good: return "Good"
+            case .fair: return "Fair"
+            case .poor: return "Needs Improvement"
             }
         }
     }
 
-    /// 現在のパフォーマンスレベル
+    /// Current performance level
     public var performanceLevel: PerformanceLevel {
         let avgTimeMs = averageSearchTime * 1000
         if avgTimeMs < 5 {

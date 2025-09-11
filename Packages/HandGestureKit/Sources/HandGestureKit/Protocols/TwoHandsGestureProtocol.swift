@@ -7,16 +7,16 @@
 
 import Foundation
 
-/// 両手ジェスチャーを定義するためのプロトコル
+/// Protocol for defining two-handed gestures
 public protocol TwoHandsGestureProtocol: BaseGestureProtocol {
 
-    /// 両手のジェスチャーデータがこのジェスチャーに一致するかを判定
-    /// - Parameter gestureData: 両手のジェスチャーデータ
-    /// - Returns: ジェスチャーが一致する場合はtrue
+    /// Determine if two-handed gesture data matches this gesture
+    /// - Parameter gestureData: Two-handed gesture data
+    /// - Returns: true if the gesture matches
     func matches(_ gestureData: HandsGestureData) -> Bool
 }
 
-// MARK: - デフォルト実装
+// MARK: - Default Implementation
 extension TwoHandsGestureProtocol {
     public var description: String {
         return gestureName
