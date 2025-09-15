@@ -20,10 +20,10 @@ struct RealityKitSystemSlide: View {
             ScrollView {
                 Item("ECS(Entity/Component/System)とは？", accessory: .number(1)) {
                     Item("Entity: 3D空間のオブジェクト(球体、文字、手など)", accessory: .number(1))
-                    Item("Component: オブジェクトの機能(見た目、動き、物理など)", accessory: .number(2))
-                    Item("System: 特定のComponentを持つEntityを毎フレーム処理", accessory: .number(3))
+                    Item("Component: オブジェクトの機能(見た目、動き、物理ルールなど)", accessory: .number(2))
+                    Item("System: 特定のComponentを持つEntityを毎フレーム処理するロジック", accessory: .number(3))
                 }
-                Item("update(context:)メソッド", accessory: .number(2)) {
+                Item("Systemのupdate(context:)メソッド", accessory: .number(2)) {
                     Item("毎フレーム自動的に呼ばれる", accessory: .bullet)
                     Item("SceneUpdateContextから必要な情報を取得", accessory: .bullet)
                 }

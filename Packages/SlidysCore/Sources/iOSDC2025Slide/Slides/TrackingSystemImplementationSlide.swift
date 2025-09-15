@@ -38,7 +38,7 @@ struct TrackingSystemImplementationSlide: View {
                         for entity in handEntities {
                             if let component = entity.components[HandTrackingComponent.self] {
                                 let chirality = component.chirality  // .left or .right
-                                let handSkeleton = component.handSkeleton
+                                let handLocation = component.handLocation
                             }
                         }
                         """)

@@ -22,12 +22,12 @@ struct PossibilitiesSlide: View {
                     Item("✅ 定型的な表現(ありがとう)", accessory: .bullet)
                     Item("✅ 数字や簡単な単語", accessory: .bullet)
                 }
-                Item("アクセシビリティ向上への第一歩", accessory: .number(3)) {
+                Item("アクセシビリティ向上への第一歩", accessory: .number(2)) {
                     Item("✅ 聴覚障害者と健聴者のコミュニケーション支援", accessory: .bullet)
                     Item("✅ 緊急時の簡単な意思疎通", accessory: .bullet)
                     Item("✅ 手話への関心と理解の促進", accessory: .bullet)
                 }
-                Item("今後の技術発展への期待", accessory: .number(4)) {
+                Item("今後の技術発展への期待", accessory: .number(3)) {
                     Item("✅ ハードウェアの進化による精度向上", accessory: .bullet)
                     Item("✅ 機械学習・AIとの組み合わせ?", accessory: .bullet)
                     Item("✅ 表情の重要性: EyeSightにより、表情が分かりやすい", accessory: .bullet)

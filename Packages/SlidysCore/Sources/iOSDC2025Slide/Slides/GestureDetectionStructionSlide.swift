@@ -2,9 +2,9 @@
 //  Created by Yugo Sugiyama on 2024/09/09.
 //
 
-import SwiftUI
 import SlideKit
 import SlidesCore
+import SwiftUI
 
 @Slide
 struct GestureDetectionStructionSlide: View {
@@ -19,7 +19,7 @@ struct GestureDetectionStructionSlide: View {
                 Item("SpatialTrackingSessionで .hand を有効化", accessory: .bullet)
             }
             Item("手の関節の位置や向きなどの情報を取得する", accessory: .number(2)) {
-                Item("HandSkeletonの必要な関節を選定", accessory: .bullet)
+                Item("HandLocationの必要な関節を選定", accessory: .bullet)
                 Item("AnchorEntityを設定し、各関節をリアルタイム追跡", accessory: .bullet)
                 Item("Componentで経由でEntityの各関節の位置や向きを取得", accessory: .bullet)
             }
@@ -35,4 +35,3 @@ struct GestureDetectionStructionSlide: View {
     .headerSlideStyle(CustomHeaderSlideStyle())
     .itemStyle(CustomItemStyle())
 }
-

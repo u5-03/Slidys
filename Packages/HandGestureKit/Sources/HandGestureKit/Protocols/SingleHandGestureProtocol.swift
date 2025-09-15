@@ -94,7 +94,6 @@ extension SingleHandGestureProtocol {
     /// Default priority (low priority)
     public var priority: Int { 1000 }
 
-
     /// Default gesture type
     public var gestureType: GestureType { .singleHand }
 

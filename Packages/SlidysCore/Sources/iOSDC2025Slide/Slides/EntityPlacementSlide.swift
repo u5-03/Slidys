@@ -16,7 +16,7 @@ struct EntityPlacementSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("HandSkeletonのJointにEntityを配置する") {
+        HeaderSlide("HandLocationのJointにEntityを配置する") {
             ScrollView {
                 VStack(alignment: .leading, spacing: 40) {
                     VStack(alignment: .leading, spacing: 15) {
@@ -66,13 +66,13 @@ struct EntityPlacementSlide: View {
                         CodeBlockView(
                             """
                             // 球体マーカー用のEntityを作成
-                            let sphere = ModelEntity(
+                            let sphereEntity = ModelEntity(
                                 mesh: .generateSphere(radius: 0.005),
                                 materials: [UnlitMaterial(color: .yellow)]
                             )
 
                             // AnchorEntityに追加(関節に追従)
-                            anchorEntity.addChild(sphere)
+                            anchorEntity.addChild(sphereEntity)
                             """)
                     }
 

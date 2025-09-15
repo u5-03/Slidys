@@ -1,9 +1,10 @@
-import SwiftUI
 import SlideKit
 import SlidesCore
+import SwiftUI
 import SymbolKit
+
 #if canImport(HandGesturePackage)
-import HandGesturePackage
+    import HandGesturePackage
 #endif
 
 public struct iOSDC2025SlideView: SlideViewProtocol {
@@ -18,7 +19,7 @@ public struct iOSDC2025SlideView: SlideViewProtocol {
 
 struct SlideConfiguration: SlideConfigurationProtocol {
     @MainActor
-    let slideIndexController = SlideIndexController() {
+    let slideIndexController = SlideIndexController {
         CenterTextSlide(text: "iOSDC Japan 2025")
         CenterTextSlide(text: "これは何を示しているか、分かりますか？")
         CenterTextSlide(text: "手話/Sign Languageは\n普段触れる機会が少ない")
@@ -41,7 +42,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         GestureDetectionStructionSlide()
 
         // HandSkeletonとEntityの基礎
-        HandSkeletonStructureSlide()
+        HandLocationStructureSlide()
         HandSkeletonDiagramSlide()
         ViewSlide {
             Text("デモ")
@@ -51,7 +52,6 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 .font(.largeFont)
                 .padding()
         }
-        VideoSlide(videoType: .handGestureEntitySample)
         RealityKitSystemSlide()
         ContentSlide(headerTitle: "偉大なパンフレット記事が...!") {
             Image(.ecsPamphlet)
@@ -60,7 +60,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         }
         EntityPlacementSlide()
 
-//        PerformanceOptimizationSlide()
+        //        PerformanceOptimizationSlide()
         // 実装詳細
         TrackingSystemImplementationSlide()
         ViewSlide {
@@ -74,10 +74,11 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 .font(.largeFont)
                 .padding()
         }
+        VideoSlide(videoType: .handGestureEntitySample)
         VideoSlide(videoType: .handGestureSignLanguage)
         GestureDetectorLogicSlide()
         SerialGestureSystemSlide()
-        
+
         // 手話ジェスチャー
         LimitationsSlide()
         PossibilitiesSlide()
