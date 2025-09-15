@@ -4,7 +4,9 @@
       "Bash(xcodebuild:*)",
       "Read(//Users/yugo.a.sugiyama/Dev/**)",
       "Bash(find:*)",
-      "Bash(swift build)"
+      "Bash(swift build)",
+      "Bash(git log:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

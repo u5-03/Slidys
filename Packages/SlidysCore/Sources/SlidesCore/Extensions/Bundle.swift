@@ -11,7 +11,7 @@ extension Foundation.Bundle {
     static var myModule: Bundle = {
         /* The name of your local package, prepended by "LocalPackages_" for iOS and "PackageName_" for macOS. You may have same PackageName and TargetName*/
         let bundleNameIOS = "LocalPackages_SlidesCore"
-        let bundleNameMacOs = "PackageName_SlideCore"
+        let bundleNameMacOs = "SlidysCore_SlidesCore"
         let candidates = [
             /* Bundle should be present here when the package is linked into an App. */
             Bundle.main.resourceURL,

@@ -35,6 +35,7 @@ struct LimitationsSlide: View {
                     Item("❌ 認識パターンの登録が大変", accessory: .bullet)
                     Item("❌ パフォーマンスとのバランス", accessory: .bullet)
                     Item("❌ 個人差(手の大きさ・柔軟性)への対応", accessory: .bullet)
+                    Item("❌ 相手の手は検知できない(装着者の手のみ)", accessory: .bullet)
                 }
             }
         }

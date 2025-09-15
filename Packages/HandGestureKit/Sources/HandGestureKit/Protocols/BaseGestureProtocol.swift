@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 /// Base protocol for all gesture types
 public protocol BaseGestureProtocol {
     /// Unique identifier for the gesture
@@ -24,7 +23,6 @@ public protocol BaseGestureProtocol {
 
     /// Gesture priority (lower value means higher priority)
     var priority: Int { get }
-
 
     /// Gesture type (single hand or two hands)
     var gestureType: GestureType { get }

@@ -51,6 +51,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 .font(.largeFont)
                 .padding()
         }
+        VideoSlide(videoType: .handGestureEntitySample)
         RealityKitSystemSlide()
         ContentSlide(headerTitle: "偉大なパンフレット記事が...!") {
             Image(.ecsPamphlet)
@@ -73,6 +74,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 .font(.largeFont)
                 .padding()
         }
+        VideoSlide(videoType: .handGestureSignLanguage)
         GestureDetectorLogicSlide()
         SerialGestureSystemSlide()
         
@@ -82,5 +84,14 @@ struct SlideConfiguration: SlideConfigurationProtocol {
 
         WrapUpSlide()
         ReferenceSlide()
+        CenterTextSlide(text: "おわり")
+        OneMoreThingSlide()
+        CenterTextSlide(text: "僕/私/俺もApple Vision Proで\nハンドジェスチャーしたいなー！")
+        ContentSlide(headerTitle: "HandGestureKit爆誕!") {
+            Image(.handGestureKit)
+                .resizable()
+                .scaledToFit()
+        }
+        EndSlide()
     }
 }

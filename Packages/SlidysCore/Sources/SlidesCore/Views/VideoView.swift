@@ -13,6 +13,8 @@ public enum VideoType {
     case visionProDemoInput
     case visionProDemoOutput
     case bookAnimation
+    case handGestureEntitySample
+    case handGestureSignLanguage
 
     var fileName: String {
         switch self {
@@ -22,11 +24,21 @@ public enum VideoType {
             return "opening_output"
         case .bookAnimation:
             return "book_animation"
+        case .handGestureEntitySample:
+            return "hand_gesture_entity_sample"
+        case .handGestureSignLanguage:
+            return "hand_gesture_sign_language"
         }
     }
 
     var fileExtension: String {
         return "mp4"
+        switch self {
+        case .visionProDemoInput, .visionProDemoOutput, .bookAnimation:
+            return "mp4"
+        case .handGestureEntitySample, .handGestureSignLanguage:
+            return "mov"
+        }
     }
 }
 

@@ -1,0 +1,1093 @@
+<!-- WordPress用HTML記事 -->
+<h1>iOSDC Japan 2025: visionOSハンドトラッキングで実現する手話認識システム - その可能性と限界</h1>
+
+<h2>はじめに</h2>
+
+<p>iOSDC Japan 2025で「手話ジェスチャーの検知と翻訳 〜ハンドトラッキングの可能性と限界〜」というタイトルで登壇させていただきます。このセッションでは、visionOSのハンドトラッキング機能を使用したリアルタイム手話ジェスチャー認識の技術的な実装について、その可能性と現実的な制約の両面から深く掘り下げていきます。</p>
+
+<p>Appleの最新空間コンピューティングプラットフォームを活用し、物理的なジェスチャーとデジタルコミュニケーションの架け橋となる、意味のあるジェスチャーベースのインタラクションの実現方法をデモンストレーションします。</p>
+
+<h2>ジェスチャー検出の実装アプローチ</h2>
+
+<p>本セッションで紹介するジェスチャー検出システムは、以下の3つのステップで実装しています：</p>
+
+<h3>1. 手のトラッキングシステムを初期化する</h3>
+<ul>
+<li><strong>ARKitSessionで権限リクエスト</strong>: Info.plistへ利用目的の追記が必要</li>
+<li><strong>SpatialTrackingSessionで.handを有効化</strong>: visionOS 2.0の新機能を活用</li>
+</ul>
+
+<h3>2. 手の関節の位置や向きなどの情報を取得する</h3>
+<ul>
+<li><strong>HandSkeletonの必要な関節を選定</strong>: 27個の関節から必要なものを選択</li>
+<li><strong>AnchorEntityを設定し、各関節をリアルタイム追跡</strong>: 自動的に関節位置を更新</li>
+<li><strong>Component経由でEntityの各関節の位置や向きを取得</strong>: ECSパターンでデータアクセス</li>
+</ul>
+
+<h3>3. 関節情報からジェスチャーを判定する</h3>
+<ul>
+<li>各関節の位置や向きから、ジェスチャーの条件に一致するかどうかを判定</li>
+<li>プロトコル指向設計により、新しいジェスチャーの追加が容易</li>
+</ul>
+
+<h2>開発環境と前提条件</h2>
+
+<h3>必要な環境</h3>
+
+<p>このセッションで紹介する実装には、以下の開発環境が必要です：</p>
+
+<ul>
+<li><strong>Xcode</strong>: 16.2以降</li>
+<li><strong>visionOS</strong>: 2.0以降（AnchorEntityはvisionOS 2.0で導入）</li>
+<li><strong>Swift</strong>: 6.0</li>
+<li><strong>実機</strong>: Apple Vision Pro（シミュレータでは手のトラッキングが制限されます）</li>
+</ul>
+
+<h3>重要な依存関係</h3>
+
+<pre><code class="language-swift">import ARKit        // SpatialTrackingSession
+import RealityKit   // AnchorEntity, Entity-Component-System
+import SwiftUI      // UI構築</code></pre>
+
+<p><strong>注意</strong>: <code>AnchorEntity</code>はvisionOS 2.0以降でのみ利用可能です。visionOS 1.xでは代替実装が必要になります。</p>
+
+<h2>セッション概要</h2>
+
+<h3>学べること</h3>
+
+<p>このセッションでは、visionOS向けジェスチャー認識システムの構築について、以下の内容を包括的にカバーします：</p>
+
+<ol>
+<li><strong>ハンドトラッキングの基礎</strong>: visionOSのSpatialTrackingSessionとAnchorEntityの理解</li>
+<li><strong>ジェスチャー検出アーキテクチャ</strong>: 柔軟でプロトコル指向のジェスチャー検出システムの構築</li>
+<li><strong>実践的な実装</strong>: バリデーション付き手話ジェスチャーの実装</li>
+<li><strong>パフォーマンス最適化</strong>: 90Hzでのリアルタイムジェスチャー処理戦略</li>
+<li><strong>制限事項と回避策</strong>: 空間ハンドトラッキングの課題への対処</li>
+</ol>
+
+<h3>対象者</h3>
+
+<p>このセッションは以下のようなiOS/visionOS開発者を対象としています：</p>
+<ul>
+<li>SwiftUIとRealityKitの基本的な知識を持っている方</li>
+<li>空間コンピューティングとジェスチャーベースインターフェースに興味がある方</li>
+<li>ハンドトラッキング実装の実践的な側面を理解したい方</li>
+<li>ヒューマンコンピュータインタラクションの未来に関心がある方</li>
+</ul>
+
+<h2>HandSkeletonの仕組み</h2>
+
+<h3>HandSkeletonとは</h3>
+
+<p>ARKitが提供する手の骨格モデルで、27個の関節点（ジョイント）で構成されています。これにより、手の形状を高精度で追跡できます。</p>
+
+<h3>取得可能な関節情報</h3>
+
+<ul>
+<li><strong>手首（wrist）</strong>: 手の基準点</li>
+<li><strong>各指の関節</strong>: 
+  <ul>
+  <li>metacarpal（中手骨）</li>
+  <li>proximal（基節骨）</li>
+  <li>intermediate（中節骨）</li>
+  <li>distal（末節骨）</li>
+  <li>tip（指先）</li>
+  </ul>
+</li>
+<li><strong>前腕（forearmArm）</strong>: 腕の向きを判定</li>
+</ul>
+
+<h3>各関節から取得できるデータ</h3>
+
+<pre><code class="language-swift">// 位置情報（SIMD3&lt;Float&gt;）
+let position = joint.position
+
+// 向き情報（simd_quatf）
+let orientation = joint.orientation
+
+// 親関節からの相対位置
+let relativePosition = joint.relativeTransform</code></pre>
+
+<h3>座標系</h3>
+
+<ul>
+<li><strong>右手系座標</strong>: 右:+X、上:+Y、手前:+Z</li>
+<li><strong>単位</strong>: メートル</li>
+<li><strong>原点</strong>: デバイスの初期位置を基準</li>
+</ul>
+
+<h2>RealityKitとECS（Entity-Component-System）</h2>
+
+<h3>ECSアーキテクチャの基本</h3>
+
+<p>RealityKitは、ECSパターンを採用した3Dレンダリングフレームワークです：</p>
+
+<h4>1. Entity（エンティティ）</h4>
+<p>3D空間のオブジェクトを表現します。球体、文字、手など、あらゆる3D要素がEntityです。</p>
+
+<h4>2. Component（コンポーネント）</h4>
+<p>Entityに機能を付与します。見た目（ModelComponent）、動き（Transform）、物理演算（PhysicsBodyComponent）など。</p>
+
+<h4>3. System（システム）</h4>
+<p>特定のComponentを持つEntityを毎フレーム処理します。ゲームループの中核となる部分です。</p>
+
+<h3>RealityViewの基本構造</h3>
+
+<pre><code class="language-swift">RealityView { content in
+    // ルートEntityを作成してシーンに追加
+    let rootEntity = Entity()
+    content.add(rootEntity)
+    
+    // 手のエンティティコンテナを作成
+    let handEntitiesContainerEntity = Entity()
+    rootEntity.addChild(handEntitiesContainerEntity)
+}</code></pre>
+
+<h3>SpatialTrackingSessionで手の追跡を有効化</h3>
+
+<p>visionOS 2.0から導入されたAnchorEntityを使用した実装：</p>
+
+<pre><code class="language-swift">// 手の追跡を有効化
+let session = SpatialTrackingSession()
+let config = SpatialTrackingSession.Configuration(tracking: [.hand])
+await session.run(config)
+
+// AnchorEntityで関節を自動追跡
+let anchorEntity = AnchorEntity(
+    .hand(.left, location: .palm),
+    trackingMode: .predicted  // 予測補正で追跡遅延を低減
+)
+
+// 追加するだけで自動追跡開始
+handEntitiesContainerEntity.addChild(anchorEntity)</code></pre>
+
+<h3>関節マーカーの作成と配置</h3>
+
+<pre><code class="language-swift">// 球体マーカー用のEntityを作成
+let sphere = ModelEntity(
+    mesh: .generateSphere(radius: 0.005),
+    materials: [UnlitMaterial(color: .yellow)]
+)
+
+// AnchorEntityに追加（関節に追従）
+anchorEntity.addChild(sphere)</code></pre>
+
+<h3>HandGestureTrackingSystemの実装</h3>
+
+<p>カスタムSystemを作成して、毎フレーム手の状態を監視します：</p>
+
+<h4>1. EntityQueryで手のEntityを取得</h4>
+
+<pre><code class="language-swift">let handEntities = context.scene.performQuery(
+    EntityQuery(where: .has(HandTrackingComponent.self))
+)</code></pre>
+
+<h4>2. HandTrackingComponentから情報を抽出</h4>
+
+<pre><code class="language-swift">for entity in handEntities {
+    if let component = entity.components[HandTrackingComponent.self] {
+        let chirality = component.chirality  // .left or .right
+        let handSkeleton = component.handSkeleton
+    }
+}</code></pre>
+
+<h4>3. ジェスチャー検出処理</h4>
+
+<pre><code class="language-swift">let detectedGestures = GestureDetector.detectGestures(
+    from: handTrackingComponents,
+    targetGestures: targetGestures
+)</code></pre>
+
+<p>このSystemは<code>update(context:)</code>メソッドが毎フレーム自動的に呼ばれ、SceneUpdateContextから必要な情報を取得して処理を行います。</p>
+
+<h2>技術アーキテクチャ</h2>
+
+<h3>リポジトリ構成</h3>
+
+<p>プロジェクトは3つの主要パッケージで構成され、それぞれがジェスチャー認識パイプラインで特定の役割を担っています：</p>
+
+<pre><code>Slidys/
+├── Packages/
+│   ├── iOSDC2025Slide/       # Slidysフレームワークで構築したプレゼンテーション
+│   ├── HandGestureKit/        # コアジェスチャー検出ライブラリ（OSS対応）
+│   └── HandGesturePackage/    # アプリケーション固有の実装</code></pre>
+
+<h3>HandGestureKit: コアライブラリ</h3>
+
+<p><code>HandGestureKit</code>はジェスチャー認識の基盤レイヤーとして機能します。任意のvisionOSプロジェクトに統合可能な、スタンドアロンのオープンソースライブラリとして設計されています。</p>
+
+<h4>主要コンポーネント</h4>
+
+<p><strong>1. ジェスチャーデータモデル</strong></p>
+
+<p>ライブラリはハンドトラッキングのための包括的なデータ構造を提供します：</p>
+
+<pre><code class="language-swift">public struct SingleHandGestureData {
+    public let handTrackingComponent: HandTrackingComponent
+    public let handKind: HandKind
+    
+    // ジェスチャー検出精度のための閾値設定
+    public let angleToleranceRadians: Float
+    public let distanceThreshold: Float
+    public let directionToleranceRadians: Float
+    
+    // パフォーマンス最適化のための事前計算値
+    private let palmNormal: SIMD3&lt;Float&gt;
+    private let forearmDirection: SIMD3&lt;Float&gt;
+    private let wristPosition: SIMD3&lt;Float&gt;
+    private let isArmExtended: Bool
+}</code></pre>
+
+<p>この構造体は必要なすべてのハンドトラッキングデータをカプセル化し、頻繁に使用される値を事前計算することで実行時のオーバーヘッドを最小化します。</p>
+
+<p><strong>2. プロトコル指向設計</strong></p>
+
+<p>ジェスチャーシステムはプロトコルの階層構造に基づいて構築されています：</p>
+
+<pre><code class="language-swift">// すべてのジェスチャーの基本プロトコル
+public protocol BaseGestureProtocol {
+    var id: String { get }
+    var gestureName: String { get }
+    var priority: Int { get }
+    var gestureType: GestureType { get }
+}
+
+// 豊富なデフォルト実装を持つ片手ジェスチャープロトコル
+public protocol SingleHandGestureProtocol: BaseGestureProtocol {
+    func matches(_ gestureData: SingleHandGestureData) -> Bool
+    
+    // 指の状態要件
+    func requiresFingersStraight(_ fingers: [FingerType]) -> Bool
+    func requiresFingersBent(_ fingers: [FingerType]) -> Bool
+    func requiresFingerPointing(_ finger: FingerType, direction: GestureDetectionDirection) -> Bool
+    
+    // 手のひらの向き要件
+    func requiresPalmFacing(_ direction: GestureDetectionDirection) -> Bool
+    
+    // 腕の位置要件
+    func requiresArmExtended() -> Bool
+    func requiresArmExtendedInDirection(_ direction: GestureDetectionDirection) -> Bool
+}</code></pre>
+
+<p>このプロトコル設計により、新しいジェスチャーを必要な条件だけをオーバーライドして簡単に追加できます。</p>
+
+<p><strong>3. ジェスチャー検出エンジン</strong></p>
+
+<p><code>GestureDetector</code>クラスは、登録されたジェスチャーを優先度順に評価します：</p>
+
+<pre><code class="language-swift">public class GestureDetector {
+    private var gestures: [BaseGestureProtocol] = []
+    
+    public func detect(from handData: SingleHandGestureData) -> [BaseGestureProtocol] {
+        return gestures
+            .sorted { $0.priority < $1.priority }
+            .filter { gesture in
+                guard let singleHandGesture = gesture as? SingleHandGestureProtocol else {
+                    return false
+                }
+                return singleHandGesture.matches(handData)
+            }
+    }
+}</code></pre>
+
+<h3>実装例：手話ジェスチャー</h3>
+
+<h4>1. サムズアップジェスチャー</h4>
+
+<pre><code class="language-swift">public class ThumbsUpGesture: SingleHandGestureProtocol {
+    public var gestureName: String { "Thumbs Up" }
+    public var priority: Int { 100 }
+    
+    // 親指だけが伸びている状態を要求
+    public var requiresOnlyThumbStraight: Bool { true }
+    
+    // 親指が上を向いていることを要求
+    public func requiresFingerPointing(_ finger: FingerType, direction: GestureDetectionDirection) -> Bool {
+        return finger == .thumb && direction == .up
+    }
+}</code></pre>
+
+<p><strong>検出ロジックの詳細</strong></p>
+
+<p>サムズアップジェスチャーの<code>matches</code>関数は、プロトコルのデフォルト実装を活用して以下の条件をチェックします：</p>
+
+<pre><code class="language-swift">// SingleHandGestureProtocolのデフォルト実装より
+public func matches(_ gestureData: SingleHandGestureData) -> Bool {
+    // 1. 親指だけが伸びているかチェック
+    if requiresOnlyThumbStraight {
+        // 内部では以下の条件を検証：
+        // - 親指: isFingerStraight(.thumb) == true
+        // - 人差し指: isFingerBent(.index) == true
+        // - 中指: isFingerBent(.middle) == true
+        // - 薬指: isFingerBent(.ring) == true
+        // - 小指: isFingerBent(.little) == true
+        guard isOnlyThumbStraight(gestureData) else { return false }
+    }
+    
+    // 2. 親指が上を向いているかチェック
+    if requiresFingerPointing(.thumb, direction: .up) {
+        // 親指のベクトルと上方向ベクトルの角度を計算
+        // angleToleranceRadians（デフォルト: π/4）以内なら真
+        guard gestureData.isFingerPointing(.thumb, direction: .up) else { return false }
+    }
+    
+    return true
+}</code></pre>
+
+<p><strong>指の曲がり判定の実装</strong></p>
+
+<pre><code class="language-swift">// SingleHandGestureData内の判定ロジック
+public func isFingerStraight(_ finger: FingerType) -> Bool {
+    // 各指の関節角度を取得
+    let jointAngles = getJointAngles(for: finger)
+    
+    // すべての関節が閾値以下の曲がり具合なら「伸びている」と判定
+    return jointAngles.allSatisfy { angle in
+        angle < straightThreshold // デフォルト: 30度
+    }
+}
+
+public func isFingerBent(_ finger: FingerType) -> Bool {
+    // 少なくとも1つの関節が閾値以上曲がっていれば「曲がっている」と判定
+    let jointAngles = getJointAngles(for: finger)
+    return jointAngles.contains { angle in
+        angle > bentThreshold // デフォルト: 60度
+    }
+}</code></pre>
+
+<h4>2. ピースサイン</h4>
+
+<pre><code class="language-swift">public class PeaceSignGesture: SingleHandGestureProtocol {
+    public var gestureName: String { "Peace Sign" }
+    public var priority: Int { 90 }
+    
+    // 人差し指と中指だけが伸びている状態を要求
+    public var requiresOnlyIndexAndMiddleStraight: Bool { true }
+    
+    // 手のひらが前を向いていることを要求
+    public func requiresPalmFacing(_ direction: GestureDetectionDirection) -> Bool {
+        return direction == .forward
+    }
+}</code></pre>
+
+<p><strong>検出ロジックの詳細</strong></p>
+
+<pre><code class="language-swift">public func matches(_ gestureData: SingleHandGestureData) -> Bool {
+    // 1. 人差し指と中指だけが伸びているかチェック
+    if requiresOnlyIndexAndMiddleStraight {
+        // 以下の条件をすべて満たす必要がある：
+        // - gestureData.isFingerStraight(.index) == true
+        // - gestureData.isFingerStraight(.middle) == true
+        // - gestureData.isFingerBent(.thumb) == true
+        // - gestureData.isFingerBent(.ring) == true
+        // - gestureData.isFingerBent(.little) == true
+        guard isOnlyIndexAndMiddleStraight(gestureData) else { return false }
+    }
+    
+    // 2. 手のひらの向きをチェック
+    if requiresPalmFacing(.forward) {
+        // 手のひらの法線ベクトルを計算し、前方向との角度を確認
+        let palmNormal = gestureData.palmNormal
+        let forwardVector = SIMD3&lt;Float&gt;(0, 0, -1) // 前方向
+        let angle = acos(dot(palmNormal, forwardVector))
+        
+        guard angle < directionToleranceRadians else { return false }
+    }
+    
+    return true
+}</code></pre>
+
+<h4>3. 祈りのジェスチャー（両手）</h4>
+
+<pre><code class="language-swift">public class PrayerGesture: TwoHandGestureProtocol {
+    public var gestureName: String { "Prayer" }
+    public var priority: Int { 80 }
+    
+    public func matches(_ leftGestureData: SingleHandGestureData, _ rightGestureData: SingleHandGestureData) -> Bool {
+        // 両手の手のひらが向かい合っている
+        let palmsFacing = arePalmsFacingEachOther(leftGestureData, rightGestureData)
+        
+        // 両手が近い距離にある
+        let handsClose = areHandsClose(leftGestureData, rightGestureData, threshold: 0.1)
+        
+        // すべての指が伸びている
+        let fingersStraight = areAllFingersStraight(leftGestureData) && 
+                              areAllFingersStraight(rightGestureData)
+        
+        return palmsFacing && handsClose && fingersStraight
+    }
+}</code></pre>
+
+<h3>ジェスチャー検出の実装を簡潔にする仕組み</h3>
+
+<h4>プロトコルのデフォルト実装による簡潔性</h4>
+
+<p>HandGestureKitの最大の特徴は、プロトコルの豊富なデフォルト実装により、新しいジェスチャーを<strong>最小限のコードで定義できる</strong>ことです：</p>
+
+<pre><code class="language-swift">// 新しいジェスチャーの追加が非常に簡単
+public class OKSignGesture: SingleHandGestureProtocol {
+    public var gestureName: String { "OK Sign" }
+    public var priority: Int { 95 }
+    
+    // 必要な条件だけを宣言的に定義
+    public var requiresOnlyIndexAndThumbTouching: Bool { true }
+    public var requiresMiddleRingLittleStraight: Bool { true }
+}</code></pre>
+
+<p>この簡潔な定義だけで、複雑なジェスチャー検出ロジックが自動的に適用されます。</p>
+
+<h4>条件の組み合わせパターン</h4>
+
+<p>よく使用される指の組み合わせは、専用のプロパティとして提供されています：</p>
+
+<pre><code class="language-swift">// 便利なプロパティ群
+public protocol SingleHandGestureProtocol {
+    // 複雑な指の条件（便利プロパティ）
+    var requiresAllFingersBent: Bool { get }              // グー（全指曲げ）
+    var requiresOnlyIndexFingerStraight: Bool { get }     // 人差し指だけ
+    var requiresOnlyIndexAndMiddleStraight: Bool { get }  // ピース
+    var requiresOnlyThumbStraight: Bool { get }           // サムズアップ
+    var requiresOnlyLittleFingerStraight: Bool { get }    // 小指だけ
+    
+    // 手首の状態
+    var requiresWristBentOutward: Bool { get }            // 手首を外側に曲げる
+    var requiresWristBentInward: Bool { get }             // 手首を内側に曲げる
+    var requiresWristStraight: Bool { get }               // 手首をまっすぐ
+}</code></pre>
+
+<h4>検証ユーティリティ</h4>
+
+<p><code>GestureValidation</code>クラスが、よく使用される検証パターンを提供：</p>
+
+<pre><code class="language-swift">public enum GestureValidation {
+    // 特定の指だけが伸びているかを検証
+    static func validateOnlyTargetFingersStraight(
+        _ gestureData: SingleHandGestureData,
+        targetFingers: [FingerType]
+    ) -> Bool {
+        for finger in FingerType.allCases {
+            if targetFingers.contains(finger) {
+                guard gestureData.isFingerStraight(finger) else { return false }
+            } else {
+                guard gestureData.isFingerBent(finger) else { return false }
+            }
+        }
+        return true
+    }
+    
+    // グーのジェスチャーを検証
+    static func validateFistGesture(_ gestureData: SingleHandGestureData) -> Bool {
+        return FingerType.allCases.allSatisfy { 
+            gestureData.isFingerBent($0) 
+        }
+    }
+}</code></pre>
+
+<h2>GestureDetectorの処理ロジック</h2>
+
+<h3>プロトコル階層</h3>
+
+<p>GestureDetectorは、階層化されたプロトコル設計により、様々な種類のジェスチャーを統一的に処理します：</p>
+
+<pre><code class="language-swift">protocol BaseGestureProtocol {
+    var gestureName: String { get }
+    var priority: Int { get }
+    var gestureType: GestureType { get }
+}
+
+protocol SingleHandGestureProtocol: BaseGestureProtocol {
+    func matches(_ gestureData: SingleHandGestureData) -> Bool
+}
+
+protocol TwoHandsGestureProtocol: BaseGestureProtocol {
+    func matches(_ gestureData: HandsGestureData) -> Bool
+}</code></pre>
+
+<h3>検出アーキテクチャ</h3>
+
+<pre><code class="language-swift">class GestureDetector {
+    // 優先度順にソートされたジェスチャー配列
+    private var sortedGestures: [BaseGestureProtocol]
+    
+    // シリアルジェスチャー専用トラッカー
+    private let serialTracker = SerialGestureTracker()
+    
+    // タイプ別インデックス(高速検索用)
+    private var typeIndex: [GestureType: [Int]]
+}</code></pre>
+
+<h3>便利な判定メソッド</h3>
+
+<p><code>SingleHandGestureData</code>は、ジェスチャー判定を簡潔に記述できる便利メソッドを提供：</p>
+
+<pre><code class="language-swift">// SingleHandGestureDataで提供される便利メソッド
+gestureData.isFingerStraight(.index)     // 人差し指が伸びているか
+gestureData.isFingerBent(.thumb)         // 親指が曲がっているか  
+gestureData.isPalmFacing(.forward)       // 手のひらが前向きか
+gestureData.areAllFingersExtended()      // 全指が伸びているか
+gestureData.isAllFingersBent             // 握り拳状態か
+
+// 複数条件の組み合わせ例
+guard gestureData.isFingerStraight(.index),
+      gestureData.isFingerStraight(.middle),
+      gestureData.areAllFingersBentExcept([.index, .middle])
+else { return false }</code></pre>
+
+<h3>ジェスチャー判定条件</h3>
+
+<p>ジェスチャーの判定には以下の4つの主要な条件を使用：</p>
+
+<ul>
+<li><strong>指の状態</strong>: isExtended/isCurled</li>
+<li><strong>手の向き</strong>: palmDirection</li>
+<li><strong>関節角度</strong>: angleWithParent</li>
+<li><strong>関節距離</strong>: jointToJointDistance</li>
+</ul>
+
+<h3>検出フロー</h3>
+
+<pre><code class="language-swift">func detectGestures(from components: [HandTrackingComponent]) -> GestureDetectionResult {
+    // 1. シリアルジェスチャーのタイムアウトチェック
+    if serialTracker.isTimedOut() {
+        serialTracker.reset()
+    }
+    
+    // 2. 優先度順に通常ジェスチャーを検出
+    for gesture in sortedGestures {
+        if gesture.matches(handData) {
+            return [gesture.gestureName]
+        }
+    }
+    
+    // 3. シリアルジェスチャーの進行状態を更新
+    if let serial = checkSerialGesture() {
+        return handleSerialResult(serial)
+    }
+}</code></pre>
+
+<h2>連続ジェスチャーの追跡システム</h2>
+
+<h3>SerialGestureProtocol</h3>
+
+<p>時系列で連続するジェスチャー（手話など）を検出するための仕組み：</p>
+
+<pre><code class="language-swift">protocol SerialGestureProtocol {
+    // 順番に検出すべきジェスチャーの配列
+    var gestures: [BaseGestureProtocol] { get }
+    
+    // ジェスチャー間の最大許容時間(秒)
+    var intervalSeconds: TimeInterval { get }
+    
+    // 各ステップの説明(UI表示用)
+    var stepDescriptions: [String] { get }
+}</code></pre>
+
+<h3>SerialGestureTracker - 状態管理</h3>
+
+<ol>
+<li><strong>現在のジェスチャーインデックスを追跡</strong></li>
+<li><strong>各ジェスチャー間のタイムアウトを監視</strong></li>
+<li><strong>タイムアウトor完了後に状態をリセット</strong></li>
+</ol>
+
+<h3>検出フローの例</h3>
+
+<pre><code class="language-swift">// 例：「ありがとう」の手話
+let arigatouGesture = SignLanguageArigatouGesture()
+gestures = [
+    // Step 1: 初期位置検出
+    ArigatouInitialPositionGesture(),  // 両手を同じ高さに
+    // Step 2: 最終位置検出 → completed ✅
+    ArigatouFinalPositionGesture()     // 上に移動した位置に右手を移動
+]</code></pre>
+
+<h3>SerialGestureDetectionResult</h3>
+
+<p>連続ジェスチャーの検出結果は4つの状態を持ちます：</p>
+
+<ul>
+<li><strong>progress</strong>: 次のステップへ進行</li>
+<li><strong>completed</strong>: 全ステップ完了</li>
+<li><strong>timeout</strong>: 時間切れ</li>
+<li><strong>notMatched</strong>: 不一致</li>
+</ul>
+
+<h2>GestureDetector: ジェスチャー検出エンジンの詳細</h2>
+
+<h3>GestureDetectorの概要</h3>
+
+<p><code>GestureDetector</code>は、HandGestureKitの中核となるジェスチャー検出エンジンです。このクラスは、登録されたジェスチャーパターンを効率的に評価し、リアルタイムでジェスチャーを認識します。</p>
+
+<h3>基本的な使い方</h3>
+
+<pre><code class="language-swift">// 1. GestureDetectorの初期化
+let gestureDetector = GestureDetector()
+
+// 2. 認識したいジェスチャーを登録
+gestureDetector.registerGesture(ThumbsUpGesture())
+gestureDetector.registerGesture(PeaceSignGesture())
+gestureDetector.registerGesture(PrayerGesture())
+
+// 3. 手のデータからジェスチャーを検出
+let detectedGestures = gestureDetector.detect(from: handGestureData)
+
+// 4. 検出結果の処理
+for gesture in detectedGestures {
+    print("検出されたジェスチャー: \(gesture.gestureName)")
+}</code></pre>
+
+<h3>内部実装と工夫ポイント</h3>
+
+<h4>1. 優先度ベースの評価システム</h4>
+
+<pre><code class="language-swift">public class GestureDetector {
+    private var gestures: [BaseGestureProtocol] = []
+    
+    public func detect(from handData: SingleHandGestureData) -> [BaseGestureProtocol] {
+        // 優先度順にソート（数値が小さいほど高優先度）
+        let sortedGestures = gestures.sorted { $0.priority < $1.priority }
+        
+        var detectedGestures: [BaseGestureProtocol] = []
+        
+        for gesture in sortedGestures {
+            if let singleHandGesture = gesture as? SingleHandGestureProtocol {
+                if singleHandGesture.matches(handData) {
+                    detectedGestures.append(gesture)
+                    
+                    // 排他的なジェスチャーの場合は、ここで処理を終了
+                    if gesture.isExclusive {
+                        break
+                    }
+                }
+            }
+        }
+        
+        return detectedGestures
+    }
+}</code></pre>
+
+<p><strong>工夫ポイント</strong>：</p>
+<ul>
+<li>優先度順の評価により、より特殊なジェスチャーを先に検出</li>
+<li>排他的フラグにより、特定のジェスチャー検出時に他の評価をスキップ</li>
+<li>複数のジェスチャーが同時に成立する場合にも対応</li>
+</ul>
+
+<h4>2. パフォーマンス最適化</h4>
+
+<pre><code class="language-swift">// ジェスチャー登録時の最適化
+public func registerGesture(_ gesture: BaseGestureProtocol) {
+    // 重複チェック
+    guard !gestures.contains(where: { $0.id == gesture.id }) else {
+        return
+    }
+    
+    gestures.append(gesture)
+    
+    // 優先度順に事前ソートしておくことで、検出時の処理を高速化
+    gestures.sort { $0.priority < $1.priority }
+}
+
+// バッチ登録による最適化
+public func registerGestures(_ newGestures: [BaseGestureProtocol]) {
+    gestures.append(contentsOf: newGestures)
+    gestures.sort { $0.priority < $1.priority }
+}</code></pre>
+
+<h4>3. デバッグとロギング機能</h4>
+
+<pre><code class="language-swift">extension GestureDetector {
+    // デバッグモードでの詳細ログ出力
+    public func detectWithDebugInfo(from handData: SingleHandGestureData) -> [(gesture: BaseGestureProtocol, confidence: Float)] {
+        var results: [(BaseGestureProtocol, Float)] = []
+        
+        for gesture in gestures.sorted(by: { $0.priority < $1.priority }) {
+            if let singleHandGesture = gesture as? SingleHandGestureProtocol {
+                let confidence = singleHandGesture.confidenceScore(for: handData)
+                
+                if HandGestureLogger.isDebugEnabled {
+                    HandGestureLogger.logDebug("Gesture: \(gesture.gestureName), Confidence: \(confidence)")
+                }
+                
+                if singleHandGesture.matches(handData) {
+                    results.append((gesture, Float(confidence)))
+                }
+            }
+        }
+        
+        return results
+    }
+}</code></pre>
+
+<h3>visionOS 2.0でのAnchorEntity統合</h3>
+
+<p>visionOS 2.0で導入されたAnchorEntityを使用した実装：</p>
+
+<pre><code class="language-swift">import RealityKit
+import ARKit
+
+@MainActor
+class GestureTrackingSystem: System {
+    private let gestureDetector = GestureDetector()
+    
+    static let query = EntityQuery(where: .has(HandTrackingComponent.self))
+    
+    required init(scene: Scene) {
+        // システム初期化時にジェスチャーを登録
+        setupGestures()
+    }
+    
+    private func setupGestures() {
+        gestureDetector.registerGestures([
+            ThumbsUpGesture(),
+            PeaceSignGesture(),
+            OKSignGesture(),
+            PrayerGesture()
+        ])
+    }
+    
+    func update(context: SceneUpdateContext) {
+        for entity in context.entities(matching: Self.query, updatingSystemWhen: .rendering) {
+            guard let handComponent = entity.components[HandTrackingComponent.self] else {
+                continue
+            }
+            
+            // SingleHandGestureDataの作成
+            let handData = SingleHandGestureData(
+                handTrackingComponent: handComponent,
+                handKind: .left // または .right
+            )
+            
+            // ジェスチャー検出
+            let detectedGestures = gestureDetector.detect(from: handData)
+            
+            // 検出結果の通知
+            if !detectedGestures.isEmpty {
+                notifyGestureDetection(detectedGestures)
+            }
+        }
+    }
+    
+    private func notifyGestureDetection(_ gestures: [BaseGestureProtocol]) {
+        let gestureNames = gestures.map { $0.gestureName }
+        
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: .gestureDetected,
+                object: gestureNames
+            )
+        }
+    }
+}</code></pre>
+
+<h3>HandGestureKit: OSSライブラリとしての提供</h3>
+
+<p>HandGestureKitは、オープンソースライブラリとして公開されており、誰でも自由に使用・改良できます。</p>
+
+<h4>インストール方法</h4>
+
+<p><strong>Swift Package Manager</strong>:</p>
+
+<pre><code class="language-swift">dependencies: [
+    .package(url: "https://github.com/your-username/HandGestureKit.git", from: "1.0.0")
+]</code></pre>
+
+<h4>特徴</h4>
+
+<ul>
+<li><strong>プロトコル指向設計</strong>: 新しいジェスチャーの追加が簡単</li>
+<li><strong>パフォーマンス最適化済み</strong>: 90Hzのリアルタイム処理に対応</li>
+<li><strong>豊富なドキュメント</strong>: 詳細な使用例とAPIドキュメント</li>
+<li><strong>サンプルプロジェクト付属</strong>: すぐに動作確認可能</li>
+</ul>
+
+<h4>コミュニティへの貢献</h4>
+
+<p>プルリクエストやイシューの報告を歓迎しています。特に以下の分野での貢献を求めています：</p>
+
+<ul>
+<li>新しいジェスチャーパターンの追加</li>
+<li>パフォーマンスの改善</li>
+<li>ドキュメントの改善</li>
+<li>多言語対応</li>
+</ul>
+
+<h2>パフォーマンス最適化</h2>
+
+<h3>1. 事前計算と値のキャッシング</h3>
+
+<p>頻繁に使用される値を事前計算してキャッシュ：</p>
+
+<pre><code class="language-swift">extension SingleHandGestureData {
+    // 初期化時に値を計算
+    init(handTrackingComponent: HandTrackingComponent, handKind: HandKind) {
+        self.handTrackingComponent = handTrackingComponent
+        self.handKind = handKind
+        
+        // 頻繁に使用される値を事前計算
+        self.palmNormal = calculatePalmNormal(handTrackingComponent)
+        self.forearmDirection = calculateForearmDirection(handTrackingComponent)
+        self.wristPosition = handTrackingComponent.joint(.wrist)?.position ?? .zero
+        self.isArmExtended = calculateArmExtension(handTrackingComponent)
+    }
+}</code></pre>
+
+<h3>2. 早期リターンの最適化</h3>
+
+<p>最も選択的な条件を最初にチェック：</p>
+
+<pre><code class="language-swift">public func matchesWithOptimization(_ gestureData: SingleHandGestureData) -> Bool {
+    // 1. 最も選択的な条件を最初に（指の構成）
+    if requiresOnlyIndexAndMiddleStraight {
+        guard validateOnlyTargetFingersStraight(gestureData, targetFingers: [.index, .middle]) 
+        else { return false }
+    }
+    
+    // 2. 方向チェック（中程度の選択性）
+    for direction in GestureDetectionDirection.allCases {
+        if requiresPalmFacing(direction) {
+            guard gestureData.isPalmFacing(direction) else { return false }
+        }
+    }
+    
+    // 3. 個々の指の方向チェック（潜在的に高コスト）
+    // ...その他のチェック
+    
+    return true
+}</code></pre>
+
+<h3>3. 優先度ベースの検出</h3>
+
+<p>優先度を使用して不要なチェックをスキップ：</p>
+
+<pre><code class="language-swift">public func detect(from handData: SingleHandGestureData) -> BaseGestureProtocol? {
+    let sortedGestures = gestures.sorted { $0.priority < $1.priority }
+    
+    for gesture in sortedGestures {
+        if let singleHandGesture = gesture as? SingleHandGestureProtocol,
+           singleHandGesture.matches(handData) {
+            return gesture // 最初のマッチで停止
+        }
+    }
+    
+    return nil
+}</code></pre>
+
+<h2>制限事項と課題</h2>
+
+<h3>1. ハードウェアの制限</h3>
+
+<p><strong>トラッキング範囲</strong></p>
+<ul>
+<li>有効範囲：ユーザーから約0.3m〜1.5m</li>
+<li>最適範囲：0.5m〜1.0m</li>
+<li>視野角：約120度の水平視野</li>
+</ul>
+
+<p><strong>解決策</strong>：</p>
+<pre><code class="language-swift">func validateTrackingDistance(_ position: SIMD3&lt;Float&gt;) -> Bool {
+    let distance = length(position)
+    return distance >= 0.3 && distance <= 1.5
+}</code></pre>
+
+<h3>2. オクルージョン処理</h3>
+
+<p>指が重なったり、手が部分的に隠れる場合の対処：</p>
+
+<pre><code class="language-swift">func handleOcclusion(_ handData: SingleHandGestureData) -> Bool {
+    // 可視ジョイントの数をチェック
+    let visibleJoints = handData.handTrackingComponent.allJoints
+        .compactMap { $0 }
+        .count
+    
+    // 最小限のジョイントが見えているか確認
+    guard visibleJoints >= minimumRequiredJoints else {
+        return false
+    }
+    
+    // 信頼度スコアをチェック
+    let confidenceScore = calculateConfidenceScore(handData)
+    return confidenceScore >= confidenceThreshold
+}</code></pre>
+
+<h3>3. 座標系の課題</h3>
+
+<p>ウィンドウ移動時の座標系のずれへの対処：</p>
+
+<pre><code class="language-swift">// ImmersiveSpaceの再起動による座標系リセット
+private func restartImmersiveSpace() async {
+    if wasImmersiveSpaceOpen {
+        await dismissImmersiveSpace()
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        
+        switch await openImmersiveSpace(id: appModel.immersiveSpaceID) {
+        case .opened:
+            // 座標系がリセットされた
+            break
+        default:
+            break
+        }
+    }
+}</code></pre>
+
+<h3>4. リアルタイム処理の課題</h3>
+
+<p>90Hzの更新レートでの処理：</p>
+
+<pre><code class="language-swift">class GestureProcessingQueue {
+    private let queue = DispatchQueue(label: "gesture.processing", qos: .userInteractive)
+    private var lastProcessedTime: TimeInterval = 0
+    private let minimumInterval: TimeInterval = 1.0 / 30.0 // 30FPSに制限
+    
+    func process(_ handData: SingleHandGestureData) {
+        let currentTime = CACurrentMediaTime()
+        
+        guard currentTime - lastProcessedTime >= minimumInterval else {
+            return // フレームをスキップ
+        }
+        
+        lastProcessedTime = currentTime
+        
+        queue.async { [weak self] in
+            self?.performGestureDetection(handData)
+        }
+    }
+}</code></pre>
+
+<h2>デモンストレーション</h2>
+
+<p>セッションでは以下のデモンストレーションを行います：</p>
+
+<h3>1. 基本ジェスチャー認識</h3>
+<ul>
+<li>サムズアップ、ピースサイン、OKサインなどの認識</li>
+<li>リアルタイムフィードバックとビジュアライゼーション</li>
+</ul>
+
+<h3>2. 手話文字の認識</h3>
+<ul>
+<li>日本手話の指文字（あ、い、う、え、お）</li>
+<li>アメリカ手話（ASL）のアルファベット</li>
+</ul>
+
+<h3>3. 動的ジェスチャー</h3>
+<ul>
+<li>スワイプ、回転などのモーションジェスチャー</li>
+<li>時系列解析による複雑なジェスチャーパターン</li>
+</ul>
+
+<h3>4. 実用的なアプリケーション</h3>
+<ul>
+<li>プレゼンテーションコントロール</li>
+<li>3Dオブジェクト操作</li>
+<li>アクセシビリティ機能</li>
+</ul>
+
+<h2>限界と可能性</h2>
+
+<h3>Apple Vision Proでの手話検知の限界</h3>
+
+<h4>1. カメラの検知範囲の制限</h4>
+
+<p>visionOSのハンドトラッキングには物理的な制約があります：</p>
+
+<ul>
+<li><strong>体の後ろや横の手は検知不可</strong>: カメラの視野外となる位置の手は追跡できません</li>
+<li><strong>顔の近くや頭の後ろも死角</strong>: デバイスの構造上、これらの位置での検出が困難</li>
+<li><strong>手が重なると正確な検知が困難</strong>: オクルージョンによりジョイントの位置推定精度が低下</li>
+</ul>
+
+<h4>2. 複雑な手の形状の認識</h4>
+
+<ul>
+<li><strong>指が絡み合うような形は誤認識しやすい</strong>: 複雑な指の交差や組み合わせの正確な検出が困難</li>
+<li><strong>手の微妙な傾きや回転の検出精度</strong>: 細かな角度の違いを区別することに限界</li>
+</ul>
+
+<h4>3. 手話特有の要素</h4>
+
+<p>手話は単なる手の形だけでなく、複数の要素から成り立っています：</p>
+
+<ul>
+<li><strong>表情による意味の変化</strong>: 手話では表情が文法的役割を持ちますが、現在のAPIでは検知困難</li>
+<li><strong>動きの速度や強弱の認識</strong>: 手話の意味を変える重要な要素ですが、正確な検出が難しい</li>
+</ul>
+
+<h4>4. 技術的な制約</h4>
+
+<ul>
+<li><strong>認識パターンの登録が大変</strong>: 手話の多様性に対応するには膨大なパターン定義が必要</li>
+<li><strong>パフォーマンスとのバランス</strong>: リアルタイム処理と精度のトレードオフ</li>
+<li><strong>個人差への対応</strong>: 手の大きさや柔軟性の違いによる認識精度の変動</li>
+<li><strong>相手の手は検知できない</strong>: 装着者自身の手のみが検知対象（対話相手の手話は読み取れない）
+  <ul>
+  <li>Enterprise APIでメインカメラアクセスが可能な場合、Vision Frameworkを使用することで実現できる可能性はある</li>
+  <li>ただし、HandSkeletonのような3D情報の取得はできないため、2D画像解析に限定され、実装難易度は非常に高い</li>
+  </ul>
+</li>
+</ul>
+
+<h3>それでも広がる可能性</h3>
+
+<h4>1. 基本的な手話単語の認識は可能！</h4>
+
+<p>現在の技術でも実用的なレベルで認識できるものがあります：</p>
+
+<ul>
+<li><strong>定型的な表現</strong>: 「ありがとう」「お願いします」などの日常的な手話</li>
+<li><strong>数字や簡単な単語</strong>: 指文字や数字表現は比較的高精度で認識可能</li>
+</ul>
+
+<h4>2. アクセシビリティ向上への第一歩</h4>
+
+<p>完璧でなくても、大きな価値を提供できます：</p>
+
+<ul>
+<li><strong>聴覚障害者と健聴者のコミュニケーション支援</strong>: 基本的な意思疎通のサポート</li>
+<li><strong>緊急時の簡単な意思疎通</strong>: 重要な情報を素早く伝える手段として</li>
+<li><strong>手話への関心と理解の促進</strong>: 手話学習アプリやインタラクティブな教材への応用</li>
+</ul>
+
+<h4>3. 今後の技術発展への期待</h4>
+
+<ul>
+<li><strong>ハードウェアの進化による精度向上</strong>: より高解像度のカメラ、広い視野角、高速な処理</li>
+<li><strong>機械学習・AIとの組み合わせ</strong>: パターン認識の精度向上と個人差への適応</li>
+<li><strong>EyeSightの活用</strong>: Apple Vision ProのEyeSight機能により、装着者の表情が外部から見えるため、手話における表情の重要性に対応可能</li>
+</ul>
+
+<h2>まとめ</h2>
+
+<p>visionOSのハンドトラッキング機能は、自然なユーザーインターフェースの新しい可能性を開きます。HandGestureKitのようなフレームワークを使用することで、開発者は複雑なジェスチャー認識システムを効率的に構築できます。</p>
+
+<p>現在の技術には制限がありますが、適切な設計と最適化により、実用的で反応性の高いジェスチャーベースのアプリケーションを作成することが可能です。空間コンピューティングが進化し続ける中、これらの技術はより洗練され、アクセシブルになっていくでしょう。</p>
+
+<h3>重要なポイント</h3>
+
+<ol>
+<li><strong>プロトコル指向設計</strong>により、拡張可能で保守しやすいジェスチャーシステムを構築</li>
+<li><strong>パフォーマンス最適化</strong>は、リアルタイムジェスチャー認識に不可欠</li>
+<li><strong>制限事項の理解</strong>と適切な回避策の実装が成功の鍵</li>
+<li><strong>将来の拡張性</strong>を考慮した設計により、新技術への適応が容易に</li>
+</ol>
+
+<h2>リソース</h2>
+
+<ul>
+<li><a href="https://github.com/your-username/HandGestureKit">HandGestureKit（GitHub）</a></li>
+<li><a href="https://developer.apple.com/documentation/arkit/hand_tracking">Apple Developer Documentation - Hand Tracking</a></li>
+<li><a href="https://developer.apple.com/design/human-interface-guidelines/gestures">visionOS Human Interface Guidelines</a></li>
+</ul>
+
+<h2>セッション情報</h2>
+
+<p><strong>タイトル</strong>: 手話ジェスチャーの検知と翻訳 〜ハンドトラッキングの可能性と限界〜<br>
+<strong>発表者</strong>: 杉山雄吾<br>
+<strong>日時</strong>: 2025年8月（詳細は後日発表）<br>
+<strong>会場</strong>: iOSDC Japan 2025</p>
+
+<p>皆様のご参加をお待ちしております！質問やフィードバックは、セッション後のAsk the Speakerセッションやソーシャルメディアでお気軽にお寄せください。</p>
+
+<hr>
+
+<p><em>この記事は、iOSDC Japan 2025での発表内容を基に作成されました。実際のセッションでは、より詳細な技術解説とライブデモンストレーションを行います。</em></p>
