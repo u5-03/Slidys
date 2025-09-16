@@ -42,24 +42,28 @@ struct GestureDetectorLogicSlide: View {
                             """)
                     }
 
-                    // 検出アーキテクチャ
+                    // 判定条件の種類
                     VStack(alignment: .leading, spacing: 15) {
-                        Text("2. 検出アーキテクチャ")
+                        Text("2. ジェスチャー判定条件")
                             .font(.regularFont)
 
-                        CodeBlockView(
-                            """
-                            class GestureDetector {
-                                // 優先度順にソートされたジェスチャー配列
-                                private var sortedGestures: [BaseGestureProtocol]
-                                
-                                // シリアルジェスチャー専用トラッカー
-                                private let serialTracker = SerialGestureTracker()
-                                
-                                // タイプ別インデックス(高速検索用)
-                                private var typeIndex: [GestureType: [Int]]
+                        HStack(spacing: 20) {
+                            VStack(alignment: .leading, spacing: 12) {
+                                ConditionItem(
+                                    icon: "hand.raised", text: "指の状態", detail: "isExtended/isCurled"
+                                )
+                                ConditionItem(
+                                    icon: "arrow.up.and.down", text: "手の向き", detail: "palmDirection"
+                                )
                             }
-                            """)
+
+                            VStack(alignment: .leading, spacing: 12) {
+                                ConditionItem(
+                                    icon: "angle", text: "部位角度", detail: "angleWithParent")
+                                ConditionItem(
+                                    icon: "ruler", text: "部位距離", detail: "jointToJointDistance")
+                            }
+                        }
                     }
 
                     // 便利な判定メソッド
@@ -84,56 +88,23 @@ struct GestureDetectorLogicSlide: View {
                             """)
                     }
 
-                    // 判定条件の種類
                     VStack(alignment: .leading, spacing: 15) {
-                        Text("4. ジェスチャー判定条件")
+                        Text("4. ピースサインのジェスチャーの条件")
                             .font(.regularFont)
-
-                        HStack(spacing: 20) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                ConditionItem(
-                                    icon: "hand.raised", text: "指の状態", detail: "isExtended/isCurled"
-                                )
-                                ConditionItem(
-                                    icon: "arrow.up.and.down", text: "手の向き", detail: "palmDirection"
-                                )
-                            }
-
-                            VStack(alignment: .leading, spacing: 12) {
-                                ConditionItem(
-                                    icon: "angle", text: "関節角度", detail: "angleWithParent")
-                                ConditionItem(
-                                    icon: "ruler", text: "関節距離", detail: "jointToJointDistance")
-                            }
+                        
+                        VStack(alignment: .leading, spacing: 20) {
+                            Text("1. 人差し指が伸びている")
+                                .font(.regularFont)
+                            Text("2. 中指が伸びている")
+                                .font(.regularFont)
+                            Text("3. 他の指（親指・薬指・小指）は曲がっている")
+                                .font(.regularFont)
+                            Text("4. 人差し指が上を向いている")
+                                .font(.regularFont)
+                            Text("5. 手のひらが前を向いている")
+                                .font(.regularFont)
                         }
-                    }
-
-                    // 検出フロー
-                    VStack(alignment: .leading, spacing: 15) {
-                        Text("5. 検出フロー")
-                            .font(.regularFont)
-
-                        CodeBlockView(
-                            """
-                            func detectGestures(from components: [HandTrackingComponent]) -> GestureDetectionResult {
-                                // 1. シリアルジェスチャーのタイムアウトチェック
-                                if serialTracker.isTimedOut() {
-                                    serialTracker.reset()
-                                }
-                                
-                                // 2. 優先度順に通常ジェスチャーを検出
-                                for gesture in sortedGestures {
-                                    if gesture.matches(handData) {
-                                        return [gesture.gestureName]
-                                    }
-                                }
-                                
-                                // 3. シリアルジェスチャーの進行状態を更新
-                                if let serial = checkSerialGesture() {
-                                    return handleSerialResult(serial)
-                                }
-                            }
-                            """)
+                        .padding(.leading, 20)
                     }
                 }
             }

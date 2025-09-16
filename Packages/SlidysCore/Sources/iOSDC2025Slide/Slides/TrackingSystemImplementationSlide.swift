@@ -29,7 +29,7 @@ struct TrackingSystemImplementationSlide: View {
                         )
                         """)
 
-                    Text("2. HandTrackingComponentから情報を抽出")
+                    Text("2. HandTrackingComponentから情報を抽出・整形")
                         .font(.regularFont)
                         .padding(.top, 10)
 
@@ -43,7 +43,7 @@ struct TrackingSystemImplementationSlide: View {
                         }
                         """)
 
-                    Text("3. ジェスチャー検出処理")
+                    Text("3. ジェスチャー検出処理へ必要な情報を渡して、結果を受け取る")
                         .font(.regularFont)
                         .padding(.top, 10)
 

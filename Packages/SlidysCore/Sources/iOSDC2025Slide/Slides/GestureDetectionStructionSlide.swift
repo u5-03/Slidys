@@ -13,17 +13,10 @@ struct GestureDetectionStructionSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("今回行うジェスチャーの検出の仕組み") {
-            Item("手のトラッキングシステムを初期化する", accessory: .number(1)) {
-                Item("ARKitSessionで権限リクエスト(Info.plistへ利用目的の追記が必要)", accessory: .bullet)
-                Item("SpatialTrackingSessionで .hand を有効化", accessory: .bullet)
-            }
-            Item("手の関節の位置や向きなどの情報を取得する", accessory: .number(2)) {
-                Item("HandLocationの必要な関節を選定", accessory: .bullet)
-                Item("AnchorEntityを設定し、各関節をリアルタイム追跡", accessory: .bullet)
-                Item("Componentで経由でEntityの各関節の位置や向きを取得", accessory: .bullet)
-            }
-            Item("それぞれの関節の位置や向きから、ジェスチャーの条件に一致するかどうかを判定する", accessory: .number(3))
+        HeaderSlide("今回行うハンドジェスチャー検出の概要") {
+            Item("SpatialTrackingSessionを使用して、手のトラッキングシステムを初期化する", accessory: .number(1))
+            Item("HandLocationで手の部位を指定し、その部位の位置や向きの情報を取得する", accessory: .number(2))
+            Item("取得した部位の位置や向きから、指定したジェスチャーの条件に一致するかどうかを判定する", accessory: .number(3))
         }
     }
 }

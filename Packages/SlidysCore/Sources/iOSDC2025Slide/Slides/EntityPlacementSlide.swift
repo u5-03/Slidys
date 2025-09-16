@@ -28,11 +28,7 @@ struct EntityPlacementSlide: View {
                             RealityView { content in
                                 // ルートEntityを作成してシーンに追加
                                 let rootEntity = Entity()
-                                content.add(rootEntity)
-                                
-                                // 手のエンティティコンテナを作成
-                                let handEntitiesContainerEntity = Entity()
-                                rootEntity.addChild(handEntitiesContainerEntity)
+                                content.add(rootEntity)                                
                             }
                             """)
                     }
@@ -48,30 +44,30 @@ struct EntityPlacementSlide: View {
                             let config = SpatialTrackingSession.Configuration(tracking: [.hand])
                             await session.run(config)
 
-                            // AnchorEntityで関節を自動追跡
+                            // AnchorEntityで部位を自動追跡
                             let anchorEntity = AnchorEntity( // visionOS2~
                                 .hand(.left, location: .palm),
                                 trackingMode: .predicted  // 予測補正で追跡遅延を低減
                             )
 
                             // 追加するだけで自動追跡開始
-                            handEntitiesContainerEntity.addChild(anchorEntity)
+                            rootEntity.addChild(anchorEntity)
                             """)
                     }
 
                     VStack(alignment: .leading, spacing: 15) {
-                        Text("3. 関節マーカーの作成")
+                        Text("3. 部位へのマーカーの追加")
                             .font(.regularFont)
 
                         CodeBlockView(
                             """
-                            // 球体マーカー用のEntityを作成
+                            // 例: 球体マーカー用のEntityを作成
                             let sphereEntity = ModelEntity(
                                 mesh: .generateSphere(radius: 0.005),
                                 materials: [UnlitMaterial(color: .yellow)]
                             )
 
-                            // AnchorEntityに追加(関節に追従)
+                            // AnchorEntityに追加(部位に追従)
                             anchorEntity.addChild(sphereEntity)
                             """)
                     }

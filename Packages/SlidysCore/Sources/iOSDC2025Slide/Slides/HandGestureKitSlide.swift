@@ -3,10 +3,9 @@
 //  Copyright ©Sugiy All rights reserved.
 //
 
-
-import SwiftUI
 import SlideKit
 import SlidesCore
+import SwiftUI
 
 @Slide
 struct HandGestureKitSlide: View {
@@ -16,7 +15,7 @@ struct HandGestureKitSlide: View {
 
     var body: some View {
         HeaderSlide("HandGestureKit爆誕") {
-            Item("RealityKitを使って手の関節にマーカーを表示する方法", accessory: .number(1))
+            Item("RealityKitを使って手の部位にマーカーを表示する方法", accessory: .number(1))
             Item("SpatialTrackingSession/AnchorEntityを用いたハンドトラッキングの基礎", accessory: .number(2))
             Item("カスタムジェスチャーの検知手法", accessory: .number(3))
         }
@@ -30,4 +29,3 @@ struct HandGestureKitSlide: View {
     .headerSlideStyle(CustomHeaderSlideStyle())
     .itemStyle(CustomItemStyle())
 }
-

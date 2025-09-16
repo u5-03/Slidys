@@ -32,23 +32,23 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 name: "すぎー/Sugiy",
                 image: .icon,
                 firstText: "DeNAでFlutterのスポーツ系ライブ配信アプリplay-by-sports開発中",
-                secondText: "11月にやるKanagawa.swift #2の運営をしています",
-                thirdText: "iOSDCのスタッフもしてます",
-                fourthText: "来月末に戸建て新居ができるので、引越しします",
-                fifthText: "明後日の夜に羽田空港からドイツに行き、別のカンファレンスで登壇してきます"
+                secondText: "iOSDCのスタッフしてます",
+                thirdText: "11月に実施するKanagawa.swift #2の運営もしています",
+                fourthText: "来月末に戸建て新居ができるので、引越しします🍍",
+                fifthText: "来週ドイツで別のカンファレンス登壇があるので、Day2の夜にそのまま羽田空港へ向かいます"
             )
         )
-        TalkPlanSlide()
+//        TalkPlanSlide()
         GestureDetectionStructionSlide()
 
         // HandSkeletonとEntityの基礎
         HandLocationStructureSlide()
-        HandSkeletonDiagramSlide()
+        // HandSkeletonDiagramSlide()
         ViewSlide {
             Text("デモ")
                 .font(.extraLargeFont)
                 .padding()
-            Text("手の関節にマーカーを表示")
+            Text("手の部位にマーカーを表示")
                 .font(.largeFont)
                 .padding()
         }
@@ -87,7 +87,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         ReferenceSlide()
         CenterTextSlide(text: "おわり")
         OneMoreThingSlide()
-        CenterTextSlide(text: "僕/私/俺もApple Vision Proで\nハンドジェスチャーしたいなー！")
+        CenterTextSlide(text: "僕/私/俺もApple Vision Proで\nハンドジェスチャー試したいなー！")
         ContentSlide(headerTitle: "HandGestureKit爆誕!") {
             Image(.handGestureKit)
                 .resizable()

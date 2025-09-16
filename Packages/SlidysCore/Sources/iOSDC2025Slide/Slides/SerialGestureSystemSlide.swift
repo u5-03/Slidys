@@ -29,12 +29,8 @@ struct SerialGestureSystemSlide: View {
                             protocol SerialGestureProtocol {
                                 // 順番に検出すべきジェスチャーの配列
                                 var gestures: [BaseGestureProtocol] { get }
-                                
                                 // ジェスチャー間の最大許容時間(秒)
-                                var intervalSeconds: TimeInterval { get }
-                                
-                                // 各ステップの説明(UI表示用)
-                                var stepDescriptions: [String] { get }
+                                var intervalSeconds: TimeInterval { get }       
                             }
                             """)
                     }
@@ -49,7 +45,7 @@ struct SerialGestureSystemSlide: View {
                                 Image(systemName: "1.circle.fill")
                                     .font(.system(size: 30))
                                     .foregroundColor(.blue)
-                                Text("現在のジェスチャーインデックスを追跡")
+                                Text("最初のジェスチャーを検知")
                                     .font(.tinyFont)
                                     .fontWeight(.regular)
                             }
@@ -58,7 +54,7 @@ struct SerialGestureSystemSlide: View {
                                 Image(systemName: "2.circle.fill")
                                     .font(.system(size: 30))
                                     .foregroundColor(.green)
-                                Text("各ジェスチャー間のタイムアウトを監視")
+                                Text("ジェスチャー間のタイムアウトの待機")
                                     .font(.tinyFont)
                                     .fontWeight(.regular)
                             }
@@ -67,7 +63,7 @@ struct SerialGestureSystemSlide: View {
                                 Image(systemName: "3.circle.fill")
                                     .font(.system(size: 30))
                                     .foregroundColor(.orange)
-                                Text("タイムアウトor完了後に状態をリセット")
+                                Text("最後までジェスチャーを検知するorタイムアウトで状態をリセット")
                                     .font(.tinyFont)
                                     .fontWeight(.regular)
                             }
@@ -87,69 +83,15 @@ struct SerialGestureSystemSlide: View {
                             gestures = [
                                 // Step 1: 初期位置検出
                                 ArigatouInitialPositionGesture(),  // 両手を同じ高さに
-                                // Step 2: 最終位置検出 → completed ✅
+                                // Step 2: 最終位置検出 or タイムアウト → completed ✅
                                 ArigatouFinalPositionGesture()     // 上に移動した位置に右手を移動
                             ]
 
                             """)
                     }
-
-                    // 状態遷移
-                    VStack(alignment: .leading, spacing: 15) {
-                        Text("4. SerialGestureDetectionResult")
-                            .font(.regularFont)
-
-                        HStack(spacing: 30) {
-                            StatusCard(
-                                title: "progress",
-                                color: .blue,
-                                description: "次のステップへ進行"
-                            )
-
-                            StatusCard(
-                                title: "completed",
-                                color: .green,
-                                description: "全ステップ完了"
-                            )
-
-                            StatusCard(
-                                title: "timeout",
-                                color: .orange,
-                                description: "時間切れ"
-                            )
-
-                            StatusCard(
-                                title: "notMatched",
-                                color: .red,
-                                description: "不一致"
-                            )
-                        }
-                    }
                 }
             }
         }
-    }
-}
-
-struct StatusCard: View {
-    let title: String
-    let color: Color
-    let description: String
-
-    var body: some View {
-        VStack(spacing: 10) {
-            Text(title)
-                .font(.system(size: 28, weight: .bold, design: .monospaced))
-                .foregroundColor(color)
-
-            Text(description)
-                .font(.system(size: 22))
-                .foregroundColor(.white)
-        }
-        .padding(15)
-        .frame(maxWidth: .infinity)
-        .background(color.opacity(0.1))
-        .cornerRadius(10)
     }
 }
 
