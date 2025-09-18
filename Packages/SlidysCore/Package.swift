@@ -78,14 +78,14 @@ let package = Package(
                 "SymbolKit",
                 .product(name: "HandGesturePackage", package: "HandGesturePackage", condition: .when(platforms: [.visionOS])),
                 .product(name: "Algorithms", package: "swift-algorithms"),
-            ],
-            resources: [
-                .process("Resources/opening_input.mp4"),
-                .process("Resources/opening_output.mp4"),
-                .process("Resources/book_animation.mp4"),
-                .process("Resources/hand_gesture_entity_sample.mp4"),
-                .process("Resources/hand_gesture_sign_language.mp4"),
             ]
+//            resources: [
+//                .process("Resources/opening_input.mp4"),
+//                .process("Resources/opening_output.mp4"),
+//                .process("Resources/book_animation.mp4"),
+//                .process("Resources/hand_gesture_entity_sample.mp4"),
+//                .process("Resources/hand_gesture_sign_language.mp4"),
+//            ]
         ),
         .target(
             name: "SlidysCommon",
