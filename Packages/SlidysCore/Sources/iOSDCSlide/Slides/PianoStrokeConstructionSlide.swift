@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct PianoStrokeConstructionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("音楽情報(PianoKeyStroke)の実装") {
             Item("key: PianoKey(Struct)", accessory: .number(1)) {

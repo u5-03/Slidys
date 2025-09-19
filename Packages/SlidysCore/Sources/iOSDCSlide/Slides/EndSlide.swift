@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct EndSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     @State private var eTextOffset: CGFloat = -EndSlide.defaultOffset
     @State private var nTextOffset: CGFloat = -EndSlide.defaultOffset
     @State private var dTextOffset: CGFloat = -EndSlide.defaultOffset

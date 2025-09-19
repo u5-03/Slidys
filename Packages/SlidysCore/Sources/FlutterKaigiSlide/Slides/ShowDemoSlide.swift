@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ShowDemoSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         VStack(spacing: 100) {
             Text("実装例をお見せします")

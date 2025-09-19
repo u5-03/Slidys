@@ -10,6 +10,10 @@ import SymbolKit
 
 @Slide
 struct ComparePlatformAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Compare SwiftUI and Flutter animation") {
             VStack(spacing: 20) {

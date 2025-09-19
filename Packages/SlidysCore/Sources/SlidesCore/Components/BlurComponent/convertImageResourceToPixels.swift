@@ -3,14 +3,15 @@
 //  Copyright ©Sugiy All rights reserved.
 //
 
-import Foundation
-#if canImport(AppKit)
-import AppKit
-#elseif canImport(UIKit)
-import UIKit
-#endif
 import CoreGraphics
 import DeveloperToolsSupport
+import Foundation
+
+#if canImport(AppKit)
+    import AppKit
+#elseif canImport(UIKit)
+    import UIKit
+#endif
 
 func convertImageResourceToPixels(
     resource: ImageResource,
@@ -34,23 +35,25 @@ func convertImageResourceToPixels(
             var pixelData = [UInt8](repeating: 0, count: height * bytesPerRow)
 
             // CGContext を作成してリサイズ後の画像を描画
-            guard let context = CGContext(
-                data: &pixelData,
-                width: width,
-                height: height,
-                bitsPerComponent: bitsPerComponent,
-                bytesPerRow: bytesPerRow,
-                space: colorSpace,
-                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-            ) else {
+            guard
+                let context = CGContext(
+                    data: &pixelData,
+                    width: width,
+                    height: height,
+                    bitsPerComponent: bitsPerComponent,
+                    bytesPerRow: bytesPerRow,
+                    space: colorSpace,
+                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+                )
+            else {
                 print("コンテキストの作成に失敗しました")
                 continuation.resume(returning: [])
                 return
             }
-            
+
             context.draw(cgImage, in: CGRect(origin: .zero, size: size))
 
-            // 各ピクセルを読み出す（左上から右下へ順次）
+            // 各ピクセルを読み出す(左上から右下へ順次)
             var currentIndex = 0
             for y in 0..<height {
                 for x in 0..<width {

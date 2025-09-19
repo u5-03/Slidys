@@ -7,6 +7,9 @@
 
 import SwiftUI
 import SymbolKit
+#if os(visionOS)
+import HandGesturePackage
+#endif
 
 public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatable, Hashable {
     case yugiohEffect
@@ -14,8 +17,17 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
     case japanSymbolQuizExtra2
     case japanSymbolQuizExtra3
     case pixelImage
+    case immersiveSpaceControl
 
     public static let samplePageWindowKey = "samplePageWindowKey"
+
+    public static var allCases: [SamplePageType] {
+#if os(visionOS)
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .immersiveSpaceControl]
+#else
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage]
+#endif
+    }
 
     public var id: String {
         return rawValue
@@ -33,6 +45,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             return "Japan Symbol Quiz Extra3"
         case .pixelImage:
             return "PixelUIView"
+        case .immersiveSpaceControl:
+            return "Immersive Space Control"
         }
     }
 
@@ -78,6 +92,13 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
         case .pixelImage:
             PixelImageSettingView(imageResource: .icon)
                 .padding(.top, 60)
+        case .immersiveSpaceControl:
+#if os(visionOS)
+            StartDemoView()
+#else
+            Text("このサンプルはvisionOSでのみ利用可能です")
+                .foregroundColor(.secondary)
+#endif
         }
     }
 }

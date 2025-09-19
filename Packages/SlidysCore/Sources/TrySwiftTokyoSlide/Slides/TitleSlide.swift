@@ -13,6 +13,10 @@ import SymbolKit
 
 @Slide
 struct TitleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     private let title1 = "Exploring SwiftUI Path Animations"
     private let title2 = "featuring Japan Symbol Quiz"
     private let dateString = "2025/04/09"

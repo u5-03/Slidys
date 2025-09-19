@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct WrapUpSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("まとめ・補足") {
             Item("SwiftUIのStrokeのアニメーション方法について解説", accessory: .number(1))

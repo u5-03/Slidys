@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct PathCodeScrollSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         VStack {
             Text("Original Path and generated Flutter Path")

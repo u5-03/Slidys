@@ -11,6 +11,10 @@ import SymbolKit
 
 @Slide
 public struct QuizAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let title: String
     let answer: String
     let answerHint: String?

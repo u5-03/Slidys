@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct TitleImageSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         VStack(alignment: .center) {
             Text("結婚したので、パートナーの電子ピアノが\n我が家にやってきた")

@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct AnimationStructure1Slide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Structure of animation implementation") {
             Item("Prepare the path of the shape", accessory: .number(1)) {

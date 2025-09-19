@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct TitleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     private let title1 = String(localized: "titlePrefix", defaultValue: "iOSDCのスライドで使った")
     private let title2 = String(localized: "titleSuffix", defaultValue: "アニメーションを深掘る")
     private let dateString = "2024/09/20"

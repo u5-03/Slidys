@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct QuizDescriptionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("神奈川 シンボルクイズ！") {
             Item("神奈川にちなんだ何かがアニメーションで描かれます！", accessory: .number(1))

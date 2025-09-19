@@ -34,6 +34,10 @@ enum RegionKind {
 
 @Slide
 struct QuizTitleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let regionKind: RegionKind
 
     var body: some View {

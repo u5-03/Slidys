@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct PianoStrokeInfoSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
 //    @Phase var phase: SlidePhase
     @State var phase: SlidePhase = .twoThree
 

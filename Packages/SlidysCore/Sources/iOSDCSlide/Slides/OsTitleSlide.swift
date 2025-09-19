@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct OsTitleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
 let shouldAnimated: Bool
 private let osNameHeight: CGFloat = 400
 @State private var yOffset: CGFloat = 0

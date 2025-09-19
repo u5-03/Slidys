@@ -14,6 +14,10 @@ import SlideKit
 public struct ShareEndSlide: View {
     private let qrCodeType: QrCodeType
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(qrCodeType: QrCodeType) {
         self.qrCodeType = qrCodeType
     }

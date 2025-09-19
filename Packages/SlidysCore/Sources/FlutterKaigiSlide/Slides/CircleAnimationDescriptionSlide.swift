@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct CircleAnimationDescriptionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("円環(アニメーション)") {
             Item("AnimatedBuilderを使って、angleを0->2 * math.piに変化させるアニメーションを実行し、かつそれを繰り返す設定をしている", accessory: .number(1))

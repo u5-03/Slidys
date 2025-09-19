@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ReferenceSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Reference") {
             Item("【Flutter】TextをPathに追従させて動かす", accessory: .number(1)) {

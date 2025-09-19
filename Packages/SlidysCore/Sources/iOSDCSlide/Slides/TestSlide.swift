@@ -13,13 +13,17 @@ import SlidesCore
 
 @Slide
 struct TestSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     @State private var audioPlayer: AVAudioPlayer?
     @State private var isPlaying = false
 
     var body: some View {
         VStack(alignment: .center) {
             Text("テスト中...")
-                .font(.system(size: 100, weight: .heavy))
+                .font(.largeFont)
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.defaultForegroundColor)
             if isPlaying {

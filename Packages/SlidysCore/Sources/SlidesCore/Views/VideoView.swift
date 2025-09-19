@@ -13,6 +13,8 @@ public enum VideoType {
     case visionProDemoInput
     case visionProDemoOutput
     case bookAnimation
+    case handGestureEntitySample
+    case handGestureSignLanguage
 
     var fileName: String {
         switch self {
@@ -22,6 +24,10 @@ public enum VideoType {
             return "opening_output"
         case .bookAnimation:
             return "book_animation"
+        case .handGestureEntitySample:
+            return "hand_gesture_entity_sample"
+        case .handGestureSignLanguage:
+            return "hand_gesture_sign_language"
         }
     }
 
@@ -43,13 +49,12 @@ public struct VideoView: View {
     public init(videoType: VideoType) {
         self.videoType = videoType
 
-        if let filePath = Bundle.myModule.path(forResource: videoType.fileName, ofType: videoType.fileExtension) {
-            let fileURL = URL(fileURLWithPath: filePath)
+        if let fileURL = Bundle.main.url(forResource: videoType.fileName, withExtension: videoType.fileExtension) {
             let playerItem = AVPlayerItem(url: fileURL)
             self.playerItem = playerItem
             player = AVPlayer(playerItem: playerItem)
         } else {
-            fatalError("Video file not found in bundle.")
+            fatalError("Video file '\(videoType.fileName).\(videoType.fileExtension)' not found in bundle.")
         }
     }
 

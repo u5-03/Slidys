@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationStep1Slide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Step 1: Prepare a Path for the desired shape") {
             Item("For simple Paths, create them yourself or use generative AI", accessory: .number(1))

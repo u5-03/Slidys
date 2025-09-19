@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct CharactersSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("登場人物") {
             Item("MyCustomLayoutDelegate", accessory: .number(1)) {

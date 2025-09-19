@@ -1,13 +1,13 @@
 {
-  "originHash" : "b66131b3f4832476bdbf12fc7c0ecbba0aeb5dc4220da6b5c595be63c4fdc08c",
+  "originHash" : "e5e37ee7ccc5cbba2337e64c45f508e1d31aa53d92d88a7e6628bfeedfbd3a44",
   "pins" : [
     {
       "identity" : "slidekit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mtj0928/SlideKit",
       "state" : {
-        "revision" : "4921d605e0fcd8cc58b9d0f50c52625930274be6",
-        "version" : "0.6.1"
+        "revision" : "ee71d2a687da199bf04d42a3ff13b9a1810fe4f1",
+        "version" : "0.7.0"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-algorithms.git",
       "state" : {
-        "revision" : "f6919dfc309e7f1b56224378b11e28bab5bccc42",
-        "version" : "1.2.0"
+        "revision" : "87e50f483c54e6efd60e885f7f5aa946cee68023",
+        "version" : "1.2.1"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-numerics.git",
       "state" : {
-        "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
-        "version" : "1.0.2"
+        "revision" : "e0ec0f5f3af6f3e4d5e7a19d2af26b481acb6ba8",
+        "version" : "1.0.3"
       }
     },
     {

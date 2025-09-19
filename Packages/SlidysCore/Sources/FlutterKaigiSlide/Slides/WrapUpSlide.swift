@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct WrapUpSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("まとめ") {
             Item("CustomMultiChildLayoutは、既存のWidgetやContainerでは表現が難しいデザインの時に活躍する強い味方", accessory: .number(1))

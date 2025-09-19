@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct WrapUpSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("まとめ・補足") {
             Item("Blurの仕組みの概要や使われ方について考えてみた", accessory: .number(1))

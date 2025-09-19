@@ -7,9 +7,14 @@
 
 import SwiftUI
 import SlideKit
+import SlidesCore
 
 @Slide
 struct QuestionCircleWithInfoSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             HeaderSlide("どうしよう？") {

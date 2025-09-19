@@ -7,12 +7,17 @@
 
 import SwiftUI
 import SlideKit
+import SlidesCore
 
 @Slide
 struct TitleSlide: View {
     private let dateString = "2025/5/30"
     private let interval: TimeInterval = 0.2
     private let startDate = Date()
+    
+    var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
 
     var body: some View {
         VStack(spacing: 0) {

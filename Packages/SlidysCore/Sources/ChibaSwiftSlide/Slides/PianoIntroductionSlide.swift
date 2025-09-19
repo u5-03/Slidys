@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct PianoIntroductionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         VStack {
             Text("ピアノの発表でしたけど、スライド上で\nアニメーションで結構遊んだ")

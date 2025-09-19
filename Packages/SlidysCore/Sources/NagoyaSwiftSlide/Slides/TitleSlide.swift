@@ -13,6 +13,10 @@ import SymbolKit
 
 @Slide
 struct TitleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     private let title = "Blurってなに？"
     private let dateString = "2025/04/26"
     private let eventName = "Nagoya.swift#1"

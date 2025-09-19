@@ -12,6 +12,10 @@ import SlidesCore
 
 @Slide
 struct PianoImageCompareSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("実物と実装したUIの比較") {
             HStack(spacing: 20) {

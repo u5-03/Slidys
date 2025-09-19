@@ -28,6 +28,10 @@ public struct MultiIntroductionSlide: View {
     let firstPersonInfo: MultiReadmeInfo
     let secondPersonInfo: MultiReadmeInfo
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(title: String, firstPersonInfo: MultiReadmeInfo, secondPersonInfo: MultiReadmeInfo) {
         self.title = title
         self.firstPersonInfo = firstPersonInfo

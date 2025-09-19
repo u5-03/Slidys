@@ -7,9 +7,14 @@
 
 import SwiftUI
 import SlideKit
+import SlidesCore
 
 @Slide
 struct ImageSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let imageResource: ImageResource
 
     var body: some View {

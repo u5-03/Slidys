@@ -48,6 +48,10 @@ public enum RegionKind {
 
 @Slide
 public struct QuizTitleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public let regionKind: RegionKind
     public let isAlmostSymbol: Bool
 

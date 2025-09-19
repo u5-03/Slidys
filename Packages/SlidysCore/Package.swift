@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SlidysCore",
-    platforms: [.iOS(.v17), .macOS(.v15), .visionOS(.v2)],
+    platforms: [.iOS(.v18), .macOS(.v15), .visionOS(.v2)],
     products: [
         .library(
             name: "SlidesCore",
@@ -55,13 +55,19 @@ let package = Package(
             name: "FlutterNinjasSlide",
             targets: ["FlutterNinjasSlide"]
         ),
+        .library(
+            name: "iOSDC2025Slide",
+            targets: ["iOSDC2025Slide"]
+        ),
     ],
     dependencies: [
-        .package(url: "https://github.com/mtj0928/SlideKit", from: "0.6.1"),
+        .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
         .package(url: "https://github.com/u5-03/YugiohCardEffect", from: "0.3.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
         .package(path: "../PianoUI"),
         .package(path: "../SymbolKit"),
+        .package(path: "../HandGesturePackage"),
+        .package(path: "../HandGestureKit"),
     ],
     targets: [
         .target(
@@ -70,13 +76,16 @@ let package = Package(
                 "SlideKit",
                 "YugiohCardEffect",
                 "SymbolKit",
+                .product(name: "HandGesturePackage", package: "HandGesturePackage", condition: .when(platforms: [.visionOS])),
                 .product(name: "Algorithms", package: "swift-algorithms"),
-            ],
-            resources: [
-                .process("Resources/opening_input.mp4"),
-                .process("Resources/opening_output.mp4"),
-                .process("Resources/book_animation.mp4"),
             ]
+//            resources: [
+//                .process("Resources/opening_input.mp4"),
+//                .process("Resources/opening_output.mp4"),
+//                .process("Resources/book_animation.mp4"),
+//                .process("Resources/hand_gesture_entity_sample.mp4"),
+//                .process("Resources/hand_gesture_sign_language.mp4"),
+//            ]
         ),
         .target(
             name: "SlidysCommon",
@@ -89,6 +98,7 @@ let package = Package(
                 "GoToNextPlatformSlide",
                 "TrySwiftTokyoSlide",
                 "NagoyaSwiftSlide",
+                "iOSDC2025Slide",
             ]
         ),
         .target(
@@ -96,7 +106,7 @@ let package = Package(
             dependencies: [
                 "SlidesCore",
                 "PianoUI",
-                .product(name: "Algorithms", package: "swift-algorithms")
+                .product(name: "Algorithms", package: "swift-algorithms"),
             ]
         ),
         .target(
@@ -121,7 +131,7 @@ let package = Package(
                 "PianoUI",
             ],
             resources: [
-                .process("Resources/vision_pro_piano_demo.mp4"),
+                .process("Resources/vision_pro_piano_demo.mp4")
             ]
         ),
         .target(
@@ -143,13 +153,13 @@ let package = Package(
         .target(
             name: "GoToNextPlatformSlide",
             dependencies: [
-                "SlidesCore",
+                "SlidesCore"
             ]
         ),
         .target(
             name: "TrySwiftTokyoSlide",
             dependencies: [
-                "SlidesCore",
+                "SlidesCore"
             ]
         ),
         .target(
@@ -163,7 +173,14 @@ let package = Package(
         .target(
             name: "FlutterNinjasSlide",
             dependencies: [
+                "SlidesCore"
+            ]
+        ),
+        .target(
+            name: "iOSDC2025Slide",
+            dependencies: [
                 "SlidesCore",
+                "SymbolKit",
             ]
         ),
         .testTarget(
@@ -173,4 +190,3 @@ let package = Package(
     ],
     swiftLanguageModes: [.v5]
 )
-

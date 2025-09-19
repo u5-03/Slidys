@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationStepSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Implementation Steps") {
             Item("Prepare a Path for the desired shape", accessory: .number(1))

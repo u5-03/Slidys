@@ -13,6 +13,10 @@ import SymbolKit
 
 @Slide
 struct TextAnimationSampleSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     @Phase var phase: SlidePhase
     enum SlidePhase: Int, PhasedState {
         case initial

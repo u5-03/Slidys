@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct JapanRegionSwiftMapSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("開催されたJapan-\\\\(region).swiftのイベント") {
             Image(.japanRegionSwiftMap)

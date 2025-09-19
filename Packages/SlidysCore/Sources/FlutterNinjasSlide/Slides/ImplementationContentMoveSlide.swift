@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct ImplementationContentMoveSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Content move animation along a Path") {
             Item("Pass the widget you want to run move-animation along path", accessory: .number(1))

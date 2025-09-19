@@ -30,6 +30,10 @@ extension StrokeAnimatableShape: Shape {
 
 @Slide
 struct StrokeAnimatableShapeCodeSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("実際のコード1") {
             Code(

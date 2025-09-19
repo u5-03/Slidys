@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct QuizDescriptionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("プラットフォーム横断公開モブプロ会「隣の芝鑑賞会」とは？") {
             Item("1つの共通のデザインをAndroid/iOS/Flutterで作る公開モブプロ", accessory: .number(1))

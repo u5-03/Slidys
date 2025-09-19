@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild:*)",
+      "Read(//Users/yugo.a.sugiyama/Dev/**)",
+      "Bash(find:*)",
+      "Bash(swift build)",
+      "Bash(git log:*)",
+      "Bash(git rm:*)",
+      "Bash(python3:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

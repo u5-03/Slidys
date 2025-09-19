@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct PanelerReadMeSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
 
     var body: some View {
         MultiIntroductionSlide(

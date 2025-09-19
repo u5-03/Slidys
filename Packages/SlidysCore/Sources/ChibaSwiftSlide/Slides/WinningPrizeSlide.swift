@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct WinningPrizeSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("優勝賞品") {
             Item("千葉のなごみの米屋のお菓子", accessory: .number(1))

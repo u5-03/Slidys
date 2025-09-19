@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct AnimationStructure2Slide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("Structure of animation implementation") {
             Item("Set the `trimmedPath` function of path to enable trimming strokes according to animatableData", accessory: .number(1))

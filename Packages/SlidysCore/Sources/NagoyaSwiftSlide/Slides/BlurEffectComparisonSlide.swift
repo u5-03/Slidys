@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct BlurEffectComparisonSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     let datas: [TableTripleData] = [
         TableTripleData(
             leading: "基本実装",

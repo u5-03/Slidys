@@ -12,6 +12,10 @@ import SlideKit
 public struct VideoSlide: View {
     let videoType: VideoType
 
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     public init(videoType: VideoType) {
         self.videoType = videoType
     }

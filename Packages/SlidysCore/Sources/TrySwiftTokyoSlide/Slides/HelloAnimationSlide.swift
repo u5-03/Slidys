@@ -9,6 +9,10 @@ import SlidesCore
 
 @Slide
 struct HelloAnimationSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     @Phase var phase: SlidePhase
     enum SlidePhase: Int, PhasedState {
         case initial

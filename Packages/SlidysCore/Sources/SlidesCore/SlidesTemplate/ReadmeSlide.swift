@@ -32,6 +32,10 @@ public struct ReadmeInfo {
 public struct ReadmeSlide: View {
     let title: String
     let info: ReadmeInfo
+    
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
 
     public init(title: String, info: ReadmeInfo) {
         self.title = title

@@ -11,6 +11,10 @@ import SlidesCore
 
 @Slide
 struct PanelDescriptionSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
     var body: some View {
         HeaderSlide("パネルディスカッション「隣の芝は青く見えるようで実は青くないかもしれない」とは？") {
             Item("普段他のプラットフォームの話を聞くと羨ましく感じることがあるかもしれません", accessory: .number(1)) {
