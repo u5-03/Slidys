@@ -12,9 +12,11 @@ import SlideKit
 public struct CustomSlideTheme: SlideTheme {
     public let headerSlideStyle = CustomHeaderSlideStyle()
     public let itemStyle = CustomItemStyle()
-    public let indexStyle = CustomIndexStyle()
+    public let indexStyle: CustomIndexStyle
 
-    public init() {}
+    public init(showSlideIndex: Bool = true) {
+        self.indexStyle = CustomIndexStyle(isVisible: showSlideIndex)
+    }
 }
 
 @Slide
@@ -98,17 +100,23 @@ public struct CustomItemStyle: ItemStyle {
 }
 
 public struct CustomIndexStyle: IndexStyle {
-    public init() {}
+    private let isVisible: Bool
+
+    public init(isVisible: Bool = true) {
+        self.isVisible = isVisible
+    }
 
     public func makeBody(configuration: Configuration) -> some View {
 #if os(visionOS)
         EmptyView()
 #else
-        Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
-            .foregroundColor(.gray)
-            .font(.system(size: 30))
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-            .padding()
+        if isVisible {
+            Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
+                .foregroundColor(.gray)
+                .font(.system(size: 30))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .padding()
+        }
 #endif
     }
 }

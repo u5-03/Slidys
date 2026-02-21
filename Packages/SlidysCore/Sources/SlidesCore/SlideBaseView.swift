@@ -37,15 +37,15 @@ public struct SlideBaseView: View {
 
     public let slideConfiguration: SlideConfigurationProtocol
     @StateObject private var slideIndexController: SlideIndexController
-    public let slideTheme = CustomSlideTheme()
+    public let slideTheme: CustomSlideTheme
 
-    public init(slideConfiguration: SlideConfigurationProtocol, timerDuration: Duration = .seconds(60 * 20)) {
+    public init(slideConfiguration: SlideConfigurationProtocol, timerDuration: Duration = .seconds(60 * 20), showSlideIndex: Bool = true) {
         self.slideConfiguration = slideConfiguration
         _slideIndexController = .init(wrappedValue: slideConfiguration.slideIndexController)
         let duration = min(timerDuration, Duration.seconds(60 * 60))
         timeRemaining = .init(duration.components.seconds)
         self.timerDuration = timerDuration
-
+        self.slideTheme = CustomSlideTheme(showSlideIndex: showSlideIndex)
     }
 
     public var body: some View {
