@@ -5,6 +5,7 @@
 //  Created by Yugo Sugiyama on 2025/12/14.
 //
 
+#if !os(visionOS)
 import SwiftUI
 import simd
 
@@ -57,3 +58,4 @@ struct MonitoringControlsView: View {
         )
     }
 }
+#endif

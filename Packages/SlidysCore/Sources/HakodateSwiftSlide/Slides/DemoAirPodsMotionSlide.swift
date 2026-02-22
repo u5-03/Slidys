@@ -27,9 +27,14 @@ struct DemoAirPodsMotionSlide: View {
                }
             }
         } trailingContent: {
+#if os(visionOS)
+            Text("visionOSではデモができません")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+#else
             MonitoringView()
                 .frame(maxHeight: .infinity)
                 .background(.white)
+#endif
         }
     }
 }

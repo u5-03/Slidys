@@ -5,6 +5,7 @@
 //  Created by Yugo Sugiyama on 2025/12/14.
 //
 
+#if !os(visionOS)
 import SwiftUI
 import RealityKit
 import simd
@@ -184,3 +185,4 @@ public struct MonitoringView: View {
         MonitoringView()
     }
 }
+#endif

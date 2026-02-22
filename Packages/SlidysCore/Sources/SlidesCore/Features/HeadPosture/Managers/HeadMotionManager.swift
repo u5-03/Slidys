@@ -5,6 +5,7 @@
 //  Created by Yugo Sugiyama on 2025/12/14.
 //
 
+#if !os(visionOS)
 import Foundation
 import os
 import CoreMotion
@@ -472,3 +473,4 @@ enum SuddenMovementType: CaseIterable {
         }
     }
 }
+#endif

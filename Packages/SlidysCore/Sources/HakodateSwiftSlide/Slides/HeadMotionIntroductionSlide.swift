@@ -23,6 +23,7 @@ struct HeadMotionIntroductionSlide: View {
             }
             Item("iOS14~から利用できる", accessory: .number(3)) {
                 Item("macOSはmacOS 14(Sonoma)から追加された", accessory: .number(1))
+                Item("visionOSでは非対応", accessory: .number(2))
             }
         }
     }

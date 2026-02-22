@@ -5,6 +5,7 @@
 //  Created by Claude on 2025/02/07.
 //
 
+#if !os(visionOS)
 import SwiftUI
 import simd
 
@@ -88,3 +89,4 @@ struct ActionButtonsView: View {
         }
     }
 }
+#endif
