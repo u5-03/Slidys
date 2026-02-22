@@ -62,7 +62,9 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         Quiz2AnswerSlide()
         CenterTextSlide(text: "感想: Appleデバイスは奥深い！")
         CenterTextSlide(text: "終わり")
-        OneMoreThingSlide()
-        CenterTextSlide(text: "せっかくなので、こんなものも作ってみました！")
+        CenterTextSlide(text: "延長線")
+        RegionSymbolQuizSlide()
+        QuizTitleSlide(regionKind: .hokkaido, isAlmostSymbol: true)
+        HakodateSymbolQuizSlide()
     }
 }
