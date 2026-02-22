@@ -59,6 +59,10 @@ let package = Package(
             name: "iOSDC2025Slide",
             targets: ["iOSDC2025Slide"]
         ),
+        .library(
+            name: "HakodateSwiftSlide",
+            targets: ["HakodateSwiftSlide"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
@@ -99,6 +103,7 @@ let package = Package(
                 "TrySwiftTokyoSlide",
                 "NagoyaSwiftSlide",
                 "iOSDC2025Slide",
+                "HakodateSwiftSlide",
             ]
         ),
         .target(
@@ -181,6 +186,12 @@ let package = Package(
             dependencies: [
                 "SlidesCore",
                 "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "HakodateSwiftSlide",
+            dependencies: [
+                "SlidesCore",
             ]
         ),
         .testTarget(

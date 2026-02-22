@@ -16,6 +16,7 @@ import GoToNextPlatformSlide
 import TrySwiftTokyoSlide
 import NagoyaSwiftSlide
 import iOSDC2025Slide
+import HakodateSwiftSlide
 
 public protocol SlideTypeProtocol: CaseIterable, Identifiable, Codable, Equatable, Hashable {
     var id: String { get }
@@ -33,6 +34,7 @@ public enum SlideType: SlideTypeProtocol {
     case trySwiftTokyo
     case nagoyaSwift
     case iOSDC2025
+    case hakodateSwift
 
     public static let slideWindowKey = "SlideWindowKey"
 
@@ -60,6 +62,8 @@ public enum SlideType: SlideTypeProtocol {
             return "Nagoya.swift#1"
         case .iOSDC2025:
             return "iOSDC2025"
+        case .hakodateSwift:
+            return "Hakodate.swift #1"
         }
     }
 
@@ -83,6 +87,8 @@ public enum SlideType: SlideTypeProtocol {
             NagoyaSwiftSlideView()
         case .iOSDC2025:
             iOSDC2025SlideView()
+        case .hakodateSwift:
+            HakodateSwiftSlideView()
         }
     }
 }
