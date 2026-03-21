@@ -9,6 +9,7 @@ import SwiftUI
 import AVKit
 import Combine
 import BackgroundAssets
+import System
 
 public enum VideoType {
     case visionProDemoInput
@@ -116,7 +117,8 @@ public struct VideoView: View {
         // 2. AssetPackManager から取得（TestFlight/App Store）
         let pack = try await AssetPackManager.shared.assetPack(withID: "slidys-videos")
         try await AssetPackManager.shared.ensureLocalAvailability(of: pack)
-        return pack.bundleURL.appending(path: "\(videoType.fileName).\(videoType.fileExtension)")
+        let filePath = FilePath("payload/\(videoType.fileName).\(videoType.fileExtension)")
+        return try AssetPackManager.shared.url(for: filePath)
     }
 }
 
