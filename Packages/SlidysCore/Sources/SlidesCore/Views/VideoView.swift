@@ -8,8 +8,6 @@
 import SwiftUI
 import AVKit
 import Combine
-import BackgroundAssets
-import System
 
 public enum VideoType {
     case visionProDemoInput
@@ -107,18 +105,23 @@ public struct VideoView: View {
     }
 
     private func resolveVideoURL(for videoType: VideoType) async throws -> URL {
-        let skipBundleFallback = ProcessInfo.processInfo.environment["SKIP_BUNDLE_VIDEO_FALLBACK"] != nil
-
-        // 1. Bundle.main から探す（Development Assets / 既存バンドル）
-        if !skipBundleFallback,
-           let url = Bundle.main.url(forResource: videoType.fileName, withExtension: videoType.fileExtension) {
+        // Bundle.main から探す（Copy Bundle Resources / Development Assets）
+        if let url = Bundle.main.url(forResource: videoType.fileName, withExtension: videoType.fileExtension) {
             return url
         }
-        // 2. AssetPackManager から取得（TestFlight/App Store）
-        let pack = try await AssetPackManager.shared.assetPack(withID: "slidys-videos")
-        try await AssetPackManager.shared.ensureLocalAvailability(of: pack)
-        let filePath = FilePath("payload/\(videoType.fileName).\(videoType.fileExtension)")
-        return try AssetPackManager.shared.url(for: filePath)
+        // TODO: BA App Extension 整備後に AssetPackManager 経由の取得を有効化
+        throw VideoLoadError.notFound(videoType.fileName)
+    }
+
+    private enum VideoLoadError: LocalizedError {
+        case notFound(String)
+
+        var errorDescription: String? {
+            switch self {
+            case .notFound(let name):
+                return "Video '\(name)' not found in bundle."
+            }
+        }
     }
 }
 
