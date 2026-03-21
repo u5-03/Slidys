@@ -10,7 +10,16 @@
       "Bash(python3:*)",
       "Bash(done)",
       "Bash(swift build:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(wc:*)",
+      "Bash(chmod:*)",
+      "WebFetch(domain:forums.developer.apple.com)",
+      "WebSearch",
+      "WebFetch(domain:wwdcnotes.com)",
+      "Bash(grep:*)",
+      "Bash(make asset-pack-build:*)",
+      "Bash(xcrun ba-package:*)",
+      "Bash(make asset-pack-upload:*)"
     ],
     "deny": [],
     "ask": []

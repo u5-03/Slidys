@@ -15,3 +15,7 @@ Apps/Slidys.xcworkspace/xcuserdata/yugo.a.sugiyama.xcuserdatad/xcdebugger/Breakp
 # Speech scripts directory
 speech_scripts/
 tmp/
+.env
+
+# Background Assets archive
+*.aar

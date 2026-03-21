@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SlidysCore",
-    platforms: [.iOS(.v18), .macOS(.v15), .visionOS(.v2)],
+    platforms: [.iOS(.v26), .macOS(.v26), .visionOS(.v26)],
     products: [
         .library(
             name: "SlidesCore",
@@ -134,9 +134,6 @@ let package = Package(
             dependencies: [
                 "SlidesCore",
                 "PianoUI",
-            ],
-            resources: [
-                .process("Resources/vision_pro_piano_demo.mp4")
             ]
         ),
         .target(

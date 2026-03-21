@@ -4,6 +4,8 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>BAUsesAppleHosting</key>
+	<true/>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>

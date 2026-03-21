@@ -1,0 +1,21 @@
+{
+  "assetPackID": "slidys-videos",
+  "downloadPolicy": {
+    "essential": {
+      "installationEventTypes": ["firstInstallation", "subsequentUpdate"]
+    }
+  },
+  "platforms": [
+    "iOS",
+    "macOS",
+    "visionOS"
+  ],
+  "fileSelectors": [
+    { "file": "payload/opening_input.mp4" },
+    { "file": "payload/opening_output.mp4" },
+    { "file": "payload/book_animation.mp4" },
+    { "file": "payload/hand_gesture_entity_sample.mp4" },
+    { "file": "payload/hand_gesture_sign_language.mp4" },
+    { "file": "payload/vision_pro_piano_demo.mp4" }
+  ]
+}

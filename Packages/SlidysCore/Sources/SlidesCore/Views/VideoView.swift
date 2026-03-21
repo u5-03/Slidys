@@ -1,6 +1,6 @@
 //
 //  VideoView.swift
-//  
+//
 //
 //  Created by Yugo Sugiyama on 2024/11/24.
 //
@@ -8,6 +8,7 @@
 import SwiftUI
 import AVKit
 import Combine
+import BackgroundAssets
 
 public enum VideoType {
     case visionProDemoInput
@@ -15,6 +16,7 @@ public enum VideoType {
     case bookAnimation
     case handGestureEntitySample
     case handGestureSignLanguage
+    case visionProPianoDemo
 
     var fileName: String {
         switch self {
@@ -28,6 +30,8 @@ public enum VideoType {
             return "hand_gesture_entity_sample"
         case .handGestureSignLanguage:
             return "hand_gesture_sign_language"
+        case .visionProPianoDemo:
+            return "vision_pro_piano_demo"
         }
     }
 
@@ -38,50 +42,81 @@ public enum VideoType {
 
 // Frameworks, Libraries, and Embedded ContentにAVKitを追加しないと、Previewでクラッシュする
 public struct VideoView: View {
-    @State private var player: AVPlayer
-    @State private var playerItem: AVPlayerItem
-    @State private var currentTime: Double = 0.0
-    @State private var duration: Double = 0.0
-    @State private var timeObserverToken: Any?
+    @State private var player: AVPlayer?
+    @State private var playerItem: AVPlayerItem?
     @State private var cancellableSet = Set<AnyCancellable>()
+    @State private var timeObserverToken: Any?
+    @State private var isLoading = true
+    @State private var loadError: String?
     private let videoType: VideoType
 
     public init(videoType: VideoType) {
         self.videoType = videoType
-
-        if let fileURL = Bundle.main.url(forResource: videoType.fileName, withExtension: videoType.fileExtension) {
-            let playerItem = AVPlayerItem(url: fileURL)
-            self.playerItem = playerItem
-            player = AVPlayer(playerItem: playerItem)
-        } else {
-            fatalError("Video file '\(videoType.fileName).\(videoType.fileExtension)' not found in bundle.")
-        }
     }
 
     public var body: some View {
-        VideoPlayer(player: player)
-            .task {
-                do {
-                    await playerItem.seek(to: .zero)
-                    try await Task.sleep(for: .seconds(1))
-                    player.play()
-                    NotificationCenter.default
-                        .publisher(for: .AVPlayerItemDidPlayToEndTime, object: playerItem)
-                        .sink { _ in
-                            player.seek(to: .zero)
-                            player.play()
-                        }
-                        .store(in: &cancellableSet)
-                } catch {
+        Group {
+            if let player {
+                VideoPlayer(player: player)
+            } else if let loadError {
+                VStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.largeTitle)
+                    Text(loadError)
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
                 }
+                .foregroundStyle(.secondary)
+            } else {
+                ProgressView()
+                    .controlSize(.large)
             }
-            .onDisappear {
-                player.pause()
-                if let token = timeObserverToken {
-                    player.removeTimeObserver(token)
-                    timeObserverToken = nil
-                }
+        }
+        .task {
+            do {
+                let url = try await resolveVideoURL(for: videoType)
+                let item = AVPlayerItem(url: url)
+                let newPlayer = AVPlayer(playerItem: item)
+                playerItem = item
+                player = newPlayer
+
+                await item.seek(to: .zero)
+                try await Task.sleep(for: .seconds(1))
+                newPlayer.play()
+                NotificationCenter.default
+                    .publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
+                    .sink { _ in
+                        newPlayer.seek(to: .zero)
+                        newPlayer.play()
+                    }
+                    .store(in: &cancellableSet)
+                isLoading = false
+            } catch {
+                loadError = error.localizedDescription
+                isLoading = false
             }
+        }
+        .onDisappear {
+            player?.pause()
+            if let token = timeObserverToken {
+                player?.removeTimeObserver(token)
+                timeObserverToken = nil
+            }
+        }
+    }
+
+    private func resolveVideoURL(for videoType: VideoType) async throws -> URL {
+        let skipBundleFallback = ProcessInfo.processInfo.environment["SKIP_BUNDLE_VIDEO_FALLBACK"] != nil
+
+        // 1. Bundle.main から探す（Development Assets / 既存バンドル）
+        if !skipBundleFallback,
+           let url = Bundle.main.url(forResource: videoType.fileName, withExtension: videoType.fileExtension) {
+            return url
+        }
+        // 2. AssetPackManager から取得（TestFlight/App Store）
+        let pack = try await AssetPackManager.shared.assetPack(withID: "slidys-videos")
+        try await AssetPackManager.shared.ensureLocalAvailability(of: pack)
+        return pack.bundleURL.appending(path: "\(videoType.fileName).\(videoType.fileExtension)")
     }
 }
 
