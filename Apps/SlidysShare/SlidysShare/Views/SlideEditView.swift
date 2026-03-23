@@ -33,7 +33,7 @@ struct SlideEditView: View {
         }
         .navigationTitle(isNew ? "新規スライド" : "スライド編集")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .confirmationAction) {
                 HStack {
                     Button("プレビュー") {
                         showPreview = true
@@ -47,9 +47,15 @@ struct SlideEditView: View {
                 }
             }
         }
+        #if os(macOS)
+        .sheet(isPresented: $showPreview) {
+            SlidePreviewView(deck: deck)
+        }
+        #else
         .fullScreenCover(isPresented: $showPreview) {
             SlidePreviewView(deck: deck)
         }
+        #endif
     }
 }
 

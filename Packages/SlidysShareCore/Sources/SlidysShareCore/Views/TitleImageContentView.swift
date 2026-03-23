@@ -8,6 +8,11 @@
 import SwiftUI
 import SlideKit
 import SlidesCore
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 struct TitleImageContentView: View {
     let title: String
@@ -15,8 +20,8 @@ struct TitleImageContentView: View {
 
     var body: some View {
         HeaderSlide(.init(title)) {
-            if let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
+            if let image = platformImage(from: imageData) {
+                image
                     .resizable()
                     .scaledToFit()
                     .padding()
@@ -24,5 +29,15 @@ struct TitleImageContentView: View {
                     .background(.slideBackgroundColor)
             }
         }
+    }
+
+    private func platformImage(from data: Data) -> Image? {
+        #if canImport(UIKit)
+        guard let uiImage = UIImage(data: data) else { return nil }
+        return Image(uiImage: uiImage)
+        #elseif canImport(AppKit)
+        guard let nsImage = NSImage(data: data) else { return nil }
+        return Image(nsImage: nsImage)
+        #endif
     }
 }

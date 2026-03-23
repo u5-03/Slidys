@@ -30,7 +30,7 @@ struct SlidePreviewView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("閉じる") { dismiss() }
                 }
                 ToolbarItem(placement: .principal) {

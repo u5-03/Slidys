@@ -2,6 +2,11 @@ import Foundation
 import MultipeerConnectivity
 import SlidysShareCore
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 @Observable
 final class MultipeerManager: NSObject, SlideConnectionProtocol {
@@ -9,7 +14,13 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
     private(set) var receivedEvent: SlideEvent?
 
     private let serviceType = "slidys-share"
-    private let myPeerID = MCPeerID(displayName: UIDevice.current.name)
+    private let myPeerID: MCPeerID = {
+        #if canImport(UIKit)
+        return MCPeerID(displayName: UIDevice.current.name)
+        #elseif canImport(AppKit)
+        return MCPeerID(displayName: Host.current().localizedName ?? "Mac")
+        #endif
+    }()
     private var session: MCSession?
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
@@ -60,10 +71,12 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
 
     // MARK: - Browser ViewController
 
+    #if os(iOS) || os(visionOS)
     func makeBrowserViewController() -> MCBrowserViewController? {
         guard let session else { return nil }
         return MCBrowserViewController(serviceType: serviceType, session: session)
     }
+    #endif
 }
 
 // MARK: - MCSessionDelegate
@@ -117,6 +130,7 @@ extension MultipeerManager: MCNearbyServiceBrowserDelegate {
 
 // MARK: - MultipeerBrowserView
 
+#if os(iOS) || os(visionOS)
 struct MultipeerBrowserView: UIViewControllerRepresentable {
     let browser: MCBrowserViewController
     let onFinished: () -> Void
@@ -151,3 +165,39 @@ struct MultipeerBrowserView: UIViewControllerRepresentable {
         }
     }
 }
+#endif
+
+#if os(macOS)
+struct MultipeerBrowserView: View {
+    let manager: MultipeerManager
+    let onFinished: () -> Void
+    let onCancelled: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("ピアを検索中...")
+                .font(.headline)
+            ProgressView()
+            Text("接続状態: \(stateText)")
+                .foregroundStyle(.secondary)
+            Button("キャンセル") {
+                onCancelled()
+            }
+        }
+        .padding(40)
+        .onChange(of: manager.connectionState) { _, newState in
+            if newState == .connected {
+                onFinished()
+            }
+        }
+    }
+
+    private var stateText: String {
+        switch manager.connectionState {
+        case .disconnected: return "未接続"
+        case .connecting: return "接続中..."
+        case .connected: return "接続済み"
+        }
+    }
+}
+#endif

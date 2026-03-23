@@ -9,6 +9,27 @@ struct SlideDetailView: View {
     @State private var showBrowser = false
     @State private var showBroadcast = false
 
+    @ViewBuilder
+    private var browserContent: some View {
+        #if os(iOS) || os(visionOS)
+        if let browser = connection.makeBrowserViewController() {
+            MultipeerBrowserView(browser: browser, onFinished: {
+                showBrowser = false
+            }, onCancelled: {
+                showBrowser = false
+                connection.disconnect()
+            })
+        }
+        #elseif os(macOS)
+        MultipeerBrowserView(manager: connection, onFinished: {
+            showBrowser = false
+        }, onCancelled: {
+            showBrowser = false
+            connection.disconnect()
+        })
+        #endif
+    }
+
     var body: some View {
         List {
             Section("スライド情報") {
@@ -31,7 +52,7 @@ struct SlideDetailView: View {
         }
         .navigationTitle(deck.title)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .confirmationAction) {
                 HStack {
                     NavigationLink(destination: SlideEditView(deck: deck, storage: storage, isNew: false)) {
                         Image(systemName: "pencil")
@@ -53,17 +74,16 @@ struct SlideDetailView: View {
             }
         }
         .sheet(isPresented: $showBrowser) {
-            if let browser = connection.makeBrowserViewController() {
-                MultipeerBrowserView(browser: browser, onFinished: {
-                    showBrowser = false
-                }, onCancelled: {
-                    showBrowser = false
-                    connection.disconnect()
-                })
-            }
+            browserContent
         }
+        #if os(macOS)
+        .sheet(isPresented: $showBroadcast) {
+            SlideBroadcastView(deck: deck, connection: connection)
+        }
+        #else
         .fullScreenCover(isPresented: $showBroadcast) {
             SlideBroadcastView(deck: deck, connection: connection)
         }
+        #endif
     }
 }

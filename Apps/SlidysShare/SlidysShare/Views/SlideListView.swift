@@ -26,7 +26,7 @@ struct SlideListView: View {
         }
         .navigationTitle("スライド一覧")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .confirmationAction) {
                 NavigationLink(destination: SlideEditView(deck: SlideDeck(title: "新しいスライド"), storage: storage, isNew: true)) {
                     Image(systemName: "plus")
                 }

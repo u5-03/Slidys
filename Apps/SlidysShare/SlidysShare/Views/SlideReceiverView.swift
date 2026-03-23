@@ -12,6 +12,27 @@ struct SlideReceiverView: View {
     @State private var currentIndex = 0
     @State private var pageCount = 0
 
+    @ViewBuilder
+    private var browserContent: some View {
+        #if os(iOS) || os(visionOS)
+        if let browser = connection.makeBrowserViewController() {
+            MultipeerBrowserView(browser: browser, onFinished: {
+                showBrowser = false
+            }, onCancelled: {
+                showBrowser = false
+                connection.disconnect()
+            })
+        }
+        #elseif os(macOS)
+        MultipeerBrowserView(manager: connection, onFinished: {
+            showBrowser = false
+        }, onCancelled: {
+            showBrowser = false
+            connection.disconnect()
+        })
+        #endif
+    }
+
     var body: some View {
         Group {
             if isReceiving, let store {
@@ -40,14 +61,7 @@ struct SlideReceiverView: View {
         }
         .navigationTitle("スライド受信")
         .sheet(isPresented: $showBrowser) {
-            if let browser = connection.makeBrowserViewController() {
-                MultipeerBrowserView(browser: browser, onFinished: {
-                    showBrowser = false
-                }, onCancelled: {
-                    showBrowser = false
-                    connection.disconnect()
-                })
-            }
+            browserContent
         }
         .onChange(of: connection.receivedEvent) { _, event in
             guard let event else { return }
