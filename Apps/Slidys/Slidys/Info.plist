@@ -6,6 +6,8 @@
 	<string></string>
 	<key>BAUsesAppleHosting</key>
 	<true/>
+	<key>BAAppGroupID</key>
+	<string>group.yugo.sugiyama.iOSDC2024Slide</string>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>

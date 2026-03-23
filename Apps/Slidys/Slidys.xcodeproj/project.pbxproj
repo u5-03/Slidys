@@ -278,7 +278,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SlidysBackgroundDownloadExtension/SlidysBackgroundDownloadExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 669226BDWM;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -292,7 +292,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide.debug.SlidysBackgroundDownloadExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -315,7 +315,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SlidysBackgroundDownloadExtension/SlidysBackgroundDownloadExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 669226BDWM;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -329,7 +329,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.iOSDC2024Slide.SlidysBackgroundDownloadExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
