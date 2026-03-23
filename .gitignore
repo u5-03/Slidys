@@ -17,6 +17,7 @@ speech_scripts/
 tmp/
 .env
 .claude/settings.local.json
+.claude/worktrees/
 
 # Background Assets archive
 *.aar
