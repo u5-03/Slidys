@@ -16,6 +16,7 @@ Apps/Slidys.xcworkspace/xcuserdata/yugo.a.sugiyama.xcuserdatad/xcdebugger/Breakp
 speech_scripts/
 tmp/
 .env
+.claude/settings.local.json
 
 # Background Assets archive
 *.aar
