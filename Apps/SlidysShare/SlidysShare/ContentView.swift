@@ -1,22 +1,29 @@
-//
-//  Created by yugo.sugiyama on 2026/03/23
-//  Copyright ©Sugiy All rights reserved.
-//
-
 import SwiftUI
+import SlidysShareCore
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @State private var storage = SlideStorage()
+    @State private var multipeerManager = MultipeerManager()
 
-#Preview {
-    ContentView()
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 40) {
+                Text("Slidys Share")
+                    .font(.largeTitle.bold())
+
+                NavigationLink("スライドを配信する") {
+                    SlideListView(storage: storage, connection: multipeerManager)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                NavigationLink("スライドを受信する") {
+                    SlideReceiverView(connection: multipeerManager)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+            }
+            .navigationTitle("Slidys Share")
+        }
+    }
 }
