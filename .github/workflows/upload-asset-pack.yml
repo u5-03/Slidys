@@ -1,0 +1,74 @@
+name: Upload Asset Pack
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Upload target'
+        required: true
+        type: choice
+        options:
+          - both
+          - slidys
+          - flutter
+        default: 'both'
+  push:
+    branches:
+      - main
+    paths:
+      - 'asset-packs/**'
+
+env:
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+
+jobs:
+  upload-slidys:
+    if: >-
+      github.event_name == 'push' ||
+      github.event.inputs.target == 'both' ||
+      github.event.inputs.target == 'slidys'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Build asset pack
+        run: |
+          cd asset-packs/slidys-videos
+          xcrun ba-package package manifest.json --output-path "$GITHUB_WORKSPACE/slidys-videos.aar"
+
+      - name: Upload asset pack for Slidys
+        env:
+          SLIDYS_APPLE_ID: ${{ secrets.SLIDYS_APPLE_ID }}
+        run: |
+          xcrun altool --upload-asset-pack slidys-videos.aar \
+            --apple-id "$SLIDYS_APPLE_ID" \
+            -u "$APPLE_ID" \
+            -p "$APP_SPECIFIC_PASSWORD"
+
+  upload-flutter:
+    if: >-
+      github.event_name == 'push' ||
+      github.event.inputs.target == 'both' ||
+      github.event.inputs.target == 'flutter'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Build asset pack
+        run: |
+          cd asset-packs/slidys-videos
+          xcrun ba-package package manifest.json --output-path "$GITHUB_WORKSPACE/slidys-videos.aar"
+
+      - name: Upload asset pack for SlidysFlutter
+        env:
+          SLIDYS_FLUTTER_APPLE_ID: ${{ secrets.SLIDYS_FLUTTER_APPLE_ID }}
+        run: |
+          xcrun altool --upload-asset-pack slidys-videos.aar \
+            --apple-id "$SLIDYS_FLUTTER_APPLE_ID" \
+            -u "$APPLE_ID" \
+            -p "$APP_SPECIFIC_PASSWORD"

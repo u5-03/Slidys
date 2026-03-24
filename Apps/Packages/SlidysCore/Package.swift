@@ -1,0 +1,200 @@
+// swift-tools-version: 6.2
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+
+import PackageDescription
+
+let package = Package(
+    name: "SlidysCore",
+    platforms: [.iOS(.v26), .macOS(.v26), .visionOS(.v26)],
+    products: [
+        .library(
+            name: "SlidesCore",
+            targets: ["SlidesCore"]
+        ),
+        .library(
+            name: "SlidysCommon",
+            targets: ["SlidysCommon"]
+        ),
+        .library(
+            name: "iOSDCSlide",
+            targets: ["iOSDCSlide"]
+        ),
+        .library(
+            name: "ChibaSwiftSlide",
+            targets: ["ChibaSwiftSlide"]
+        ),
+        .library(
+            name: "KanagawaSwiftSlide",
+            targets: ["KanagawaSwiftSlide"]
+        ),
+        .library(
+            name: "FlutterKaigiSlide",
+            targets: ["FlutterKaigiSlide"]
+        ),
+        .library(
+            name: "OsakaSwiftSlide",
+            targets: ["OsakaSwiftSlide"]
+        ),
+        .library(
+            name: "MinokamoSwiftSlide",
+            targets: ["MinokamoSwiftSlide"]
+        ),
+        .library(
+            name: "GoToNextPlatformSlide",
+            targets: ["GoToNextPlatformSlide"]
+        ),
+        .library(
+            name: "TrySwiftTokyoSlide",
+            targets: ["TrySwiftTokyoSlide"]
+        ),
+        .library(
+            name: "NagoyaSwiftSlide",
+            targets: ["NagoyaSwiftSlide"]
+        ),
+        .library(
+            name: "FlutterNinjasSlide",
+            targets: ["FlutterNinjasSlide"]
+        ),
+        .library(
+            name: "iOSDC2025Slide",
+            targets: ["iOSDC2025Slide"]
+        ),
+        .library(
+            name: "HakodateSwiftSlide",
+            targets: ["HakodateSwiftSlide"]
+        ),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
+        .package(url: "https://github.com/u5-03/YugiohCardEffect", from: "0.3.0"),
+        .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
+        .package(path: "../PianoUI"),
+        .package(path: "../SymbolKit"),
+        .package(path: "../HandGesturePackage"),
+        .package(path: "../HandGestureKit"),
+    ],
+    targets: [
+        .target(
+            name: "SlidesCore",
+            dependencies: [
+                "SlideKit",
+                "YugiohCardEffect",
+                "SymbolKit",
+                .product(name: "HandGesturePackage", package: "HandGesturePackage", condition: .when(platforms: [.visionOS])),
+                .product(name: "Algorithms", package: "swift-algorithms"),
+            ]
+//            resources: [
+//                .process("Resources/opening_input.mp4"),
+//                .process("Resources/opening_output.mp4"),
+//                .process("Resources/book_animation.mp4"),
+//                .process("Resources/hand_gesture_entity_sample.mp4"),
+//                .process("Resources/hand_gesture_sign_language.mp4"),
+//            ]
+        ),
+        .target(
+            name: "SlidysCommon",
+            dependencies: [
+                "iOSDCSlide",
+                "ChibaSwiftSlide",
+                "KanagawaSwiftSlide",
+                "OsakaSwiftSlide",
+                "MinokamoSwiftSlide",
+                "GoToNextPlatformSlide",
+                "TrySwiftTokyoSlide",
+                "NagoyaSwiftSlide",
+                "iOSDC2025Slide",
+                "HakodateSwiftSlide",
+            ]
+        ),
+        .target(
+            name: "iOSDCSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+                .product(name: "Algorithms", package: "swift-algorithms"),
+            ]
+        ),
+        .target(
+            name: "ChibaSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+            ]
+        ),
+        .target(
+            name: "KanagawaSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+                "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "FlutterKaigiSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+            ]
+        ),
+        .target(
+            name: "OsakaSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+                "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "MinokamoSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+                "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "GoToNextPlatformSlide",
+            dependencies: [
+                "SlidesCore"
+            ]
+        ),
+        .target(
+            name: "TrySwiftTokyoSlide",
+            dependencies: [
+                "SlidesCore"
+            ]
+        ),
+        .target(
+            name: "NagoyaSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+                "PianoUI",
+                "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "FlutterNinjasSlide",
+            dependencies: [
+                "SlidesCore"
+            ]
+        ),
+        .target(
+            name: "iOSDC2025Slide",
+            dependencies: [
+                "SlidesCore",
+                "SymbolKit",
+            ]
+        ),
+        .target(
+            name: "HakodateSwiftSlide",
+            dependencies: [
+                "SlidesCore",
+            ]
+        ),
+        .testTarget(
+            name: "KanagawaSwiftSlideTests",
+            dependencies: ["KanagawaSwiftSlide"]
+        ),
+    ],
+    swiftLanguageModes: [.v5]
+)
