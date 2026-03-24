@@ -10,8 +10,9 @@ public protocol SlideConnectionProtocol: AnyObject {
     var connectionState: ConnectionState { get }
     var receivedEvent: SlideEvent? { get }
 
-    func startHosting()
+    func startHosting(displayName: String)
     func startBrowsing()
     func send(event: SlideEvent) throws
     func disconnect()
+    func clearReceivedEvent()
 }

@@ -4,6 +4,8 @@ public enum ShareSlideType: Codable, Hashable {
     case titleList(title: String, items: [ListItem])
     case titleImage(title: String, imageData: Data)
     case centerText(text: String)
+    case centerImage(imageData: Data)
+    case code(title: String, code: String)
 }
 
 public struct ListItem: Codable, Hashable, Identifiable {
@@ -27,6 +29,8 @@ public struct SlidePageData: Codable, Hashable, Identifiable {
         case .centerText(let text): text
         case .titleList(let title, _): title
         case .titleImage(let title, _): title
+        case .centerImage: "画像"
+        case .code(let title, _): title
         }
     }
 

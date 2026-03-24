@@ -14,24 +14,29 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
     private(set) var receivedEvent: SlideEvent?
 
     private let serviceType = "slidys-share"
-    private let myPeerID: MCPeerID = {
-        #if canImport(UIKit)
-        return MCPeerID(displayName: UIDevice.current.name)
-        #elseif canImport(AppKit)
-        return MCPeerID(displayName: Host.current().localizedName ?? "Mac")
-        #endif
-    }()
+    private var myPeerID: MCPeerID
     private var session: MCSession?
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
 
+    private static var defaultPeerName: String {
+        #if canImport(UIKit)
+        UIDevice.current.name
+        #elseif canImport(AppKit)
+        Host.current().localizedName ?? "Mac"
+        #endif
+    }
+
     override init() {
+        self.myPeerID = MCPeerID(displayName: Self.defaultPeerName)
         super.init()
     }
 
     // MARK: - SlideConnectionProtocol
 
-    func startHosting() {
+    func startHosting(displayName: String = "スライド送信者") {
+        myPeerID = MCPeerID(displayName: displayName)
+
         let session = MCSession(peer: myPeerID, securityIdentity: nil, encryptionPreference: .none)
         session.delegate = self
         self.session = session
@@ -46,11 +51,15 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
         let session = MCSession(peer: myPeerID, securityIdentity: nil, encryptionPreference: .none)
         session.delegate = self
         self.session = session
+        connectionState = .connecting
 
+        #if os(macOS)
+        // macOS uses programmatic browser (no MCBrowserViewController)
         browser = MCNearbyServiceBrowser(peer: myPeerID, serviceType: serviceType)
         browser?.delegate = self
         browser?.startBrowsingForPeers()
-        connectionState = .connecting
+        #endif
+        // iOS/visionOS: session only — MCBrowserViewController handles browsing
     }
 
     func send(event: SlideEvent) throws {
@@ -66,7 +75,12 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
         advertiser = nil
         browser = nil
         session = nil
+        receivedEvent = nil
         connectionState = .disconnected
+    }
+
+    func clearReceivedEvent() {
+        receivedEvent = nil
     }
 
     // MARK: - Browser ViewController

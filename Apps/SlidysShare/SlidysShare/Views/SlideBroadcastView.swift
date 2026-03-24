@@ -36,16 +36,20 @@ struct SlideBroadcastView: View {
 
             VStack {
                 HStack {
+                    Spacer()
+                    Text("\(currentIndex + 1) / \(deck.pages.count)")
+                        .font(.callout.monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.7))
+                        .shadow(radius: 4)
                     Button {
                         showCloseConfirmation = true
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.white.opacity(0.7))
                             .shadow(radius: 4)
                     }
                     .padding()
-                    Spacer()
                 }
                 Spacer()
             }

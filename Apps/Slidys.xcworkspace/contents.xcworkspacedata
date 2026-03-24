@@ -2,19 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Packages">
+   </FileRef>
+   <FileRef
       location = "group:SlidysShare/SlidysShare.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../Packages/SlidysShareCore">
-   </FileRef>
-   <FileRef
-      location = "group:../Packages/SlidysCore">
-   </FileRef>
-   <FileRef
-      location = "group:../Packages/PianoUI">
-   </FileRef>
-   <FileRef
-      location = "group:../Packages/SymbolKit">
    </FileRef>
    <FileRef
       location = "group:Slidys/Slidys.xcodeproj">

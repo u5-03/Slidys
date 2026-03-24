@@ -31,26 +31,33 @@ public struct DynamicSlideContentView: View {
     }
 
     public var body: some View {
-        if let pageData {
-            switch pageData.type {
-            case .centerText(let text):
-                Text(text)
-                    .lineSpacing(24)
+        Group {
+            if let pageData {
+                switch pageData.type {
+                case .centerText(let text):
+                    Text(text)
+                        .lineSpacing(24)
+                        .font(.largeFont)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                        .foregroundStyle(.defaultForegroundColor)
+                        .background(.slideBackgroundColor)
+                case .titleList(let title, let items):
+                    TitleListContentView(title: title, items: items)
+                case .titleImage(let title, let imageData):
+                    TitleImageContentView(title: title, imageData: imageData)
+                case .centerImage(let imageData):
+                    CenterImageContentView(imageData: imageData)
+                case .code(let title, let code):
+                    CodeContentView(title: title, code: code)
+                }
+            } else {
+                Text("Loading...")
                     .font(.largeFont)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .foregroundStyle(.defaultForegroundColor)
                     .background(.slideBackgroundColor)
-            case .titleList(let title, let items):
-                TitleListContentView(title: title, items: items)
-            case .titleImage(let title, let imageData):
-                TitleImageContentView(title: title, imageData: imageData)
             }
-        } else {
-            Text("Loading...")
-                .font(.largeFont)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundStyle(.defaultForegroundColor)
-                .background(.slideBackgroundColor)
         }
+        .slideTheme(CustomSlideTheme(showSlideIndex: false))
     }
 }

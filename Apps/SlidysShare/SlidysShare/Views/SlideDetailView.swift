@@ -1,5 +1,6 @@
 import SwiftUI
 import MultipeerConnectivity
+import SlideKit
 import SlidysShareCore
 
 struct SlideDetailView: View {
@@ -8,26 +9,23 @@ struct SlideDetailView: View {
     let connection: MultipeerManager
     @State private var showBrowser = false
     @State private var showBroadcast = false
+    @State private var showNameInput = false
+    @State private var hostName = "スライド送信者"
 
     @ViewBuilder
-    private var browserContent: some View {
-        #if os(iOS) || os(visionOS)
-        if let browser = connection.makeBrowserViewController() {
-            MultipeerBrowserView(browser: browser, onFinished: {
-                showBrowser = false
-            }, onCancelled: {
+    private var waitingForConnectionView: some View {
+        VStack(spacing: 20) {
+            Text("接続を待機中...")
+                .font(.headline)
+            ProgressView()
+            Text("受信側のデバイスから接続してください")
+                .foregroundStyle(.secondary)
+            Button("キャンセル") {
                 showBrowser = false
                 connection.disconnect()
-            })
+            }
         }
-        #elseif os(macOS)
-        MultipeerBrowserView(manager: connection, onFinished: {
-            showBrowser = false
-        }, onCancelled: {
-            showBrowser = false
-            connection.disconnect()
-        })
-        #endif
+        .padding(40)
     }
 
     var body: some View {
@@ -35,17 +33,26 @@ struct SlideDetailView: View {
             Section("スライド情報") {
                 LabeledContent("タイトル", value: deck.title)
                 LabeledContent("ページ数", value: "\(deck.pages.count)")
-                LabeledContent("作成日", value: deck.createdAt.formatted(date: .abbreviated, time: .shortened))
-                LabeledContent("更新日", value: deck.updatedAt.formatted(date: .abbreviated, time: .shortened))
+                LabeledContent("作成日", value: deck.createdAt.formatted(.dateTime.year().month().day().hour().minute()))
+                LabeledContent("更新日", value: deck.updatedAt.formatted(.dateTime.year().month().day().hour().minute()))
             }
 
             Section("ページ一覧") {
                 ForEach(Array(deck.pages.enumerated()), id: \.element.id) { index, page in
-                    HStack {
-                        Text("\(index + 1)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(page.displayTitle)
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("\(index + 1)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text(page.displayTitle)
+                        }
+                        PresentationView(slideSize: SlideSize.standard16_9) {
+                            DynamicSlideContentView(pageData: page)
+                        }
+                        .aspectRatio(16/9, contentMode: .fit)
+                        .frame(height: 120)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .allowsHitTesting(false)
                     }
                 }
             }
@@ -58,8 +65,7 @@ struct SlideDetailView: View {
                         Image(systemName: "pencil")
                     }
                     Button {
-                        connection.startHosting()
-                        showBrowser = true
+                        showNameInput = true
                     } label: {
                         Image(systemName: "antenna.radiowaves.left.and.right")
                     }
@@ -73,8 +79,18 @@ struct SlideDetailView: View {
                 showBroadcast = true
             }
         }
+        .alert("配信者名", isPresented: $showNameInput) {
+            TextField("名前", text: $hostName)
+            Button("配信開始") {
+                connection.startHosting(displayName: hostName)
+                showBrowser = true
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("受信側に表示される名前を入力してください")
+        }
         .sheet(isPresented: $showBrowser) {
-            browserContent
+            waitingForConnectionView
         }
         #if os(macOS)
         .sheet(isPresented: $showBroadcast) {

@@ -8,9 +8,9 @@ struct SlideReceiverView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showBrowser = false
     @State private var isReceiving = false
+    @State private var showCloseConfirmation = false
     @State private var store: DynamicSlideStore?
     @State private var currentIndex = 0
-    @State private var pageCount = 0
 
     @ViewBuilder
     private var browserContent: some View {
@@ -40,6 +40,22 @@ struct SlideReceiverView: View {
                     PresentationView(slideSize: SlideSize.standard16_9) {
                         DynamicSlideContentView(pageData: currentIndex < store.pages.count ? store.pages[currentIndex] : nil)
                     }
+
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Button {
+                                showCloseConfirmation = true
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.title)
+                                    .foregroundStyle(.white.opacity(0.7))
+                                    .shadow(radius: 4)
+                            }
+                            .padding()
+                        }
+                        Spacer()
+                    }
                 }
             } else {
                 VStack(spacing: 20) {
@@ -59,7 +75,15 @@ struct SlideReceiverView: View {
                 }
             }
         }
-        .navigationTitle("スライド受信")
+        .confirmationDialog("受信を終了しますか？", isPresented: $showCloseConfirmation) {
+            Button("終了する", role: .destructive) {
+                isReceiving = false
+                store = nil
+                connection.disconnect()
+                dismiss()
+            }
+            Button("キャンセル", role: .cancel) {}
+        }
         .sheet(isPresented: $showBrowser) {
             browserContent
         }
@@ -72,7 +96,6 @@ struct SlideReceiverView: View {
     private func handleEvent(_ event: SlideEvent) {
         switch event {
         case .openSlide(let count):
-            pageCount = count
             store = DynamicSlideStore(pageCount: count)
             currentIndex = 0
             isReceiving = true
@@ -85,5 +108,6 @@ struct SlideReceiverView: View {
             connection.disconnect()
             dismiss()
         }
+        connection.clearReceivedEvent()
     }
 }

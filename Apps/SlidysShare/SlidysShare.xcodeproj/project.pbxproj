@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		682E4DE52F71539D00DA3D04 /* SlidysShareCore in Frameworks */ = {isa = PBXBuildFile; productRef = 682E4DE42F71539D00DA3D04 /* SlidysShareCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		682E4D952F70CBEA00DA3D04 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				682E4DE52F71539D00DA3D04 /* SlidysShareCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = SlidysShare;
 			packageProductDependencies = (
+				682E4DE42F71539D00DA3D04 /* SlidysShareCore */,
 			);
 			productName = SlidysShare;
 			productReference = 682E4D872F70CBE700DA3D04 /* SlidysShare.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 682E4D7E2F70CBE700DA3D04;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				682E4DE32F71539D00DA3D04 /* XCLocalSwiftPackageReference "../../Packages/SlidysShareCore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 682E4D882F70CBE700DA3D04 /* Products */;
 			projectDirPath = "";
@@ -398,6 +407,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -442,6 +452,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -615,6 +626,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		682E4DE32F71539D00DA3D04 /* XCLocalSwiftPackageReference "../../Packages/SlidysShareCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../Packages/SlidysShareCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		682E4DE42F71539D00DA3D04 /* SlidysShareCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SlidysShareCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 682E4D7F2F70CBE700DA3D04 /* Project object */;
 }
