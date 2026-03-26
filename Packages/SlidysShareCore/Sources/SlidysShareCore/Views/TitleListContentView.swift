@@ -1,6 +1,5 @@
 import SwiftUI
 import SlideKit
-import SlidesCore
 
 struct TitleListContentView: View {
     let title: String

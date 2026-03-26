@@ -24,6 +24,13 @@ struct ContentView: View {
                 .controlSize(.large)
             }
             .navigationTitle("Slidys Share")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
         }
     }
 }

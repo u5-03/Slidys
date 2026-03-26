@@ -1,5 +1,4 @@
 import SwiftUI
-import SlidesCore
 
 struct CenterImageContentView: View {
     let imageData: Data

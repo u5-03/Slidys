@@ -7,7 +7,6 @@
 
 import SwiftUI
 import SlideKit
-import SlidesCore
 
 @Observable
 public final class DynamicSlideStore {
@@ -58,6 +57,5 @@ public struct DynamicSlideContentView: View {
                     .background(.slideBackgroundColor)
             }
         }
-        .slideTheme(CustomSlideTheme(showSlideIndex: false))
     }
 }

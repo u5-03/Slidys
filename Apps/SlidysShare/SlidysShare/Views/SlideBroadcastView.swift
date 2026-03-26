@@ -63,6 +63,7 @@ struct SlideBroadcastView: View {
             Button("キャンセル", role: .cancel) {}
         }
         .onAppear {
+            guard !deck.pages.isEmpty else { return }
             try? connection.send(event: .openSlide(pageCount: deck.pages.count))
             sendCurrentPage()
         }

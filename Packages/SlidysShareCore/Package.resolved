@@ -1,6 +1,15 @@
 {
-  "originHash" : "d9ff75a16d43929bd04f4ea7f6b398c6d860ccc3c61be2f64b0afde206281960",
+  "originHash" : "b30c17502fd05183b8657f0179793e729f7d4339078573c2e2caa63ebcf7921c",
   "pins" : [
+    {
+      "identity" : "licenselist",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cybozu/LicenseList.git",
+      "state" : {
+        "revision" : "a0a1784aa60dcdafbc30cb2ffbac90544b46100a",
+        "version" : "2.1.0"
+      }
+    },
     {
       "identity" : "slidekit",
       "kind" : "remoteSourceControl",
@@ -8,24 +17,6 @@
       "state" : {
         "revision" : "ee71d2a687da199bf04d42a3ff13b9a1810fe4f1",
         "version" : "0.7.0"
-      }
-    },
-    {
-      "identity" : "swift-algorithms",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-algorithms.git",
-      "state" : {
-        "revision" : "87e50f483c54e6efd60e885f7f5aa946cee68023",
-        "version" : "1.2.1"
-      }
-    },
-    {
-      "identity" : "swift-numerics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics.git",
-      "state" : {
-        "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
-        "version" : "1.1.1"
       }
     },
     {
@@ -44,15 +35,6 @@
       "state" : {
         "revision" : "66fea7139f8e27cc2ac7c42fa9a5167c59685e16",
         "version" : "0.0.2"
-      }
-    },
-    {
-      "identity" : "yugiohcardeffect",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/u5-03/YugiohCardEffect",
-      "state" : {
-        "revision" : "938a2a84ec1e3b042a2a216493e59c2757ab6054",
-        "version" : "0.3.0"
       }
     }
   ],

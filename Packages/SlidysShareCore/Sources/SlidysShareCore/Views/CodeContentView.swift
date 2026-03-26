@@ -1,6 +1,5 @@
 import SwiftUI
 import SlideKit
-import SlidesCore
 import SyntaxInk
 
 struct CodeContentView: View {

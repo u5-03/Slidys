@@ -1,6 +1,5 @@
 import SwiftUI
 import SlideKit
-import SlidesCore
 
 struct TitleImageContentView: View {
     let title: String

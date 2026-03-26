@@ -1,6 +1,5 @@
 import SwiftUI
 import SlideKit
-import SlidesCore
 import SlidysShareCore
 
 struct SlideReceiverView: View {
@@ -9,6 +8,7 @@ struct SlideReceiverView: View {
     @State private var showBrowser = false
     @State private var isReceiving = false
     @State private var showCloseConfirmation = false
+    @State private var showDisconnectedAlert = false
     @State private var store: DynamicSlideStore?
     @State private var currentIndex = 0
 
@@ -90,6 +90,16 @@ struct SlideReceiverView: View {
         .onChange(of: connection.receivedEvent) { _, event in
             guard let event else { return }
             handleEvent(event)
+        }
+        .onChange(of: connection.connectionState) { _, newState in
+            if newState == .disconnected && isReceiving {
+                isReceiving = false
+                store = nil
+                showDisconnectedAlert = true
+            }
+        }
+        .alert("接続が切断されました", isPresented: $showDisconnectedAlert) {
+            Button("OK") {}
         }
     }
 
