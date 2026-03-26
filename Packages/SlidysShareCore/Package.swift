@@ -12,7 +12,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
-        .package(url: "https://github.com/cybozu/LicenseList.git", exact: "2.1.0"),
+        .package(url: "https://github.com/cybozu/LicenseList.git", from: "2.3.0"),
     ],
     targets: [
         .target(
