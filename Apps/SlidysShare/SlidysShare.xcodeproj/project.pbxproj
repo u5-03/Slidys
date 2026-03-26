@@ -27,19 +27,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		682E4EC52F744C9E00DA3D04 /* Embed App Clips */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			name = "Embed App Clips";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		682E4D872F70CBE700DA3D04 /* SlidysShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SlidysShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		682E4D942F70CBEA00DA3D04 /* SlidysShareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SlidysShareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -128,7 +115,6 @@
 				682E4D832F70CBE700DA3D04 /* Sources */,
 				682E4D842F70CBE700DA3D04 /* Frameworks */,
 				682E4D852F70CBE700DA3D04 /* Resources */,
-				682E4EC52F744C9E00DA3D04 /* Embed App Clips */,
 			);
 			buildRules = (
 			);
