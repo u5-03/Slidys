@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CenterImageContentView: View {
     let imageData: Data
+    let style: SlideStyle
 
     var body: some View {
         if let image = platformImage(from: imageData) {
@@ -10,7 +11,6 @@ struct CenterImageContentView: View {
                 .scaledToFit()
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(.slideBackgroundColor)
         }
     }
 }

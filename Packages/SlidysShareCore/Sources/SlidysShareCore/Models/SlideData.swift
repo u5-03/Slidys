@@ -23,6 +23,7 @@ public struct ListItem: Codable, Hashable, Identifiable {
 public struct SlidePageData: Codable, Hashable, Identifiable {
     public let id: UUID
     public var type: ShareSlideType
+    public var imageQuality: ImageQuality
 
     public var displayTitle: String {
         switch type {
@@ -34,9 +35,17 @@ public struct SlidePageData: Codable, Hashable, Identifiable {
         }
     }
 
-    public init(id: UUID = UUID(), type: ShareSlideType) {
+    public init(id: UUID = UUID(), type: ShareSlideType, imageQuality: ImageQuality = .low) {
         self.id = id
         self.type = type
+        self.imageQuality = imageQuality
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        type = try container.decode(ShareSlideType.self, forKey: .type)
+        imageQuality = try container.decodeIfPresent(ImageQuality.self, forKey: .imageQuality) ?? .low
     }
 }
 
@@ -44,14 +53,26 @@ public struct SlideDeck: Codable, Hashable, Identifiable {
     public let id: UUID
     public var title: String
     public var pages: [SlidePageData]
+    public var style: SlideStyle
     public var createdAt: Date
     public var updatedAt: Date
 
-    public init(id: UUID = UUID(), title: String, pages: [SlidePageData] = [], createdAt: Date = Date(), updatedAt: Date = Date()) {
+    public init(id: UUID = UUID(), title: String, pages: [SlidePageData] = [], style: SlideStyle = .default, createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
         self.title = title
         self.pages = pages
+        self.style = style
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        pages = try container.decode([SlidePageData].self, forKey: .pages)
+        style = try container.decodeIfPresent(SlideStyle.self, forKey: .style) ?? .default
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        updatedAt = try container.decode(Date.self, forKey: .updatedAt)
     }
 }

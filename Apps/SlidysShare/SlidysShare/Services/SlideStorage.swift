@@ -50,6 +50,23 @@ final class SlideStorage {
             .sorted { $0.updatedAt > $1.updatedAt }
     }
 
+    @discardableResult
+    func importDeck(from url: URL) -> Bool {
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let data = try? Data(contentsOf: url),
+              let importedDeck = try? decoder.decode(SlideDeck.self, from: data) else { return false }
+        let newDeck = SlideDeck(
+            title: importedDeck.title,
+            pages: importedDeck.pages,
+            style: importedDeck.style
+        )
+        save(deck: newDeck)
+        return true
+    }
+
     func delete(id: UUID) {
         let url = documentsDirectory.appendingPathComponent("\(id.uuidString).json")
         try? FileManager.default.removeItem(at: url)

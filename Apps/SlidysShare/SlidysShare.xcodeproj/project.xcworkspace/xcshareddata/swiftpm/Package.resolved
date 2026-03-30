@@ -1,0 +1,42 @@
+{
+  "originHash" : "7876efe51c4cb316e86a7abc892467bea79196d423ad9ec168dbcd576e9260c1",
+  "pins" : [
+    {
+      "identity" : "licenselist",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cybozu/LicenseList.git",
+      "state" : {
+        "revision" : "6740b7c6372d26c89bae227b5e9ee9793064e816",
+        "version" : "2.3.0"
+      }
+    },
+    {
+      "identity" : "slidekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mtj0928/SlideKit",
+      "state" : {
+        "revision" : "ee71d2a687da199bf04d42a3ff13b9a1810fe4f1",
+        "version" : "0.7.0"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax",
+      "state" : {
+        "revision" : "f99ae8aa18f0cf0d53481901f88a0991dc3bd4a2",
+        "version" : "601.0.1"
+      }
+    },
+    {
+      "identity" : "syntaxink",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mtj0928/SyntaxInk",
+      "state" : {
+        "revision" : "66fea7139f8e27cc2ac7c42fa9a5167c59685e16",
+        "version" : "0.0.2"
+      }
+    }
+  ],
+  "version" : 3
+}

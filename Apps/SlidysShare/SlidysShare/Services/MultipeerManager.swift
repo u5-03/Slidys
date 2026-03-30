@@ -8,16 +8,27 @@ import UIKit
 import AppKit
 #endif
 
+struct ReceivedReaction: Identifiable, Sendable {
+    let id: UUID
+    let type: ReactionType
+    let timestamp: Date
+}
+
+@MainActor
 @Observable
 final class MultipeerManager: NSObject, SlideConnectionProtocol {
     private(set) var connectionState: ConnectionState = .disconnected
     private(set) var receivedEvent: SlideEvent?
+    private(set) var receivedReactions: [ReceivedReaction] = []
+    private(set) var isHost: Bool = false
+    var onPeerConnected: (@MainActor @Sendable (MCPeerID) -> Void)?
 
     private let serviceType = "slidys-share"
     private var myPeerID: MCPeerID
     private var session: MCSession?
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
+    private var reactionCleanupTask: Task<Void, Never>?
 
     private static var defaultPeerName: String {
         #if canImport(UIKit)
@@ -36,6 +47,7 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
 
     func startHosting(displayName: String = "スライド送信者") {
         myPeerID = MCPeerID(displayName: displayName)
+        isHost = true
 
         let session = MCSession(peer: myPeerID, securityIdentity: nil, encryptionPreference: .none)
         session.delegate = self
@@ -45,13 +57,16 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
         advertiser?.delegate = self
         advertiser?.startAdvertisingPeer()
         connectionState = .connecting
+        startReactionCleanup()
     }
 
     func startBrowsing() {
+        isHost = false
         let session = MCSession(peer: myPeerID, securityIdentity: nil, encryptionPreference: .none)
         session.delegate = self
         self.session = session
         connectionState = .connecting
+        startReactionCleanup()
 
         #if os(macOS)
         // macOS uses programmatic browser (no MCBrowserViewController)
@@ -68,6 +83,12 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
         try session.send(data, toPeers: session.connectedPeers, with: .reliable)
     }
 
+    func send(event: SlideEvent, to peer: MCPeerID) throws {
+        guard let session else { return }
+        let data = try JSONEncoder().encode(event)
+        try session.send(data, toPeers: [peer], with: .reliable)
+    }
+
     func disconnect() {
         session?.disconnect()
         advertiser?.stopAdvertisingPeer()
@@ -76,11 +97,39 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
         browser = nil
         session = nil
         receivedEvent = nil
+        receivedReactions = []
+        reactionCleanupTask?.cancel()
+        reactionCleanupTask = nil
+        onPeerConnected = nil
+        isHost = false
         connectionState = .disconnected
     }
 
     func clearReceivedEvent() {
         receivedEvent = nil
+    }
+
+    func addLocalReaction(_ type: ReactionType) {
+        let reaction = ReceivedReaction(id: UUID(), type: type, timestamp: Date())
+        receivedReactions.append(reaction)
+    }
+
+    func removeReaction(id: UUID) {
+        receivedReactions.removeAll { $0.id == id }
+    }
+
+    // MARK: - Reaction Cleanup
+
+    private func startReactionCleanup() {
+        reactionCleanupTask?.cancel()
+        reactionCleanupTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                guard let self else { return }
+                let cutoff = Date().addingTimeInterval(-3)
+                self.receivedReactions.removeAll { $0.timestamp < cutoff }
+            }
+        }
     }
 
     // MARK: - Browser ViewController
@@ -96,50 +145,74 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
 // MARK: - MCSessionDelegate
 
 extension MultipeerManager: MCSessionDelegate {
-    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+    nonisolated func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         Task { @MainActor in
             switch state {
             case .connected:
                 self.connectionState = .connected
+                if self.isHost {
+                    self.onPeerConnected?(peerID)
+                }
             case .connecting:
-                self.connectionState = .connecting
+                if session.connectedPeers.isEmpty {
+                    self.connectionState = .connecting
+                }
             case .notConnected:
-                self.connectionState = .disconnected
+                if session.connectedPeers.isEmpty {
+                    self.connectionState = .disconnected
+                }
             @unknown default:
                 break
             }
         }
     }
 
-    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+    nonisolated func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         guard let event = try? JSONDecoder().decode(SlideEvent.self, from: data) else { return }
         Task { @MainActor in
-            self.receivedEvent = event
+            switch event {
+            case .reaction(let type):
+                let reaction = ReceivedReaction(id: UUID(), type: type, timestamp: Date())
+                self.receivedReactions.append(reaction)
+                // Host relays reactions to all other connected peers
+                if self.isHost {
+                    let otherPeers = session.connectedPeers.filter { $0 != peerID }
+                    if !otherPeers.isEmpty {
+                        try? session.send(data, toPeers: otherPeers, with: .reliable)
+                    }
+                }
+            default:
+                self.receivedEvent = event
+            }
         }
     }
 
-    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
-    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {}
-    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {}
+    nonisolated func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
+    nonisolated func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {}
+    nonisolated func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {}
 }
 
 // MARK: - MCNearbyServiceAdvertiserDelegate
 
 extension MultipeerManager: MCNearbyServiceAdvertiserDelegate {
-    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        invitationHandler(true, session)
+    nonisolated func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
+        Task { @MainActor in
+            invitationHandler(true, self.session)
+        }
     }
 }
 
 // MARK: - MCNearbyServiceBrowserDelegate
 
 extension MultipeerManager: MCNearbyServiceBrowserDelegate {
-    func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
-        guard let session else { return }
-        browser.invitePeer(peerID, to: session, withContext: nil, timeout: 30)
+    nonisolated func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
+        Task { @MainActor in
+            guard let session = self.session else { return }
+            browser.invitePeer(peerID, to: session, withContext: nil, timeout: 30)
+        }
     }
 
-    func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {}
+    nonisolated func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {}
 }
 
 // MARK: - MultipeerBrowserView

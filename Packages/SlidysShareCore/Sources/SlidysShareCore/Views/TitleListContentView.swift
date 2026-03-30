@@ -4,6 +4,7 @@ import SlideKit
 struct TitleListContentView: View {
     let title: String
     let items: [ListItem]
+    let style: SlideStyle
 
     var body: some View {
         HeaderSlide(.init(title)) {

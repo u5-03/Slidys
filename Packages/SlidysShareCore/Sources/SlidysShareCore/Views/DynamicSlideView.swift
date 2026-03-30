@@ -24,9 +24,11 @@ public final class DynamicSlideStore {
 
 public struct DynamicSlideContentView: View {
     let pageData: SlidePageData?
+    let style: SlideStyle
 
-    public init(pageData: SlidePageData?) {
+    public init(pageData: SlidePageData?, style: SlideStyle = .default) {
         self.pageData = pageData
+        self.style = style
     }
 
     public var body: some View {
@@ -36,26 +38,25 @@ public struct DynamicSlideContentView: View {
                 case .centerText(let text):
                     Text(text)
                         .lineSpacing(24)
-                        .font(.largeFont)
+                        .font(.system(size: 100, weight: .bold))
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .foregroundStyle(.defaultForegroundColor)
-                        .background(.slideBackgroundColor)
                 case .titleList(let title, let items):
-                    TitleListContentView(title: title, items: items)
+                    TitleListContentView(title: title, items: items, style: style)
                 case .titleImage(let title, let imageData):
-                    TitleImageContentView(title: title, imageData: imageData)
+                    TitleImageContentView(title: title, imageData: imageData, style: style)
                 case .centerImage(let imageData):
-                    CenterImageContentView(imageData: imageData)
+                    CenterImageContentView(imageData: imageData, style: style)
                 case .code(let title, let code):
-                    CodeContentView(title: title, code: code)
+                    CodeContentView(title: title, code: code, style: style)
                 }
             } else {
                 Text("Loading...")
-                    .font(.largeFont)
+                    .font(.system(size: 100, weight: .bold))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .foregroundStyle(.defaultForegroundColor)
-                    .background(.slideBackgroundColor)
             }
         }
+        .foregroundStyle(style.textColor.color)
+        .tint(style.accentColor.color)
+        .background(style.backgroundColor.color)
     }
 }

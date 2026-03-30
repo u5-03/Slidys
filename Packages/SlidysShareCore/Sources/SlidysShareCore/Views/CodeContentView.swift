@@ -5,6 +5,7 @@ import SyntaxInk
 struct CodeContentView: View {
     let title: String
     let code: String
+    let style: SlideStyle
 
     var body: some View {
         HeaderSlide(LocalizedStringKey(title)) {

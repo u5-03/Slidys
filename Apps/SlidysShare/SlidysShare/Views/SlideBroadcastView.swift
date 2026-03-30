@@ -13,7 +13,7 @@ struct SlideBroadcastView: View {
         ZStack {
             if !deck.pages.isEmpty, deck.pages.indices.contains(currentIndex) {
                 PresentationView(slideSize: SlideSize.standard16_9) {
-                    DynamicSlideContentView(pageData: deck.pages[currentIndex])
+                    DynamicSlideContentView(pageData: deck.pages[currentIndex], style: deck.style)
                 }
 
                 HStack {
@@ -32,6 +32,10 @@ struct SlideBroadcastView: View {
                             sendCurrentPage()
                         }
                 }
+            }
+
+            ReactionOverlayView(reactions: connection.receivedReactions) { id in
+                connection.removeReaction(id: id)
             }
 
             VStack {
@@ -64,9 +68,22 @@ struct SlideBroadcastView: View {
         }
         .onAppear {
             guard !deck.pages.isEmpty else { return }
-            try? connection.send(event: .openSlide(pageCount: deck.pages.count))
+            try? connection.send(event: .openSlide(pageCount: deck.pages.count, style: deck.style))
             sendCurrentPage()
+
+            connection.onPeerConnected = { [deck] peer in
+                try? connection.send(event: .openSlide(pageCount: deck.pages.count, style: deck.style), to: peer)
+                if currentIndex < deck.pages.count {
+                    try? connection.send(event: .showPage(index: currentIndex, page: deck.pages[currentIndex]), to: peer)
+                }
+            }
         }
+        .onDisappear {
+            connection.onPeerConnected = nil
+        }
+        #if os(macOS)
+        .frame(minWidth: 960, idealWidth: 1280, minHeight: 540, idealHeight: 720)
+        #endif
     }
 
     private func sendCurrentPage() {
@@ -74,3 +91,9 @@ struct SlideBroadcastView: View {
         try? connection.send(event: .showPage(index: currentIndex, page: deck.pages[currentIndex]))
     }
 }
+
+#if DEBUG
+#Preview {
+    SlideBroadcastView(deck: PreviewSampleData.sampleDeck, connection: PreviewSampleData.sampleConnection)
+}
+#endif

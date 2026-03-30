@@ -6,8 +6,10 @@
     {
       "layers" : [
         {
-          "image-name" : "Rectangle 1.svg",
-          "name" : "Rectangle 1"
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "SlidysShare.svg",
+          "name" : "SlidysShare"
         }
       ],
       "shadow" : {
@@ -21,9 +23,6 @@
     }
   ],
   "supported-platforms" : {
-    "circles" : [
-      "watchOS"
-    ],
     "squares" : "shared"
   }
 }

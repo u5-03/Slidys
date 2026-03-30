@@ -4,6 +4,7 @@ import SlideKit
 struct TitleImageContentView: View {
     let title: String
     let imageData: Data
+    let style: SlideStyle
 
     var body: some View {
         HeaderSlide(.init(title)) {
@@ -13,7 +14,6 @@ struct TitleImageContentView: View {
                     .scaledToFit()
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(.slideBackgroundColor)
             }
         }
     }

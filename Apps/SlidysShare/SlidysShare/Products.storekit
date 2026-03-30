@@ -1,0 +1,56 @@
+{
+  "identifier" : "com.sugiy.slidysshare.tips",
+  "type" : "Configuration",
+  "version" : 3,
+  "products" : [
+    {
+      "displayPrice" : "120",
+      "familyShareable" : false,
+      "internalID" : "tip_small",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "サポート（小）",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "com.sugiy.slidysshare.tip.small",
+      "referenceName" : "Small Tip",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "480",
+      "familyShareable" : false,
+      "internalID" : "tip_medium",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "サポート（中）",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "com.sugiy.slidysshare.tip.medium",
+      "referenceName" : "Medium Tip",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "980",
+      "familyShareable" : false,
+      "internalID" : "tip_large",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "サポート（大）",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "com.sugiy.slidysshare.tip.large",
+      "referenceName" : "Large Tip",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "slidysshare",
+    "_developerTeamID" : "669226BDWM"
+  }
+}

@@ -12,7 +12,7 @@ struct SlidePreviewView: View {
             ZStack {
                 if !deck.pages.isEmpty, deck.pages.indices.contains(currentIndex) {
                     PresentationView(slideSize: SlideSize.standard16_9) {
-                        DynamicSlideContentView(pageData: deck.pages[currentIndex])
+                        DynamicSlideContentView(pageData: deck.pages[currentIndex], style: deck.style)
                     }
 
                     HStack {
@@ -40,3 +40,9 @@ struct SlidePreviewView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview {
+    SlidePreviewView(deck: PreviewSampleData.sampleDeck)
+}
+#endif

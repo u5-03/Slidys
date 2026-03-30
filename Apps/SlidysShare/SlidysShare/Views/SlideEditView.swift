@@ -16,9 +16,24 @@ struct SlideEditView: View {
                 TextField("タイトル", text: $deck.title)
             }
 
+            Section("スタイル") {
+                ColorPicker("テキストの色", selection: Binding(
+                    get: { deck.style.textColor.color },
+                    set: { deck.style.textColor = CodableColor(color: $0) }
+                ))
+                ColorPicker("背景の色", selection: Binding(
+                    get: { deck.style.backgroundColor.color },
+                    set: { deck.style.backgroundColor = CodableColor(color: $0) }
+                ))
+                ColorPicker("アクセントカラー", selection: Binding(
+                    get: { deck.style.accentColor.color },
+                    set: { deck.style.accentColor = CodableColor(color: $0) }
+                ))
+            }
+
             Section("ページ") {
                 ForEach($deck.pages) { $page in
-                    SlidePageEditRow(page: $page)
+                    SlidePageEditRow(page: $page, style: deck.style)
                 }
                 .onDelete { indexSet in
                     deck.pages.remove(atOffsets: indexSet)
@@ -32,6 +47,7 @@ struct SlideEditView: View {
                 }
             }
         }
+        .formStyle(.grouped)
         .navigationTitle(isNew ? "新規スライド" : "スライド編集")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -60,13 +76,24 @@ struct SlideEditView: View {
     }
 }
 
+#if DEBUG
+#Preview {
+    NavigationStack {
+        SlideEditView(deck: PreviewSampleData.sampleDeck, storage: PreviewSampleData.sampleStorage, isNew: true)
+    }
+}
+#endif
+
 struct SlidePageEditRow: View {
     @Binding var page: SlidePageData
+    let style: SlideStyle
     @State private var selectedType: Int = 0
     @State private var centerText: String = ""
     @State private var titleText: String = ""
     @State private var listItems: [ListItem] = []
     @State private var imageData: Data = Data()
+    @State private var originalImageData: Data?
+    @State private var imageQuality: ImageQuality = .low
     @State private var codeText: String = ""
     @State private var selectedPhoto: PhotosPickerItem?
 
@@ -121,15 +148,17 @@ struct SlidePageEditRow: View {
                 EmptyView()
             }
         } label: {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(pageLabel)
+            HStack(spacing: 8) {
                 PresentationView(slideSize: SlideSize.standard16_9) {
-                    DynamicSlideContentView(pageData: page)
+                    DynamicSlideContentView(pageData: page, style: style)
                 }
                 .aspectRatio(16/9, contentMode: .fit)
-                .frame(height: 80)
+                .frame(width: 120, height: 67.5)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .allowsHitTesting(false)
+
+                Text(pageLabel)
+                    .lineLimit(1)
             }
         }
         .onAppear { loadFromPage() }
@@ -141,12 +170,26 @@ struct SlidePageEditRow: View {
             .onChange(of: selectedPhoto) { _, newItem in
                 Task {
                     if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                        imageData = Self.compressImage(data: data)
+                        originalImageData = data
+                        imageData = Self.compressImage(data: data, quality: imageQuality)
                         selectedPhoto = nil
                         syncToPage()
                     }
                 }
             }
+        Picker("画質", selection: $imageQuality) {
+            ForEach(ImageQuality.allCases, id: \.self) { quality in
+                Text(quality.displayName).tag(quality)
+            }
+        }
+        .onChange(of: imageQuality) { _, newQuality in
+            if let original = originalImageData {
+                imageData = Self.compressImage(data: original, quality: newQuality)
+            } else if !imageData.isEmpty {
+                imageData = Self.compressImage(data: imageData, quality: newQuality)
+            }
+            syncToPage()
+        }
         #if canImport(UIKit)
         if !imageData.isEmpty, let uiImage = UIImage(data: imageData) {
             Image(uiImage: uiImage)
@@ -175,6 +218,7 @@ struct SlidePageEditRow: View {
     }
 
     private func loadFromPage() {
+        imageQuality = page.imageQuality
         switch page.type {
         case .centerText(let text):
             selectedType = 0
@@ -210,17 +254,19 @@ struct SlidePageEditRow: View {
 
     private func syncToPage() {
         updatePageType(selectedType)
+        page.imageQuality = imageQuality
     }
 
-    private static let maxImageBytes = 500_000 // 500KB
-    private static let dimensionSteps: [CGFloat] = [1280, 640, 320]
+    private static func compressImage(data: Data, quality imageQuality: ImageQuality) -> Data {
+        let maxImageBytes = imageQuality.maxBytes
+        let dimensionSteps = imageQuality.maxDimensionSteps
+        let initialQuality = imageQuality.initialQuality
 
-    private static func compressImage(data: Data) -> Data {
         #if canImport(UIKit)
         guard let original = UIImage(data: data) else { return data }
         for maxDim in dimensionSteps {
             let resized = resizeUIImage(original, maxDimension: maxDim)
-            var quality: CGFloat = 0.8
+            var quality: CGFloat = initialQuality
             while quality >= 0.1 {
                 if let jpeg = resized.jpegData(compressionQuality: quality),
                    jpeg.count <= maxImageBytes {
@@ -229,7 +275,7 @@ struct SlidePageEditRow: View {
                 quality -= 0.1
             }
         }
-        let smallest = resizeUIImage(original, maxDimension: dimensionSteps.last!)
+        let smallest = resizeUIImage(original, maxDimension: dimensionSteps.last ?? 320)
         return smallest.jpegData(compressionQuality: 0.1) ?? data
         #elseif canImport(AppKit)
         guard let original = NSImage(data: data) else { return data }
@@ -237,7 +283,7 @@ struct SlidePageEditRow: View {
             let resized = resizeNSImage(original, maxDimension: maxDim)
             guard let tiffData = resized.tiffRepresentation,
                   let bitmap = NSBitmapImageRep(data: tiffData) else { continue }
-            var quality: CGFloat = 0.8
+            var quality: CGFloat = initialQuality
             while quality >= 0.1 {
                 if let jpeg = bitmap.representation(using: .jpeg, properties: [.compressionFactor: quality]),
                    jpeg.count <= maxImageBytes {
@@ -246,7 +292,7 @@ struct SlidePageEditRow: View {
                 quality -= 0.1
             }
         }
-        let smallest = resizeNSImage(original, maxDimension: dimensionSteps.last!)
+        let smallest = resizeNSImage(original, maxDimension: dimensionSteps.last ?? 320)
         if let tiffData = smallest.tiffRepresentation,
            let bitmap = NSBitmapImageRep(data: tiffData) {
             return bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.1]) ?? data

@@ -2,7 +2,7 @@ import SwiftUI
 import SlidysShareCore
 
 struct ContentView: View {
-    @State private var storage = SlideStorage()
+    @Bindable var storage: SlideStorage
     @State private var multipeerManager = MultipeerManager()
 
     var body: some View {
@@ -34,3 +34,9 @@ struct ContentView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview {
+    ContentView(storage: PreviewSampleData.sampleStorage)
+}
+#endif

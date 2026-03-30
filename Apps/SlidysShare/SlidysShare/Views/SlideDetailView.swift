@@ -1,5 +1,4 @@
 import SwiftUI
-import MultipeerConnectivity
 import SlideKit
 import SlidysShareCore
 
@@ -47,7 +46,7 @@ struct SlideDetailView: View {
                             Text(page.displayTitle)
                         }
                         PresentationView(slideSize: SlideSize.standard16_9) {
-                            DynamicSlideContentView(pageData: page)
+                            DynamicSlideContentView(pageData: page, style: deck.style)
                         }
                         .aspectRatio(16/9, contentMode: .fit)
                         .frame(height: 120)
@@ -61,6 +60,9 @@ struct SlideDetailView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 HStack {
+                    ShareLink(item: deck, preview: SharePreview(deck.title)) {
+                        Image(systemName: "square.and.arrow.up.fill")
+                    }
                     NavigationLink(destination: SlideEditView(deck: deck, storage: storage, isNew: false)) {
                         Image(systemName: "pencil")
                     }
@@ -103,3 +105,11 @@ struct SlideDetailView: View {
         #endif
     }
 }
+
+#if DEBUG
+#Preview {
+    NavigationStack {
+        SlideDetailView(deck: PreviewSampleData.sampleDeck, storage: PreviewSampleData.sampleStorage, connection: PreviewSampleData.sampleConnection)
+    }
+}
+#endif

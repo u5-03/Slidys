@@ -11,6 +11,7 @@ struct SlideReceiverView: View {
     @State private var showDisconnectedAlert = false
     @State private var store: DynamicSlideStore?
     @State private var currentIndex = 0
+    @State private var slideStyle: SlideStyle = .default
 
     @ViewBuilder
     private var browserContent: some View {
@@ -38,7 +39,11 @@ struct SlideReceiverView: View {
             if isReceiving, let store {
                 ZStack {
                     PresentationView(slideSize: SlideSize.standard16_9) {
-                        DynamicSlideContentView(pageData: currentIndex < store.pages.count ? store.pages[currentIndex] : nil)
+                        DynamicSlideContentView(pageData: currentIndex < store.pages.count ? store.pages[currentIndex] : nil, style: slideStyle)
+                    }
+
+                    ReactionOverlayView(reactions: connection.receivedReactions) { id in
+                        connection.removeReaction(id: id)
                     }
 
                     VStack {
@@ -55,6 +60,11 @@ struct SlideReceiverView: View {
                             .padding()
                         }
                         Spacer()
+                        ReactionPickerView { type in
+                            try? connection.send(event: .reaction(type))
+                            connection.addLocalReaction(type)
+                        }
+                        .padding(.bottom, 16)
                     }
                 }
             } else {
@@ -105,8 +115,9 @@ struct SlideReceiverView: View {
 
     private func handleEvent(_ event: SlideEvent) {
         switch event {
-        case .openSlide(let count):
+        case .openSlide(let count, let style):
             store = DynamicSlideStore(pageCount: count)
+            slideStyle = style
             currentIndex = 0
             isReceiving = true
         case .showPage(let index, let page):
@@ -117,7 +128,16 @@ struct SlideReceiverView: View {
             store = nil
             connection.disconnect()
             dismiss()
+        case .reaction:
+            // Reactions are handled directly in MultipeerManager
+            break
         }
         connection.clearReceivedEvent()
     }
 }
+
+#if DEBUG
+#Preview {
+    SlideReceiverView(connection: PreviewSampleData.sampleConnection)
+}
+#endif
