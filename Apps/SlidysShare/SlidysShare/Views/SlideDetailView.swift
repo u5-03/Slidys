@@ -9,7 +9,7 @@ struct SlideDetailView: View {
     @State private var showBrowser = false
     @State private var showBroadcast = false
     @State private var showNameInput = false
-    @State private var hostName = "スライド送信者"
+    @State private var hostName = String(localized: "スライド送信者")
 
     @ViewBuilder
     private var waitingForConnectionView: some View {
@@ -60,7 +60,14 @@ struct SlideDetailView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 HStack {
-                    ShareLink(item: deck, preview: SharePreview(deck.title)) {
+                    Menu {
+                        ShareLink(item: deck, preview: SharePreview(deck.title)) {
+                            Label("スライドファイルとして共有", systemImage: "doc")
+                        }
+                        ShareLink(item: deck.toMarkdown(), preview: SharePreview("\(deck.title).md")) {
+                            Label("マークダウンとして書き出し", systemImage: "doc.plaintext")
+                        }
+                    } label: {
                         Image(systemName: "square.and.arrow.up.fill")
                     }
                     NavigationLink(destination: SlideEditView(deck: deck, storage: storage, isNew: false)) {

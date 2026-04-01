@@ -67,6 +67,18 @@ final class SlideStorage {
         return true
     }
 
+    #if canImport(FoundationModels)
+    func importMarkdownDeck(from url: URL) async throws {
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        let markdownString = try String(contentsOf: url, encoding: .utf8)
+        let fileName = url.deletingPathExtension().lastPathComponent
+        let parser = MarkdownSlideParser()
+        let deck = try await parser.parse(markdown: markdownString, deckTitle: fileName)
+        save(deck: deck)
+    }
+    #endif
+
     func delete(id: UUID) {
         let url = documentsDirectory.appendingPathComponent("\(id.uuidString).json")
         try? FileManager.default.removeItem(at: url)

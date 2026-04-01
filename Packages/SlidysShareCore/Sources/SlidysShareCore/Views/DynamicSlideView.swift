@@ -41,7 +41,7 @@ public struct DynamicSlideContentView: View {
                         .font(.system(size: 100, weight: .bold))
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 case .titleList(let title, let items):
-                    TitleListContentView(title: title, items: items, style: style)
+                    TitleListContentView(title: title, items: items, style: style, listBulletStyle: pageData.listBulletStyle)
                 case .titleImage(let title, let imageData):
                     TitleImageContentView(title: title, imageData: imageData, style: style)
                 case .centerImage(let imageData):

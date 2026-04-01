@@ -1,5 +1,10 @@
 import Foundation
 
+public enum ListBulletStyle: String, Codable, Hashable, CaseIterable, Sendable {
+    case bullet
+    case numbered
+}
+
 public enum ShareSlideType: Codable, Hashable {
     case titleList(title: String, items: [ListItem])
     case titleImage(title: String, imageData: Data)
@@ -24,6 +29,7 @@ public struct SlidePageData: Codable, Hashable, Identifiable {
     public let id: UUID
     public var type: ShareSlideType
     public var imageQuality: ImageQuality
+    public var listBulletStyle: ListBulletStyle
 
     public var displayTitle: String {
         switch type {
@@ -35,10 +41,11 @@ public struct SlidePageData: Codable, Hashable, Identifiable {
         }
     }
 
-    public init(id: UUID = UUID(), type: ShareSlideType, imageQuality: ImageQuality = .low) {
+    public init(id: UUID = UUID(), type: ShareSlideType, imageQuality: ImageQuality = .low, listBulletStyle: ListBulletStyle = .bullet) {
         self.id = id
         self.type = type
         self.imageQuality = imageQuality
+        self.listBulletStyle = listBulletStyle
     }
 
     public init(from decoder: Decoder) throws {
@@ -46,6 +53,7 @@ public struct SlidePageData: Codable, Hashable, Identifiable {
         id = try container.decode(UUID.self, forKey: .id)
         type = try container.decode(ShareSlideType.self, forKey: .type)
         imageQuality = try container.decodeIfPresent(ImageQuality.self, forKey: .imageQuality) ?? .low
+        listBulletStyle = try container.decodeIfPresent(ListBulletStyle.self, forKey: .listBulletStyle) ?? .bullet
     }
 }
 

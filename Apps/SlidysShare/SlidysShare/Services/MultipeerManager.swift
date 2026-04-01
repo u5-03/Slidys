@@ -45,7 +45,7 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
 
     // MARK: - SlideConnectionProtocol
 
-    func startHosting(displayName: String = "スライド送信者") {
+    func startHosting(displayName: String = String(localized: "スライド送信者")) {
         myPeerID = MCPeerID(displayName: displayName)
         isHost = true
 
@@ -281,9 +281,9 @@ struct MultipeerBrowserView: View {
 
     private var stateText: String {
         switch manager.connectionState {
-        case .disconnected: return "未接続"
-        case .connecting: return "接続中..."
-        case .connected: return "接続済み"
+        case .disconnected: return String(localized: "未接続")
+        case .connecting: return String(localized: "接続中...")
+        case .connected: return String(localized: "接続済み")
         }
     }
 }

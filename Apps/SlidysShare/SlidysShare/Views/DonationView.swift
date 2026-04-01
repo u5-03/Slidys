@@ -8,9 +8,9 @@ private enum TipProduct: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .small: "サポート（小）"
-        case .medium: "サポート（中）"
-        case .large: "サポート（大）"
+        case .small: String(localized: "サポート（小）")
+        case .medium: String(localized: "サポート（中）")
+        case .large: String(localized: "サポート（大）")
         }
     }
 

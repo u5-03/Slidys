@@ -91,6 +91,7 @@ struct SlidePageEditRow: View {
     @State private var centerText: String = ""
     @State private var titleText: String = ""
     @State private var listItems: [ListItem] = []
+    @State private var listBulletStyle: ListBulletStyle = .bullet
     @State private var imageData: Data = Data()
     @State private var originalImageData: Data?
     @State private var imageQuality: ImageQuality = .low
@@ -117,6 +118,12 @@ struct SlidePageEditRow: View {
             case 1:
                 TextField("タイトル", text: $titleText)
                     .onChange(of: titleText) { _, _ in syncToPage() }
+                Picker("リストスタイル", selection: $listBulletStyle) {
+                    ForEach(ListBulletStyle.allCases, id: \.self) { style in
+                        Text(style.localizedDisplayName).tag(style)
+                    }
+                }
+                .onChange(of: listBulletStyle) { _, _ in syncToPage() }
                 ForEach($listItems) { $item in
                     HStack {
                         Toggle("インデント", isOn: $item.isIndented)
@@ -179,7 +186,7 @@ struct SlidePageEditRow: View {
             }
         Picker("画質", selection: $imageQuality) {
             ForEach(ImageQuality.allCases, id: \.self) { quality in
-                Text(quality.displayName).tag(quality)
+                Text(quality.localizedDisplayName).tag(quality)
             }
         }
         .onChange(of: imageQuality) { _, newQuality in
@@ -209,16 +216,17 @@ struct SlidePageEditRow: View {
 
     private var pageLabel: String {
         switch page.type {
-        case .centerText(let text): return text.isEmpty ? "中央テキスト" : text
-        case .titleList(let title, _): return title.isEmpty ? "タイトル+リスト" : title
-        case .titleImage(let title, _): return title.isEmpty ? "タイトル+画像" : title
-        case .centerImage: return "画像のみ"
-        case .code(let title, _): return title.isEmpty ? "コード" : title
+        case .centerText(let text): return text.isEmpty ? String(localized: "中央テキスト") : text
+        case .titleList(let title, _): return title.isEmpty ? String(localized: "タイトル+リスト") : title
+        case .titleImage(let title, _): return title.isEmpty ? String(localized: "タイトル+画像") : title
+        case .centerImage: return String(localized: "画像のみ")
+        case .code(let title, _): return title.isEmpty ? String(localized: "コード") : title
         }
     }
 
     private func loadFromPage() {
         imageQuality = page.imageQuality
+        listBulletStyle = page.listBulletStyle
         switch page.type {
         case .centerText(let text):
             selectedType = 0
@@ -255,6 +263,7 @@ struct SlidePageEditRow: View {
     private func syncToPage() {
         updatePageType(selectedType)
         page.imageQuality = imageQuality
+        page.listBulletStyle = listBulletStyle
     }
 
     private static func compressImage(data: Data, quality imageQuality: ImageQuality) -> Data {

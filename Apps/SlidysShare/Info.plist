@@ -2,12 +2,27 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>スライドを近くのデバイスと共有するためにローカルネットワークを使用します</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Slidys Share Slide</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>yugo.sugiyama.slidysshare</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_slidys-share._tcp</string>
 	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>スライドを近くのデバイスと共有するためにローカルネットワークを使用します</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -27,21 +42,6 @@
 					<string>slidysshare</string>
 				</array>
 			</dict>
-		</dict>
-	</array>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>Slidys Share Slide</string>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>yugo.sugiyama.slidysshare</string>
-			</array>
 		</dict>
 	</array>
 </dict>
