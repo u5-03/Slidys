@@ -8,12 +8,6 @@ import UIKit
 import AppKit
 #endif
 
-struct ReceivedReaction: Identifiable, Sendable {
-    let id: UUID
-    let type: ReactionType
-    let timestamp: Date
-}
-
 @MainActor
 @Observable
 final class MultipeerManager: NSObject, SlideConnectionProtocol {
@@ -110,8 +104,7 @@ final class MultipeerManager: NSObject, SlideConnectionProtocol {
     }
 
     func addLocalReaction(_ type: ReactionType) {
-        let reaction = ReceivedReaction(id: UUID(), type: type, timestamp: Date())
-        receivedReactions.append(reaction)
+        receivedReactions.append(ReceivedReaction(type: type))
     }
 
     func removeReaction(id: UUID) {
@@ -172,8 +165,7 @@ extension MultipeerManager: MCSessionDelegate {
         Task { @MainActor in
             switch event {
             case .reaction(let type):
-                let reaction = ReceivedReaction(id: UUID(), type: type, timestamp: Date())
-                self.receivedReactions.append(reaction)
+                self.receivedReactions.append(ReceivedReaction(type: type))
                 // Host relays reactions to all other connected peers
                 if self.isHost {
                     let otherPeers = session.connectedPeers.filter { $0 != peerID }

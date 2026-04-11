@@ -4,7 +4,7 @@ import SlidysShareCore
 
 struct SlideListView: View {
     @Bindable var storage: SlideStorage
-    let connection: MultipeerManager
+    let connection: any SlideConnectionProtocol
     @State private var showFileImporter = false
     #if canImport(FoundationModels)
     @State private var showMarkdownImporter = false

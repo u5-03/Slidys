@@ -16,4 +16,14 @@ public enum ReactionType: String, Codable, CaseIterable, Sendable {
         case .rocket: return "\u{1F680}"
         }
     }
+
+    public var sfSymbolName: String {
+        switch self {
+        case .thumbsUp: return "hand.thumbsup.fill"
+        case .clap: return "hands.clap.fill"
+        case .heart: return "heart.fill"
+        case .fire: return "flame.fill"
+        case .rocket: return "paperplane.fill"
+        }
+    }
 }

@@ -5,6 +5,7 @@ xcschememanagement.plist
 DerivedData/
 FlutterFrameworks/
 **/.build/
+**/build/**
 
 # Xcode user specific files
 Apps/Slidys.xcworkspace/xcuserdata/

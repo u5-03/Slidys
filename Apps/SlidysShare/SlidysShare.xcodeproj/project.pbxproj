@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		682E4DE52F71539D00DA3D04 /* SlidysShareCore in Frameworks */ = {isa = PBXBuildFile; productRef = 682E4DE42F71539D00DA3D04 /* SlidysShareCore */; };
 		68B3DE2B2F76CE50008D091C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68B3DE2A2F76CE50008D091C /* StoreKit.framework */; };
+		CC00000D000000000000AA0D /* AppStoreScreenshotTestCore in Frameworks */ = {isa = PBXBuildFile; productRef = CC00000B000000000000AA0B /* AppStoreScreenshotTestCore */; };
+		CC00000E000000000000AA0E /* SlidysShareCore in Frameworks */ = {isa = PBXBuildFile; productRef = CC00000C000000000000AA0C /* SlidysShareCore */; };
+		CC000010000000000000AA10 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68B3DE2A2F76CE50008D091C /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,11 +36,25 @@
 		682E4D942F70CBEA00DA3D04 /* SlidysShareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SlidysShareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		682E4D9E2F70CBEA00DA3D04 /* SlidysShareUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SlidysShareUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		68B3DE2A2F76CE50008D091C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		CC000002000000000000AA02 /* SlidysShareScreenshots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SlidysShareScreenshots.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CC00000F000000000000AA0F /* Exceptions for "SlidysShare" folder in "SlidysShareScreenshots" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SlidysShareApp.swift,
+			);
+			target = CC000001000000000000AA01 /* SlidysShareScreenshots */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		682E4D892F70CBE700DA3D04 /* SlidysShare */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CC00000F000000000000AA0F /* Exceptions for "SlidysShare" folder in "SlidysShareScreenshots" target */,
+			);
 			path = SlidysShare;
 			sourceTree = "<group>";
 		};
@@ -49,6 +66,11 @@
 		682E4DA12F70CBEA00DA3D04 /* SlidysShareUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = SlidysShareUITests;
+			sourceTree = "<group>";
+		};
+		CC000009000000000000AA09 /* SlidysShareScreenshots */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SlidysShareScreenshots;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -77,6 +99,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC000004000000000000AA04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC00000D000000000000AA0D /* AppStoreScreenshotTestCore in Frameworks */,
+				CC00000E000000000000AA0E /* SlidysShareCore in Frameworks */,
+				CC000010000000000000AA10 /* StoreKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -86,6 +118,7 @@
 				682E4D892F70CBE700DA3D04 /* SlidysShare */,
 				682E4D972F70CBEA00DA3D04 /* SlidysShareTests */,
 				682E4DA12F70CBEA00DA3D04 /* SlidysShareUITests */,
+				CC000009000000000000AA09 /* SlidysShareScreenshots */,
 				682E4ECC2F744D6900DA3D04 /* Frameworks */,
 				682E4D882F70CBE700DA3D04 /* Products */,
 			);
@@ -97,6 +130,7 @@
 				682E4D872F70CBE700DA3D04 /* SlidysShare.app */,
 				682E4D942F70CBEA00DA3D04 /* SlidysShareTests.xctest */,
 				682E4D9E2F70CBEA00DA3D04 /* SlidysShareUITests.xctest */,
+				CC000002000000000000AA02 /* SlidysShareScreenshots.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -181,6 +215,31 @@
 			productReference = 682E4D9E2F70CBEA00DA3D04 /* SlidysShareUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		CC000001000000000000AA01 /* SlidysShareScreenshots */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC000008000000000000AA08 /* Build configuration list for PBXNativeTarget "SlidysShareScreenshots" */;
+			buildPhases = (
+				CC000003000000000000AA03 /* Sources */,
+				CC000004000000000000AA04 /* Frameworks */,
+				CC000005000000000000AA05 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				682E4D892F70CBE700DA3D04 /* SlidysShare */,
+				CC000009000000000000AA09 /* SlidysShareScreenshots */,
+			);
+			name = SlidysShareScreenshots;
+			packageProductDependencies = (
+				CC00000B000000000000AA0B /* AppStoreScreenshotTestCore */,
+				CC00000C000000000000AA0C /* SlidysShareCore */,
+			);
+			productName = SlidysShareScreenshots;
+			productReference = CC000002000000000000AA02 /* SlidysShareScreenshots.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -202,6 +261,9 @@
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = 682E4D862F70CBE700DA3D04;
 					};
+					CC000001000000000000AA01 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 				};
 			};
 			buildConfigurationList = 682E4D822F70CBE700DA3D04 /* Build configuration list for PBXProject "SlidysShare" */;
@@ -216,6 +278,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				682E4DE32F71539D00DA3D04 /* XCLocalSwiftPackageReference "../../Packages/SlidysShareCore" */,
+				CC00000A000000000000AA0A /* XCLocalSwiftPackageReference "../../../AppStoreScreenshotTest" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 682E4D882F70CBE700DA3D04 /* Products */;
@@ -225,6 +288,7 @@
 				682E4D862F70CBE700DA3D04 /* SlidysShare */,
 				682E4D932F70CBEA00DA3D04 /* SlidysShareTests */,
 				682E4D9D2F70CBEA00DA3D04 /* SlidysShareUITests */,
+				CC000001000000000000AA01 /* SlidysShareScreenshots */,
 			);
 		};
 /* End PBXProject section */
@@ -251,6 +315,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC000005000000000000AA05 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -269,6 +340,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		682E4D9A2F70CBEA00DA3D04 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC000003000000000000AA03 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -613,6 +691,86 @@
 			};
 			name = Release;
 		};
+		CC000006000000000000AA06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 669226BDWM;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SlidysShareScreenshots;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.SlidysShare.Screenshots;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		CC000007000000000000AA07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 669226BDWM;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SlidysShareScreenshots;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = yugo.sugiyama.SlidysShare.Screenshots;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -652,6 +810,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		CC000008000000000000AA08 /* Build configuration list for PBXNativeTarget "SlidysShareScreenshots" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC000006000000000000AA06 /* Debug */,
+				CC000007000000000000AA07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -659,10 +826,23 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../Packages/SlidysShareCore;
 		};
+		CC00000A000000000000AA0A /* XCLocalSwiftPackageReference "../../../AppStoreScreenshotTest" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../AppStoreScreenshotTest;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		682E4DE42F71539D00DA3D04 /* SlidysShareCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SlidysShareCore;
+		};
+		CC00000B000000000000AA0B /* AppStoreScreenshotTestCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC00000A000000000000AA0A /* XCLocalSwiftPackageReference "../../../AppStoreScreenshotTest" */;
+			productName = AppStoreScreenshotTestCore;
+		};
+		CC00000C000000000000AA0C /* SlidysShareCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SlidysShareCore;
 		};

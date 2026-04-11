@@ -39,8 +39,9 @@ private struct ReactionBubbleView: View {
     }
 
     var body: some View {
-        Text(reaction.type.emoji)
+        Image(systemName: reaction.type.sfSymbolName)
             .font(.system(size: 40))
+            .symbolRenderingMode(.multicolor)
             .position(
                 x: horizontalPosition,
                 y: isAnimating ? containerSize.height * 0.2 : containerSize.height - 40

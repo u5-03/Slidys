@@ -50,6 +50,9 @@
     "by mtj0928" : {
 
     },
+    "Failed to load screenshot config" : {
+
+    },
     "Markdownの解析に失敗しました: %@\n詳細: %@" : {
       "localizations" : {
         "en" : {
@@ -909,6 +912,16 @@
         }
       }
     },
+    "箇条書き" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bullet List"
+          }
+        }
+      }
+    },
     "終了する" : {
       "localizations" : {
         "en" : {
@@ -1035,16 +1048,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add Item"
-          }
-        }
-      }
-    },
-    "箇条書き" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bullet List"
           }
         }
       }

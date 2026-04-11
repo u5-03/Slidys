@@ -19,9 +19,9 @@ enum PreviewSampleData {
     )
 
     static let sampleReactions: [ReceivedReaction] = [
-        ReceivedReaction(id: UUID(), type: .thumbsUp, timestamp: Date()),
-        ReceivedReaction(id: UUID(), type: .heart, timestamp: Date()),
-        ReceivedReaction(id: UUID(), type: .fire, timestamp: Date()),
+        ReceivedReaction(type: .thumbsUp),
+        ReceivedReaction(type: .heart),
+        ReceivedReaction(type: .fire),
     ]
 
     @MainActor

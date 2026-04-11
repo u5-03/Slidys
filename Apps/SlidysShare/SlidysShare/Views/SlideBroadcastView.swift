@@ -4,7 +4,7 @@ import SlidysShareCore
 
 struct SlideBroadcastView: View {
     let deck: SlideDeck
-    let connection: MultipeerManager
+    let connection: any SlideConnectionProtocol
     @Environment(\.dismiss) private var dismiss
     @State private var currentIndex = 0
     @State private var showCloseConfirmation = false
@@ -32,6 +32,36 @@ struct SlideBroadcastView: View {
                             sendCurrentPage()
                         }
                 }
+
+                HStack {
+                    Button {
+                        guard currentIndex > 0 else { return }
+                        currentIndex -= 1
+                        sendCurrentPage()
+                    } label: {
+                        Image(systemName: "chevron.left.circle.fill")
+                            .font(.largeTitle)
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                    .disabled(currentIndex == 0)
+
+                    Spacer()
+
+                    Button {
+                        guard currentIndex < deck.pages.count - 1 else { return }
+                        currentIndex += 1
+                        sendCurrentPage()
+                    } label: {
+                        Image(systemName: "chevron.right.circle.fill")
+                            .font(.largeTitle)
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                    .disabled(currentIndex >= deck.pages.count - 1)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 40)
             }
 
             ReactionOverlayView(reactions: connection.receivedReactions) { id in
@@ -71,15 +101,19 @@ struct SlideBroadcastView: View {
             try? connection.send(event: .openSlide(pageCount: deck.pages.count, style: deck.style))
             sendCurrentPage()
 
-            connection.onPeerConnected = { [deck] peer in
-                try? connection.send(event: .openSlide(pageCount: deck.pages.count, style: deck.style), to: peer)
-                if currentIndex < deck.pages.count {
-                    try? connection.send(event: .showPage(index: currentIndex, page: deck.pages[currentIndex]), to: peer)
+            if let multipeer = connection as? MultipeerManager {
+                multipeer.onPeerConnected = { [deck] peer in
+                    try? multipeer.send(event: .openSlide(pageCount: deck.pages.count, style: deck.style), to: peer)
+                    if currentIndex < deck.pages.count {
+                        try? multipeer.send(event: .showPage(index: currentIndex, page: deck.pages[currentIndex]), to: peer)
+                    }
                 }
             }
         }
         .onDisappear {
-            connection.onPeerConnected = nil
+            if let multipeer = connection as? MultipeerManager {
+                multipeer.onPeerConnected = nil
+            }
         }
         #if os(macOS)
         .frame(minWidth: 960, idealWidth: 1280, minHeight: 540, idealHeight: 720)

@@ -5,7 +5,7 @@ import SlidysShareCore
 struct SlideDetailView: View {
     let deck: SlideDeck
     @Bindable var storage: SlideStorage
-    let connection: MultipeerManager
+    let connection: any SlideConnectionProtocol
     @State private var showBrowser = false
     @State private var showBroadcast = false
     @State private var showNameInput = false

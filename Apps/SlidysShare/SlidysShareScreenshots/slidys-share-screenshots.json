@@ -1,0 +1,59 @@
+{
+  "appName": "SlidysShare",
+  "devices": [
+    { "id": "iphone65", "displayType": "APP_IPHONE_6_5", "simulatorName": "iPhone 17 Pro Max" },
+    { "id": "ipad13",   "displayType": "APP_IPAD_PRO_3GEN_129", "simulatorName": "iPad Pro 13-inch (M4)" }
+  ],
+  "languages": [
+    { "code": "ja", "name": "Japanese", "locale": "ja" },
+    { "code": "en", "name": "English",  "locale": "en-US" }
+  ],
+  "screenshots": [
+    {
+      "id": "CreateSlide",
+      "previewState": "createSlide",
+      "backgroundColor": "blue",
+      "statusBarBackgroundColor": "systemGroupedBackground",
+      "headlines": {
+        "ja": { "headline": "シンプルにスライドを作成", "subheadline": "タイトルとテキストだけでサクッと作れる" },
+        "en": { "headline": "Simple Slide Creation", "subheadline": "Just a title and text — done" }
+      }
+    },
+    {
+      "id": "PresentAnywhere",
+      "previewState": "presentAnywhere",
+      "backgroundColor": "purple",
+      "statusBarBackgroundColor": "black",
+      "headlines": {
+        "ja": { "headline": "デバイス同士でスライド共有", "subheadline": "外部スクリーン不要、その場で見せあえる" },
+        "en": { "headline": "Share Between Your Devices", "subheadline": "No cables, no external screen" }
+      }
+    },
+    {
+      "id": "LiveReactions",
+      "previewState": "liveReactions",
+      "backgroundColor": "pink",
+      "statusBarBackgroundColor": "black",
+      "headlines": {
+        "ja": { "headline": "リアクションで盛り上がる", "subheadline": "拍手やハートを発表者にリアルタイムで届ける" },
+        "en": { "headline": "Live Reactions", "subheadline": "Cheer with reactions in real-time" }
+      }
+    },
+    {
+      "id": "MarkdownImport",
+      "previewState": "markdownImport",
+      "backgroundColor": "teal",
+      "statusBarBackgroundColor": "systemGroupedBackground",
+      "headlines": {
+        "ja": { "headline": "Markdownから一瞬でスライド", "subheadline": "書き慣れた記法そのまま、整ったスライドに" },
+        "en": { "headline": "From Markdown to Slides", "subheadline": "Your Markdown, beautifully presented" }
+      }
+    }
+  ],
+  "screenshotOrder": [
+    { "screenshotId": "CreateSlide",     "prefix": "01" },
+    { "screenshotId": "PresentAnywhere", "prefix": "02" },
+    { "screenshotId": "LiveReactions",   "prefix": "03" },
+    { "screenshotId": "MarkdownImport",  "prefix": "04" }
+  ]
+}

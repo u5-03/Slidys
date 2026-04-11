@@ -3,20 +3,43 @@ import SlideKit
 import SlidysShareCore
 
 struct SlideReceiverView: View {
-    let connection: MultipeerManager
+    let connection: any SlideConnectionProtocol
     @Environment(\.dismiss) private var dismiss
     @State private var showBrowser = false
-    @State private var isReceiving = false
+    @State private var isReceiving: Bool
     @State private var showCloseConfirmation = false
     @State private var showDisconnectedAlert = false
     @State private var store: DynamicSlideStore?
-    @State private var currentIndex = 0
-    @State private var slideStyle: SlideStyle = .default
+    @State private var currentIndex: Int
+    @State private var slideStyle: SlideStyle
+
+    init(
+        connection: any SlideConnectionProtocol,
+        initialIsReceiving: Bool = false,
+        initialPages: [SlidePageData]? = nil,
+        initialStyle: SlideStyle = .default,
+        initialIndex: Int = 0
+    ) {
+        self.connection = connection
+        _isReceiving = State(initialValue: initialIsReceiving)
+        _currentIndex = State(initialValue: initialIndex)
+        _slideStyle = State(initialValue: initialStyle)
+        if let initialPages {
+            let store = DynamicSlideStore(pageCount: initialPages.count)
+            for (idx, page) in initialPages.enumerated() {
+                store.update(page: page, at: idx)
+            }
+            _store = State(initialValue: store)
+        } else {
+            _store = State(initialValue: nil)
+        }
+    }
 
     @ViewBuilder
     private var browserContent: some View {
         #if os(iOS) || os(visionOS)
-        if let browser = connection.makeBrowserViewController() {
+        if let multipeer = connection as? MultipeerManager,
+           let browser = multipeer.makeBrowserViewController() {
             MultipeerBrowserView(browser: browser, onFinished: {
                 showBrowser = false
             }, onCancelled: {
@@ -25,12 +48,14 @@ struct SlideReceiverView: View {
             })
         }
         #elseif os(macOS)
-        MultipeerBrowserView(manager: connection, onFinished: {
-            showBrowser = false
-        }, onCancelled: {
-            showBrowser = false
-            connection.disconnect()
-        })
+        if let multipeer = connection as? MultipeerManager {
+            MultipeerBrowserView(manager: multipeer, onFinished: {
+                showBrowser = false
+            }, onCancelled: {
+                showBrowser = false
+                connection.disconnect()
+            })
+        }
         #endif
     }
 

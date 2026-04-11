@@ -13,8 +13,9 @@ struct ReactionPickerView: View {
                 Button {
                     sendReaction(type)
                 } label: {
-                    Text(type.emoji)
+                    Image(systemName: type.sfSymbolName)
                         .font(.system(size: 28))
+                        .symbolRenderingMode(.multicolor)
                         .scaleEffect(tappedType == type ? 1.3 : 1.0)
                         .animation(.spring(duration: 0.2), value: tappedType)
                 }

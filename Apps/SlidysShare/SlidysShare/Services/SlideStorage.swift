@@ -15,6 +15,10 @@ final class SlideStorage {
         decks = loadAll()
     }
 
+    init(inMemoryDecks: [SlideDeck]) {
+        self.decks = inMemoryDecks
+    }
+
     private func ensureDirectoryExists() {
         try? FileManager.default.createDirectory(at: documentsDirectory, withIntermediateDirectories: true)
     }
