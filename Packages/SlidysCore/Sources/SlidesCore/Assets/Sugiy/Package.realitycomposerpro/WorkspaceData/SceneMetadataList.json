@@ -1,0 +1,33 @@
+{
+  "B47E471B-ED01-4074-AB5E-F1A46429F8D9" : {
+    "objectMetadataList" : [
+      [
+        "B47E471B-ED01-4074-AB5E-F1A46429F8D9",
+        "Root",
+        "sugiy"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "B47E471B-ED01-4074-AB5E-F1A46429F8D9",
+        "Root",
+        "sugiy",
+        "_materials"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "B47E471B-ED01-4074-AB5E-F1A46429F8D9",
+        "Root"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      }
+    ]
+  }
+}

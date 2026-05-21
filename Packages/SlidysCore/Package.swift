@@ -72,6 +72,7 @@ let package = Package(
         .package(path: "../SymbolKit"),
         .package(path: "../HandGesturePackage"),
         .package(path: "../HandGestureKit"),
+        .package(path: "Sources/SlidesCore/Assets/Sugiy"),
     ],
     targets: [
         .target(
@@ -80,9 +81,13 @@ let package = Package(
                 "SlideKit",
                 "YugiohCardEffect",
                 "SymbolKit",
+                "Sugiy",
                 .product(name: "HandGesturePackage", package: "HandGesturePackage", condition: .when(platforms: [.visionOS])),
                 .product(name: "Algorithms", package: "swift-algorithms"),
-            ]
+            ],
+            // Assets/Sugiy はネストされた独立Swiftパッケージ(Reality Composer Pro)。
+            // SlidesCoreターゲットのソースに含めないよう除外する。
+            exclude: ["Assets/Sugiy"]
 //            resources: [
 //                .process("Resources/opening_input.mp4"),
 //                .process("Resources/opening_output.mp4"),

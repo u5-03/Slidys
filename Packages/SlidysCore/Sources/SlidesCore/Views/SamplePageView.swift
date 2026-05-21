@@ -17,15 +17,16 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
     case japanSymbolQuizExtra2
     case japanSymbolQuizExtra3
     case pixelImage
+    case blenderSample
     case immersiveSpaceControl
 
     public static let samplePageWindowKey = "samplePageWindowKey"
 
     public static var allCases: [SamplePageType] {
 #if os(visionOS)
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .immersiveSpaceControl]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .immersiveSpaceControl]
 #else
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample]
 #endif
     }
 
@@ -45,6 +46,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             return "Japan Symbol Quiz Extra3"
         case .pixelImage:
             return "PixelUIView"
+        case .blenderSample:
+            return "Blenderサンプル"
         case .immersiveSpaceControl:
             return "Immersive Space Control"
         }
@@ -92,6 +95,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
         case .pixelImage:
             PixelImageSettingView(imageResource: .icon)
                 .padding(.top, 60)
+        case .blenderSample:
+            BlenderSampleView()
         case .immersiveSpaceControl:
 #if os(visionOS)
             StartDemoView()
