@@ -14,6 +14,9 @@ import SlidesCore
 #if canImport(HandGesturePackage)
 import HandGesturePackage
 #endif
+#if os(visionOS)
+import YugiohDuelDiskPackage
+#endif
 
 @main
 struct SlidysApp: App {
@@ -52,6 +55,9 @@ struct SlidysApp: App {
         }
 #if canImport(HandGesturePackage)
         HandGestureScene()
+#endif
+#if os(visionOS)
+        YugiohDuelDiskScene()
 #endif
     }
 }

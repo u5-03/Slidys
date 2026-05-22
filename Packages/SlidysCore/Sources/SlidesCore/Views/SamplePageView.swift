@@ -19,12 +19,13 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
     case pixelImage
     case blenderSample
     case immersiveSpaceControl
+    case yugiohDuelDisk
 
     public static let samplePageWindowKey = "samplePageWindowKey"
 
     public static var allCases: [SamplePageType] {
 #if os(visionOS)
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .immersiveSpaceControl]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .immersiveSpaceControl, .yugiohDuelDisk]
 #else
         return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample]
 #endif
@@ -50,6 +51,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             return "Blenderサンプル"
         case .immersiveSpaceControl:
             return "Immersive Space Control"
+        case .yugiohDuelDisk:
+            return "Yugioh Duel Disk"
         }
     }
 
@@ -104,6 +107,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             Text("このサンプルはvisionOSでのみ利用可能です")
                 .foregroundColor(.secondary)
 #endif
+        case .yugiohDuelDisk:
+            YugiohDuelDiskSampleEntryView()
         }
     }
 }
