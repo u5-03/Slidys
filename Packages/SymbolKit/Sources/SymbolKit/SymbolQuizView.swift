@@ -294,7 +294,7 @@ private extension SymbolQuizView {
                 .font(.system(size: 100, weight: .bold))
                 .foregroundStyle(.white)
         }, answerHintContent: {
-            Text("someone's icon" ?? "")
+            Text("someone's icon")
                 .lineLimit(2)
                 .font(.system(size: 80, weight: .bold))
                 .foregroundStyle(.white)
@@ -332,7 +332,7 @@ private extension SymbolQuizView {
                 .font(.system(size: 100, weight: .bold))
                 .foregroundStyle(.white)
         }, answerHintContent: {
-            Text("someone's icon" ?? "")
+            Text("someone's icon")
                 .lineLimit(2)
                 .font(.system(size: 80, weight: .bold))
                 .foregroundStyle(.white)

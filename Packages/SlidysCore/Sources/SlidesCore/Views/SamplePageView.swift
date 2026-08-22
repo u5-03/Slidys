@@ -18,16 +18,18 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
     case japanSymbolQuizExtra3
     case pixelImage
     case blenderSample
+    case taiyakiFocus
     case immersiveSpaceControl
     case yugiohDuelDisk
+    case hitenryuSummon
 
     public static let samplePageWindowKey = "samplePageWindowKey"
 
     public static var allCases: [SamplePageType] {
 #if os(visionOS)
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .immersiveSpaceControl, .yugiohDuelDisk]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .immersiveSpaceControl, .yugiohDuelDisk, .hitenryuSummon]
 #else
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .hitenryuSummon]
 #endif
     }
 
@@ -49,10 +51,14 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             return "PixelUIView"
         case .blenderSample:
             return "Blenderサンプル"
+        case .taiyakiFocus:
+            return "たい焼きフォーカス"
         case .immersiveSpaceControl:
             return "Immersive Space Control"
         case .yugiohDuelDisk:
             return "Yugioh Duel Disk"
+        case .hitenryuSummon:
+            return "緋天竜(召喚モンスター)"
         }
     }
 
@@ -100,6 +106,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
                 .padding(.top, 60)
         case .blenderSample:
             BlenderSampleView()
+        case .taiyakiFocus:
+            TaiyakiFocusView()
         case .immersiveSpaceControl:
 #if os(visionOS)
             StartDemoView()
@@ -109,6 +117,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
 #endif
         case .yugiohDuelDisk:
             YugiohDuelDiskSampleEntryView()
+        case .hitenryuSummon:
+            HitenryuSampleView()
         }
     }
 }

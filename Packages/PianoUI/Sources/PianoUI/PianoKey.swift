@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PianoKey: Equatable, Identifiable, Hashable, Codable {
+public struct PianoKey: Equatable, Identifiable, Hashable, Codable, Sendable {
     public let keyType: KeyType
     public let octave: Octave
 
@@ -79,7 +79,7 @@ public struct PianoKey: Equatable, Identifiable, Hashable, Codable {
     }
 }
 
-public enum Octave: Int, CaseIterable, Identifiable, Codable {
+public enum Octave: Int, CaseIterable, Identifiable, Codable, Sendable {
     case minusFirst
     case zero
     case first
@@ -133,7 +133,7 @@ public enum KeyDisplayType: String, CaseIterable, Identifiable, Codable, Sendabl
     }
 }
 
-public enum KeyType: Int, CaseIterable, Identifiable, Codable {
+public enum KeyType: Int, CaseIterable, Identifiable, Codable, Sendable {
     case c
     case cSharp
     case d

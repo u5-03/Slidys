@@ -81,15 +81,6 @@
         "revision" : "dfd70507def84cb5fb821278448a262c6ff2bbad",
         "version" : "1.9.0"
       }
-    },
-    {
-      "identity" : "yugiohcardeffect",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/u5-03/YugiohCardEffect",
-      "state" : {
-        "revision" : "938a2a84ec1e3b042a2a216493e59c2757ab6054",
-        "version" : "0.3.0"
-      }
     }
   ],
   "version" : 3

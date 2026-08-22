@@ -1,0 +1,3 @@
+[submodule "Packages/YugiohCardEffect"]
+	path = Packages/YugiohCardEffect
+	url = https://github.com/u5-03/YugiohCardEffect

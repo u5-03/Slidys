@@ -63,10 +63,14 @@ let package = Package(
             name: "HakodateSwiftSlide",
             targets: ["HakodateSwiftSlide"]
         ),
+        .library(
+            name: "iOSDC2026Slide",
+            targets: ["iOSDC2026Slide"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
-        .package(url: "https://github.com/u5-03/YugiohCardEffect", from: "0.3.0"),
+        .package(path: "../YugiohCardEffect"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
         .package(path: "../PianoUI"),
         .package(path: "../SymbolKit"),
@@ -74,6 +78,8 @@ let package = Package(
         .package(path: "../HandGestureKit"),
         .package(path: "../YugiohDuelDiskPackage"),
         .package(path: "Sources/SlidesCore/Assets/Sugiy"),
+        // 召喚エフェクト(RCP製パーティクル)。iOS でも表示するため条件なしで依存。
+        .package(path: "../SummonEffectAssets"),
     ],
     targets: [
         .target(
@@ -83,6 +89,7 @@ let package = Package(
                 "YugiohCardEffect",
                 "SymbolKit",
                 "Sugiy",
+                "SummonEffectAssets",
                 .product(name: "HandGesturePackage", package: "HandGesturePackage", condition: .when(platforms: [.visionOS])),
                 .product(name: "YugiohDuelDiskPackage", package: "YugiohDuelDiskPackage", condition: .when(platforms: [.visionOS])),
                 .product(name: "Algorithms", package: "swift-algorithms"),
@@ -111,6 +118,7 @@ let package = Package(
                 "NagoyaSwiftSlide",
                 "iOSDC2025Slide",
                 "HakodateSwiftSlide",
+                "iOSDC2026Slide",
             ]
         ),
         .target(
@@ -196,6 +204,18 @@ let package = Package(
             name: "HakodateSwiftSlide",
             dependencies: [
                 "SlidesCore",
+            ]
+        ),
+        .target(
+            name: "iOSDC2026Slide",
+            dependencies: [
+                "SlidesCore",
+                // ライブデモ(ImmersiveSpace起動)用。visionOS でのみリンクする。
+                .product(
+                    name: "YugiohDuelDiskPackage",
+                    package: "YugiohDuelDiskPackage",
+                    condition: .when(platforms: [.visionOS])
+                ),
             ]
         ),
         .testTarget(

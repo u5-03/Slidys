@@ -15,7 +15,7 @@ import UIKit
 typealias AppColor = UIColor
 #endif
 
-extension Color: RawRepresentable {
+extension Color: @retroactive RawRepresentable {
     public init?(rawValue: String) {
         guard let data = Data(base64Encoded: rawValue) else {
             self = .orange

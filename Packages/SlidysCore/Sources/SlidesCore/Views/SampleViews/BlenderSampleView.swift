@@ -23,6 +23,25 @@ private func blog(_ message: @autoclosure () -> String) {
     print("[Blender] \(message())")
 }
 
+/// たい焼きの具材の種類(rkassets内のFilling_*エンティティ名に対応)
+enum TaiyakiFilling: String, CaseIterable, Identifiable {
+    case redBeans = "Filling_RedBeans"
+    case custard = "Filling_Custard"
+    case matcha = "Filling_Matcha"
+    case chocolate = "Filling_Chocolate"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .redBeans: "あんこ"
+        case .custard: "カスタード"
+        case .matcha: "抹茶"
+        case .chocolate: "チョコ"
+        }
+    }
+}
+
 /// Blenderで作成しReality Composer Proに取り込んだモデルを`RealityView`でプレビューするサンプル
 struct BlenderSampleView: View {
     /// 回転の中心となるpivot Entity(この子としてモデルを配置する)
@@ -43,11 +62,8 @@ struct BlenderSampleView: View {
     /// デバッグ: update呼び出し回数
     @State private var debugUpdateCount = 0
 
-    /// 各surface(マテリアルスロット)に割り当てる色
-    private let surfaceColors: [SimpleMaterial.Color] = [
-        SimpleMaterial.Color(red: 0.20, green: 0.55, blue: 0.95, alpha: 1.0), // 青
-        SimpleMaterial.Color(red: 0.95, green: 0.55, blue: 0.15, alpha: 1.0)  // オレンジ
-    ]
+    /// 現在表示中の具材
+    @State private var selectedFilling: TaiyakiFilling = .redBeans
 
     var body: some View {
         ZStack {
@@ -78,10 +94,36 @@ struct BlenderSampleView: View {
                 Text("モデルをドラッグして回転")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.7))
-                    .padding(.bottom, 48)
+                    .padding(.bottom, 108)
             }
             .padding()
             .allowsHitTesting(false)
+
+            // 具材切替(こちらはタッチを受け付ける)
+            VStack {
+                Spacer()
+                Picker("具材", selection: $selectedFilling) {
+                    ForEach(TaiyakiFilling.allCases) { filling in
+                        Text(filling.displayName).tag(filling)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 40)
+            }
+        }
+        .onChange(of: selectedFilling) { _, newValue in
+            guard let sceneEntity else { return }
+            applyFilling(newValue, to: sceneEntity)
+        }
+    }
+
+    /// 選択された具材のエンティティだけを表示し、他は非表示にする
+    private func applyFilling(_ filling: TaiyakiFilling, to root: Entity) {
+        for candidate in TaiyakiFilling.allCases {
+            let entity = root.findEntity(named: candidate.rawValue)
+            entity?.isEnabled = (candidate == filling)
+            blog("filling: '\(candidate.rawValue)' found=\(entity != nil) enabled=\(candidate == filling)")
         }
     }
 
@@ -122,19 +164,17 @@ struct BlenderSampleView: View {
             content.add(fillLight)
 
             do {
-                // Sugiyパッケージのsugiy.usdcを読み込む
-                let scene = try await Entity(named: "sugiy", in: sugiyBundle)
+                // SugiyパッケージのTaiyaki.usdz(たい焼き+具材4種)を読み込む
+                let scene = try await Entity(named: "Taiyaki", in: sugiyBundle)
                 blog("make: scene loaded name='\(scene.name)' id=\(ObjectIdentifier(scene)) childrenCount=\(scene.children.count)")
                 logEntityTree(scene, depth: 0, label: "loaded")
 
-                // Blenderエクスポートに含まれる Camera / Light / ReferenceImage / env_light を除去する。
-                // 特にシーン内のCameraは content.camera = .virtual と競合し、回転しても
-                // カメラごと一緒に回ってしまうため見た目が変わらない原因になり得る。
+                // 万一エクスポートに Camera / Light などのメッシュ以外が含まれていた場合に除去する
                 pruneToMeshSubtrees(scene)
                 logEntityTree(scene, depth: 0, label: "pruned")
 
-                // 分割されたsurface(マテリアルスロット)ごとに別の色を割り当てる
-                applyDistinctColors(to: scene)
+                // 選択中の具材だけを表示する(マテリアルはUSDZに焼き込み済み)
+                applyFilling(selectedFilling, to: scene)
 
                 // 見やすいサイズに正規化する
                 let rawBounds = scene.visualBounds(relativeTo: nil)
@@ -267,40 +307,6 @@ struct BlenderSampleView: View {
         for child in entity.children {
             removeHoverEffect(from: child)
         }
-    }
-
-    /// モデルが持つマテリアルスロットごとに、別々の色のマテリアルを割り当てる
-    /// - Note: GeomSubsetでマテリアルスロットが2つあるため、両方に別の色が適用される
-    private func applyDistinctColors(to entity: Entity) {
-        var slotIndex = 0
-        var modelComponentCount = 0
-
-        func traverse(_ entity: Entity) {
-            if var modelComponent = entity.components[ModelComponent.self] {
-                modelComponentCount += 1
-                let originalCount = modelComponent.materials.count
-                let coloredMaterials: [any RealityKit.Material] = modelComponent.materials.map { _ in
-                    let color = surfaceColors[slotIndex % surfaceColors.count]
-                    slotIndex += 1
-                    var material = SimpleMaterial()
-                    material.color = .init(tint: color)
-                    material.roughness = 0.4
-                    material.metallic = 0.0
-                    return material
-                }
-                if !coloredMaterials.isEmpty {
-                    modelComponent.materials = coloredMaterials
-                    entity.components.set(modelComponent)
-                }
-                blog("applyColors: entity='\(entity.name)' originalMaterials=\(originalCount) coloredMaterials=\(coloredMaterials.count)")
-            }
-            for child in entity.children {
-                traverse(child)
-            }
-        }
-
-        traverse(entity)
-        blog("applyColors: done. modelComponentCount=\(modelComponentCount) totalSlots=\(slotIndex)")
     }
 
     /// エンティティツリー構造をログ出力する(深さ最大3まで)

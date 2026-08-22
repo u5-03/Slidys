@@ -97,6 +97,13 @@ struct BookView: View {
                 .clipped()
                 .frame(maxWidth: .infinity)
                 .background(.black)
+                #if os(visionOS)
+                .rotation3DEffect(
+                    .degrees(shouldShow ? 0 : -90),
+                    axis: (x: 0, y: 1, z: 0),
+                    anchor: .leading
+                )
+                #else
                 .rotation3DEffect(
                     .degrees(shouldShow ? 0 : -90),
                     axis: (x: 0, y: 1, z: 0),
@@ -104,6 +111,7 @@ struct BookView: View {
                     anchorZ: 0,
                     perspective: 0.3
                 )
+                #endif
             }
         }
     }
@@ -123,6 +131,13 @@ struct BookView: View {
                         axis: (x: 0, y: 1, z: 0)
                     )
             }
+            #if os(visionOS)
+            .rotation3DEffect(
+                .degrees(shouldShowBihind ? -180 : 0),
+                axis: (x: 0, y: 1, z: 0),
+                anchor: .leading
+            )
+            #else
             .rotation3DEffect(
                 .degrees(shouldShowBihind ? -180 : 0),
                 axis: (x: 0, y: 1, z: 0),
@@ -130,6 +145,7 @@ struct BookView: View {
                 anchorZ: 0,
                 perspective: 0.3
             )
+            #endif
             .opacity(shouldCloseBihind ? 1 : 0)
 
         }

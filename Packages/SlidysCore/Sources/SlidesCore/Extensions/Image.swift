@@ -58,7 +58,11 @@ extension AppImage {
     }
 }
 
-extension AppImage: @unchecked @retroactive Sendable {}
+#if os(macOS)
+    // NSImage is not declared Sendable by AppKit, so add it here.
+    // On iOS/visionOS, UIImage already conforms to Sendable in UIKit.
+    extension AppImage: @unchecked @retroactive Sendable {}
+#endif
 
 extension Image {
     public init?(data: Data) {

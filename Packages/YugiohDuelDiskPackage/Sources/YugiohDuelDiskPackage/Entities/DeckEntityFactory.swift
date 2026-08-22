@@ -23,7 +23,8 @@ public enum DeckEntityFactory {
         )
         var material = SimpleMaterial()
 #if canImport(UIKit)
-        material.color = .init(tint: UIColor(red: 0.20, green: 0.10, blue: 0.05, alpha: 1.0))
+        // カード裏面の茶色。チャネルの白地・影の中でも視認できる明るさにする
+        material.color = .init(tint: UIColor(red: 0.72, green: 0.55, blue: 0.36, alpha: 1.0))
 #endif
         material.metallic = 0.1
         material.roughness = 0.6

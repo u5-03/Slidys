@@ -1,0 +1,11 @@
+{
+  "pathsToIds" : {
+    "\/SummonEffectAssets\/Sources\/SummonEffectAssets\/SummonEffectAssets.rkassets\/Scene.usda" : "C7F2A9E1-3B4D-4A6C-9E12-8F5D2A1B0C34",
+    "SummonEffectAssets\/Sources\/SummonEffectAssets\/SummonEffectAssets.rkassets\/Scene.usda" : "E34067C6-C3A4-41BF-96F2-22B9B7C90084"
+  },
+  "projectID" : 7412650098123456789,
+  "uuidToIntID" : {
+    "C7F2A9E1-3B4D-4A6C-9E12-8F5D2A1B0C34" : 5581322676419137001,
+    "E34067C6-C3A4-41BF-96F2-22B9B7C90084" : 558148248500356802
+  }
+}
