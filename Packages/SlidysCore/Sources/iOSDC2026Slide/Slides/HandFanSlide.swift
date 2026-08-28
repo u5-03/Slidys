@@ -14,17 +14,10 @@ struct HandFanSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("左手のピンチで手札を扇状に持つ") {
-            Item("左手の親指・人差し指・中指の3本ピンチ中だけ、扇状の手札を表示", accessory: .number(1)) {
-                Item("位置は指先(ピンチ中点)、向きは手のひらの基底に追従", accessory: .bullet)
-            }
-            Item("ハマりどころ: ピンチ中は指先が1点に集まり、指先からは手の向きの基底が作れない", accessory: .number(2)) {
-                Item("→ ピンチの影響を受けない付け根(ナックル)関節から基底を作る", accessory: .bullet)
-            }
-            Item("ハマりどころ: 手のひら法線の外積は左手と右手で順序が逆(鏡像関係)", accessory: .number(3)) {
-                Item("右手のロジックをコピーすると、カードが手の甲側に出る", accessory: .bullet)
-            }
-            Item("扇レイアウトはカード1枚あたり8°回転 + 選択中カードだけ持ち上げ", accessory: .number(4))
+        HeaderSlide("左手の3本指「つまみ」で手札を扇状に持つ") {
+            Item("親指・人差し指・中指を合わせている間だけ扇を表示", accessory: .number(1))
+            Item("標準の2本指ピンチ(タップ操作)と混同しないための3本指", accessory: .number(2))
+            Item("つまみ中は指先が1点に集まる → 向きは付け根(ナックル)から", accessory: .number(3))
         }
     }
 }
@@ -33,6 +26,6 @@ struct HandFanSlide: View {
     SlidePreview {
         HandFanSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

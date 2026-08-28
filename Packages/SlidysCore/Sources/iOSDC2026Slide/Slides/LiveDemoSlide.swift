@@ -1,8 +1,8 @@
 //
-//  DuelDemoSlide.swift
+//  LiveDemoSlide.swift
 //  iOSDC2026Slide
 //
-//  カードバトル体験のライブデモ起動スライド。
+//  Vision Proのライブデモ起動スライド(デモ1: 一連の流れ / デモ2: 竜の召喚)。
 //  visionOS では YugiohDuelDiskPackage の ImmersiveSpace を直接開閉できる。
 //  (シーン自体はアプリ側で YugiohDuelDiskScene として登録済み)
 //
@@ -15,19 +15,23 @@ import YugiohDuelDiskPackage
 #endif
 
 @Slide
-struct DuelDemoSlide: View {
+struct LiveDemoSlide: View {
+    let title: String
+    let caption: String
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }
 
     var body: some View {
         VStack(spacing: 40) {
-            Text("Demo")
+            Text(title)
                 .font(.system(size: 120, weight: .heavy))
                 .foregroundStyle(.themeColor)
 
-            Text("カードを引いて、置いて、召喚する")
+            Text(caption)
                 .font(.system(size: 80, weight: .bold))
+                .multilineTextAlignment(.center)
                 .foregroundStyle(.defaultForegroundColor)
 
 #if canImport(YugiohDuelDiskPackage)
@@ -104,8 +108,8 @@ private struct DemoImmersiveSpaceButton: View {
 
 #Preview {
     SlidePreview {
-        DuelDemoSlide()
+        LiveDemoSlide(title: "デモ 1", caption: "カードを引いて、手札に加えて、\n配置して、召喚するまで")
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

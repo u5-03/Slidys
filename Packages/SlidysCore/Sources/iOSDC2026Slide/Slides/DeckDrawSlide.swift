@@ -14,34 +14,10 @@ struct DeckDrawSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("デッキからカードを引く(ドロー)ジェスチャー") {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 25) {
-                    Text("「触れた瞬間に引く」のではなく、2段階の判定にする")
-                        .font(.regularFont)
-
-                    CodeBlockView(
-                        """
-                        let fingersTouching = simd_distance(indexPos, middlePos) < threshold
-                        let insideDeck = isPointInsideDeckVolume(midpoint) // デッキローカル座標でOBB判定
-
-                        if isDeckDrawArmed {
-                            if !fingersTouching || !insideDeck {
-                                isDeckDrawArmed = false
-                                performDeckDraw() // 指を離す or デッキから抜くとドロー発火
-                            }
-                        } else if fingersTouching && insideDeck {
-                            isDeckDrawArmed = true // 指をくっつけてデッキ空間へ → 構え
-                        }
-                        """)
-
-                    Text("カードの束から1枚スライドさせて抜く、あの動作の再現を目指した")
-                        .font(.regularFont)
-                        .padding(.top, 10)
-                    Text("引いたカードは右手の指の間に追従(指の腹側にカード面・指先方向に上端)")
-                        .font(.regularFont)
-                }
-            }
+        HeaderSlide("デッキからカードを引く(ドロー)") {
+            Item("2段階: 人差し指+中指でデッキに触れる=構え → 離す/抜く=発火", accessory: .number(1))
+            Item("束から1枚スライドさせて抜く、あの動作の再現", accessory: .number(2))
+            Item("引いたカードは右手の指の間に追従", accessory: .number(3))
         }
     }
 }
@@ -50,6 +26,6 @@ struct DeckDrawSlide: View {
     SlidePreview {
         DeckDrawSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

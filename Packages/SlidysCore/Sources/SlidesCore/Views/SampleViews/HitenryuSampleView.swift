@@ -93,7 +93,10 @@ struct HitenryuSampleView: View {
                     Spacer()
                 }
                 Spacer()
+                // 右下に配置: 中央下だとvisionOSのWindow操作バーと重なり、
+                // ウィンドウの移動・クローズ操作をブロックしてしまう
                 HStack(spacing: 16) {
+                    Spacer()
                     Button {
                         replayAnimation()
                     } label: {
@@ -105,7 +108,8 @@ struct HitenryuSampleView: View {
                     }
                     .foregroundStyle(.white)
                 }
-                .padding(.bottom, 48)
+                .padding(.bottom, 24)
+                .padding(.trailing, 8)
             }
             .padding()
         }

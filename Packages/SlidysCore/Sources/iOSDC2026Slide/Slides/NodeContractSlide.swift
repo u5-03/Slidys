@@ -15,15 +15,9 @@ struct NodeContractSlide: View {
 
     var body: some View {
         HeaderSlide("モデルに「ノード契約」を仕込む") {
-            Item("Blenderの空オブジェクト(Empty)はUSDZでは座標だけを持つノード(Xform)になる", accessory: .number(1))
-            Item("これをアタッチメントポイントとしてモデル内に埋め込んでおく", accessory: .number(2)) {
-                Item("WristAnchor: モデル原点 = 手首への固定点", accessory: .bullet)
-                Item("DeckSlot / CardSlot_1...5 / SpellSlot_1...5: デッキとカード配置位置", accessory: .bullet)
-                Item("カードゾーンは実物のカードサイズ(58mm × 88mm)に合わせる", accessory: .bullet)
-            }
-            Item("Swift側はfindEntity(named:)でノードを探すだけ", accessory: .number(3)) {
-                Item("ノード名の取り決めさえ守れば、モデルの形状を作り直してもコードは無変更", accessory: .bullet)
-            }
+            Item("Blenderの空オブジェクト = 形のない「目印のピン」", accessory: .number(1))
+            Item("手首の固定点・5つのゾーン・デッキ・墓地・ライフ表示の位置に名前を付けて刺す", accessory: .number(2))
+            Item("アプリは名前で探すだけ。モデルを作り直してもコードは無変更", accessory: .number(3))
         }
     }
 }
@@ -32,6 +26,6 @@ struct NodeContractSlide: View {
     SlidePreview {
         NodeContractSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

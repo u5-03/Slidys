@@ -39,6 +39,14 @@ public enum TaiyakiFlavor: String, CaseIterable, Sendable {
     }
 }
 
+/// 召喚時に表示する 3D モデルの種類。
+public enum SummonModel: Equatable, Sendable {
+    /// たい焼き(具材違い)。Taiyaki.usdz + Filling_*。
+    case taiyaki(TaiyakiFlavor)
+    /// 緋天竜(アニメ付き USDZ、Hitenryu.usdz)。
+    case hitenryu
+}
+
 /// モンスターカードの表示情報。
 public struct MonsterCard: Identifiable, Equatable, Sendable {
     public let id: UUID
@@ -52,8 +60,10 @@ public struct MonsterCard: Identifiable, Equatable, Sendable {
     public let isRare: Bool
     /// 既存の作り込まれたカードビジュアル(0: あんこフォルム / 1: デスマーチ)の選択。
     public let artVariant: Int
-    /// 召喚時に表示するたい焼きの具材。
+    /// 召喚時に表示するたい焼きの具材(たい焼きモンスター用)。
     public let flavor: TaiyakiFlavor
+    /// 召喚時に表示する 3D モデル。
+    public let summonModel: SummonModel
 
     public init(
         id: UUID = UUID(),
@@ -66,7 +76,8 @@ public struct MonsterCard: Identifiable, Equatable, Sendable {
         defense: Int,
         isRare: Bool = false,
         artVariant: Int = 0,
-        flavor: TaiyakiFlavor = .redBean
+        flavor: TaiyakiFlavor = .redBean,
+        summonModel: SummonModel? = nil
     ) {
         self.id = id
         self.name = name
@@ -79,6 +90,8 @@ public struct MonsterCard: Identifiable, Equatable, Sendable {
         self.isRare = isRare
         self.artVariant = artVariant
         self.flavor = flavor
+        // 明示指定が無ければ、たい焼き(flavor)を召喚する。
+        self.summonModel = summonModel ?? .taiyaki(flavor)
     }
 }
 
@@ -175,6 +188,21 @@ public extension DuelCard {
 }
 
 public extension MonsterCard {
+    /// 緋天竜(自作のアニメ付き召喚モンスター)。召喚時に Hitenryu.usdz を再生する。
+    static var hitenryu: MonsterCard {
+        MonsterCard(
+            name: "緋天竜",
+            attribute: "炎",
+            level: 8,
+            species: "ドラゴン",
+            text: "天を焦がす緋色の竜。召喚時、螺旋を描いて顕現する。自作モデルによる特殊召喚モンスター。",
+            attack: 3000,
+            defense: 2500,
+            isRare: true,
+            summonModel: .hitenryu
+        )
+    }
+
     /// たい焼きモンスター4種(具材違い)。カード画像は後で差し替え予定のため暫定。
     static var samples: [MonsterCard] {
         TaiyakiFlavor.allCases.enumerated().map { index, flavor in

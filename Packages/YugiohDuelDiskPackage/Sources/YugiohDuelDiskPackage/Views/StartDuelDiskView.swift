@@ -18,7 +18,7 @@ public struct StartDuelDiskView: View {
 
     public var body: some View {
         VStack(spacing: 24) {
-            Text("Yu-Gi-Oh Duel Disk")
+            Text("Card Battle Demo")
                 .font(.system(size: 36, weight: .bold))
             Text("左腕にディスクが装着されます。\n右腕でデッキからドローし、左腕に手札を集めましょう。")
                 .font(.body)

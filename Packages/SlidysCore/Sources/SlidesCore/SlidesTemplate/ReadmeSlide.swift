@@ -51,7 +51,9 @@ public struct ReadmeSlide: View {
             Item(.init(stringLiteral: info.secondText), accessory: .number(2))
             Item(.init(stringLiteral: info.thirdText), accessory: .number(3))
             Item(.init(stringLiteral: info.fourthText), accessory: .number(4))
-            Item(.init(stringLiteral: info.fifthText), accessory: .number(5))
+            if !info.fifthText.isEmpty {
+                Item(.init(stringLiteral: info.fifthText), accessory: .number(5))
+            }
         }
         .overlay {
             Image(info.image)

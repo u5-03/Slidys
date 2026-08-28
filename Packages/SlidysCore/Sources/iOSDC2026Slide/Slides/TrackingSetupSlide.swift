@@ -2,6 +2,10 @@
 //  TrackingSetupSlide.swift
 //  iOSDC2026Slide
 //
+//  Hand Gesture章の導入2枚。
+//  1枚目: 去年(iOSDC2025)の発表のアピール(プロポーザル画像)
+//  2枚目: 今回使っているジェスチャーの一覧
+//
 
 import SlideKit
 import SlidesCore
@@ -14,25 +18,47 @@ struct TrackingSetupSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("ハンドトラッキングのセットアップ") {
-            Item("ARKitSessionで権限リクエスト + SpatialTrackingSessionで.hand/.worldを有効化", accessory: .number(1)) {
-                Item("このあたりはiOSDC2025の発表と同じ構成です(詳細はそちらで)", accessory: .bullet)
-            }
-            Item("手の関節ごとにAnchorEntityを張り付けて位置を追跡", accessory: .number(2)) {
-                Item("左手: 手首(デバイス装着) / 3指の先端(ピンチ判定) / 付け根3関節(手のひらの向き)", accessory: .bullet)
-                Item("右手: 人差し指・中指の先端(ドロー判定+カード保持) / 付け根2関節(カードの向き)", accessory: .bullet)
-            }
-            Item("ピンチ判定はHandGestureKitのareFingerTipsTouchingを利用", accessory: .number(3)) {
-                Item("2関節の距離がしきい値以下かを見るだけの軽量API", accessory: .bullet)
-            }
+        HeaderSlide("土台は去年のHandGestureKitそのまま") {
+            Image(.proposal2025)
+                .resizable()
+                .scaledToFit()
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.15), lineWidth: 2)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
 
-#Preview {
+@Slide
+struct TrackingGestureListSlide: View {
+    public var transition: AnyTransition {
+        SlideTransition.defaultTransition
+    }
+
+    var body: some View {
+        HeaderSlide("ジェスチャーまわりの構成") {
+            Item("検知の基礎はHandGestureKit: 関節ごとのAnchor + 指先距離の判定", accessory: .number(1))
+            Item("今回載せたのは4つ: 手首装着 / 3本指の手札 / ドロー / 視線+タップ配置", accessory: .number(2))
+            Item("今回のアプリ側で、指の付け根(ナックル)のアンカーを追加。理由は後ほど", accessory: .number(3))
+        }
+    }
+}
+
+#Preview("去年のアピール") {
     SlidePreview {
         TrackingSetupSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
+    .itemStyle(CustomItemStyle())
+}
+
+#Preview("ジェスチャー一覧") {
+    SlidePreview {
+        TrackingGestureListSlide()
+    }
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

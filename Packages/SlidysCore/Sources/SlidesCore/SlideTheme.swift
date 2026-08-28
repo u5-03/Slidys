@@ -8,13 +8,37 @@
 import SwiftUI
 import SlideKit
 
+/// リスト(HeaderSlide 内の Item)本文の文字サイズのプリセット。
+/// デッキ単位で切り替えられるようにし、既存デッキは `.standard` のまま影響を受けない。
+public enum ListTextStyle: Sendable {
+    /// 従来どおり(45pt)
+    case standard
+    /// 文字少なめ・話し中心のデッキ向け(60pt、行間広め)
+    case large
+
+    var contentFont: Font {
+        switch self {
+        case .standard: return .regularFont
+        case .large: return .listLargeFont
+        }
+    }
+
+    var contentSpacing: CGFloat {
+        switch self {
+        case .standard: return 30
+        case .large: return 44
+        }
+    }
+}
+
 @MainActor
 public struct CustomSlideTheme: SlideTheme {
-    public let headerSlideStyle = CustomHeaderSlideStyle()
+    public let headerSlideStyle: CustomHeaderSlideStyle
     public let itemStyle = CustomItemStyle()
     public let indexStyle: CustomIndexStyle
 
-    public init(showSlideIndex: Bool = true) {
+    public init(showSlideIndex: Bool = true, listTextStyle: ListTextStyle = .standard) {
+        self.headerSlideStyle = CustomHeaderSlideStyle(listTextStyle: listTextStyle)
         self.indexStyle = CustomIndexStyle(isVisible: showSlideIndex)
     }
 }
@@ -43,7 +67,11 @@ public struct CustomStyleSlide: View {
 
 
 public struct CustomHeaderSlideStyle: HeaderSlideStyle {
-    public init() {}
+    private let listTextStyle: ListTextStyle
+
+    public init(listTextStyle: ListTextStyle = .standard) {
+        self.listTextStyle = listTextStyle
+    }
 
     public func makeBody(configuration: Configuration) -> some View {
         GeometryReader { proxy in
@@ -55,9 +83,9 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
                     .foregroundStyle(.themeColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .frame(height: 100)
-                VStack(alignment: .leading, spacing: 30) {
+                VStack(alignment: .leading, spacing: listTextStyle.contentSpacing) {
                     configuration.content
-                        .font(.regularFont)
+                        .font(listTextStyle.contentFont)
                         .foregroundStyle(.defaultForegroundColor)
                 }
             }

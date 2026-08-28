@@ -11,6 +11,9 @@ import Foundation
 import RealityKit
 import SwiftUI
 import YugiohCardEffect
+#if canImport(UIKit)
+import UIKit
+#endif
 
 public enum CardEntityFactory {
     public static func make(model: DuelCard) -> Entity {
@@ -33,14 +36,24 @@ public enum DuelCardVisualFactory {
     public static func visualModel(for card: DuelCard) -> YugiohCardEffect.CardModel {
         switch card {
         case .monster(let monster):
-            // カードにモンスターの種類(抹茶/クリーム/…)が分かるよう、実データから組み立てる。
-            // 画像は後で差し替え予定のため、種類ごとに色分けした仮アイコン(SF Symbol)を使う。
+            // カードにモンスターの種類が分かるよう、実データから組み立てる。
+            // 画像は差し替え可能: 緋天竜は専用画像(あれば)、たい焼きは色分け仮アイコン。
+            let art: YugiohCardEffect.ImageType
+            let backgroundColor: Color
+            switch monster.summonModel {
+            case .hitenryu:
+                art = hitenryuArt()
+                backgroundColor = Color(red: 0.18, green: 0.03, blue: 0.05) // 深紅
+            case .taiyaki:
+                art = .image(image: Image(systemName: "fish.fill"), aspectRatio: 1)
+                backgroundColor = flavorColor(monster.flavor)
+            }
             return YugiohCardEffect.CardModel(
                 name: monster.name,
                 attribute: monster.attribute,
                 starCount: monster.level,
-                imageType: .image(image: Image(systemName: "fish.fill"), aspectRatio: 1),
-                imageBackgroundColor: flavorColor(monster.flavor),
+                imageType: art,
+                imageBackgroundColor: backgroundColor,
                 species: monster.species,
                 description: monster.text,
                 attackPoint: monster.attack,
@@ -87,6 +100,18 @@ public enum DuelCardVisualFactory {
         case .chocolate: return Color(red: 0.55, green: 0.40, blue: 0.28)   // チョコ(茶)
         case .redBean: return Color(red: 0.78, green: 0.45, blue: 0.50)     // あんこ(小豆色)
         }
+    }
+
+    /// 緋天竜カードの絵。パッケージに画像 "hitenryu_card" があればそれを使い、
+    /// 無ければ仮のシンボル(爬虫類)を使う。画像提供後は asset を追加するだけで差し替わる。
+    static func hitenryuArt() -> YugiohCardEffect.ImageType {
+#if canImport(UIKit)
+        if let uiImage = UIImage(named: "hitenryu_card", in: .module, with: nil) {
+            let aspect = uiImage.size.height > 0 ? uiImage.size.width / uiImage.size.height : 1
+            return .image(image: Image(uiImage: uiImage), aspectRatio: aspect)
+        }
+#endif
+        return .image(image: Image(systemName: "lizard.fill"), aspectRatio: 1)
     }
 }
 #endif

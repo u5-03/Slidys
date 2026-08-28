@@ -2,6 +2,9 @@
 //  MonsterVariationSlide.swift
 //  iOSDC2026Slide
 //
+//  1モデル4バリエーションの説明 + 右側で具材切り替えのライブデモ。
+//  (TaiyakiFocusView の fillingOnly モード: タップ・説明UIなし、ドラッグ回転と具材切り替えのみ)
+//
 
 import SlideKit
 import SlidesCore
@@ -14,28 +17,21 @@ struct MonsterVariationSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("モンスターは1モデルでバリエーションを作る") {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 25) {
-                    Text("召喚するモンスターはBlender製「たい焼き」モデル")
-                        .font(.regularFont)
-                    Text("1つのUSDZに具材ノード4種(あんこ/クリーム/抹茶/チョコ)を全部入れておき、カードに対応するノードだけ表示する")
-                        .font(.regularFont)
-
-                    CodeBlockView(
-                        """
-                        let monster = try await Entity(named: "Taiyaki", in: sugiyBundle)
-                        for name in fillingNames {
-                            // カードの具材に対応するノードだけを有効化する
-                            monster.findEntity(named: name)?.isEnabled = (name == flavor.fillingNodeName)
-                        }
-                        """)
-
-                    Text("モデル差し替えよりも、ロードが1回で済む + Blender側の管理が1ファイルにまとまる")
-                        .font(.regularFont)
-                        .padding(.top, 10)
+        HeaderSlide("モンスターは1モデルで4バリエーション") {
+            HStack(alignment: .top, spacing: 60) {
+                VStack(alignment: .leading, spacing: 44) {
+                    Item("具材4種を別パーツとして全部同梱(Blender製たい焼き)", accessory: .number(1))
+                    Item("実行時はカードに対応するパーツだけ表示", accessory: .number(2))
+                    Item("形ごと変えたい → パーツ切り替え / 絵だけ → テクスチャ差し替え", accessory: .number(3))
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                TaiyakiFocusView(mode: .fillingOnly)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .frame(width: 760)
+                    .frame(maxHeight: .infinity)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -44,6 +40,6 @@ struct MonsterVariationSlide: View {
     SlidePreview {
         MonsterVariationSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

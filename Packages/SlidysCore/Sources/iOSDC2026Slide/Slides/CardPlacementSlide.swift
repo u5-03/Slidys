@@ -14,32 +14,10 @@ struct CardPlacementSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("カード配置: タップの「意味」をComponentで解決する") {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 25) {
-                    Text("配置はvisionOS標準の視線 + タップ(SpatialTapGesture)")
-                        .font(.regularFont)
-                    Text("タップされたEntityが何であるかは、名前文字列ではなく自作Componentで判定")
-                        .font(.regularFont)
-
-                    CodeBlockView(
-                        """
-                        if let slotIdx = target?.components[DiskSlotIndexComponent.self]?.index {
-                            sessionStore.placeSelectedCardToDiskSlot(index: slotIdx)
-                        } else if let location = target?.components[PlacedCardLocationComponent.self] {
-                            sessionStore.tappedPlacedCardContext = mapToContext(location.location)
-                        } else if let cardId = target?.components[CardIdentityComponent.self]?.id {
-                            sessionStore.selectHandCard(id: cardId)
-                        }
-                        """)
-
-                    Text("タップイベントはコライダーを持つ末端Entityが返るので、祖先へ遡ってComponentを探す")
-                        .font(.regularFont)
-                        .padding(.top, 10)
-                    Text("ECSのComponentを「Entityへの意味づけタグ」として使うパターンはかなり便利")
-                        .font(.regularFont)
-                }
-            }
+        HeaderSlide("カード配置: どこがタップされたかはComponentで判定") {
+            Item("配置は標準の視線+タップ", accessory: .number(1))
+            Item("タップされたEntityが「どのゾーンか」は、名前の文字列ではなく自作Componentのタグで判定", accessory: .number(2))
+            Item("持っているカードの種類で、置けるスロットだけハイライト", accessory: .number(3))
         }
     }
 }
@@ -48,6 +26,6 @@ struct CardPlacementSlide: View {
     SlidePreview {
         CardPlacementSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

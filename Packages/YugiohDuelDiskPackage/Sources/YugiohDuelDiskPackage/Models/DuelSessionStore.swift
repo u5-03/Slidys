@@ -77,7 +77,10 @@ public final class DuelSessionStore: @unchecked Sendable {
 
     /// 新規デュエル開始: 初期手札を配る + 状態を全リセット。
     public func startNewDuel() {
-        hand = (0..<Self.initialHandSize).map { _ in DuelCard.random() }
+        // デモ用に緋天竜を1枚確実に手札へ入れ、残りはランダム。
+        var dealt: [DuelCard] = [.monster(MonsterCard.hitenryu)]
+        dealt += (1..<Self.initialHandSize).map { _ in DuelCard.random() }
+        hand = dealt.shuffled()
         rightHandCard = nil
         selectedHandCardId = nil
         diskSlots = Array(repeating: nil, count: Self.diskSlotCount)

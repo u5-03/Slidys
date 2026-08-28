@@ -63,7 +63,9 @@ let package = Package(
                 // RCP コンテンツパッケージ (.rkassets): Xcode ビルドでは realitytool が
                 // .reality にコンパイルし、CLI (swift build/test) では raw copy に
                 // フォールバックする。どちらも Entity(named: "YugiohDuelDisk", in: .module) で読める。
-                .process("YugiohDuelDisk.rkassets")
+                .process("YugiohDuelDisk.rkassets"),
+                // カード画像アセット(緋天竜など)。UIImage(named:in:.module) で参照する。
+                .process("Resources/Media.xcassets")
             ]
         ),
         .testTarget(

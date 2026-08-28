@@ -65,6 +65,6 @@ struct TitleSlide: View {
     SlidePreview {
         TitleSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

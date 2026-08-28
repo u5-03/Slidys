@@ -64,7 +64,21 @@ enum TaiyakiPart: String, CaseIterable, Identifiable {
 /// RealityViewのたい焼きモデルにアンカー付きフォーカスUIを重ねるサンプル。
 /// ドラッグで回転し、手前を向いたアンカーだけに「+」ボタンが表示される。
 /// タップすると正面を向きながらその部位へズームし、説明パネルを表示する。
-struct TaiyakiFocusView: View {
+public struct TaiyakiFocusView: View {
+    /// スライド埋め込みなど、機能を絞って見せたい場面向けの表示モード
+    public enum Mode: Sendable {
+        /// アンカーバブル+詳細パネル+具材ピッカー(フル機能)
+        case full
+        /// ドラッグ回転と具材切り替えのみ(タップ・説明UIなし)
+        case fillingOnly
+    }
+
+    private let mode: Mode
+
+    public init(mode: Mode = .full) {
+        self.mode = mode
+    }
+
     /// 回転の中心となるpivot Entity
     @State private var pivotEntity: Entity?
     /// 読み込んだモデル(scene)
@@ -101,7 +115,7 @@ struct TaiyakiFocusView: View {
     private let bubbleLabelWidth: CGFloat = 150
     private let bubbleHeight: CGFloat = 54
 
-    var body: some View {
+    public var body: some View {
         GeometryReader { proxy in
             ZStack {
                 Color.black.ignoresSafeArea()
@@ -115,28 +129,25 @@ struct TaiyakiFocusView: View {
                 } else {
                     realityView
 
-                    if focusedPart == nil && !isTransitioning {
+                    if mode == .full, focusedPart == nil && !isTransitioning {
                         anchorBubbles(in: proxy.size)
                     }
 
-                    if let part = focusedPart, !isTransitioning {
+                    if mode == .full, let part = focusedPart, !isTransitioning {
                         detailPanel(for: part, in: proxy.size)
                     }
 
                     VStack {
                         Spacer()
                         if focusedPart == nil {
-                            Text("モデルをドラッグして回転 / ＋をタップで詳細")
-                                .font(.caption)
-                                .foregroundStyle(.white.opacity(0.7))
-                            Picker("具材", selection: $selectedFilling) {
-                                ForEach(TaiyakiFilling.allCases) { filling in
-                                    Text(filling.displayName).tag(filling)
-                                }
+                            if mode == .full {
+                                Text("モデルをドラッグして回転 / ＋をタップで詳細")
+                                    .font(.caption)
+                                    .foregroundStyle(.white.opacity(0.7))
                             }
-                            .pickerStyle(.segmented)
-                            .padding(.horizontal, 24)
-                            .padding(.bottom, 24)
+                            fillingPicker
+                                .padding(.horizontal, 24)
+                                .padding(.bottom, 24)
                         }
                     }
                 }
@@ -145,6 +156,36 @@ struct TaiyakiFocusView: View {
         .onChange(of: selectedFilling) { _, newValue in
             guard let sceneEntity else { return }
             applyFilling(newValue, to: sceneEntity)
+        }
+    }
+
+    // MARK: - 具材ピッカー
+
+    /// 標準のsegmented Pickerだと環境フォントの影響でラベルだけ巨大になり、
+    /// 逆にタブ側の文字は小さいままなので、フォントを明示できるカスタム版にしている。
+    /// (ラベル「具材」は控えめ、タブの具材名は大きめ)
+    private var fillingPicker: some View {
+        HStack(spacing: 14) {
+            Text("具材")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.75))
+            HStack(spacing: 8) {
+                ForEach(TaiyakiFilling.allCases) { filling in
+                    Button {
+                        selectedFilling = filling
+                    } label: {
+                        Text(filling.displayName)
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(selectedFilling == filling ? .black : .white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(
+                                Capsule().fill(selectedFilling == filling ? Color.white : Color.white.opacity(0.16))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
     }
 
@@ -216,8 +257,8 @@ struct TaiyakiFocusView: View {
                     let deltaX = Float(value.translation.width - lastDragTranslation.width)
                     let deltaY = Float(value.translation.height - lastDragTranslation.height)
                     lastDragTranslation = value.translation
-                    let worldY = simd_quatf(angle: -deltaX * sensitivity, axis: SIMD3<Float>(0, 1, 0))
-                    let worldX = simd_quatf(angle: -deltaY * sensitivity, axis: SIMD3<Float>(1, 0, 0))
+                    let worldY = simd_quatf(angle: deltaX * sensitivity, axis: SIMD3<Float>(0, 1, 0))
+                    let worldX = simd_quatf(angle: deltaY * sensitivity, axis: SIMD3<Float>(1, 0, 0))
                     modelRotation = worldY * worldX * modelRotation
                     pivotEntity?.transform.rotation = modelRotation
                 }

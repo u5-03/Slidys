@@ -20,19 +20,21 @@ import UIKit
 /// 既定の `HoverEffectComponent()` は弱く、「今フォーカスされている / タップできる」ことが
 /// 分かりづらいため、色付きの強いハイライトを共通で使う。
 public enum DuelHoverStyle {
-    /// 召喚スロット(カード召喚置き場)用。シアン系で強くハイライトする。
+    /// 召喚スロット(カード召喚置き場)用。
+    /// スロット面はシアン系なので、同色のハイライトだと変化が見えない。
+    /// 視線が当たると「白く強く光る」よう白ハイライト(最大強度)にして視認性を上げる。
     public static var summonSlot: HoverEffectComponent {
 #if canImport(UIKit)
-        HoverEffectComponent(.highlight(.init(color: UIColor.cyan, strength: 1.0)))
+        HoverEffectComponent(.highlight(.init(color: UIColor.white, strength: 1.0)))
 #else
         HoverEffectComponent()
 #endif
     }
 
-    /// 魔法・トラップ挿入口用。マゼンタ系で強くハイライトする。
+    /// 魔法・トラップ挿入口用。ピンク系の面に対し、白く強く光らせる。
     public static var spellSlot: HoverEffectComponent {
 #if canImport(UIKit)
-        HoverEffectComponent(.highlight(.init(color: UIColor.systemPink, strength: 1.0)))
+        HoverEffectComponent(.highlight(.init(color: UIColor.white, strength: 1.0)))
 #else
         HoverEffectComponent()
 #endif

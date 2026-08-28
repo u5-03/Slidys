@@ -103,8 +103,9 @@ public struct YugiohDuelDiskImmersiveView: View {
     /// col ごとの召喚バースト(共通コントローラ SummonBurstController)。
     /// スロット削除/退室時に stop() で片付ける。
     @State private var fieldSummonEffects: [Int: SummonBurstController] = [:]
-    @State private var fieldDragStartPosition: SIMD3<Float>?
-    @State private var fieldRotateStartOrientation: simd_quatf?
+    /// 両手2本指フィールド操作の前フレーム状態
+    @State private var fieldManipPrevMidpoint: SIMD3<Float>?
+    @State private var fieldManipPrevAngle: Float?
     @State private var activeDiskSummonEffects: [UUID: DiskSummonEffectState] = [:]
 
     // 衝突購読 & polling
@@ -118,6 +119,8 @@ public struct YugiohDuelDiskImmersiveView: View {
 
     // attachment の親付け済みフラグ(update 内での再 addChild 防止)
     @State private var attachmentInstalled: Bool = false
+    /// 配置カード操作メニューを視界正面に固定するための頭アンカー
+    @State private var menuHeadAnchor: AnchorEntity?
     /// ライフ表示 attachment を LifeDisplay ノードへ設置済みか
     @State private var lifeDisplayInstalled: Bool = false
 
@@ -276,31 +279,13 @@ public struct YugiohDuelDiskImmersiveView: View {
         // 既知の制約: 上肢オクルージョンは画面空間セグメンテーションのため、
         // 中間角度の連続的な遮蔽 (実物の腕時計のような見え方) は表現できない。
         .upperLimbVisibility(limbVisibility)
+        // 召喚エリアの移動/回転は 2本指ピンチのハンドトラッキング(updateFieldManipulation)で行う。
+        // タップ配置と競合する DragGesture/RotateGesture3D は廃止し、タップの反応を優先する。
         .gesture(
             SpatialTapGesture()
                 .targetedToAnyEntity()
                 .onEnded { value in
                     handleSpatialTap(on: value.entity)
-                }
-        )
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .targetedToAnyEntity()
-                .onChanged { value in
-                    updateFieldDrag(value)
-                }
-                .onEnded { value in
-                    endFieldDrag(value)
-                }
-        )
-        .simultaneousGesture(
-            RotateGesture3D(constrainedToAxis: .y)
-                .targetedToAnyEntity()
-                .onChanged { value in
-                    updateFieldRotation(value)
-                }
-                .onEnded { value in
-                    endFieldRotation(value)
                 }
         )
         .onDisappear {
@@ -656,6 +641,13 @@ private extension YugiohDuelDiskImmersiveView {
         rhc.fingers[.indexFingerTip] = rIndex
         rhc.fingers[.middleFingerTip] = rMiddle
         rightHandComponent = rhc
+
+        // 配置カード操作メニュー用の頭アンカー(視界正面にメニューを固定表示する)
+        let headAnchor = AnchorEntity(.head)
+        headAnchor.name = "MenuHeadAnchor"
+        headAnchor.anchoring.trackingMode = .continuous
+        rootEntity.addChild(headAnchor)
+        menuHeadAnchor = headAnchor
     }
 
     func setupDiskRig() {
@@ -1045,7 +1037,10 @@ private extension YugiohDuelDiskImmersiveView {
         // update でも呼べる(`attachmentInstalled` で 1 回だけ親付けする)。
         guard !attachmentInstalled,
               let menu = attachments.entity(for: AttachmentID.placedCardMenu) else { return }
-        rootEntity.addChild(menu)
+        // 頭アンカーの子として視界正面(0.7m 前方・やや下)に固定する。
+        // 遠くのモンスター位置に置くと小さく読めないため、常に目の前に出す。
+        (menuHeadAnchor ?? rootEntity).addChild(menu)
+        menu.position = SIMD3<Float>(0, -0.1, -0.7)
         menu.isEnabled = false
         attachmentInstalled = true
     }
@@ -1457,60 +1452,6 @@ private extension YugiohDuelDiskImmersiveView {
         }
     }
 
-    func updateFieldDrag(_ value: EntityTargetValue<DragGesture.Value>) {
-        guard let fieldEntity = resolveFieldInteractionEntity(startingFrom: value.entity),
-              let parent = fieldEntity.parent else {
-            return
-        }
-        if fieldDragStartPosition == nil {
-            fieldDragStartPosition = fieldEntity.position(relativeTo: parent)
-            DuelLog.event("FieldDragStarted", "hit=\(value.entity.name)")
-        }
-
-        let startPosition = fieldDragStartPosition ?? fieldEntity.position(relativeTo: parent)
-        let currentLocation = value.convert(value.location3D, from: .local, to: parent)
-        let startLocation = value.convert(value.startLocation3D, from: .local, to: parent)
-        var nextPosition = startPosition + (currentLocation - startLocation)
-        nextPosition.y = startPosition.y
-        fieldEntity.setPosition(nextPosition, relativeTo: parent)
-        DuelLog.state("FieldDrag", "position=\(shortVector(nextPosition))")
-    }
-
-    func endFieldDrag(_ value: EntityTargetValue<DragGesture.Value>) {
-        if let fieldEntity = resolveFieldInteractionEntity(startingFrom: value.entity),
-           let parent = fieldEntity.parent {
-            DuelLog.event("FieldDragEnded", "position=\(shortVector(fieldEntity.position(relativeTo: parent)))")
-        }
-        fieldDragStartPosition = nil
-    }
-
-    func updateFieldRotation(_ value: EntityTargetValue<RotateGesture3D.Value>) {
-        guard let fieldEntity = resolveFieldInteractionEntity(startingFrom: value.entity),
-              let parent = fieldEntity.parent else {
-            return
-        }
-        if fieldRotateStartOrientation == nil {
-            fieldRotateStartOrientation = fieldEntity.orientation(relativeTo: parent)
-            DuelLog.event("FieldRotateStarted", "hit=\(value.entity.name)")
-        }
-
-        let startOrientation = fieldRotateStartOrientation ?? fieldEntity.orientation(relativeTo: parent)
-        // RotateGesture3D の angle は符号なし(常に正)なので、そのままだと片方向にしか回らない。
-        // クォータニオンから Y 軸まわりの「符号付き」回転量を取り出す。
-        let q = value.rotation.quaternion
-        let signedAngle = Float(2 * atan2(q.imag.y, q.real))
-        let deltaRotation = simd_quatf(angle: signedAngle, axis: SIMD3<Float>(0, 1, 0))
-        fieldEntity.setOrientation(startOrientation * deltaRotation, relativeTo: parent)
-        DuelLog.state("FieldRotate", "signedAngle=\(signedAngle)")
-    }
-
-    func endFieldRotation(_ value: EntityTargetValue<RotateGesture3D.Value>) {
-        if let fieldEntity = resolveFieldInteractionEntity(startingFrom: value.entity),
-           let parent = fieldEntity.parent {
-            DuelLog.event("FieldRotateEnded", "angle=\(fieldEntity.orientation(relativeTo: parent).angle)")
-        }
-        fieldRotateStartOrientation = nil
-    }
 }
 
 // MARK: - ピンチ判定 (Timer ベース)
@@ -1527,34 +1468,81 @@ private extension YugiohDuelDiskImmersiveView {
     }
 
     func updatePinchState() {
-        // 左手ピンチ判定
-        if let lhc = leftHandComponent {
-            sessionStore.isLeftPinching = computePinching(component: lhc)
-        }
-        // 右手ピンチ判定
-        if let rhc = rightHandComponent {
-            sessionStore.isRightPinching = computePinching(component: rhc)
-        }
+        let left = pinchSignals(component: leftHandComponent)
+        let right = pinchSignals(component: rightHandComponent)
+        // 手札表示は「3本指(親指+人差し指+中指)」のときだけ。2本指では出さない。
+        sessionStore.isLeftPinching = left.threeFinger
+        sessionStore.isRightPinching = right.threeFinger
+        // 召喚エリアの移動/回転は「2本指(親指+人差し指)」で操作する。
+        updateFieldManipulation(leftTwoFinger: left.twoFinger, rightTwoFinger: right.twoFinger)
         updateDiskPoseFollowingWrist()
         updateDynamicRigTransforms()
     }
 
-    /// HandGestureKit の `areFingerTipsTouching` を用いてピンチ判定する。
-    /// AnchorEntity が未トラッキング時には (0,0,0) を返す可能性があり、その状態では
-    /// `areFingerTipsTouching` が「距離 0 < threshold」で誤判定するため、tracked チェックも併用する。
-    func computePinching(component: HandTrackingComponent) -> Bool {
-        guard let thumbTip = component.fingers[.thumbTip],
+    /// 各手のピンチ状態を返す。
+    /// - twoFinger: 親指+人差し指がくっついている(中指はくっついていない)= フィールド操作用
+    /// - threeFinger: 親指+人差し指+中指がすべてくっついている = 手札表示用
+    /// 未トラッキング時は (0,0,0) が返るため tracked チェックを併用する。
+    func pinchSignals(component: HandTrackingComponent?) -> (twoFinger: Bool, threeFinger: Bool) {
+        guard let component,
+              let thumbTip = component.fingers[.thumbTip],
               let indexTip = component.fingers[.indexFingerTip],
-              let middleTip = component.fingers[.middleFingerTip] else { return false }
+              let middleTip = component.fingers[.middleFingerTip] else { return (false, false) }
         let thumbPos = thumbTip.position(relativeTo: nil)
         let indexPos = indexTip.position(relativeTo: nil)
         let middlePos = middleTip.position(relativeTo: nil)
-        let isTracked = thumbPos != .zero || indexPos != .zero || middlePos != .zero
-        guard isTracked else { return false }
-        let thumbIndex = component.areFingerTipsTouching(.thumb, .index, threshold: DuelDiskMetrics.pinchThreshold)
-        let thumbMiddle = component.areFingerTipsTouching(.thumb, .middle, threshold: DuelDiskMetrics.pinchThreshold)
-        let indexMiddle = distance(indexPos, middlePos) < DuelDiskMetrics.pinchThreshold
-        return thumbIndex && thumbMiddle && indexMiddle
+        guard thumbPos != .zero || indexPos != .zero || middlePos != .zero else { return (false, false) }
+        let thumbIndex = distance(thumbPos, indexPos) < DuelDiskMetrics.pinchThreshold
+        // 中指は厳しめの閾値で「確実にくっついている」ときだけ 3本指とみなす
+        let thumbMiddle = distance(thumbPos, middlePos) < DuelDiskMetrics.threeFingerThreshold
+        let indexMiddle = distance(indexPos, middlePos) < DuelDiskMetrics.threeFingerThreshold
+        let threeFinger = thumbIndex && thumbMiddle && indexMiddle
+        // 2本指 = 親指+人差し指がくっつき、かつ3本指ではない
+        let twoFinger = thumbIndex && !threeFinger
+        return (twoFinger, threeFinger)
+    }
+
+    /// 召喚エリア(field)の移動・回転を「2本指ピンチ」で操作する。
+    /// - 両手2本指: 中点の移動で平行移動 + 手の間の角度変化で回転。
+    /// - 左手のみ2本指: 平行移動のみ(visionOS標準の両手ジェスチャに頼らない自前実装)。
+    func updateFieldManipulation(leftTwoFinger: Bool, rightTwoFinger: Bool) {
+        guard let field = fieldInteractionRoot else { fieldManipPrevMidpoint = nil; fieldManipPrevAngle = nil; return }
+        let lp = trackedPosition(leftIndexTipAnchor)
+        let rp = trackedPosition(rightIndexTipAnchor)
+
+        if leftTwoFinger, rightTwoFinger, let lp, let rp {
+            let mid = (lp + rp) / 2
+            let angle = atan2(rp.x - lp.x, rp.z - lp.z)
+            if let prevMid = fieldManipPrevMidpoint, let prevAngle = fieldManipPrevAngle {
+                let delta = mid - prevMid
+                let cur = field.position(relativeTo: nil)
+                field.setPosition(SIMD3<Float>(cur.x + delta.x, cur.y, cur.z + delta.z), relativeTo: nil)
+                let dAngle = shortestAngleDelta(from: prevAngle, to: angle)
+                let rot = simd_quatf(angle: dAngle, axis: SIMD3<Float>(0, 1, 0))
+                field.setOrientation(rot * field.orientation(relativeTo: nil), relativeTo: nil)
+            }
+            fieldManipPrevMidpoint = mid
+            fieldManipPrevAngle = angle
+        } else if leftTwoFinger, let lp {
+            if let prevMid = fieldManipPrevMidpoint {
+                let delta = lp - prevMid
+                let cur = field.position(relativeTo: nil)
+                field.setPosition(SIMD3<Float>(cur.x + delta.x, cur.y, cur.z + delta.z), relativeTo: nil)
+            }
+            fieldManipPrevMidpoint = lp
+            fieldManipPrevAngle = nil
+        } else {
+            fieldManipPrevMidpoint = nil
+            fieldManipPrevAngle = nil
+        }
+    }
+
+    /// -π..π に収めた角度差。
+    func shortestAngleDelta(from a: Float, to b: Float) -> Float {
+        var d = b - a
+        while d > .pi { d -= 2 * .pi }
+        while d < -.pi { d += 2 * .pi }
+        return d
     }
 
     func updateDynamicRigTransforms() {
@@ -2095,6 +2083,13 @@ private extension YugiohDuelDiskImmersiveView {
     }
 
     func summon(into field: Entity, at col: Int, card: DuelCard) async {
+        // デモ用: ディスクにカードを置いてからフィールドに出現するまで少し待つ。
+        // 遅延が無いと配置と同時に召喚され、確認する間もなく出現を見逃すため。
+        try? await Task.sleep(nanoseconds: UInt64(DuelDiskMetrics.fieldSummonDelay * 1_000_000_000))
+        // 待機中にスロットが変更/削除されていたら中止
+        guard sessionStore.fieldBackRow.indices.contains(col),
+              sessionStore.fieldBackRow[col]?.id == card.id else { return }
+
         let pitchX = DuelDiskMetrics.fieldSlotWidth + DuelDiskMetrics.fieldGapX
         let totalCols = DuelDiskMetrics.diskSlotCount
         let offsetX = (Float(col) - Float(totalCols - 1) / 2) * pitchX
@@ -2161,12 +2156,22 @@ private extension YugiohDuelDiskImmersiveView {
         // stale チェック: 待っている間に削除/再追加で col の Entity が変わっていたら中止
         guard fieldCardEntities[col] === cardEntity else { return }
 
-        // モンスターカードの具材(たい焼きの種類)に応じた 3D オブジェクトを出す
-        let flavor: TaiyakiFlavor = {
-            if case .monster(let m) = card { return m.flavor }
-            return .redBean
+        // モンスターカードに応じた 3D オブジェクト(たい焼き / 緋天竜)を出す
+        let model: SummonModel = {
+            if case .monster(let m) = card { return m.summonModel }
+            return .taiyaki(.redBean)
         }()
-        await spawnMonster(into: field, at: col, above: cardEntity, flavor: flavor)
+        await spawnMonster(into: field, at: col, above: cardEntity, model: model)
+    }
+
+    /// 召喚モデルの種類に応じて 3D オブジェクトを出す。
+    func spawnMonster(into field: Entity, at col: Int, above cardEntity: Entity, model: SummonModel) async {
+        switch model {
+        case .taiyaki(let flavor):
+            await spawnTaiyaki(into: field, at: col, above: cardEntity, flavor: flavor)
+        case .hitenryu:
+            await spawnHitenryu(into: field, at: col, above: cardEntity)
+        }
     }
 
     /// RCP(SummonEffectAssets)の放射バーストを読み込んで発火する。
@@ -2189,7 +2194,7 @@ private extension YugiohDuelDiskImmersiveView {
 #endif
     }
 
-    func spawnMonster(into field: Entity, at col: Int, above cardEntity: Entity, flavor: TaiyakiFlavor) async {
+    func spawnTaiyaki(into field: Entity, at col: Int, above cardEntity: Entity, flavor: TaiyakiFlavor) async {
 #if canImport(Sugiy)
         do {
             // Sugiy.rkassets には Taiyaki.usdz が含まれ、具材4種(Filling_*)を内包する。
@@ -2214,6 +2219,8 @@ private extension YugiohDuelDiskImmersiveView {
             // フェードイン + 上昇で出現させる(上昇パーティクルのピークに紛れる)。
             container.transform.translation = cardEntity.transform.translation
                 + SIMD3<Float>(0, 0.15 - DuelDiskMetrics.monsterRevealRise, 0)
+            // モンスターは相手側(プレイヤーの逆方向)を向く。既定は正面がこちら向きなので180°回す。
+            container.transform.rotation = simd_quatf(angle: .pi, axis: SIMD3<Float>(0, 1, 0))
             container.components.set(OpacityComponent(opacity: 0))
             field.addChild(container)
             fieldMonsterEntities[col] = container
@@ -2246,6 +2253,78 @@ private extension YugiohDuelDiskImmersiveView {
 #endif
     }
 
+    /// 緋天竜(アニメ付き USDZ)を召喚する。出現アニメ(上昇→とぐろ)を再生する。
+    func spawnHitenryu(into field: Entity, at col: Int, above cardEntity: Entity) async {
+#if canImport(Sugiy)
+        do {
+            let dragon = try await Entity(named: "Hitenryu", in: sugiyBundle)
+            let bounds = dragon.visualBounds(relativeTo: nil)
+            let maxExtent = max(bounds.extents.x, max(bounds.extents.y, bounds.extents.z))
+            let targetMax: Float = 0.6
+            if maxExtent > 0 {
+                dragon.scale = SIMD3<Float>(repeating: targetMax / maxExtent)
+            }
+            // 足元(bounds 下端)を container 原点に合わせる(とぐろの底が召喚面に来る)
+            dragon.position = SIMD3<Float>(
+                -bounds.center.x * dragon.scale.x,
+                -bounds.min.y * dragon.scale.y,
+                -bounds.center.z * dragon.scale.z
+            )
+
+            let container = Entity()
+            container.name = "Monster_col\(col)"
+            container.addChild(dragon)
+            container.transform.translation = cardEntity.transform.translation
+                + SIMD3<Float>(0, 0.15 - DuelDiskMetrics.monsterRevealRise, 0)
+            // モンスターは相手側(プレイヤーの逆方向)を向く。既定は正面がこちら向きなので180°回す。
+            container.transform.rotation = simd_quatf(angle: .pi, axis: SIMD3<Float>(0, 1, 0))
+            container.components.set(OpacityComponent(opacity: 0))
+            field.addChild(container)
+            fieldMonsterEntities[col] = container
+            DuelLog.event("HitenryuSpawned", "col=\(col)")
+
+            // 出現アニメ(上昇→とぐろ→アイドル)を再生
+            if let (holder, animation) = firstAvailableAnimation(in: dragon) {
+                holder.playAnimation(animation, transitionDuration: 0)
+            }
+
+            var goal = container.transform
+            goal.translation.y += DuelDiskMetrics.monsterRevealRise + DuelDiskMetrics.cardRiseHeight
+            container.move(
+                to: goal,
+                relativeTo: container.parent,
+                duration: DuelDiskMetrics.monsterRevealDuration,
+                timingFunction: .easeOut
+            )
+            let fadeIn = FromToByAnimation<Float>(
+                from: 0, to: 1,
+                duration: DuelDiskMetrics.monsterRevealDuration,
+                timing: .easeOut, bindTarget: .opacity
+            )
+            if let resource = try? AnimationResource.generate(with: fadeIn) {
+                container.playAnimation(resource)
+            } else {
+                container.components.set(OpacityComponent(opacity: 1))
+            }
+        } catch {
+            DuelLog.warning("Failed to load Hitenryu entity: \(error)")
+        }
+#endif
+    }
+
+    /// availableAnimations を持つエンティティをツリーから探す。
+    func firstAvailableAnimation(in entity: Entity) -> (Entity, AnimationResource)? {
+        if let animation = entity.availableAnimations.first {
+            return (entity, animation)
+        }
+        for child in entity.children {
+            if let result = firstAvailableAnimation(in: child) {
+                return result
+            }
+        }
+        return nil
+    }
+
     // NOTE: 削除時の Entity removeFromParent は `syncDiskSlotCardEntities` / `syncFieldBackEntities`
     // の onChange 経由でのみ行う(`onDelete` → Store のみ更新 → onChange で View 同期)。
     // View 層から直接 Entity を消す経路は廃止した(2 重実行の責務分散を解消するため)。
@@ -2256,17 +2335,8 @@ private extension YugiohDuelDiskImmersiveView {
 private extension YugiohDuelDiskImmersiveView {
     func updateAttachmentPlacement(_ attachments: RealityViewAttachments) {
         guard let menu = attachments.entity(for: AttachmentID.placedCardMenu) else { return }
-        guard let ctx = sessionStore.tappedPlacedCardContext else {
-            menu.isEnabled = false
-            return
-        }
-        guard let pos = anchorPosition(for: ctx) else {
-            menu.isEnabled = false
-            return
-        }
-        menu.isEnabled = true
-        menu.setPosition(pos + SIMD3<Float>(0, 0.15, 0), relativeTo: nil)
-        DuelLog.event("PlacedCardMenuPositioned", "context=\(ctx) position=\(pos)")
+        // メニューは頭アンカー配下の固定位置(視界正面)に置いてあるので、表示/非表示だけ切り替える。
+        menu.isEnabled = (sessionStore.tappedPlacedCardContext != nil)
     }
 
     func anchorPosition(for ctx: PlacedCardContext) -> SIMD3<Float>? {
@@ -2361,8 +2431,8 @@ private extension YugiohDuelDiskImmersiveView {
         isRightHandNearLeftFan = false
         fieldRoot = nil
         fieldInteractionRoot = nil
-        fieldDragStartPosition = nil
-        fieldRotateStartOrientation = nil
+        fieldManipPrevMidpoint = nil
+        fieldManipPrevAngle = nil
 
         // HandTrackingComponent もクリア(Entity 参照を保持し続けないように)
         leftHandComponent = nil
@@ -2371,6 +2441,7 @@ private extension YugiohDuelDiskImmersiveView {
         // attachment フラグもリセット
         attachmentInstalled = false
         lifeDisplayInstalled = false
+        menuHeadAnchor = nil
         spellSlotHighlightEntities.removeAll()
 
         // SpatialTrackingSession を停止
@@ -2411,8 +2482,11 @@ private struct DiskSummonEffectView: View {
             animationID: animationID,
             boardInset: 0,
             showsBoardBackground: false,
-            // TODO(debug): ライン伸長を10倍スロー再生して見やすくしている。確認後 1.0 に戻す。
-            durationMultiplier: DuelDiskMetrics.diskSummonEffectDebugSlowMultiplier
+            durationMultiplier: DuelDiskMetrics.diskSummonEffectSpeedMultiplier,
+            // 実カードは別途表示されるため中央カードは出さない(二重表示防止)
+            showsCard: false,
+            // 線がボード領域外へはみ出さないようクリップする
+            clipsLinesToBounds: true
         )
         .frame(width: canvasWidth, height: canvasHeight)
     }

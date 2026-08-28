@@ -14,10 +14,10 @@ struct TalkPlanSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("今日話すこと: カードバトル再現の3ステップ") {
-            Item("BlenderやReality Composer Proを利用して、3Dモデルをアプリ上で表示できるようになるまでの流れ", accessory: .number(1))
-            Item("Hand Gestureを活用してカードを引く、持つといったインタラクションの実装", accessory: .number(2))
-            Item("カードの召喚エフェクトやオブジェクト移動アニメーションを使って、よりそれらしい体験を実現する工夫", accessory: .number(3))
+        HeaderSlide("今日話すこと") {
+            Item("3Dモデルを用意して表示する(Blender / Reality Composer Pro)", accessory: .number(1))
+            Item("Hand Gestureでカードを引く・持つ・置く", accessory: .number(2))
+            Item("エフェクトとアニメーションでそれらしくする", accessory: .number(3))
         }
     }
 }
@@ -26,6 +26,6 @@ struct TalkPlanSlide: View {
     SlidePreview {
         TalkPlanSlide()
     }
-    .headerSlideStyle(CustomHeaderSlideStyle())
+    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
     .itemStyle(CustomItemStyle())
 }

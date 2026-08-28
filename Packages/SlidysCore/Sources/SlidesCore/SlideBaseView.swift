@@ -39,13 +39,20 @@ public struct SlideBaseView: View {
     @StateObject private var slideIndexController: SlideIndexController
     public let slideTheme: CustomSlideTheme
 
-    public init(slideConfiguration: SlideConfigurationProtocol, timerDuration: Duration = .seconds(60 * 20), showSlideIndex: Bool = true) {
+    /// - Parameter listTextStyle: HeaderSlide 内のリスト本文の文字サイズ。
+    ///   既定は `.standard`(従来どおり)。文字少なめのデッキでは `.large` を指定する。
+    public init(
+        slideConfiguration: SlideConfigurationProtocol,
+        timerDuration: Duration = .seconds(60 * 20),
+        showSlideIndex: Bool = true,
+        listTextStyle: ListTextStyle = .standard
+    ) {
         self.slideConfiguration = slideConfiguration
         _slideIndexController = .init(wrappedValue: slideConfiguration.slideIndexController)
         let duration = min(timerDuration, Duration.seconds(60 * 60))
         timeRemaining = .init(duration.components.seconds)
         self.timerDuration = timerDuration
-        self.slideTheme = CustomSlideTheme(showSlideIndex: showSlideIndex)
+        self.slideTheme = CustomSlideTheme(showSlideIndex: showSlideIndex, listTextStyle: listTextStyle)
     }
 
     public var body: some View {

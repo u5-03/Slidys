@@ -72,6 +72,10 @@ public enum DuelDiskMetrics {
     /// ピンチ判定の距離 (親指Tip - 人差し指Tip 間) 5cm
     public static let pinchThreshold: Float = 0.05
 
+    /// 3本指(手札表示)判定で「中指も確実にくっついている」とみなす距離。
+    /// 2本指ピンチ(親指+人差し指)を誤って3本指と判定しないよう、pinchThreshold より厳しくする。
+    public static let threeFingerThreshold: Float = 0.032
+
     /// 選択中カードの持ち上げ量
     public static let selectedCardLift: Float = 0.005
 
@@ -130,6 +134,9 @@ public enum DuelDiskMetrics {
     /// モンスター召喚までの待機時間
     public static let monsterSpawnDelay: TimeInterval = 1.0
 
+    /// デモ用: ディスク配置からフィールド出現までの遅延(見逃し防止)
+    public static let fieldSummonDelay: TimeInterval = 2.0
+
     /// 召喚バースト(共通コントローラ)の拡大率。
     /// フィールドは 3x スケールなので、素材(約1m基準)を控えめに縮小して配置する。
     public static let summonBurstScale: Float = 0.3
@@ -147,11 +154,10 @@ public enum DuelDiskMetrics {
     /// ディスク上の召喚エフェクト平面の奥行き
     public static let diskSummonEffectDepth: Float = 0.18
     /// ディスク上の召喚エフェクト表示時間
-    /// TODO(debug): デバッグ用に 10 倍スロー再生しているため表示時間も 10 倍にしている。確認後 1.2 に戻す。
-    public static let diskSummonEffectDuration: TimeInterval = 1.2 * Double(diskSummonEffectDebugSlowMultiplier)
+    public static let diskSummonEffectDuration: TimeInterval = 1.2 * diskSummonEffectSpeedMultiplier
 
-    /// TODO(debug): 召喚ライン伸長エフェクトのスロー再生倍率。確認後 1.0 に戻す。
-    public static let diskSummonEffectDebugSlowMultiplier: Double = 10.0
+    /// 召喚ライン伸長エフェクトの再生倍率(1.0 = 元の SwiftUI 実装と同じ速さ)。
+    public static let diskSummonEffectSpeedMultiplier: Double = 1.0
 
     // MARK: - ピンチ polling
 
