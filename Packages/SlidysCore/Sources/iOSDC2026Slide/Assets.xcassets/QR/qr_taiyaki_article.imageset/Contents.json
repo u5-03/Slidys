@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "qr_taiyaki_article.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

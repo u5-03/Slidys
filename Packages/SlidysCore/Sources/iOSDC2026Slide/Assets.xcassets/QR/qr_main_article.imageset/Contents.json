@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "qr_main_article.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
