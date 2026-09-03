@@ -49,12 +49,23 @@ struct DuelSessionStoreTests {
         #expect(store.phase == .idle)
     }
 
-    @Test func startNewDuelDealsFiveCards() {
+    @Test func startNewDuelDealsInitialHand() {
         let store = DuelSessionStore()
         store.startNewDuel()
-        #expect(store.hand.count == 5)
+        #expect(store.hand.count == DuelSessionStore.initialHandSize)
         #expect(store.phase == .idle)
         #expect(store.rightHandCard == nil)
+    }
+
+    @Test func startNewDuelUsesFixedComposition() {
+        // 固定構成: 緋天竜 / あんこ・抹茶・クリームのたい焼き / 魔法 / トラップ。
+        let store = DuelSessionStore()
+        store.startNewDuel()
+        #expect(store.hand.count == 6)
+        #expect(store.hand.contains { $0.kind == .spell })
+        #expect(store.hand.contains { $0.kind == .trap })
+        let monsterCount = store.hand.filter { $0.kind == .monster }.count
+        #expect(monsterCount == 4)
     }
 
     @Test func startNewDuelResetsExistingState() {
@@ -71,7 +82,7 @@ struct DuelSessionStoreTests {
         #expect(store.rightHandCard == nil)
         #expect(store.selectedHandCardId == nil)
         #expect(store.phase == .idle)
-        #expect(store.hand.count == 5)
+        #expect(store.hand.count == DuelSessionStore.initialHandSize)
     }
 
     // MARK: - drawCard
@@ -131,6 +142,81 @@ struct DuelSessionStoreTests {
         store.addRightHandCardToFan()
         #expect(store.hand.count == beforeHand)
         #expect(store.rightHandCard != nil) // 取り込めなかったので残る
+    }
+
+    // MARK: - moveSelectedCardToRightHand / summonRightHandCardToDiskSlot
+
+    @Test func moveSelectedCardToRightHandRemovesFromHand() {
+        let store = DuelSessionStore()
+        let card = TestCards.monster()
+        store.hand = [card]
+        store.selectHandCard(id: card.id)
+        let moved = store.moveSelectedCardToRightHand()
+        #expect(moved)
+        #expect(store.rightHandCard?.id == card.id)
+        #expect(store.hand.isEmpty)
+        #expect(store.selectedHandCardId == nil)
+    }
+
+    @Test func moveSelectedCardToRightHandIsNoOpWhenRightHandOccupied() {
+        let store = DuelSessionStore()
+        let card = TestCards.monster()
+        store.hand = [card]
+        store.selectHandCard(id: card.id)
+        store.rightHandCard = TestCards.monster()
+        let moved = store.moveSelectedCardToRightHand()
+        #expect(!moved)
+        #expect(store.hand.count == 1)
+    }
+
+    @Test func summonRightHandCardToDiskSlotFillsSlotAndFieldBack() {
+        let store = DuelSessionStore()
+        let card = TestCards.monster()
+        store.rightHandCard = card
+        let summoned = store.summonRightHandCardToDiskSlot(index: 2)
+        #expect(summoned)
+        #expect(store.diskSlots[2]?.id == card.id)
+        #expect(store.fieldBackRow[2]?.id == card.id)
+        #expect(store.rightHandCard == nil)
+    }
+
+    @Test func summonRightHandCardToDiskSlotRejectsSpell() {
+        let store = DuelSessionStore()
+        store.rightHandCard = TestCards.spell()
+        let summoned = store.summonRightHandCardToDiskSlot(index: 0)
+        #expect(!summoned)
+        #expect(store.diskSlots[0] == nil)
+        #expect(store.rightHandCard != nil)
+    }
+
+    @Test func placeRightHandCardToSpellSlotFillsSlotAndFieldFront() {
+        let store = DuelSessionStore()
+        let card = TestCards.spell()
+        store.rightHandCard = card
+        let placed = store.placeRightHandCardToSpellSlot(index: 3)
+        #expect(placed)
+        #expect(store.spellSlots[3]?.id == card.id)
+        #expect(store.fieldFrontRow[3]?.id == card.id)
+        #expect(store.fieldFrontRevealed[3] == false)
+        #expect(store.rightHandCard == nil)
+    }
+
+    @Test func placeRightHandCardToSpellSlotRejectsMonster() {
+        let store = DuelSessionStore()
+        store.rightHandCard = TestCards.monster()
+        let placed = store.placeRightHandCardToSpellSlot(index: 0)
+        #expect(!placed)
+        #expect(store.spellSlots[0] == nil)
+        #expect(store.rightHandCard != nil)
+    }
+
+    @Test func summonRightHandCardToDiskSlotRejectsOccupiedSlot() {
+        let store = DuelSessionStore()
+        store.diskSlots[1] = TestCards.monster()
+        store.rightHandCard = TestCards.monster()
+        let summoned = store.summonRightHandCardToDiskSlot(index: 1)
+        #expect(!summoned)
+        #expect(store.rightHandCard != nil)
     }
 
     // MARK: - selectHandCard
@@ -485,16 +571,14 @@ struct DuelSessionStoreTests {
         #expect(store.hand.count == DuelSessionStore.initialHandSize)
     }
 
-    /// 自然な状態機械フロー: hand=5 → draw → fan → hand=6 → draw → fan → hand=7 → draw 拒否
+    /// 自然な状態機械フロー: 上限-1 → draw → fan → 上限 → draw 拒否。
     @Test func drawAddLoopRespectsCapacityNaturally() {
         let store = DuelSessionStore()
-        store.startNewDuel() // hand=5
-        store.drawCard()
-        store.addRightHandCardToFan() // hand=6
-        #expect(store.hand.count == 6)
-        store.drawCard() // 6 < 7 なので成功
+        // 上限-1枚から開始(initialHandSize に依存しない)。
+        store.hand = TestCards.monsters(DuelSessionStore.handCapacity - 1)
+        store.drawCard() // 上限未満なので成功
         #expect(store.rightHandCard != nil)
-        store.addRightHandCardToFan() // hand=7
+        store.addRightHandCardToFan() // 上限に到達
         #expect(store.hand.count == DuelSessionStore.handCapacity)
         // 上限到達後の drawCard は拒否される
         store.drawCard()

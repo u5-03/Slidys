@@ -93,4 +93,13 @@ public struct PlacedCardLocationComponent: Component {
 public struct FieldInteractionComponent: Component {
     public init() {}
 }
+
+/// 召喚エリア移動用の丸いハンドル(右下)に付与するマーカー。
+/// このハンドルをドラッグ/回転したときだけ召喚エリアを操作する
+/// (指ピンチでの誤操作を防ぐため、フィールド操作はハンドル限定)。
+public struct FieldHandleComponent: Component {
+    public enum Kind: Sendable { case move, rotate }
+    public var kind: Kind
+    public init(kind: Kind) { self.kind = kind }
+}
 #endif

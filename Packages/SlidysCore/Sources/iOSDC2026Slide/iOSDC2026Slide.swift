@@ -66,29 +66,28 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         MediaPlaceholderSlide(title: "", caption: "TODO: デモ1の保険動画\n(ドロー→手札→配置→たい焼き召喚の一連の流れ)")
 
         // 1. 3Dモデルを用意して表示する
-        CenterTextSlide(text: "1. 3Dモデルを用意して表示する")
-        MediaPlaceholderSlide(title: "Blenderでのモデリング", caption: "TODO: ディスクのモデリング画面と\n完成モデルの画像", symbolName: "photo")
+        ChapterDividerSlide(activeIndex: 0)
+        BlenderModelingSlide()
         ModelPipelineSlide()
         CenterTextSlide(text: "正直に言うと、\nモデルづくりでRCPアプリは\n一度も開いていません")
         RcpUsageSlide()
         BlenderMcpSlide()
         NodeContractSlide()
-        MediaPlaceholderSlide(title: "ノード契約の実物", caption: "TODO: Blender上のEmpty配置と\nアプリ側で参照している様子の画像", symbolName: "photo")
+        LocatorShowcaseSlide()
         MonsterVariationSlide()
 
         // 2. Hand Gestureでカードを操作する
-        CenterTextSlide(text: "2. Hand Gestureで\nカードを操作できるようにする")
+        ChapterDividerSlide(activeIndex: 1)
         TrackingSetupSlide()
         TrackingGestureListSlide()
         CenterTextSlide(text: "手首アンカーの子にすれば終わり\n……ではなかった")
         WristAttachmentSlide()
-        MediaPlaceholderSlide(title: "手首追従", caption: "TODO: ディスクの手首追従と\nロスト時の挙動の動画")
         HandFanSlide()
         DeckDrawSlide()
         CardPlacementSlide()
 
         // 3. エフェクトとアニメーションで演出する
-        CenterTextSlide(text: "3. エフェクトとアニメーションで\nそれらしい体験にする")
+        ChapterDividerSlide(activeIndex: 2)
         SummonSequenceSlide()
         ParticleEffectSlide()
 
@@ -98,7 +97,6 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         DragonSummonMakingSlide()
 
         // iOS/iPadOSへの応用
-        CenterTextSlide(text: "同じ仕組みを\niOS/iPadOSで使うと")
         TaiyakiFocusSlide()
 
         // まとめ
@@ -109,10 +107,11 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         // 締め: アニメの次回予告風
         CenterTextSlide(text: "この発表を機に、みなさんも\n何か自分が作ってみたいものを\n作ってもらえるとうれしいです！")
         CenterTextSlide(text: "ということで、")
+        CenterTextSlide(text: "時間はまだ残ってる。")
+        CenterTextSlide(text: "ここを耐えれば、発表は終わるんだから！")
         NextEpisodePreviewSlide(mainText: "城⚫︎内死す")
         NextEpisodePreviewSlide(
-            mainText: "「いつかやってみたかった」\nをみんなが実現する",
-            mainFontSize: 88
+            content: .imageWithQR(image: .kanagawaSwiftEvent, qrImage: .qrKanagawaEvent)
         )
         EndSlide()
     }
@@ -122,7 +121,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
     iOSDC2026SlideView()
 }
 
-#Preview("スライド一覧(グリッド)", traits: .fixedLayout(width: 1200, height: 1080)) {
+#Preview("スライド一覧(グリッド)", traits: .fixedLayout(width: 1400, height: 1080)) {
     // ウィンドウサイズは fixedLayout で確保し、中身(固有サイズのグリッド)はスクロールで見る。
     // ライブプレビュー(▶)にするとトラックパッドで縦横スクロールできる。
     ScrollView([.vertical, .horizontal]) {

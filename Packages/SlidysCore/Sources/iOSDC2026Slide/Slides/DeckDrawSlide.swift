@@ -15,9 +15,9 @@ struct DeckDrawSlide: View {
 
     var body: some View {
         HeaderSlide("デッキからカードを引く(ドロー)") {
-            Item("2段階: 人差し指+中指でデッキに触れる=構え → 離す/抜く=発火", accessory: .number(1))
-            Item("束から1枚スライドさせて抜く、あの動作の再現", accessory: .number(2))
-            Item("引いたカードは右手の指の間に追従", accessory: .number(3))
+            Item("人差し指+中指で触れて「構え」、離す/抜くで「発火」の2段階", keywords: ["2段階"], accessory: .number(1))
+            Item("束から1枚スライドさせて抜く、あの動作の再現", keywords: ["あの動作"], accessory: .number(2))
+            Item("引いたカードは右手の指の間に追従", keywords: [], accessory: .number(3))
         }
     }
 }

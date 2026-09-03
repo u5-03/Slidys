@@ -13,12 +13,22 @@ import SwiftUI
 
 @Slide
 struct NextEpisodePreviewSlide: View {
-    let mainText: String
-    let mainFontSize: CGFloat
+    /// メイン部分に出す内容
+    enum Content {
+        /// アニメ次回予告風の大きな文字
+        case text(String, fontSize: CGFloat = 170)
+        /// イベント告知: バナー画像とQRコードを横並びで
+        case imageWithQR(image: ImageResource, qrImage: ImageResource)
+    }
+
+    let content: Content
 
     init(mainText: String, mainFontSize: CGFloat = 170) {
-        self.mainText = mainText
-        self.mainFontSize = mainFontSize
+        self.content = .text(mainText, fontSize: mainFontSize)
+    }
+
+    init(content: Content) {
+        self.content = content
     }
 
     public var transition: AnyTransition {
@@ -33,12 +43,42 @@ struct NextEpisodePreviewSlide: View {
                 OutlinedText(text: "次回予告", fontSize: 90)
                     .padding(.leading, 60)
 
-                OutlinedText(text: mainText, fontSize: mainFontSize)
+                mainContent
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.horizontal, 80)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .padding(.top, -60)
+        }
+    }
+
+    @ViewBuilder
+    private var mainContent: some View {
+        switch content {
+        case .text(let text, let fontSize):
+            OutlinedText(text: text, fontSize: fontSize)
+        case .imageWithQR(let image, let qrImage):
+            // バナーとQRは同じ高さで横に並べる
+            HStack(spacing: 80) {
+                Image(image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 560)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.5), lineWidth: 3)
+                    }
+                    .shadow(color: .black.opacity(0.4), radius: 12, x: 4, y: 8)
+                Image(qrImage)
+                    .resizable()
+                    .interpolation(.none) // QRのドットをにじませない
+                    .scaledToFit()
+                    .frame(width: 560, height: 560)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(color: .black.opacity(0.4), radius: 12, x: 4, y: 8)
+            }
         }
     }
 

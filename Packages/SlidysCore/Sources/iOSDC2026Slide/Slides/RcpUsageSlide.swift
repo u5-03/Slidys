@@ -17,9 +17,9 @@ struct RcpUsageSlide: View {
 
     var body: some View {
         HeaderSlide("BlenderとRCPの使い分け(実際はこうなった)") {
-            Item("形を作る = Blender。使ったRCPは「パッケージ形式(.rkassets)」だけ", accessory: .number(1))
-            Item("当初はRCPでコンポーネント付与も想定 → 動的な要素ばかりでコードへ", accessory: .number(2))
-            Item("RCPのGUIが活きたのは召喚エフェクト(3章で)", accessory: .number(3))
+            Item("形を作るのはBlender。RCPはパッケージ形式(.rkassets)だけ", keywords: ["パッケージ形式(.rkassets)だけ"], accessory: .number(1))
+            Item("当初はRCPでコンポーネント付与も想定 → 動的な要素ばかりでコードへ", keywords: ["コードへ"], accessory: .number(2))
+            Item("RCPのGUIが活きたのは召喚エフェクト(3章で)", keywords: ["召喚エフェクト"], accessory: .number(3))
         }
     }
 }

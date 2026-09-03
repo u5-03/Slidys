@@ -50,6 +50,9 @@ public struct YugiohDuelDiskImmersiveView: View {
     @State private var diskModelEntity: Entity?
     /// 手首追従の初回適用が済んだか (未適用の間は board を非表示にする)
     @State private var diskPoseInitialized = false
+    /// 手首推定が非現実的に飛んだ(=死角トラッキンググリッチ)ときに追従を保留したフレーム数。
+    /// 一定フレーム継続したら「本当に動いた/再ローカライズした」とみなして追従を再開する。
+    @State private var wristJumpHoldFrames = 0
     /// 実腕オクルージョンの動的切替 (手首を返した時だけ .automatic にして腕の奥に隠す)
     @State private var limbVisibility: Visibility = .hidden
     @State private var diskSlotEntities: [ModelEntity] = []
@@ -94,6 +97,9 @@ public struct YugiohDuelDiskImmersiveView: View {
     // 召喚エリア
     @State private var fieldRoot: AnchorEntity?
     @State private var fieldInteractionRoot: Entity?
+    /// 召喚エリア移動/回転用の丸いハンドル(フィールド手前に追従)
+    @State private var fieldMoveHandle: Entity?
+    @State private var fieldRotateHandle: Entity?
     @State private var fieldCardEntities: [Int: Entity] = [:]
     /// フィールド手前列(魔法・トラップ)に配置したカード Entity
     @State private var fieldFrontCardEntities: [Int: Entity] = [:]
@@ -103,9 +109,14 @@ public struct YugiohDuelDiskImmersiveView: View {
     /// col ごとの召喚バースト(共通コントローラ SummonBurstController)。
     /// スロット削除/退室時に stop() で片付ける。
     @State private var fieldSummonEffects: [Int: SummonBurstController] = [:]
-    /// 両手2本指フィールド操作の前フレーム状態
-    @State private var fieldManipPrevMidpoint: SIMD3<Float>?
-    @State private var fieldManipPrevAngle: Float?
+    /// 移動ハンドルのドラッグ開始時のフィールド位置(ワールド)
+    @State private var fieldDragStartPosition: SIMD3<Float>?
+    /// 回転ハンドルのドラッグ開始時の状態(フィールド中央を軸に回すために使う)
+    @State private var fieldRotateStartAngle: Float?
+    @State private var fieldRotateStartOrientation: simd_quatf?
+    @State private var fieldRotateStartPosition: SIMD3<Float>?
+    @State private var fieldRotateCenterWorld: SIMD3<Float>?
+    @State private var fieldRotateHandleStartWorld: SIMD3<Float>?
     @State private var activeDiskSummonEffects: [UUID: DiskSummonEffectState] = [:]
 
     // 衝突購読 & polling
@@ -114,6 +125,8 @@ public struct YugiohDuelDiskImmersiveView: View {
     /// デッキドロー: 右手の人差し指+中指がくっついた状態でデッキ空間へ入ると true。
     /// その後「指を離す」or「デッキ空間から出る」でドロー発火する。
     @State private var isDeckDrawArmed = false
+    /// 右手の人差し指+中指が「くっついた」立ち上がり検知用(前フレームの接触状態)。
+    @State private var wasRightFingersTouching = false
     @State private var isRightHandNearLeftFan = false
     @State private var lastBoardOrientationLogTime: TimeInterval = 0
 
@@ -279,8 +292,8 @@ public struct YugiohDuelDiskImmersiveView: View {
         // 既知の制約: 上肢オクルージョンは画面空間セグメンテーションのため、
         // 中間角度の連続的な遮蔽 (実物の腕時計のような見え方) は表現できない。
         .upperLimbVisibility(limbVisibility)
-        // 召喚エリアの移動/回転は 2本指ピンチのハンドトラッキング(updateFieldManipulation)で行う。
-        // タップ配置と競合する DragGesture/RotateGesture3D は廃止し、タップの反応を優先する。
+        // 召喚エリアの移動/回転は「右下の丸いハンドル」限定で行う。
+        // 指ピンチ(手札表示など)での誤操作を無くすため、フィールド操作はハンドルにのみ紐付ける。
         .gesture(
             SpatialTapGesture()
                 .targetedToAnyEntity()
@@ -288,6 +301,7 @@ public struct YugiohDuelDiskImmersiveView: View {
                     handleSpatialTap(on: value.entity)
                 }
         )
+        .gesture(fieldHandleDragGesture)
         .onDisappear {
             tearDown()
         }
@@ -382,8 +396,20 @@ private let fieldInteractionWidth: Float =
     + Float(DuelDiskMetrics.diskSlotCount - 1) * DuelDiskMetrics.fieldGapX
 private let fieldInteractionDepth: Float =
     abs(DuelDiskMetrics.fieldFrontZ - DuelDiskMetrics.fieldBackZ) + DuelDiskMetrics.fieldSlotDepth
-private let fieldWorldCenterPosition = SIMD3<Float>(0, -1.0, -2.0)
+/// フィールド(3xスケール適用後)の奥行き半分。ワールド座標での実寸。
+private let fieldHalfDepthWorld: Float = fieldInteractionDepth / 2 * DuelDiskMetrics.fieldScale
+private let fieldHalfWidthWorld: Float = fieldInteractionWidth / 2 * DuelDiskMetrics.fieldScale
 private let fieldLocalCenterOffsetZ = (DuelDiskMetrics.fieldBackZ + DuelDiskMetrics.fieldFrontZ) / 2
+/// 「手前の召喚列(見えているスロットの手前列)」をプレイヤーの何m前方に置くか。
+/// 見えないインタラクション板の端ではなく、実際に見える手前列を基準にする。
+private let fieldFrontRowWorldZ: Float = -1.5
+/// フィールド中心から手前列までのワールド距離(3xスケール適用後)。
+/// (fieldFrontZ は中心オフセット基準なので、そこから中心オフセットを引いてスケール倍する)
+private let fieldFrontRowLocalOffsetWorld: Float =
+    (DuelDiskMetrics.fieldFrontZ - fieldLocalCenterOffsetZ) * DuelDiskMetrics.fieldScale
+/// 手前列が fieldFrontRowWorldZ に来るよう、フィールド中心の Z を決める。
+private let fieldWorldCenterPosition =
+    SIMD3<Float>(0, -1.0, fieldFrontRowWorldZ - fieldFrontRowLocalOffsetWorld)
 
 private func fieldInteractionMaterial() -> SimpleMaterial {
     var material = SimpleMaterial()
@@ -689,18 +715,23 @@ private extension YugiohDuelDiskImmersiveView {
         ))
         board.addChild(deck)
         deckEntity = deck
+        installDeckBackFace(on: deck)
         DuelLog.event("DeckAttached", "position=\(deck.position)")
 
         // ディスクスロット ×5
+        // タップの当たり判定を上方向に大きく取り、視線タップが当たりやすいようにする
+        // (元は 5mm 厚で狙いにくかった)。高さ方向のボックス中心を上に持ち上げて、
+        // 「スロットの真上の空間」を広くタップ対象にする。
         let slots = DiskSlotFactory.makeSlots()
         for slot in slots {
             slot.components.set(CollisionComponent(
                 shapes: [
                     .generateBox(size: SIMD3<Float>(
-                        DuelDiskMetrics.diskSlotWidth,
-                        0.005,
-                        DuelDiskMetrics.diskSlotDepth
+                        DuelDiskMetrics.diskSlotWidth * 1.15,
+                        DuelDiskMetrics.diskSlotTapHeight,
+                        DuelDiskMetrics.diskSlotDepth * 1.15
                     ))
+                    .offsetBy(translation: SIMD3<Float>(0, DuelDiskMetrics.diskSlotTapHeight / 2, 0))
                 ],
                 mode: .default,
                 filter: .default
@@ -742,6 +773,13 @@ private extension YugiohDuelDiskImmersiveView {
         let wristTransform = Transform(matrix: wrist.transformMatrix(relativeTo: nil))
         // 未トラッキング時に原点 (単位行列) が返るケースを弾く
         guard simd_length(wristTransform.translation) > 0.05 else { return }
+
+        // 右手をディスクへ伸ばしている間は追従を凍結する。
+        // (このとき左手首が死角に入り姿勢推定が乱れ、ディスクが急に動く主因になるため)
+        // 初回姿勢確定前は凍結しない(初期化を優先)。
+        if diskPoseInitialized, isRightHandNearDisk(boardWorld: board.position(relativeTo: nil)) {
+            return
+        }
         let targetRotation = wristTransform.rotation * DuelDiskBoardLayout.rotation
         // 手首表面から surfaceLift だけディスク上方向 (board ローカル +Y) に浮かせる
         let targetPosition = wristTransform.translation
@@ -752,9 +790,40 @@ private extension YugiohDuelDiskImmersiveView {
             board.orientation = targetRotation
             board.isEnabled = true
             diskPoseInitialized = true
+            wristJumpHoldFrames = 0
             DuelLog.event("DiskPoseInitialized", "position=\(shortVector(targetPosition))")
             return
         }
+
+        // --- 外れ値(死角トラッキンググリッチ)の棄却 ---
+        // 右手をディスクへ伸ばすと左手首が死角に入り、手首推定が瞬間的に飛ぶことがある。
+        // 1tickの移動/回転が非現実的に大きい場合は追従を保留し、最後の姿勢を維持する。
+        // ただし、その大ジャンプが一定フレーム継続したら「本当に動いた/再ローカライズした」と判断して追従を再開する
+        // (恒久的なズレを防ぐため)。
+        let positionJump = simd_distance(board.position, targetPosition)
+        // 2つの姿勢間の最短回転角 (rad)
+        let relativeRotation = board.orientation.inverse * targetRotation
+        let rawAngle = relativeRotation.angle
+        let angleJump = rawAngle > .pi ? (2 * .pi - rawAngle) : rawAngle
+        let isGlitchJump = positionJump > DuelDiskMetrics.wristFollowMaxJumpPerTick
+            || angleJump > DuelDiskMetrics.wristFollowMaxAnglePerTick
+        if isGlitchJump {
+            wristJumpHoldFrames += 1
+            if wristJumpHoldFrames < DuelDiskMetrics.wristFollowJumpConfirmFrames {
+                // グリッチとみなして最後の姿勢を保持(=ディスクを動かさない)
+                if wristJumpHoldFrames == 1 {
+                    DuelLog.event(
+                        "DiskPoseJumpRejected",
+                        "posJump=\(String(format: "%.3f", positionJump)) angJump=\(String(format: "%.2f", angleJump))"
+                    )
+                }
+                return
+            }
+            // 継続したので実際の移動と判断 → このフレームで追従を再開
+            DuelLog.event("DiskPoseJumpAccepted", "posJump=\(String(format: "%.3f", positionJump))")
+        }
+        wristJumpHoldFrames = 0
+
         // ローパスで滑らかに追従 (60fps 想定で α=0.35)
         let alpha: Float = 0.35
         board.position = mix(board.position, targetPosition, t: alpha)
@@ -845,8 +914,9 @@ private extension YugiohDuelDiskImmersiveView {
         return simd_quatf(angle: yaw, axis: SIMD3<Float>(0, 1, 0))
     }
 
-    /// SpellSlot ノード位置に、視線ハイライト + タップ用のオーバーレイ板を敷く。
-    /// モデルのスリットは細く目立たないため、カード大の板を重ねて分かりやすくする。
+    /// SpellSlot ノード位置に、タップ + カード接触判定用のオーバーレイ板を敷く。
+    /// 実際のアニメには無い「赤い半透明ガイド」は出さない方針のため、板は透明にする
+    /// (見た目は出さず、タップ/接触の判定だけを担う)。
     func installSpellSlotHighlightOverlays(model: Entity, board: Entity) {
         spellSlotHighlightEntities.forEach { $0.removeFromParent() }
         spellSlotHighlightEntities.removeAll()
@@ -854,7 +924,7 @@ private extension YugiohDuelDiskImmersiveView {
             guard let node = model.findEntity(named: "SpellSlot_\(i + 1)") else { continue }
             let plane = ModelEntity(
                 mesh: .generatePlane(width: DuelDiskMetrics.diskSlotWidth, depth: DuelDiskMetrics.diskSlotDepth),
-                materials: [slotHighlightMaterial(active: false, kind: .spell)]
+                materials: [invisibleSlotMaterial()]
             )
             plane.name = "SpellSlotHighlight_\(i)"
             plane.transform.translation = node.convert(position: .zero, to: board) + SIMD3<Float>(0, 0.002, 0)
@@ -886,11 +956,9 @@ private extension YugiohDuelDiskImmersiveView {
             slot.model?.materials = [slotHighlightMaterial(active: monsterActive, kind: .monster)]
             setHoverEnabled(slot, enabled: monsterActive, style: DuelHoverStyle.summonSlot)
         }
-        // 魔法・トラップ挿入口オーバーレイ板 (魔法/トラップ用)
-        for plane in spellSlotHighlightEntities {
-            plane.model?.materials = [slotHighlightMaterial(active: spellActive, kind: .spell)]
-            setHoverEnabled(plane, enabled: spellActive, style: DuelHoverStyle.spellSlot)
-        }
+        // 魔法・トラップ挿入口: 赤い半透明ガイドは出さない(実アニメに無いため)。
+        // 板は常に透明のまま、タップ/カード接触の判定だけを担う。ホバーも付けない。
+        _ = spellActive
         guard let model = diskModelEntity else { return }
         // 召喚ゾーン面 (モンスター用) — 視線ホバーのみ
         for name in DuelDiskModelFactory.zoneFieldNames {
@@ -924,6 +992,16 @@ private extension YugiohDuelDiskImmersiveView {
 #else
         return SimpleMaterial()
 #endif
+    }
+
+    /// 完全透明なマテリアル。見た目を出さずにタップ/接触判定だけを担う板に使う。
+    func invisibleSlotMaterial() -> RealityKit.Material {
+        var m = UnlitMaterial()
+        m.blending = .transparent(opacity: 0.0)
+#if canImport(UIKit)
+        m.color = .init(tint: UIColor.white.withAlphaComponent(0.0))
+#endif
+        return m
     }
 
     /// ホバーハイライトの有効/無効を切り替える。無効時は HoverEffectComponent を外す。
@@ -997,6 +1075,91 @@ private extension YugiohDuelDiskImmersiveView {
         let slots = FieldSlotFactory.makeField()
         interactionRoot.addChild(slots)
         DuelLog.event("FieldSetupCompleted", "slotCount=10")
+
+        // 召喚エリアの「移動」「回転」ハンドル(丸い球)を、フィールドの手前に設置する。
+        // rootEntity 直下(回転しないワールド系)に置き、位置だけをフィールド中央に追従させる。
+        // → 置き場と重ならない(手前)/ドラッグ計算が安定する/フィールド移動に追従する。
+        setupFieldHandles()
+    }
+
+    /// 移動/回転ハンドルを生成する(rootEntity 直下・ワールド系)。位置は毎tick追従で更新する。
+    func setupFieldHandles() {
+        let move = makeFieldHandle(kind: .move, color: .cyan, name: "FieldMoveHandle")
+        rootEntity.addChild(move)
+        fieldMoveHandle = move
+
+        let rotate = makeFieldHandle(kind: .rotate, color: .orange, name: "FieldRotateHandle")
+        rootEntity.addChild(rotate)
+        fieldRotateHandle = rotate
+
+        updateFieldHandlePositions()
+        DuelLog.event("FieldHandlesReady", "move+rotate")
+    }
+
+    /// ハンドル1個を生成する。球より分かりやすいよう「角丸パネル + 日本語ラベル」にする。
+    /// 存在感を抑えるため色は少し薄め。
+    func makeFieldHandle(kind: FieldHandleComponent.Kind, color: UIColor, name: String) -> ModelEntity {
+        var material = PhysicallyBasedMaterial()
+        let tinted = color.withAlphaComponent(CGFloat(DuelDiskMetrics.fieldHandleOpacity))
+        material.baseColor = .init(tint: tinted)
+        material.emissiveColor = .init(color: color)
+        material.emissiveIntensity = DuelDiskMetrics.fieldHandleEmissiveIntensity
+        material.roughness = 0.4
+        material.blending = .transparent(opacity: .init(floatLiteral: DuelDiskMetrics.fieldHandleOpacity))
+
+        let size = DuelDiskMetrics.fieldHandleSize
+        let panel = ModelEntity(
+            mesh: .generateBox(size: size, cornerRadius: size.y * 0.4),
+            materials: [material]
+        )
+        panel.name = name
+        panel.components.set(FieldHandleComponent(kind: kind))
+        panel.components.set(InputTargetComponent())
+        panel.components.set(HoverEffectComponent(.highlight(.init(color: .white, strength: 0.8))))
+        panel.components.set(CollisionComponent(
+            shapes: [.generateBox(size: size * 1.25)],
+            mode: .default,
+            filter: .default
+        ))
+
+        // 何のハンドルか一目で分かるよう、上に立てた日本語ラベルを付ける。
+        let label = makeHandleLabel(kind == .move ? "移動" : "回転")
+        label.position = SIMD3<Float>(0, size.y / 2 + 0.02, 0)
+        panel.addChild(label)
+        return panel
+    }
+
+    /// ハンドル上に立てる 3D テキストラベル(プレイヤー側=+Z を向く)。
+    func makeHandleLabel(_ text: String) -> ModelEntity {
+        let mesh = MeshResource.generateText(
+            text,
+            extrusionDepth: 0.004,
+            font: .systemFont(ofSize: 0.06, weight: .bold),
+            alignment: .center
+        )
+        var material = UnlitMaterial()
+        material.color = .init(tint: .white)
+        let entity = ModelEntity(mesh: mesh, materials: [material])
+        // generateText の原点は左下。中央に揃える。
+        let bounds = entity.visualBounds(relativeTo: entity)
+        entity.position = SIMD3<Float>(-bounds.center.x, -bounds.center.y, 0)
+        // テキスト面(+Z法線)をプレイヤーに向けて立てる。
+        let holder = ModelEntity()
+        holder.addChild(entity)
+        return holder
+    }
+
+    /// ハンドルの位置を、フィールド中央からのオフセットで毎tick追従させる。
+    /// 移動ハンドル=手前の右外角 / 回転ハンドル=手前の左外角(いずれも置き場の外)。
+    /// (フィールドが動けばハンドルも一緒に動く。回転中は中央が固定なのでハンドルは静止する)
+    func updateFieldHandlePositions() {
+        guard let center = fieldInteractionRoot?.position(relativeTo: nil) else { return }
+        // 手前(プレイヤー寄り=+Z)・エリア外(左右端の少し外)・少し上。
+        let frontZ = fieldFrontRowLocalOffsetWorld + 0.4
+        let outerX = fieldHalfWidthWorld + 0.3
+        let handleY: Float = 0.2
+        fieldMoveHandle?.setPosition(center + SIMD3<Float>(outerX, handleY, frontZ), relativeTo: nil)
+        fieldRotateHandle?.setPosition(center + SIMD3<Float>(-outerX, handleY, frontZ), relativeTo: nil)
     }
 
     /// 衝突購読を **対象 entity を限定して** 仕掛ける。
@@ -1058,8 +1221,9 @@ private extension YugiohDuelDiskImmersiveView {
         let targetWidth: Float = 0.07
         let scale = bounds.extents.x > 0.0001 ? targetWidth / bounds.extents.x : 1
         lifeEntity.transform.scale = SIMD3<Float>(repeating: scale)
-        // LifeDisplay ノードの姿勢へ合わせ、面が上(+Y)を向くよう寝かせる
-        lifeEntity.transform.translation = node.convert(position: .zero, to: board) + SIMD3<Float>(0, 0.002, 0)
+        // LifeDisplay ノードの姿勢へ合わせ、面が上(+Y)を向くよう寝かせる。
+        // ディスク面にぴったり乗るよう、Z-fight を避ける最小限だけ浮かせる。
+        lifeEntity.transform.translation = node.convert(position: .zero, to: board) + SIMD3<Float>(0, 0.0005, 0)
         lifeEntity.transform.rotation = yawOnlyOrientation(of: node, relativeTo: board)
             * simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
         board.addChild(lifeEntity)
@@ -1218,6 +1382,27 @@ private extension YugiohDuelDiskImmersiveView {
         attachment.addChild(back)
     }
 
+    /// デッキの一番上の面にカード裏面デザインを貼り、「カードの束」に見えるようにする。
+    func installDeckBackFace(on deck: ModelEntity) {
+        guard deck.findEntity(named: "DeckBackFace") == nil else { return }
+        var material = UnlitMaterial()
+#if canImport(UIKit)
+        if let texture = cardBackTextureResource() {
+            material.color = .init(tint: .white, texture: .init(texture))
+        } else {
+            material.color = .init(tint: UIColor(red: 0.72, green: 0.55, blue: 0.36, alpha: 1.0))
+        }
+#endif
+        // deck ローカルの XZ 平面(法線 +Y)。デッキ天面のわずかに上に置く。
+        let plane = ModelEntity(
+            mesh: .generatePlane(width: DuelDiskMetrics.cardWidth, depth: DuelDiskMetrics.cardDepth),
+            materials: [material]
+        )
+        plane.name = "DeckBackFace"
+        plane.position = SIMD3<Float>(0, DuelDiskMetrics.deckHeight / 2 + 0.0006, 0)
+        deck.addChild(plane)
+    }
+
     /// カード裏面デザインを一度だけラスタライズして TextureResource 化しキャッシュする。
     func cardBackTextureResource() -> TextureResource? {
 #if canImport(UIKit) && canImport(YugiohCardEffect)
@@ -1337,7 +1522,16 @@ private extension YugiohDuelDiskImmersiveView {
         // ディスク部品 (ボタン / 魔法・トラップ挿入口 / 墓地) のタップを最優先で判定
         if let part = DuelDiskModelFactory.resolveTapPartName(from: tappedEntity) {
             if part.hasPrefix("Button_") {
-                DuelLog.event("DiskButtonTapped", "button=\(part)")
+                // 手前の5つのボタン → 対応する列の「裏でセットした魔法・トラップ」をオープンする。
+                if let index = spellSlotIndex(from: part) {
+                    let context = PlacedCardContext.fieldFront(index)
+                    if sessionStore.canOpenCard(at: context) {
+                        DuelLog.event("DiskButtonOpenSetCard", "button=\(part) col=\(index)")
+                        sessionStore.openPlacedCard(at: context)
+                    } else {
+                        DuelLog.event("DiskButtonTapped", "button=\(part) col=\(index) openable=false")
+                    }
+                }
             } else if part.hasPrefix("SpellSlot_") {
                 // 魔法・トラップ挿入口 → 選択中の魔法/トラップを配置
                 if let index = spellSlotIndex(from: part) {
@@ -1473,10 +1667,19 @@ private extension YugiohDuelDiskImmersiveView {
         // 手札表示は「3本指(親指+人差し指+中指)」のときだけ。2本指では出さない。
         sessionStore.isLeftPinching = left.threeFinger
         sessionStore.isRightPinching = right.threeFinger
-        // 召喚エリアの移動/回転は「2本指(親指+人差し指)」で操作する。
-        updateFieldManipulation(leftTwoFinger: left.twoFinger, rightTwoFinger: right.twoFinger)
+        // 召喚エリアの移動・回転はどちらも「専用ハンドル」限定にする。
+        // 指ピンチ(手札表示や右手カード保持)には一切紐付けないため、誤作動しない。
+        _ = (left.twoFinger, right.twoFinger)
         updateDiskPoseFollowingWrist()
         updateDynamicRigTransforms()
+    }
+
+    /// -π..π に収めた角度差。
+    func shortestAngleDelta(from a: Float, to b: Float) -> Float {
+        var d = b - a
+        while d > .pi { d -= 2 * .pi }
+        while d < -.pi { d += 2 * .pi }
+        return d
     }
 
     /// 各手のピンチ状態を返す。
@@ -1502,47 +1705,72 @@ private extension YugiohDuelDiskImmersiveView {
         return (twoFinger, threeFinger)
     }
 
-    /// 召喚エリア(field)の移動・回転を「2本指ピンチ」で操作する。
-    /// - 両手2本指: 中点の移動で平行移動 + 手の間の角度変化で回転。
-    /// - 左手のみ2本指: 平行移動のみ(visionOS標準の両手ジェスチャに頼らない自前実装)。
-    func updateFieldManipulation(leftTwoFinger: Bool, rightTwoFinger: Bool) {
-        guard let field = fieldInteractionRoot else { fieldManipPrevMidpoint = nil; fieldManipPrevAngle = nil; return }
-        let lp = trackedPosition(leftIndexTipAnchor)
-        let rp = trackedPosition(rightIndexTipAnchor)
+    /// 移動/回転ハンドルのドラッグでだけ召喚エリアを操作する(指ピンチには一切紐付けない)。
+    /// - 移動(シアン): ドラッグ量ぶんフィールドを水平移動。
+    /// - 回転(オレンジ): フィールド中央を軸に、ハンドルを動かした方向へ回転。
+    var fieldHandleDragGesture: some Gesture {
+        DragGesture()
+            .targetedToAnyEntity()
+            .onChanged { value in
+                guard let field = fieldRoot else { return }
+                let worldDelta = value.convert(value.translation3D, from: .local, to: .scene)
 
-        if leftTwoFinger, rightTwoFinger, let lp, let rp {
-            let mid = (lp + rp) / 2
-            let angle = atan2(rp.x - lp.x, rp.z - lp.z)
-            if let prevMid = fieldManipPrevMidpoint, let prevAngle = fieldManipPrevAngle {
-                let delta = mid - prevMid
-                let cur = field.position(relativeTo: nil)
-                field.setPosition(SIMD3<Float>(cur.x + delta.x, cur.y, cur.z + delta.z), relativeTo: nil)
-                let dAngle = shortestAngleDelta(from: prevAngle, to: angle)
-                let rot = simd_quatf(angle: dAngle, axis: SIMD3<Float>(0, 1, 0))
-                field.setOrientation(rot * field.orientation(relativeTo: nil), relativeTo: nil)
+                if fieldHandle(from: value.entity, kind: .move) {
+                    let start: SIMD3<Float>
+                    if let s = fieldDragStartPosition {
+                        start = s
+                    } else {
+                        start = field.position(relativeTo: nil)
+                        fieldDragStartPosition = start
+                    }
+                    // 前後左右+上下(3軸)すべて移動できるようにする。
+                    field.setPosition(start + worldDelta, relativeTo: nil)
+                } else if fieldHandle(from: value.entity, kind: .rotate) {
+                    // 初回に中央・ハンドル位置・開始姿勢を記録する。
+                    if fieldRotateStartAngle == nil {
+                        let center = fieldInteractionRoot?.position(relativeTo: nil) ?? field.position(relativeTo: nil)
+                        let handleStart = value.entity.position(relativeTo: nil)
+                        fieldRotateCenterWorld = center
+                        fieldRotateHandleStartWorld = handleStart
+                        fieldRotateStartOrientation = field.orientation(relativeTo: nil)
+                        fieldRotateStartPosition = field.position(relativeTo: nil)
+                        fieldRotateStartAngle = atan2(handleStart.x - center.x, handleStart.z - center.z)
+                    }
+                    guard let center = fieldRotateCenterWorld,
+                          let handleStart = fieldRotateHandleStartWorld,
+                          let startAngle = fieldRotateStartAngle,
+                          let startOrientation = fieldRotateStartOrientation,
+                          let startPosition = fieldRotateStartPosition else { return }
+                    // ハンドルをドラッグした仮想位置の、中央まわりの角度差ぶん回す。
+                    let dragged = handleStart + worldDelta
+                    let curAngle = atan2(dragged.x - center.x, dragged.z - center.z)
+                    let dAngle = shortestAngleDelta(from: startAngle, to: curAngle)
+                    let rot = simd_quatf(angle: dAngle, axis: SIMD3<Float>(0, 1, 0))
+                    // フィールド中央を軸に回す(姿勢 + 中央まわりに位置も回転)。
+                    field.setOrientation(rot * startOrientation, relativeTo: nil)
+                    field.setPosition(center + rot.act(startPosition - center), relativeTo: nil)
+                }
             }
-            fieldManipPrevMidpoint = mid
-            fieldManipPrevAngle = angle
-        } else if leftTwoFinger, let lp {
-            if let prevMid = fieldManipPrevMidpoint {
-                let delta = lp - prevMid
-                let cur = field.position(relativeTo: nil)
-                field.setPosition(SIMD3<Float>(cur.x + delta.x, cur.y, cur.z + delta.z), relativeTo: nil)
+            .onEnded { _ in
+                fieldDragStartPosition = nil
+                fieldRotateStartAngle = nil
+                fieldRotateStartOrientation = nil
+                fieldRotateStartPosition = nil
+                fieldRotateCenterWorld = nil
+                fieldRotateHandleStartWorld = nil
             }
-            fieldManipPrevMidpoint = lp
-            fieldManipPrevAngle = nil
-        } else {
-            fieldManipPrevMidpoint = nil
-            fieldManipPrevAngle = nil
-        }
     }
 
-    /// -π..π に収めた角度差。
-    func shortestAngleDelta(from a: Float, to b: Float) -> Float {
-        var d = b - a
-        while d > .pi { d -= 2 * .pi }
-        while d < -.pi { d += 2 * .pi }
-        return d
+    /// 指定 entity(またはその親)が指定種別のフィールド操作ハンドルかを判定する。
+    func fieldHandle(from entity: Entity, kind: FieldHandleComponent.Kind) -> Bool {
+        var node: Entity? = entity
+        while let cur = node {
+            if let handle = cur.components[FieldHandleComponent.self], handle.kind == kind {
+                return true
+            }
+            node = cur.parent
+        }
+        return false
     }
 
     func updateDynamicRigTransforms() {
@@ -1550,6 +1778,7 @@ private extension YugiohDuelDiskImmersiveView {
 
         updateLeftFanPose()
         updateRightHandRig()
+        updateFieldHandlePositions()
     }
 
     /// 左手の扇手札の位置と姿勢を、ピンチ中点 + 手のひらの基底に追従させる。
@@ -1562,9 +1791,11 @@ private extension YugiohDuelDiskImmersiveView {
               let midpoint = centroidOfTips(leftThumbTipAnchor, leftIndexTipAnchor, leftMiddleTipAnchor) else { return }
 
         let targetOrientation = leftFanBasisOrientation() ?? fanRoot.orientation(relativeTo: nil)
-        // ハンドトラッキングのジッタを抑えるローパス (ディスク追従と同程度)
-        let alpha: Float = 0.4
-        let smoothed = simd_slerp(fanRoot.orientation(relativeTo: nil), targetOrientation, alpha)
+        // ハンドトラッキングのジッタを抑える: deadband(微小変化を無視)+ 強めのローパス。
+        let smoothed = jitterSmoothedOrientation(
+            current: fanRoot.orientation(relativeTo: nil),
+            target: targetOrientation
+        )
         // 扇ルート原点を指先(ピンチ中点)に置く。カード自体は fanTransform で +Y に
         // カード高さ半分ぶん持ち上がるので、カード下端がちょうど指先に来る。
         // 指にめり込まないよう手のひら法線側(+Z)へ少しだけ浮かせる。
@@ -1572,7 +1803,10 @@ private extension YugiohDuelDiskImmersiveView {
         let targetPosition = midpoint + smoothed.act(localOffset)
 
         fanRoot.setOrientation(smoothed, relativeTo: nil)
-        fanRoot.setPosition(mix(fanRoot.position(relativeTo: nil), targetPosition, t: alpha), relativeTo: nil)
+        fanRoot.setPosition(
+            jitterSmoothedPosition(current: fanRoot.position(relativeTo: nil), target: targetPosition),
+            relativeTo: nil
+        )
         updateRightHandToLeftFanProximityLog(leftFanPosition: targetPosition)
     }
 
@@ -1618,8 +1852,11 @@ private extension YugiohDuelDiskImmersiveView {
         }
         let midpoint = (indexPos + middlePos) / 2
         rightDrawProbe?.setPosition(midpoint, relativeTo: nil)
-        if let cardEntity = rightHandCardEntity {
-            cardEntity.isEnabled = true
+        // 右手カードは「人差し指と中指がくっついている(=カードをつまんでいる)」ときだけ表示する。
+        // 指が離れているのに表示され続けるのを防ぐため、判定を厳格化する。
+        let fingersHolding = simd_distance(indexPos, middlePos) < DuelDiskMetrics.rightHandCardHoldThreshold
+        rightHandCardEntity?.isEnabled = fingersHolding
+        if let cardEntity = rightHandCardEntity, fingersHolding {
             // 向き: 指の腹側にカード面 / 指先方向にカード上端。
             // Entity ローカルでは attachment が X軸 +90° で差し込まれるため、その分を打ち消しておく。
             let targetOrientation: simd_quatf
@@ -1628,17 +1865,57 @@ private extension YugiohDuelDiskImmersiveView {
             } else {
                 targetOrientation = cardEntity.orientation(relativeTo: nil)
             }
-            let alpha: Float = 0.4
-            let smoothed = simd_slerp(cardEntity.orientation(relativeTo: nil), targetOrientation, alpha)
+            // deadband + 強めのローパスで手ブレを吸収する。
+            let smoothed = jitterSmoothedOrientation(
+                current: cardEntity.orientation(relativeTo: nil),
+                target: targetOrientation
+            )
             cardEntity.setOrientation(smoothed, relativeTo: nil)
             // 位置: 指先がカードの「下から1/3」の高さに来るよう、中心を上端方向へずらす
             let topDirection = smoothed.act(SIMD3<Float>(0, 0, 1))
+            let targetPos = midpoint + topDirection * DuelDiskMetrics.rightHandCardCenterOffset
             cardEntity.setPosition(
-                midpoint + topDirection * DuelDiskMetrics.rightHandCardCenterOffset,
+                jitterSmoothedPosition(current: cardEntity.position(relativeTo: nil), target: targetPos),
                 relativeTo: nil
             )
         }
         updateDeckDrawGesture(indexPos: indexPos, middlePos: middlePos, midpoint: midpoint)
+        // カードをつまんでいる(表示中)ときだけ、置き場への重ね召喚を判定する。
+        if fingersHolding {
+            updateRightHandCardSummonOverlap()
+        }
+    }
+
+    /// 右手に持っているカードがディスクの置き場/挿入口に重なったら設置(召喚)する。
+    /// - モンスター: カード置き場(diskSlot)に重ねると召喚。
+    /// - 魔法・トラップ: 挿入口(spellSlot)の空間に重ねると設置。
+    /// (右手カード = デッキドロー or 選択カードの持ち替え、どちらでも対象)
+    func updateRightHandCardSummonOverlap() {
+        guard let card = sessionStore.rightHandCard,
+              let cardEntity = rightHandCardEntity else { return }
+        let cardPos = cardEntity.position(relativeTo: nil)
+
+        if card.kind == .monster {
+            for slot in diskSlotEntities {
+                guard let index = slot.components[DiskSlotIndexComponent.self]?.index else { continue }
+                if simd_distance(cardPos, slot.position(relativeTo: nil)) < DuelDiskMetrics.rightHandCardSummonRadius {
+                    if sessionStore.summonRightHandCardToDiskSlot(index: index) {
+                        DuelLog.event("RightHandCardSummoned", "slot=\(index)")
+                    }
+                    return
+                }
+            }
+        } else if card.isSpellOrTrap {
+            for plane in spellSlotHighlightEntities {
+                guard let index = plane.components[SpellSlotIndexComponent.self]?.index else { continue }
+                if simd_distance(cardPos, plane.position(relativeTo: nil)) < DuelDiskMetrics.rightHandCardSummonRadius {
+                    if sessionStore.placeRightHandCardToSpellSlot(index: index) {
+                        DuelLog.event("RightHandCardPlacedToSpellSlot", "slot=\(index)")
+                    }
+                    return
+                }
+            }
+        }
     }
 
     /// 右手の指の基底から保持カードの目標姿勢を作る。
@@ -1667,12 +1944,44 @@ private extension YugiohDuelDiskImmersiveView {
         return simd_quatf(simd_float3x3(columns: (xAxis, yAxis, zAxis)))
     }
 
+    /// 右手の指先(親指/人差し指/中指のいずれか)がディスクの「上」に伸びているか。
+    /// タップ・配置のために右手をディスク上へ伸ばしている状況に限定して検知する
+    /// (近くを通るだけでは凍結させない = 左手移動への追従を妨げない)。
+    func isRightHandNearDisk(boardWorld: SIMD3<Float>) -> Bool {
+        let tips = [rightIndexTipAnchor, rightMiddleTipAnchor, rightThumbTipAnchor]
+        for tip in tips {
+            guard let pos = trackedPosition(tip) else { continue }
+            // ディスク面上方向(ローカル+Y)から見て、水平方向に近く、かつ面より上にあるか
+            let dist = simd_distance(pos, boardWorld)
+            let above = pos.y > boardWorld.y - 0.02
+            if dist < DuelDiskMetrics.diskFollowFreezeRadius, above {
+                return true
+            }
+        }
+        return false
+    }
+
     /// デッキドロー判定:
     ///  1. 右手の人差し指+中指がくっついた状態で、その中点がデッキの空間に交差 → armed
     ///  2. armed のまま「指が離れる」or「デッキ空間から出る」→ ドロー発火
     func updateDeckDrawGesture(indexPos: SIMD3<Float>, middlePos: SIMD3<Float>, midpoint: SIMD3<Float>) {
         let fingersTouching = simd_distance(indexPos, middlePos) < DuelDiskMetrics.drawFingerTouchThreshold
         let insideDeck = isPointInsideDeckVolume(midpoint)
+
+        // 選択中カードの「右手への持ち替え」:
+        // 手札カードを選択した状態で右手の人差し指+中指をくっつけた瞬間(立ち上がり)に、
+        // デッキから引いたカードと同じように選択カードを右手に持たせる。
+        // (デッキドローより優先。持ち替え後は右手カード追従 → カード置き場に重ねて召喚する)
+        if !wasRightFingersTouching, fingersTouching,
+           sessionStore.rightHandCard == nil,
+           sessionStore.selectedHandCardId != nil {
+            if sessionStore.moveSelectedCardToRightHand() {
+                DuelLog.event("SelectedCardMovedToRightHand", "")
+                wasRightFingersTouching = fingersTouching
+                return
+            }
+        }
+        wasRightFingersTouching = fingersTouching
 
         if isDeckDrawArmed {
             if !fingersTouching || !insideDeck {
@@ -1697,6 +2006,25 @@ private extension YugiohDuelDiskImmersiveView {
         return abs(local.x) <= DuelDiskMetrics.cardWidth / 2 + margin
             && abs(local.y) <= DuelDiskMetrics.deckHeight / 2 + margin
             && abs(local.z) <= DuelDiskMetrics.cardDepth / 2 + margin
+    }
+
+    /// 手ブレ抑制付きの位置追従。deadband 未満の微小変化は無視し、それ以上はローパスで滑らかに寄せる。
+    func jitterSmoothedPosition(current: SIMD3<Float>, target: SIMD3<Float>) -> SIMD3<Float> {
+        if simd_distance(current, target) < DuelDiskMetrics.handFollowPositionDeadband {
+            return current
+        }
+        return mix(current, target, t: DuelDiskMetrics.handFollowPositionAlpha)
+    }
+
+    /// 手ブレ抑制付きの姿勢追従。deadband 未満の微小回転は無視する。
+    func jitterSmoothedOrientation(current: simd_quatf, target: simd_quatf) -> simd_quatf {
+        let rel = current.inverse * target
+        let raw = rel.angle
+        let ang = raw > .pi ? (2 * .pi - raw) : raw
+        if ang < DuelDiskMetrics.handFollowRotationDeadband {
+            return current
+        }
+        return simd_slerp(current, target, DuelDiskMetrics.handFollowRotationAlpha)
     }
 
     /// AnchorEntity のワールド位置を返す。未トラッキング (原点) のときは nil。
@@ -2219,8 +2547,8 @@ private extension YugiohDuelDiskImmersiveView {
             // フェードイン + 上昇で出現させる(上昇パーティクルのピークに紛れる)。
             container.transform.translation = cardEntity.transform.translation
                 + SIMD3<Float>(0, 0.15 - DuelDiskMetrics.monsterRevealRise, 0)
-            // モンスターは相手側(プレイヤーの逆方向)を向く。既定は正面がこちら向きなので180°回す。
-            container.transform.rotation = simd_quatf(angle: .pi, axis: SIMD3<Float>(0, 1, 0))
+            // デモ用にモンスターの正面はプレイヤー(こちら)側を向かせる(既定のまま=回転なし)。
+            container.transform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
             container.components.set(OpacityComponent(opacity: 0))
             field.addChild(container)
             fieldMonsterEntities[col] = container
@@ -2276,8 +2604,8 @@ private extension YugiohDuelDiskImmersiveView {
             container.addChild(dragon)
             container.transform.translation = cardEntity.transform.translation
                 + SIMD3<Float>(0, 0.15 - DuelDiskMetrics.monsterRevealRise, 0)
-            // モンスターは相手側(プレイヤーの逆方向)を向く。既定は正面がこちら向きなので180°回す。
-            container.transform.rotation = simd_quatf(angle: .pi, axis: SIMD3<Float>(0, 1, 0))
+            // デモ用にモンスターの正面はプレイヤー(こちら)側を向かせる(既定のまま=回転なし)。
+            container.transform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
             container.components.set(OpacityComponent(opacity: 0))
             field.addChild(container)
             fieldMonsterEntities[col] = container
@@ -2408,6 +2736,7 @@ private extension YugiohDuelDiskImmersiveView {
         // anchor / probe / fieldRoot の参照もクリア
         leftWristAnchor = nil
         diskPoseInitialized = false
+        wristJumpHoldFrames = 0
         boardEntity = nil
         deckEntity = nil
         diskModelEntity = nil
@@ -2428,11 +2757,18 @@ private extension YugiohDuelDiskImmersiveView {
         rightDrawProbe = nil
         rightIndexProbe = nil
         isDeckDrawArmed = false
+        wasRightFingersTouching = false
         isRightHandNearLeftFan = false
         fieldRoot = nil
         fieldInteractionRoot = nil
-        fieldManipPrevMidpoint = nil
-        fieldManipPrevAngle = nil
+        fieldMoveHandle = nil
+        fieldRotateHandle = nil
+        fieldDragStartPosition = nil
+        fieldRotateStartAngle = nil
+        fieldRotateStartOrientation = nil
+        fieldRotateStartPosition = nil
+        fieldRotateCenterWorld = nil
+        fieldRotateHandleStartWorld = nil
 
         // HandTrackingComponent もクリア(Entity 参照を保持し続けないように)
         leftHandComponent = nil
@@ -2535,14 +2871,7 @@ private struct LifeDisplayView: View {
         }
         .padding(.horizontal, 26)
         .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.black.opacity(0.85))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.green.opacity(0.4), lineWidth: 2)
-                }
-        )
+        // 黒い半透明の背景板は付けない(ディスク面に直接、数字だけが乗るように)。
         .fixedSize()
     }
 }

@@ -21,7 +21,8 @@ struct ReferenceSlide: View {
             Item("Create enhanced spatial computing experiences with ARKit - WWDC24", accessory: .number(2))
             Item("https://developer.apple.com/videos/play/wwdc2024/10100/", accessory: .bullet)
 
-            Item("【iOSDC2025】手話ジェスチャーの検知と翻訳~ハンドトラッキングの可能性と限界~", accessory: .number(3))
+            // 「~〜~」がMarkdownの取り消し線として解釈されるため、素の文字列として描画するkeywords付きinitを使う
+            Item("【iOSDC2025】手話ジェスチャーの検知と翻訳~ハンドトラッキングの可能性と限界~", keywords: [], accessory: .number(3))
             Item("https://ulog.sugiy.com/iosdc2025-vision-hand-gesture-tracking/", accessory: .bullet)
         }
     }

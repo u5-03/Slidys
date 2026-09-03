@@ -27,7 +27,7 @@ public final class DuelSessionStore: @unchecked Sendable {
     // MARK: - 定数
 
     /// ImmersiveSpace 入室時に配るカード枚数
-    public static let initialHandSize: Int = 5
+    public static let initialHandSize: Int = 6
     /// 手札上限(これ以上はドローしない)
     public static let handCapacity: Int = 7
     /// ディスク上の召喚スロット数 / 魔法・トラップ挿入口数
@@ -77,10 +77,27 @@ public final class DuelSessionStore: @unchecked Sendable {
 
     /// 新規デュエル開始: 初期手札を配る + 状態を全リセット。
     public func startNewDuel() {
-        // デモ用に緋天竜を1枚確実に手札へ入れ、残りはランダム。
-        var dealt: [DuelCard] = [.monster(MonsterCard.hitenryu)]
-        dealt += (1..<Self.initialHandSize).map { _ in DuelCard.random() }
-        hand = dealt.shuffled()
+        // デモ用に初期手札を固定構成にする(順番もこの通り):
+        //  1. 龍のモンスター(緋天竜)
+        //  2. あんこのたい焼き / 3. 抹茶 / 4. クリーム
+        //  5. 魔法カード(黄金の命の水) / 6. トラップ(仕様変更)
+        let taiyaki = MonsterCard.samples
+        func taiyakiCard(_ flavor: TaiyakiFlavor) -> DuelCard {
+            .monster(taiyaki.first { $0.flavor == flavor } ?? taiyaki[0])
+        }
+        var dealt: [DuelCard] = [
+            .monster(MonsterCard.hitenryu),
+            taiyakiCard(.redBean),
+            taiyakiCard(.matcha),
+            taiyakiCard(.cream),
+        ]
+        if let spell = SpellCard.samples.first { dealt.append(.spell(spell)) }        // 黄金の命の水
+        if let trap = TrapCard.samples.first(where: { $0.name == "仕様変更" }) {
+            dealt.append(.trap(trap))
+        } else if let trap = TrapCard.samples.last {
+            dealt.append(.trap(trap))
+        }
+        hand = dealt
         rightHandCard = nil
         selectedHandCardId = nil
         diskSlots = Array(repeating: nil, count: Self.diskSlotCount)
@@ -115,6 +132,52 @@ public final class DuelSessionStore: @unchecked Sendable {
         hand.append(card)
         rightHandCard = nil
         phase = .idle
+    }
+
+    /// 選択中の手札カードを「右手に持ち替える」。
+    /// デッキから引いたカードと同じ扱い(rightHandCard)にして、右手に追従表示する。
+    /// - 既に右手にカードがある場合や、選択カードが無い場合は何もしない。
+    @discardableResult
+    public func moveSelectedCardToRightHand() -> Bool {
+        guard rightHandCard == nil else { return false }
+        guard let card = selectedCard else { return false }
+        guard let cardIndex = hand.firstIndex(where: { $0.id == card.id }) else { return false }
+        hand.remove(at: cardIndex)
+        rightHandCard = card
+        selectedHandCardId = nil
+        phase = .drawing
+        return true
+    }
+
+    /// 右手に持っているカードを、ディスクの空き召喚スロットに「召喚」する。
+    /// (右手カードをカード置き場に重ねたときに呼ぶ)
+    /// - 右手カードがモンスターでない/スロットが埋まっている場合は拒否。
+    /// - placeSelectedCardToDiskSlot と同様に fieldBackRow にも反映する。
+    @discardableResult
+    public func summonRightHandCardToDiskSlot(index: Int) -> Bool {
+        guard (0..<Self.diskSlotCount).contains(index) else { return false }
+        guard let card = rightHandCard, card.kind == .monster else { return false }
+        guard diskSlots[index] == nil else { return false }
+        diskSlots[index] = card
+        fieldBackRow[index] = card
+        rightHandCard = nil
+        phase = .idle
+        return true
+    }
+
+    /// 右手に持っている魔法・トラップカードを、ディスクの空き挿入口に設置する。
+    /// (右手カードを挿入口の空間に重ねたときに呼ぶ)
+    @discardableResult
+    public func placeRightHandCardToSpellSlot(index: Int) -> Bool {
+        guard (0..<Self.diskSlotCount).contains(index) else { return false }
+        guard let card = rightHandCard, card.isSpellOrTrap else { return false }
+        guard spellSlots[index] == nil else { return false }
+        spellSlots[index] = card
+        fieldFrontRow[index] = card
+        fieldFrontRevealed[index] = false // 魔法・トラップは基本裏で置く
+        rightHandCard = nil
+        phase = .idle
+        return true
     }
 
     /// 手札カードを選択(タップ)。同じカードを再タップすると選択解除。

@@ -35,7 +35,7 @@ enum TaiyakiFilling: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .redBeans: "あんこ"
-        case .custard: "カスタード"
+        case .custard: "クリーム"
         case .matcha: "抹茶"
         case .chocolate: "チョコ"
         }

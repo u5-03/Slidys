@@ -17,9 +17,9 @@ struct BlenderMcpSlide: View {
 
     var body: some View {
         HeaderSlide("簡単なモデルならAIでも作れる(Blender MCP)") {
-            Item("Blender MCPを使うと、AIがBlenderを直接操作してモデリングできる", accessory: .number(1))
-            Item("「こういうモデルを作って」と頼むだけで、土台になる形はできてしまう", accessory: .number(2))
-            Item("細かい調整は人間が引き取る。まずAIに任せてみるのがおすすめ", accessory: .number(3))
+            Item("Blender MCPを使うと、AIがBlenderを直接操作してモデリングできる", keywords: ["直接操作"], accessory: .number(1))
+            Item("「作って」と頼むだけで、土台になる形はできてしまう", keywords: ["頼むだけ"], accessory: .number(2))
+            Item("細かい調整は人間が引き取る。まずAIに任せてみるのがおすすめ", keywords: [], accessory: .number(3))
         }
     }
 }

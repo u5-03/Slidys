@@ -49,6 +49,7 @@ public enum DuelCardVisualFactory {
                 backgroundColor = flavorColor(monster.flavor)
             }
             return YugiohCardEffect.CardModel(
+                id: monster.id,
                 name: monster.name,
                 attribute: monster.attribute,
                 starCount: monster.level,
@@ -63,6 +64,7 @@ public enum DuelCardVisualFactory {
             )
         case .spell(let spell):
             return YugiohCardEffect.CardModel(
+                id: spell.id,
                 name: spell.name,
                 attribute: "",
                 starCount: 0,
@@ -77,6 +79,7 @@ public enum DuelCardVisualFactory {
             )
         case .trap(let trap):
             return YugiohCardEffect.CardModel(
+                id: trap.id,
                 name: trap.name,
                 attribute: "",
                 starCount: 0,

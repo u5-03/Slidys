@@ -20,9 +20,9 @@ struct MonsterVariationSlide: View {
         HeaderSlide("モンスターは1モデルで4バリエーション") {
             HStack(alignment: .top, spacing: 60) {
                 VStack(alignment: .leading, spacing: 44) {
-                    Item("具材4種を別パーツとして全部同梱(Blender製たい焼き)", accessory: .number(1))
-                    Item("実行時はカードに対応するパーツだけ表示", accessory: .number(2))
-                    Item("形ごと変えたい → パーツ切り替え / 絵だけ → テクスチャ差し替え", accessory: .number(3))
+                    Item("具材4種を同梱して、1つだけ表示する", keywords: ["1つだけ表示"], accessory: .number(1))
+                    Item("Blender製たい焼き。\nカードに対応するパーツだけON", keywords: [], accessory: .number(2))
+                    Item("形ごと変える → パーツ切り替え\n絵だけ変える → テクスチャ差し替え", keywords: ["パーツ切り替え"], accessory: .number(3))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 

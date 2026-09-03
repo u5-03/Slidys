@@ -15,9 +15,9 @@ struct WrapUpSlide: View {
 
     var body: some View {
         HeaderSlide("まとめ") {
-            Item("モデルには「ノード契約」。形はBlender、見た目の調整はRCP、振る舞いはコード", accessory: .number(1))
-            Item("手首装着とジェスチャーは、関節の特性(ロスト・ブレ・つまみ中の縮退)込みで設計する", accessory: .number(2))
-            Item("制約は多いが、「いつかやってみたかった」は個人開発でも形にできる", accessory: .number(3))
+            Item("モデルには「ロケーター」。形はBlender、形式はRCP、振る舞いはコード", keywords: ["ロケーター"], accessory: .number(1))
+            Item("手首装着とジェスチャーは、関節の特性(ロスト・ブレ・つまみ中の縮退)込みで設計", keywords: ["関節の特性"], accessory: .number(2))
+            Item("制約は多いが、「いつかやってみたかった」は個人開発でも形にできる", keywords: ["個人開発でも形にできる"], accessory: .number(3))
         }
     }
 }

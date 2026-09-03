@@ -29,6 +29,23 @@ public enum ListTextStyle: Sendable {
         case .large: return 44
         }
     }
+
+    /// 見出し(HeaderSlideのタイトル)のフォント。
+    /// .large は本文とのジャンプ率を上げるため見出しも一回り大きくする。
+    var headerFont: Font {
+        switch self {
+        case .standard: return .mediumFont
+        case .large: return .system(size: 84, weight: .bold)
+        }
+    }
+
+    /// 見出し領域の高さ。フォントサイズに合わせて確保する。
+    var headerHeight: CGFloat {
+        switch self {
+        case .standard: return 100
+        case .large: return 120
+        }
+    }
 }
 
 @MainActor
@@ -77,12 +94,12 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
         GeometryReader { proxy in
             VStack(alignment: .leading, spacing: 40) {
                 configuration.header
-                    .font(.mediumFont)
+                    .font(listTextStyle.headerFont)
                     .lineLimit(1)
                     .minimumScaleFactor(0.1)
                     .foregroundStyle(.themeColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(height: 100)
+                    .frame(height: listTextStyle.headerHeight)
                 VStack(alignment: .leading, spacing: listTextStyle.contentSpacing) {
                     configuration.content
                         .font(listTextStyle.contentFont)

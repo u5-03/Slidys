@@ -225,7 +225,11 @@ public extension MonsterCard {
 public extension SpellCard {
     static var samples: [SpellCard] {
         [
-            SpellCard(name: "エナジードリンク", text: "自分フィールドのモンスター1体の攻撃力を、ターン終了時まで1000アップする。", symbolName: "bolt.fill"),
+            SpellCard(
+                name: "黄金の命の水",
+                text: "黄金色に泡立つ、疲れた大人のための命の水(=ビール)。自分フィールドのモンスター1体の攻撃力を、ターン終了時まで1000アップする。一日の終わりの一杯が、明日への活力を呼び覚ます。",
+                symbolName: "mug.fill"
+            ),
             SpellCard(name: "残業月80時間", text: "装備モンスターの攻撃力を2000アップするが、エンドフェイズに持ち主はライフを失う。", symbolName: "wand.and.stars"),
         ]
     }

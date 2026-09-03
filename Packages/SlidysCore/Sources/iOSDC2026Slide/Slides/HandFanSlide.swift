@@ -14,10 +14,10 @@ struct HandFanSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("左手の3本指「つまみ」で手札を扇状に持つ") {
-            Item("親指・人差し指・中指を合わせている間だけ扇を表示", accessory: .number(1))
-            Item("標準の2本指ピンチ(タップ操作)と混同しないための3本指", accessory: .number(2))
-            Item("つまみ中は指先が1点に集まる → 向きは付け根(ナックル)から", accessory: .number(3))
+        HeaderSlide("左手の3本指「つまみ」で手札を持つ") {
+            Item("3本指を合わせている間だけ、手札の扇を表示", keywords: ["3本指"], accessory: .number(1))
+            Item("標準の2本指ピンチ(タップ操作)と混同しないための3本指", keywords: [], accessory: .number(2))
+            Item("つまみ中は指先が1点に集まる → 扇の向きは付け根(ナックル)から計算", keywords: ["付け根(ナックル)"], accessory: .number(3))
         }
     }
 }
