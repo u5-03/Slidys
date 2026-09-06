@@ -47,12 +47,31 @@ public enum DuelDiskMetrics {
     public static let diskSlotCount: Int = 5
 
     /// ディスクスロットに配置したカードを盤面からどれだけ垂直に浮かせるか。
-    /// ディスクにぴったり乗って見えるよう、Z-fight を避ける最小限だけ浮かせる。
-    public static let diskPlacedCardLift: Float = 0.001
+    /// 召喚エフェクトの線(盤面すれすれ)より確実に上に来るよう、わずかに浮かせる
+    /// (線がカードの下を通るようにするため)。
+    public static let diskPlacedCardLift: Float = 0.004
+
+    /// 召喚線エフェクト平面の高さ。配置カードと「同一平面」にする。
+    /// 考え方(SwiftUIプレビューと同じ): エフェクトは1枚の平面で、中央にカードの footprint 分の
+    /// 「穴」があり、その穴の周囲から線が出る。カードと同一平面なら穴とカードがピッタリ重なり、
+    /// 視点が変わっても線がカードに被らない(=浮かせて視差を出す必要がない)。
+    /// → diskPlacedCardLift と同値にしてカード面と co-planar にする。
+    public static let diskSummonEffectLift: Float = diskPlacedCardLift
+
+    /// 召喚線の「発生源(=中央の空き=カード領域)」を、実カードの実寸に対して何倍にするか。
+    /// カードと同一平面なので 1.0(カード実寸ぴったり)で穴がカードに一致し、線はカードの縁から出る。
+    /// (プレビューと同じ挙動。被り対策で広げる必要はない。)
+    public static let diskSummonEffectCardHoleScale: Float = 1.0
 
     /// ディスクスロットのタップ当たり判定の高さ (m)。
-    /// 薄いと視線タップが当たりにくいため、スロット真上に十分な高さの判定を持たせる。
-    public static let diskSlotTapHeight: Float = 0.09
+    /// 厚い箱(30mm)は斜めの視線だと投影面積が大きく、隣接スロットの箱と画面上で重なって
+    /// 「複数同時ホバー / どのスロットに当たっているか曖昧 → タップで配置されない」原因になる。
+    /// 盤面すれすれに寝かせた薄い箱にして、視線が必ず1スロットだけに乗るようにする。
+    public static let diskSlotTapHeight: Float = 0.01
+    /// スロット当たり判定の幅・奥行き。ヨー(±12°)で回転しても隣(ピッチ0.063m)と重ならないサイズ。
+    /// (幅*cos12 + 奥行*sin12 < 0.063 を満たす: 0.046*0.978 + 0.06*0.208 ≈ 0.058 < 0.063、間隔約5mm)
+    public static let diskSlotTapWidth: Float = 0.046
+    public static let diskSlotTapDepth: Float = 0.06
 
     // MARK: - 召喚エリア(地面)
 
@@ -78,6 +97,14 @@ public enum DuelDiskMetrics {
     public static let fieldHandleRadius: Float = 0.08
     /// ハンドル(角丸パネル)のサイズ (m)。球より "つまみ" らしく分かりやすい。
     public static let fieldHandleSize = SIMD3<Float>(0.16, 0.06, 0.16)
+    /// ハンドル3つのかたまり(=ハンドルエリア)の初期ワールド位置(プレイヤーのすぐ手前・低め)。
+    /// この container を「エリア移動ハンドル(3つ目)」で好きな位置へ動かせる。
+    public static let fieldHandleAreaWorldPosition = SIMD3<Float>(0.0, -0.42, -0.5)
+    /// エリア内での各ハンドルのローカルオフセット(container 原点=エリア中心 からの相対)。
+    /// 横に3つ並べ、真ん中を「エリア移動」ハンドルにする。
+    public static let fieldMoveHandleLocalOffset = SIMD3<Float>(0.20, 0, 0)   // 右: フィールド移動
+    public static let fieldRotateHandleLocalOffset = SIMD3<Float>(-0.20, 0, 0) // 左: フィールド回転
+    public static let fieldAreaHandleLocalOffset = SIMD3<Float>(0.0, 0, 0)     // 中央: エリアごと移動
     /// 移動ハンドルの、フィールド中央からのワールドオフセット(手前=+Z, 右=+X, 上=+Y)。
     /// 召喚エリアの手前・中央やや右に、置き場と重ならないよう前に出す。
     public static let fieldMoveHandleOffset = SIMD3<Float>(0.35, 0.30, 1.6)
@@ -93,12 +120,16 @@ public enum DuelDiskMetrics {
     /// ピンチ判定の距離 (親指Tip - 人差し指Tip 間) 5cm
     public static let pinchThreshold: Float = 0.05
 
+    /// 左手が死角で一時的に未トラッキングになった時に手札表示を保持する猶予フレーム数。
+    /// 60fps 想定で約0.6秒。右手でタップする一瞬の死角ロストでは手札が消えないようにする。
+    public static let leftPinchGraceFrames = 36
+
     /// 3本指(手札表示)判定で「中指も確実にくっついている」とみなす距離。
     /// 2本指ピンチ(親指+人差し指)を誤って3本指と判定しないよう、pinchThreshold より厳しくする。
     public static let threeFingerThreshold: Float = 0.032
 
-    /// 選択中カードの持ち上げ量
-    public static let selectedCardLift: Float = 0.005
+    /// 選択中カードの持ち上げ量。選択が一目で分かるよう、扇の先端方向へ大きく引き出す。
+    public static let selectedCardLift: Float = 0.03
 
     // MARK: - 手札/右手カードのジッタ抑制(追従スムージング)
 
@@ -157,13 +188,25 @@ public enum DuelDiskMetrics {
 
     // MARK: - 扇手札レイアウト
 
-    /// 扇1枚あたりの広がり角度(度)
-    public static let fanDegreesPerCard: Float = 8
+    /// 扇1枚あたりの広がり角度(度)。
+    /// 広いほどカードの重なりが減り、各カードの内容が見やすく・タップしやすくなる。
+    public static let fanDegreesPerCard: Float = 26
+
+    /// 扇カードの前後(法線方向)の微小な段差。カードを僅かに前後にずらして重なりの前後関係を確定させ、
+    /// タップ時に狙ったカード(手前のカード)が確実に選ばれるようにする。
+    public static let fanDepthStagger: Float = 0.0025
+
+    /// 扇の回転半径。カードは指先(扇ルート原点)の下にある回転軸を中心に、
+    /// この半径の円弧上に等角度で並ぶ(=きれいな扇形)。大きいほど扇が緩やかになる。
+    public static let fanPivotRadius: Float = 0.24
+
+    /// 扇の要(指先)からカード下端までのわずかな隙間 (m)。0 だと指に埋まって見えるので少しだけ空ける。
+    public static let fanBottomGap: Float = 0.006
 
     /// 扇カードの基準持ち上げ量。
     /// カード下端を指先に合わせるため、扇ルート原点(指先)からカード高さの半分だけ +Y に上げる。
-    /// これで指とカードが重ならず全カードが見える。
-    public static var fanBaseY: Float { cardDepth / 2 + 0.004 }
+    /// 指から浮きすぎないよう、わずかに指側へ沈めて「手で持っている」見え方にする。
+    public static var fanBaseY: Float { cardDepth / 2 - 0.004 }
 
     /// 扇カードを手のひらからどれだけ奥に置くか
     public static let fanOffsetZ: Float = -0.05
@@ -181,8 +224,9 @@ public enum DuelDiskMetrics {
     /// 扇カードをピンチ中点からどれだけ前方に出すか
     public static let fanForwardOffset: Float = -0.03
 
-    /// 扇カードをピンチ中点からどれだけ上方向にずらすか
-    public static let fanVerticalOffset: Float = 0.01
+    /// 扇カードをピンチ中点からどれだけ上方向にずらすか(手のひら法線側の浮かせ量)。
+    /// 指から浮いて見えないよう小さめにする。
+    public static let fanVerticalOffset: Float = 0.004
 
     // MARK: - 召喚エフェクト
 
@@ -202,6 +246,11 @@ public enum DuelDiskMetrics {
     /// フィールドは 3x スケールなので、素材(約1m基準)を控えめに縮小して配置する。
     public static let summonBurstScale: Float = 0.3
 
+    /// 緋天竜USDZの焼き込みアニメで「揺れ(浮遊)区間」が始まる時刻 (秒)。
+    /// Blender タイムライン 1..237F / 30fps のうち、F=116 以降が先頭・末尾同ポーズの完全周期。
+    /// 出現(上昇→とぐろ)を1回見せた後、この位置からをトリムして無限ループする。
+    public static let hitenryuFloatLoopStart: TimeInterval = 116.0 / 30.0
+
     /// モンスター出現アニメ(フェードイン + 上昇)の所要時間
     public static let monsterRevealDuration: TimeInterval = 0.8
 
@@ -210,6 +259,15 @@ public enum DuelDiskMetrics {
 
     /// アリーナ上のカードのスケール倍率(=見やすさのため4倍に拡大)
     public static let fieldCardScale: Float = 8
+    /// 召喚エフェクト平面(置いたカードを中心とする局所エリア)の横幅・奥行き (m) = カード実寸 + マージン。
+    /// 線がカード周囲へ伸びる距離(マージン)。カード置き場エリアからはみ出さない範囲に抑える。
+    /// スロットは奥(z)側の縁に近く、手前は魔法・トラップ挿入口の列が迫るため、奥行きは特に短めにする。
+    /// 横(marginWidth)は隣のモンスターゾーンに少し重なる程度は許容(線は隣カードの下を通る)。
+    public static let diskSummonEffectMarginWidth: Float = 0.022
+    public static let diskSummonEffectMarginDepth: Float = 0.014
+    public static let diskSummonEffectAreaWidth: Float = cardWidth + diskSummonEffectMarginWidth * 2
+    public static let diskSummonEffectAreaDepth: Float = cardDepth + diskSummonEffectMarginDepth * 2
+
     /// ディスク上の召喚エフェクト平面の横幅
     public static let diskSummonEffectWidth: Float = 0.14
     /// ディスク上の召喚エフェクト平面の奥行き

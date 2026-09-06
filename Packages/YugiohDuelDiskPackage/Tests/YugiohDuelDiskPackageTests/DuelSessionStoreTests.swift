@@ -155,7 +155,10 @@ struct DuelSessionStoreTests {
         #expect(moved)
         #expect(store.rightHandCard?.id == card.id)
         #expect(store.hand.isEmpty)
-        #expect(store.selectedHandCardId == nil)
+        // 選択は保持される(選択中のカードを右手に持っている状態)。
+        // selectedCard は右手のカードへフォールバックして解決できる。
+        #expect(store.selectedHandCardId == card.id)
+        #expect(store.selectedCard?.id == card.id)
     }
 
     @Test func moveSelectedCardToRightHandIsNoOpWhenRightHandOccupied() {

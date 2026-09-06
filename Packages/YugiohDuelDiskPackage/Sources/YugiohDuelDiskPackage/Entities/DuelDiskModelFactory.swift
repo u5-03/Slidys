@@ -92,21 +92,9 @@ public enum DuelDiskModelFactory {
                 entity.components.set(HoverEffectComponent())
             }
         }
-        // 召喚ゾーン面: ゾーン全体をタップ可能にする (DiskSlot plane の補完ではなく主判定)
-        for name in zoneFieldNames {
-            guard let entity = model.findEntity(named: name) else { continue }
-            let bounds = entity.visualBounds(relativeTo: entity)
-            let extents = bounds.extents
-            let size = SIMD3<Float>(max(extents.x, 0.05), max(extents.y, 0.01), max(extents.z, 0.08))
-            entity.components.set(CollisionComponent(
-                shapes: [.generateBox(size: size).offsetBy(translation: bounds.center)],
-                isStatic: true,
-                filter: .default
-            ))
-            entity.components.set(InputTargetComponent())
-            // 召喚できる状態が分かるよう、召喚スロットと同じ強いハイライトにする
-            entity.components.set(DuelHoverStyle.summonSlot)
-        }
+        // 召喚ゾーン面 (Zone_i_Field) には入力/ホバーを付けない。
+        // 召喚スロットの判定は、盤面より手前に浮かせた DiskSlot plane(1スロット分の判定)に一本化する。
+        // (Zone 面にも入力があると、DiskSlot plane と二重に当たって「複数同時ホバー/誤タップ」になる)
         // 墓地の口は Empty (形状なし) のため判定箱を直接指定する
         if let grave = model.findEntity(named: graveyardSlotName) {
             grave.components.set(CollisionComponent(

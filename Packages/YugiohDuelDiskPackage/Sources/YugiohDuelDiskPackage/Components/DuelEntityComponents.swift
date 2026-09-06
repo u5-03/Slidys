@@ -39,6 +39,15 @@ public enum DuelHoverStyle {
         HoverEffectComponent()
 #endif
     }
+
+    /// 手札カード用。視線を合わせたカードがはっきり分かるよう、明るい黄で強くハイライトする。
+    public static var handCard: HoverEffectComponent {
+#if canImport(UIKit)
+        HoverEffectComponent(.highlight(.init(color: UIColor.systemYellow, strength: 1.0)))
+#else
+        HoverEffectComponent()
+#endif
+    }
 }
 
 /// カード(扇手札 / 右手 / ディスク配置 / アリーナ配置 すべて) に付与する識別 Component。
@@ -98,7 +107,10 @@ public struct FieldInteractionComponent: Component {
 /// このハンドルをドラッグ/回転したときだけ召喚エリアを操作する
 /// (指ピンチでの誤操作を防ぐため、フィールド操作はハンドル限定)。
 public struct FieldHandleComponent: Component {
-    public enum Kind: Sendable { case move, rotate }
+    /// - move: 召喚エリアを平行移動する。
+    /// - rotate: 召喚エリアを中央軸で回転する。
+    /// - area: ハンドル3つのかたまり(=ハンドルエリア)自体を、好きな位置へ動かす。
+    public enum Kind: Sendable { case move, rotate, area }
     public var kind: Kind
     public init(kind: Kind) { self.kind = kind }
 }

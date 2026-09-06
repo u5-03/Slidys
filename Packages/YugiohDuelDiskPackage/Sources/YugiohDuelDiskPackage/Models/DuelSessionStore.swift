@@ -62,10 +62,15 @@ public final class DuelSessionStore: @unchecked Sendable {
 
     // MARK: - 派生状態
 
-    /// 現在選択中の手札カード。
+    /// 現在選択中のカード。
+    /// 手札にある場合はそれを、選択したまま右手へ持ち替えた場合は右手のカードを返す。
+    /// (「選択中のカードを右手に持っている」状態を選択として扱うことで、
+    ///  選択なしで右手にカードがあるのはドロー時だけ、という不変条件を保つ)
     public var selectedCard: DuelCard? {
         guard let id = selectedHandCardId else { return nil }
-        return hand.first(where: { $0.id == id })
+        if let inHand = hand.first(where: { $0.id == id }) { return inHand }
+        if let right = rightHandCard, right.id == id { return right }
+        return nil
     }
 
     /// 現在選択中のカードの種類(未選択なら nil)。
@@ -131,6 +136,9 @@ public final class DuelSessionStore: @unchecked Sendable {
         }
         hand.append(card)
         rightHandCard = nil
+        // 右手へ持ち替えていた選択カードを扇に戻したときは、選択も解除する
+        // (戻したカードが選択されたまま残らないように)。
+        if selectedHandCardId == card.id { selectedHandCardId = nil }
         phase = .idle
     }
 
@@ -144,8 +152,10 @@ public final class DuelSessionStore: @unchecked Sendable {
         guard let cardIndex = hand.firstIndex(where: { $0.id == card.id }) else { return false }
         hand.remove(at: cardIndex)
         rightHandCard = card
-        selectedHandCardId = nil
-        phase = .drawing
+        // 選択は保持する(=選択中のカードを右手に持っている状態)。
+        // これで「選択なしで右手にカードがある」のはドロー時だけになる(ドローとは phase で区別)。
+        selectedHandCardId = card.id
+        phase = .selectingFromHand
         return true
     }
 
@@ -161,6 +171,8 @@ public final class DuelSessionStore: @unchecked Sendable {
         diskSlots[index] = card
         fieldBackRow[index] = card
         rightHandCard = nil
+        // 右手のカード=選択中のカードだった場合があるため選択も解除する。
+        selectedHandCardId = nil
         phase = .idle
         return true
     }
