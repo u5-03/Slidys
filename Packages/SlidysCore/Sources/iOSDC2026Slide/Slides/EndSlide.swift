@@ -19,14 +19,20 @@ struct EndSlide: View {
                 HStack(alignment: .top, spacing: 80) {
                     qrColumn(
                         title: "本日の発表のブログ(詳細・コード)",
-                        image: .qrMainArticle,
                         url: "https://ulog.sugiy.com/iosdc2026-visionos-anime-card-battle/"
-                    )
+                    ) {
+                        Image(.qrMainArticle)
+                            .resizable()
+                            .interpolation(.none) // QRのドットをにじませない
+                            .scaledToFit()
+                    }
                     qrColumn(
-                        title: "iOS/iPadOS応用の記事",
-                        image: .qrTaiyakiArticle,
-                        url: "https://ulog.sugiy.com/taiyaki-focus-3d-showcase-ios/"
-                    )
+                        title: "このスライドアプリ(TestFlight)",
+                        url: SlideConstants.testFlightPublicLink.absoluteString
+                    ) {
+                        // SlidesCoreにバンドル済みのTestFlight配布用QR
+                        QrCodeType.native.view
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 Text("実装リポジトリ: https://github.com/u5-03/Slidys")
@@ -36,14 +42,15 @@ struct EndSlide: View {
         }
     }
 
-    private func qrColumn(title: String, image: ImageResource, url: String) -> some View {
+    private func qrColumn(
+        title: String,
+        url: String,
+        @ViewBuilder qrImage: () -> some View
+    ) -> some View {
         VStack(spacing: 24) {
             Text(title)
                 .font(.system(size: 40, weight: .bold))
-            Image(image)
-                .resizable()
-                .interpolation(.none) // QRのドットをにじませない
-                .scaledToFit()
+            qrImage()
                 .frame(width: 440, height: 440)
                 .background(Color.white)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))

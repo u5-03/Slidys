@@ -16,7 +16,7 @@ struct TalkPlanSlide: View {
     var body: some View {
         HeaderSlide("今日話すこと") {
             Item("3Dモデルを用意して表示する(Blender / Reality Composer Pro)", accessory: .number(1))
-            Item("Hand Gestureでカードを引く・持つ・置く", accessory: .number(2))
+            Item("Hand Gestureとでカードを引く・持つ・置く", accessory: .number(2))
             Item("エフェクトとアニメーションでそれらしくする", accessory: .number(3))
         }
     }

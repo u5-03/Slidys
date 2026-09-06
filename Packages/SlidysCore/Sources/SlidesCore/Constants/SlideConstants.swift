@@ -6,6 +6,6 @@
 import Foundation
 
 public enum SlideConstants {
-    static let testFlightPublicLink: URL = URL(string: "https://testflight.apple.com/join/s5j2zJbS")!
-    static let testFlightFlutterPublicLink: URL = URL(string: "https://testflight.apple.com/join/tKHf1Uq2")!
+    public static let testFlightPublicLink: URL = URL(string: "https://testflight.apple.com/join/s5j2zJbS")!
+    public static let testFlightFlutterPublicLink: URL = URL(string: "https://testflight.apple.com/join/tKHf1Uq2")!
 }

@@ -16,8 +16,8 @@ struct LimitationsSlide: View {
     var body: some View {
         HeaderSlide("再現してみてわかった制約") {
             Item("腕とディスクのオクルージョンが不完全(腕時計のようには隠れない)", keywords: ["オクルージョンが不完全"], accessory: .number(1))
-            Item("手首トラッキングは頻繁にロストする。速い動きは追従が遅れる", keywords: ["頻繁にロスト"], accessory: .number(2))
-            Item("シミュレータでは体験できない / 現実の部屋は照らせない", keywords: ["シミュレータでは体験できない"], accessory: .number(3))
+            Item("手首トラッキングはよくロストする。速い動きは追従が遅れるし、カメラの死角に入ると追跡が止まる", keywords: ["頻繁にロスト"], accessory: .number(2))
+            Item("光の演出をしても、現実の部屋を照らすことはできない(visionOS 26まで)", keywords: ["現実の部屋を照らすことはできない"], accessory: .number(3))
         }
     }
 }

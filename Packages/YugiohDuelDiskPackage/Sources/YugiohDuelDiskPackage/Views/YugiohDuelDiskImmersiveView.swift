@@ -104,8 +104,14 @@ public struct YugiohDuelDiskImmersiveView: View {
     @State private var fieldHandleArea: Entity?
     /// ハンドルエリアごと移動する3つ目のハンドル。
     @State private var fieldAreaHandle: Entity?
+    /// フィールドのサイズ(スケール)を調整するハンドル。
+    @State private var fieldScaleHandle: Entity?
+    /// 現在の視線正面へフィールドを再配置するボタン(タップ)。
+    @State private var fieldRecenterHandle: Entity?
     /// エリア移動ドラッグ開始時の container ワールド位置。
     @State private var fieldHandleAreaDragStart: SIMD3<Float>?
+    /// スケール調整ドラッグ開始時のフィールド一様スケール。
+    @State private var fieldScaleDragStart: Float?
     @State private var fieldCardEntities: [Int: Entity] = [:]
     /// フィールド手前列(魔法・トラップ)に配置したカード Entity
     @State private var fieldFrontCardEntities: [Int: Entity] = [:]
@@ -448,6 +454,11 @@ private struct DiskSummonEffectState: Identifiable {
 private enum CardBackTextureCache {
     static var didAttempt = false
     static var texture: TextureResource?
+}
+
+@MainActor
+private enum HandleFaceTextureCache {
+    static var textures: [FieldHandleComponent.Kind: TextureResource] = [:]
 }
 #endif
 
@@ -1122,117 +1133,135 @@ private extension YugiohDuelDiskImmersiveView {
         setupFieldHandles()
     }
 
-    /// 移動/回転ハンドルを生成する(rootEntity 直下・ワールド系)。位置は毎tick追従で更新する。
+    /// 5種類のハンドル(移動/回転/サイズ/エリア移動/再配置)を生成し、手元に横1列で並べる。
+    /// それぞれアイコン+ラベルを正面に貼って区別しやすくする。
     func setupFieldHandles() {
-        // ハンドル3つを「ハンドルエリア」container にまとめる。
-        // container を3つ目のハンドルで丸ごと動かせるので、手元の好きな位置へ持ってこられる。
         let area = Entity()
         area.name = "FieldHandleArea"
         area.position = DuelDiskMetrics.fieldHandleAreaWorldPosition
         rootEntity.addChild(area)
         fieldHandleArea = area
 
-        let move = makeFieldHandle(kind: .move, color: .cyan, name: "FieldMoveHandle")
-        move.position = DuelDiskMetrics.fieldMoveHandleLocalOffset
-        area.addChild(move)
-        fieldMoveHandle = move
-
-        let rotate = makeFieldHandle(kind: .rotate, color: .orange, name: "FieldRotateHandle")
-        rotate.position = DuelDiskMetrics.fieldRotateHandleLocalOffset
-        area.addChild(rotate)
-        fieldRotateHandle = rotate
-
-        // 3つ目: ハンドルエリア(=このかたまり)自体を動かすハンドル。
-        let areaHandle = makeFieldHandle(kind: .area, color: .systemGreen, name: "FieldAreaHandle")
-        areaHandle.position = DuelDiskMetrics.fieldAreaHandleLocalOffset
-        area.addChild(areaHandle)
-        fieldAreaHandle = areaHandle
+        // 左→右の並び順。中央(0)を基準に fieldHandleSpacing 間隔で配置。
+        let specs: [(kind: FieldHandleComponent.Kind, color: UIColor, name: String)] = [
+            (.move, .systemCyan, "FieldMoveHandle"),
+            (.rotate, .systemOrange, "FieldRotateHandle"),
+            (.scale, .systemPurple, "FieldScaleHandle"),
+            (.area, .systemGreen, "FieldAreaHandle"),
+            (.recenter, .systemYellow, "FieldRecenterHandle"),
+        ]
+        let spacing = DuelDiskMetrics.fieldHandleSpacing
+        let startX = -spacing * Float(specs.count - 1) / 2
+        for (i, spec) in specs.enumerated() {
+            let handle = makeFieldHandle(kind: spec.kind, color: spec.color, name: spec.name)
+            handle.position = SIMD3<Float>(startX + spacing * Float(i), 0, 0)
+            area.addChild(handle)
+            switch spec.kind {
+            case .move: fieldMoveHandle = handle
+            case .rotate: fieldRotateHandle = handle
+            case .scale: fieldScaleHandle = handle
+            case .area: fieldAreaHandle = handle
+            case .recenter: fieldRecenterHandle = handle
+            }
+        }
 
         // 生成直後に一度、正面(ヘッド)を向かせる。以降は毎tickの billboard 更新で追従。
         updateFieldHandleBillboard()
-        DuelLog.event(
-            "FieldHandlesReady",
-            "areaWorld=\(shortVector(area.position(relativeTo: nil))) move=\(shortVector(move.position)) rotate=\(shortVector(rotate.position)) area=\(shortVector(areaHandle.position))"
-        )
+        DuelLog.event("FieldHandlesReady", "count=\(specs.count) areaWorld=\(shortVector(area.position(relativeTo: nil)))")
     }
 
-    /// ハンドル(移動/回転/エリア)を、常に Vision Pro(ヘッド)の方へ向ける(ヨーのみ)。
-    /// これで文字・ハンドル面が常にこちらを向き、どこへ動かしても読める・つまみやすい。
-    /// 各ハンドルを個別に「自分の原点まわり」で回すので、ワールド位置は変わらない
-    /// (= フィールド移動/回転ドラッグの基準がズレない)。
+    /// 全ハンドルを常に Vision Pro(ヘッド)の方へ向ける(ヨーのみ)。文字/アイコン面が常にこちらを向く。
+    /// 各ハンドルを個別に「自分の原点まわり」で回すので、ワールド位置は変わらない。
     func updateFieldHandleBillboard() {
         guard let head = menuHeadAnchor else { return }
         let headWorld = head.position(relativeTo: nil)
-        // ヘッドアンカーが未トラッキング(原点付近)の間は向きを触らない。
         guard simd_length(headWorld) > 0.05 else { return }
-        for handle in [fieldMoveHandle, fieldRotateHandle, fieldAreaHandle].compactMap({ $0 }) {
+        let handles = [fieldMoveHandle, fieldRotateHandle, fieldScaleHandle, fieldAreaHandle, fieldRecenterHandle]
+        for handle in handles.compactMap({ $0 }) {
             let hp = handle.position(relativeTo: nil)
             let toHead = headWorld - hp
             let flat = SIMD3<Float>(toHead.x, 0, toHead.z)
             guard simd_length(flat) > 0.0001 else { continue }
-            // ラベル面(+Z)をヘッド方向へ向けるヨー。
-            let yaw = atan2(flat.x, flat.z)
+            let yaw = atan2(flat.x, flat.z)  // 正面(+Z面)をヘッドへ向ける
             handle.setOrientation(simd_quatf(angle: yaw, axis: SIMD3<Float>(0, 1, 0)), relativeTo: nil)
         }
     }
 
-    /// ハンドル1個を生成する。球より分かりやすいよう「角丸パネル + 日本語ラベル」にする。
-    /// 存在感を抑えるため色は少し薄め。
+    /// ハンドル1個を生成する。角丸パネルの正面(+Z)に「SFシンボルのアイコン + 日本語ラベル」の
+    /// テクスチャを貼り、色だけでなくアイコン/文字で一目で区別できるようにする。
     func makeFieldHandle(kind: FieldHandleComponent.Kind, color: UIColor, name: String) -> ModelEntity {
-        var material = PhysicallyBasedMaterial()
-        let tinted = color.withAlphaComponent(CGFloat(DuelDiskMetrics.fieldHandleOpacity))
-        material.baseColor = .init(tint: tinted)
-        material.emissiveColor = .init(color: color)
-        material.emissiveIntensity = DuelDiskMetrics.fieldHandleEmissiveIntensity
-        material.roughness = 0.4
-        material.blending = .transparent(opacity: .init(floatLiteral: DuelDiskMetrics.fieldHandleOpacity))
-
         let size = DuelDiskMetrics.fieldHandleSize
+        // 台座(角丸パネル)。色付き・半透明で "ボタン" らしく。
+        var base = PhysicallyBasedMaterial()
+        base.baseColor = .init(tint: color.withAlphaComponent(0.9))
+        base.emissiveColor = .init(color: color)
+        base.emissiveIntensity = DuelDiskMetrics.fieldHandleEmissiveIntensity
+        base.roughness = 0.4
         let panel = ModelEntity(
-            mesh: .generateBox(size: size, cornerRadius: size.y * 0.4),
-            materials: [material]
+            mesh: .generateBox(size: size, cornerRadius: min(size.x, size.y) * 0.22),
+            materials: [base]
         )
         panel.name = name
         panel.components.set(FieldHandleComponent(kind: kind))
         panel.components.set(InputTargetComponent())
-        panel.components.set(HoverEffectComponent(.highlight(.init(color: .white, strength: 0.8))))
+        panel.components.set(HoverEffectComponent(.highlight(.init(color: .white, strength: 1.0))))
         panel.components.set(CollisionComponent(
-            shapes: [.generateBox(size: size * 1.25)],
+            shapes: [.generateBox(size: SIMD3<Float>(size.x * 1.2, size.y * 1.2, size.z * 2.0))],
             mode: .default,
             filter: .default
         ))
 
-        // 何のハンドルか一目で分かるよう、上に立てた日本語ラベルを付ける。
-        let labelText: String
-        switch kind {
-        case .move: labelText = "移動"
-        case .rotate: labelText = "回転"
-        case .area: labelText = "まとめて移動"
+        // 正面(+Z)にアイコン+ラベルのテクスチャ板を貼る(白のアイコン/文字が透過背景で乗る)。
+        var faceMat = UnlitMaterial()
+        faceMat.color = .init(tint: .white)
+        if let tex = handleFaceTexture(for: kind) {
+            faceMat.color = .init(tint: .white, texture: .init(tex))
         }
-        let label = makeHandleLabel(labelText)
-        label.position = SIMD3<Float>(0, size.y / 2 + 0.02, 0)
-        panel.addChild(label)
+        faceMat.blending = .transparent(opacity: .init(floatLiteral: 1.0))
+        let face = ModelEntity(
+            mesh: .generatePlane(width: size.x * 0.92, height: size.y * 0.92),
+            materials: [faceMat]
+        )
+        face.name = "\(name)_Face"
+        face.position = SIMD3<Float>(0, 0, size.z / 2 + 0.001)  // 正面(+Z)手前
+        panel.addChild(face)
         return panel
     }
 
-    /// ハンドル上に立てる 3D テキストラベル(プレイヤー側=+Z を向く)。
-    func makeHandleLabel(_ text: String) -> ModelEntity {
-        let mesh = MeshResource.generateText(
-            text,
-            extrusionDepth: 0.004,
-            font: .systemFont(ofSize: 0.06, weight: .bold),
-            alignment: .center
-        )
-        var material = UnlitMaterial()
-        material.color = .init(tint: .white)
-        let entity = ModelEntity(mesh: mesh, materials: [material])
-        // generateText の原点は左下。中央に揃える。
-        let bounds = entity.visualBounds(relativeTo: entity)
-        entity.position = SIMD3<Float>(-bounds.center.x, -bounds.center.y, 0)
-        // テキスト面(+Z法線)をプレイヤーに向けて立てる。
-        let holder = ModelEntity()
-        holder.addChild(entity)
-        return holder
+    /// ハンドル正面テクスチャ(SFシンボル + ラベル)を一度だけ生成してキャッシュする。
+    func handleFaceTexture(for kind: FieldHandleComponent.Kind) -> TextureResource? {
+#if canImport(UIKit)
+        if let cached = HandleFaceTextureCache.textures[kind] { return cached }
+        let (symbol, label): (String, String) = {
+            switch kind {
+            case .move: return ("arrow.up.and.down.and.arrow.left.and.right", "移動")
+            case .rotate: return ("arrow.trianglehead.clockwise", "回転")
+            case .scale: return ("arrow.up.left.and.arrow.down.right", "サイズ")
+            case .area: return ("hand.point.up.left.fill", "まとめて")
+            case .recenter: return ("scope", "正面へ")
+            }
+        }()
+        let content = VStack(spacing: 10) {
+            Image(systemName: symbol)
+                .font(.system(size: 110, weight: .bold))
+            Text(label)
+                .font(.system(size: 52, weight: .heavy))
+                .lineLimit(1)
+                .minimumScaleFactor(0.4)
+        }
+        .foregroundStyle(.white)
+        .shadow(color: .black.opacity(0.6), radius: 4)
+        .frame(width: 256, height: 256)
+        let renderer = ImageRenderer(content: content)
+        renderer.scale = 3
+        renderer.isOpaque = false
+        guard let cg = renderer.cgImage else { return nil }
+        let tex = try? TextureResource(image: cg, options: .init(semantic: .color))
+        HandleFaceTextureCache.textures[kind] = tex
+        return tex
+#else
+        return nil
+#endif
     }
 
     /// 衝突購読を **対象 entity を限定して** 仕掛ける。
@@ -1674,6 +1703,12 @@ private extension YugiohDuelDiskImmersiveView {
             + " phase=\(String(describing: sessionStore.phase))"
         )
 
+        // 再配置ハンドル(タップ): 現在の視線正面を基準にフィールドを置き直す。
+        if fieldHandle(from: tappedEntity, kind: .recenter) {
+            recenterFieldToView()
+            return
+        }
+
         // 魔法・トラップ挿入口オーバーレイ板のタップ → 選択中の魔法/トラップを配置
         if let spellIndex = resolveSpellSlotIndex(from: tappedEntity) {
             DuelLog.event(
@@ -2017,6 +2052,21 @@ private extension YugiohDuelDiskImmersiveView {
                     let rot = simd_quatf(angle: dAngle, axis: SIMD3<Float>(0, 1, 0))
                     // fieldInteractionRoot の原点=中央なので、その場回転がそのまま中央軸回転になる。
                     field.setOrientation(rot * startOrientation, relativeTo: nil)
+                } else if fieldHandle(from: value.entity, kind: .scale) {
+                    // サイズ調整: ドラッグ縦移動(上=拡大 / 下=縮小)でフィールドの一様スケールを変える。
+                    let start: Float
+                    if let s = fieldScaleDragStart {
+                        start = s
+                    } else {
+                        start = field.scale(relativeTo: nil).x
+                        fieldScaleDragStart = start
+                    }
+                    let factor = 1 + worldDelta.y * DuelDiskMetrics.fieldScaleDragSensitivity
+                    let newScale = min(
+                        DuelDiskMetrics.fieldScaleMax,
+                        max(DuelDiskMetrics.fieldScaleMin, start * factor)
+                    )
+                    field.setScale(SIMD3<Float>(repeating: newScale), relativeTo: nil)
                 }
             }
             .onEnded { _ in
@@ -2027,7 +2077,34 @@ private extension YugiohDuelDiskImmersiveView {
                 fieldRotateCenterWorld = nil
                 fieldRotateHandleStartWorld = nil
                 fieldHandleAreaDragStart = nil
+                fieldScaleDragStart = nil
             }
+    }
+
+    /// 現在の視線(ヘッド)正面を基準に、召喚エリアを置き直す。
+    /// アプリ起動時の空間の向きとデモ時の向きが違っても、ワンタップで正面に持ってこられる。
+    func recenterFieldToView() {
+        guard let field = fieldInteractionRoot, let head = menuHeadAnchor else { return }
+        let headPos = head.position(relativeTo: nil)
+        guard simd_length(headPos) > 0.05 else { return }  // ヘッド未トラッキング時は何もしない
+        // ヘッドの前方(水平成分)。カメラは -Z を向く。
+        let forward = head.orientation(relativeTo: nil).act(SIMD3<Float>(0, 0, -1))
+        var forwardH = SIMD3<Float>(forward.x, 0, forward.z)
+        guard simd_length(forwardH) > 0.0001 else { return }
+        forwardH = simd_normalize(forwardH)
+        // フィールド中心 = 視線正面の少し前。高さは今のフィールドの高さを維持(急な上下移動を避ける)。
+        let currentY = field.position(relativeTo: nil).y
+        let target = SIMD3<Float>(
+            headPos.x + forwardH.x * DuelDiskMetrics.fieldRecenterDistance,
+            currentY,
+            headPos.z + forwardH.z * DuelDiskMetrics.fieldRecenterDistance
+        )
+        // フィールドの正面(+Z=プレイヤー側)がヘッドを向くヨー。
+        let toHead = SIMD3<Float>(headPos.x - target.x, 0, headPos.z - target.z)
+        let yaw = atan2(toHead.x, toHead.z)
+        field.setPosition(target, relativeTo: nil)
+        field.setOrientation(simd_quatf(angle: yaw, axis: SIMD3<Float>(0, 1, 0)), relativeTo: nil)
+        DuelLog.event("FieldRecentered", "target=\(shortVector(target)) yawDeg=\(String(format: "%.0f", yaw * 180 / .pi))")
     }
 
     /// 指定 entity(またはその親)が指定種別のフィールド操作ハンドルかを判定する。
@@ -3075,9 +3152,12 @@ private extension YugiohDuelDiskImmersiveView {
         fieldInteractionRoot = nil
         fieldMoveHandle = nil
         fieldRotateHandle = nil
+        fieldScaleHandle = nil
+        fieldRecenterHandle = nil
         fieldHandleArea = nil
         fieldAreaHandle = nil
         fieldHandleAreaDragStart = nil
+        fieldScaleDragStart = nil
         fieldDragStartPosition = nil
         fieldRotateStartAngle = nil
         fieldRotateStartOrientation = nil

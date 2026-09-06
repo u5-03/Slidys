@@ -36,10 +36,6 @@ struct LiveDemoSlide: View {
 
 #if canImport(YugiohDuelDiskPackage)
             DemoImmersiveSpaceButton()
-#else
-            Text("visionOSでのみデモは開始できます")
-                .font(.system(size: 40))
-                .foregroundStyle(.gray)
 #endif
         }
         .padding(.horizontal, 100)

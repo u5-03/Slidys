@@ -45,6 +45,7 @@ public struct SlideBaseView: View {
         slideConfiguration: SlideConfigurationProtocol,
         timerDuration: Duration = .seconds(60 * 20),
         showSlideIndex: Bool = true,
+        showsTotalSlideCount: Bool = true,
         listTextStyle: ListTextStyle = .standard
     ) {
         self.slideConfiguration = slideConfiguration
@@ -52,7 +53,11 @@ public struct SlideBaseView: View {
         let duration = min(timerDuration, Duration.seconds(60 * 60))
         timeRemaining = .init(duration.components.seconds)
         self.timerDuration = timerDuration
-        self.slideTheme = CustomSlideTheme(showSlideIndex: showSlideIndex, listTextStyle: listTextStyle)
+        self.slideTheme = CustomSlideTheme(
+            showSlideIndex: showSlideIndex,
+            showsTotalSlideCount: showsTotalSlideCount,
+            listTextStyle: listTextStyle
+        )
     }
 
     public var body: some View {
@@ -147,14 +152,16 @@ public struct SlideBaseView: View {
         .focusable()
         .focused($isFocused)
         .focusEffectDisabled()
-        .onKeyPress(.leftArrow) {
+        // Page Up/Downはプレゼン用ポインター(HIDキーボードとして
+        // 「進む=Page Down / 戻る=Page Up」を送るタイプ)用
+        .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
             isFocused = true
             Task {
                 slideConfiguration.slideIndexController.back()
             }
             return .handled
         }
-        .onKeyPress(.rightArrow) {
+        .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
             isFocused = true
             Task {
                 slideConfiguration.slideIndexController.forward()

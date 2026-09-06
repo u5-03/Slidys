@@ -95,16 +95,22 @@ public enum DuelDiskMetrics {
 
     /// ハンドル球の半径 (m)。遠く(数m先)でも視認できるよう大きめ。
     public static let fieldHandleRadius: Float = 0.08
-    /// ハンドル(角丸パネル)のサイズ (m)。球より "つまみ" らしく分かりやすい。
-    public static let fieldHandleSize = SIMD3<Float>(0.16, 0.06, 0.16)
-    /// ハンドル3つのかたまり(=ハンドルエリア)の初期ワールド位置(プレイヤーのすぐ手前・低め)。
-    /// この container を「エリア移動ハンドル(3つ目)」で好きな位置へ動かせる。
+    /// ハンドル(角丸パネル)のサイズ (m)。アイコン+ラベルを載せる正面向きのボタン風にする。
+    /// (横 x 縦 x 厚み。正面 +Z 面にアイコン/ラベルのテクスチャを貼る)
+    public static let fieldHandleSize = SIMD3<Float>(0.11, 0.11, 0.02)
+    /// ハンドルの横並び間隔 (m)。5個を1列に並べる。
+    public static let fieldHandleSpacing: Float = 0.135
+    /// ハンドルのかたまり(=ハンドルエリア)の初期ワールド位置(プレイヤーのすぐ手前・低め)。
+    /// この container を「エリア移動ハンドル」で好きな位置へ動かせる。
     public static let fieldHandleAreaWorldPosition = SIMD3<Float>(0.0, -0.42, -0.5)
-    /// エリア内での各ハンドルのローカルオフセット(container 原点=エリア中心 からの相対)。
-    /// 横に3つ並べ、真ん中を「エリア移動」ハンドルにする。
-    public static let fieldMoveHandleLocalOffset = SIMD3<Float>(0.20, 0, 0)   // 右: フィールド移動
-    public static let fieldRotateHandleLocalOffset = SIMD3<Float>(-0.20, 0, 0) // 左: フィールド回転
-    public static let fieldAreaHandleLocalOffset = SIMD3<Float>(0.0, 0, 0)     // 中央: エリアごと移動
+
+    /// フィールドのスケール調整の感度(ドラッグ縦移動 1m あたりの倍率変化)。
+    public static let fieldScaleDragSensitivity: Float = 2.0
+    /// フィールドスケールの下限・上限(fieldScale 基準の倍率)。
+    public static let fieldScaleMin: Float = fieldScale * 0.4
+    public static let fieldScaleMax: Float = fieldScale * 2.5
+    /// 再配置(recenter)時に、視線正面のどれくらい前へフィールド中心を置くか (m)。
+    public static let fieldRecenterDistance: Float = 2.0
     /// 移動ハンドルの、フィールド中央からのワールドオフセット(手前=+Z, 右=+X, 上=+Y)。
     /// 召喚エリアの手前・中央やや右に、置き場と重ならないよう前に出す。
     public static let fieldMoveHandleOffset = SIMD3<Float>(0.35, 0.30, 1.6)

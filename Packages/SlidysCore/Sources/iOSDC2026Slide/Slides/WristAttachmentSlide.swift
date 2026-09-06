@@ -16,7 +16,7 @@ struct WristAttachmentSlide: View {
     var body: some View {
         HeaderSlide("ディスクを手首に「安定して」装着する") {
             Item("手首アンカーの子にすると、ロストの瞬間に消える・暴れる", keywords: ["消える・暴れる"], accessory: .number(1))
-            Item("→ 子にはせず、毎フレーム手首を「追いかける」。ロスト中は最後の姿勢で留まる", keywords: ["追いかける"], accessory: .number(2))
+            Item("そのため子にはせず、毎フレーム手首を「追いかける」。ロスト中は最後の姿勢で留まる", keywords: ["追いかける"], accessory: .number(2))
             Item("さらに毎フレーム35%だけ寄せる(ローパス)でブレを吸収", keywords: ["35%"], accessory: .number(3))
         }
     }

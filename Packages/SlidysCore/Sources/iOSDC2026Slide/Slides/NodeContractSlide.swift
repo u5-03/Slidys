@@ -14,10 +14,10 @@ struct NodeContractSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("モデルに「ロケーター」を仕込む") {
-            Item("モデルとコードは、名前を付けたロケーターでつなぐ", keywords: ["ロケーター"], accessory: .number(1))
-            Item("Blenderの空オブジェクト(Empty) = 形のない目印。ゾーン・デッキ・墓地・手首・ライフに置く", keywords: [], accessory: .number(2))
-            Item("アプリは名前で探すだけ。モデルを作り直してもコードは無変更", keywords: ["コードは無変更"], accessory: .number(3))
+        HeaderSlide("モデルとコードを疎結合につなぐ") {
+            Item("ディスクのオブジェクト内のカード置き場やデッキ、手首の配置座標などは、アプリ内で取得するためにロケーターでつなぐ", keywords: ["ロケーター"], accessory: .number(1))
+            Item("Blenderの空オブジェクト(Empty) = 形のない目印をロケーターとして配置し、アプリ内から参照できるようにする", keywords: ["空オブジェクト(Empty)"], accessory: .number(2))
+            Item("アプリは名前で探すだけ。モデルを作り直してもその名前が変わらなければ、コードは変更不要", keywords: ["コードは無変更"], accessory: .number(3))
         }
     }
 }

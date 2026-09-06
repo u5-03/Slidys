@@ -74,9 +74,16 @@ public struct TaiyakiFocusView: View {
     }
 
     private let mode: Mode
+    /// テキスト・バブルUIの拡大率。スライド埋め込みで遠くから見せる場合は1より大きくする
+    private let fontScale: CGFloat
+    /// モデルの表示サイズ(正規化後の最大辺の長さ、シーン単位)。
+    /// カメラ(z=1.2, fov60°)の見える範囲は高さ約1.4なので、回転の余白込みで0.9程度まで
+    private let modelScale: Float
 
-    public init(mode: Mode = .full) {
+    public init(mode: Mode = .full, fontScale: CGFloat = 1, modelScale: Float = 0.6) {
         self.mode = mode
+        self.fontScale = fontScale
+        self.modelScale = modelScale
     }
 
     /// 回転の中心となるpivot Entity
@@ -110,12 +117,28 @@ public struct TaiyakiFocusView: View {
     private var focusRotation: simd_quatf {
         simd_quatf(angle: -0.12, axis: SIMD3<Float>(1, 0, 0))
     }
-    // バブルUIの寸法(重なり判定にも使用)
-    private let bubbleButtonSize: CGFloat = 40
-    private let bubbleLabelWidth: CGFloat = 150
-    private let bubbleHeight: CGFloat = 54
+    // バブルUIの寸法(重なり判定にも使用)。fontScaleに追従して拡大する
+    private var bubbleButtonSize: CGFloat { 40 * fontScale }
+    private var bubbleLabelWidth: CGFloat { 150 * fontScale }
+    private var bubbleHeight: CGFloat { 54 * fontScale }
+
+    @Environment(\.isSlideThumbnail) private var isSlideThumbnail
 
     public var body: some View {
+        // スライド一覧のサムネイルではRealityViewを起動せず、プレースホルダーだけ出す
+        if isSlideThumbnail {
+            ZStack {
+                Color.black
+                Image(systemName: "cube.transparent")
+                    .font(.system(size: 160, weight: .light))
+                    .foregroundStyle(.gray)
+            }
+        } else {
+            mainContent
+        }
+    }
+
+    private var mainContent: some View {
         GeometryReader { proxy in
             ZStack {
                 Color.black.ignoresSafeArea()
@@ -142,7 +165,7 @@ public struct TaiyakiFocusView: View {
                         if focusedPart == nil {
                             if mode == .full {
                                 Text("モデルをドラッグして回転 / ＋をタップで詳細")
-                                    .font(.caption)
+                                    .font(.system(size: 12 * fontScale))
                                     .foregroundStyle(.white.opacity(0.7))
                             }
                             fillingPicker
@@ -217,7 +240,7 @@ public struct TaiyakiFocusView: View {
                 let rawBounds = scene.visualBounds(relativeTo: nil)
                 let maxExtent = max(rawBounds.extents.x, max(rawBounds.extents.y, rawBounds.extents.z))
                 if maxExtent > 0 {
-                    scene.scale = SIMD3<Float>(repeating: 0.6 / maxExtent)
+                    scene.scale = SIMD3<Float>(repeating: modelScale / maxExtent)
                 }
                 let scaledBounds = scene.visualBounds(relativeTo: nil)
                 scene.position = -scaledBounds.center
@@ -318,7 +341,7 @@ public struct TaiyakiFocusView: View {
                     focus(on: bubble.part)
                 } label: {
                     Image(systemName: "plus")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.system(size: 17 * fontScale, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(width: bubbleButtonSize, height: bubbleButtonSize)
                         .background(.blue.opacity(0.85), in: Circle())
@@ -336,10 +359,10 @@ public struct TaiyakiFocusView: View {
     private func labelCard(for part: TaiyakiPart, alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 2) {
             Text(part.title)
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 14 * fontScale, weight: .bold))
                 .foregroundStyle(.white)
             Text(part.shortDescription)
-                .font(.system(size: 10.5))
+                .font(.system(size: 10.5 * fontScale))
                 .foregroundStyle(.white.opacity(0.85))
         }
         .multilineTextAlignment(alignment == .leading ? .leading : .trailing)
@@ -360,26 +383,26 @@ public struct TaiyakiFocusView: View {
                     unfocus()
                 } label: {
                     Image(systemName: "minus")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.system(size: 17 * fontScale, weight: .semibold))
                         .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 40 * fontScale, height: 40 * fontScale)
                         .background(.gray.opacity(0.7), in: Circle())
                         .overlay(Circle().strokeBorder(.white.opacity(0.6), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
 
                 Text(part.title)
-                    .font(.title3.bold())
+                    .font(.system(size: 20 * fontScale, weight: .bold))
                     .foregroundStyle(.white)
                 Text(part == .filling
                      ? part.detailDescription + "\n(いまの具材: \(selectedFilling.displayName))"
                      : part.detailDescription)
-                    .font(.footnote)
+                    .font(.system(size: 13 * fontScale))
                     .foregroundStyle(.white.opacity(0.9))
-                    .lineSpacing(4)
+                    .lineSpacing(4 * fontScale)
             }
             .padding(16)
-            .frame(width: min(size.width * 0.46, 300))
+            .frame(width: min(size.width * 0.6, 300 * fontScale))
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
             .environment(\.colorScheme, .dark)
             .padding(.trailing, 16)

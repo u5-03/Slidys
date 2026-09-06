@@ -15,8 +15,8 @@ struct WrapUpSlide: View {
 
     var body: some View {
         HeaderSlide("まとめ") {
-            Item("モデルには「ロケーター」。形はBlender、形式はRCP、振る舞いはコード", keywords: ["ロケーター"], accessory: .number(1))
-            Item("手首装着とジェスチャーは、関節の特性(ロスト・ブレ・つまみ中の縮退)込みで設計", keywords: ["関節の特性"], accessory: .number(2))
+            Item("オブジェクトの形はBlender、エフェクト調整はRCP、細かい振る舞いはコードで実現", keywords: [], accessory: .number(1))
+            Item("トラッキングのロストやブレはvisionOS側の制約。\n起きる前提で、追従や補間を設計する", keywords: ["起きる前提"], accessory: .number(2))
             Item("制約は多いが、「いつかやってみたかった」は個人開発でも形にできる", keywords: ["個人開発でも形にできる"], accessory: .number(3))
         }
     }

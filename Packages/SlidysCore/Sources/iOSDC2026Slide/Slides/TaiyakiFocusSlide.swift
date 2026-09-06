@@ -20,15 +20,14 @@ struct TaiyakiFocusSlide: View {
         HeaderSlide("同じ仕組みはiOS/iPadOSでも使える") {
             HStack(alignment: .top, spacing: 60) {
                 VStack(alignment: .leading, spacing: 44) {
-                    Item("2Dの写真より、3Dモデルは情報量が多い", keywords: ["情報量"], accessory: .number(1))
-                    Item("実在するものなら、実際の空間に投影してより高い解像度で確認できる", keywords: [], accessory: .number(2))
-                    Item("見てほしいポイントにアンカー → タップで部位の詳細へ", keywords: ["アンカー"], accessory: .number(3))
+                    Item("2Dよりも3Dで表示した方が確認しやすい場合もある", keywords: [], accessory: .number(1))
+                    Item("見てほしいポイントにアンカーを置き、タップで部位の詳細を表示することもできる", keywords: ["アンカー"], accessory: .number(2))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                TaiyakiFocusView(mode: .full)
+                TaiyakiFocusView(mode: .full, fontScale: 2.5, modelScale: 1)
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                    .frame(width: 760)
+                    .frame(width: 900)
                     .frame(maxHeight: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

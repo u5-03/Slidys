@@ -25,7 +25,25 @@ private func hlog(_ message: @autoclosure () -> String) {
 /// Blenderで自作した召喚モンスター「緋天竜」のアニメーション付きUSDZを確認するサンプル。
 /// 出現シーケンス(垂直上昇→とぐろ形成→アイドル、150F/30fps)がSkelAnimationとして
 /// 焼き込まれており、RealityKitで再生できるかの疎通検証を兼ねる。
-struct HitenryuSampleView: View {
+public struct HitenryuSampleView: View {
+    /// 表示モード
+    public enum Mode: Sendable {
+        /// ステータス表示 + 再生ボタン付き(サンプルページ用)
+        case full
+        /// UIなし。自動再生し、召喚シーケンスを無限ループする(スライド埋め込み用)
+        case autoLoop
+    }
+
+    private let mode: Mode
+    /// モデルの表示サイズ(正規化後の最大辺の長さ、シーン単位)。
+    /// カメラ(z=1.6, fov60°)の見える範囲は高さ約1.85なので、回転・召喚上昇の余白込みで1.0程度まで
+    private let modelScale: Float
+
+    public init(mode: Mode = .full, modelScale: Float = 0.62) {
+        self.mode = mode
+        self.modelScale = modelScale
+    }
+
     /// 回転の中心となるpivot Entity
     @State private var pivotEntity: Entity?
     /// 読み込んだモデル本体
@@ -49,7 +67,23 @@ struct HitenryuSampleView: View {
     /// バーストの発火世代。オクルーダーの遅延無効化が古い発火のものか判定する
     @State private var burstGeneration = 0
 
-    var body: some View {
+    @Environment(\.isSlideThumbnail) private var isSlideThumbnail
+
+    public var body: some View {
+        // スライド一覧のサムネイルではRealityViewや召喚ループを起動せず、プレースホルダーだけ出す
+        if isSlideThumbnail {
+            ZStack {
+                Color.black
+                Image(systemName: "cube.transparent")
+                    .font(.system(size: 160, weight: .light))
+                    .foregroundStyle(.gray)
+            }
+        } else {
+            mainContent
+        }
+    }
+
+    private var mainContent: some View {
         ZStack {
             Color.black.ignoresSafeArea()
 
@@ -82,36 +116,38 @@ struct HitenryuSampleView: View {
                     )
             }
 
-            VStack {
-                HStack {
-                    Text(statusText)
-                        .font(.system(.caption2, design: .monospaced))
-                        .foregroundStyle(.green)
-                        .padding(6)
-                        .background(.black.opacity(0.6))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                    Spacer()
-                }
-                Spacer()
-                // 右下に配置: 中央下だとvisionOSのWindow操作バーと重なり、
-                // ウィンドウの移動・クローズ操作をブロックしてしまう
-                HStack(spacing: 16) {
-                    Spacer()
-                    Button {
-                        replayAnimation()
-                    } label: {
-                        Label("最初から再生", systemImage: "arrow.counterclockwise")
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(.white.opacity(0.15))
-                            .clipShape(Capsule())
+            if mode == .full {
+                VStack {
+                    HStack {
+                        Text(statusText)
+                            .font(.system(.caption2, design: .monospaced))
+                            .foregroundStyle(.green)
+                            .padding(6)
+                            .background(.black.opacity(0.6))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        Spacer()
                     }
-                    .foregroundStyle(.white)
+                    Spacer()
+                    // 右下に配置: 中央下だとvisionOSのWindow操作バーと重なり、
+                    // ウィンドウの移動・クローズ操作をブロックしてしまう
+                    HStack(spacing: 16) {
+                        Spacer()
+                        Button {
+                            replayAnimation()
+                        } label: {
+                            Label("最初から再生", systemImage: "arrow.counterclockwise")
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(.white.opacity(0.15))
+                                .clipShape(Capsule())
+                        }
+                        .foregroundStyle(.white)
+                    }
+                    .padding(.bottom, 24)
+                    .padding(.trailing, 8)
                 }
-                .padding(.bottom, 24)
-                .padding(.trailing, 8)
+                .padding()
             }
-            .padding()
         }
     }
 
@@ -143,7 +179,7 @@ struct HitenryuSampleView: View {
                 let maxExtent = max(bounds.extents.x, max(bounds.extents.y, bounds.extents.z))
                 hlog("make: bounds center=\(bounds.center) extents=\(bounds.extents)")
                 if maxExtent > 0 {
-                    scene.scale = SIMD3<Float>(repeating: 0.62 / maxExtent)
+                    scene.scale = SIMD3<Float>(repeating: modelScale / maxExtent)
                 }
                 let scaled = scene.visualBounds(relativeTo: nil)
                 scene.position = -scaled.center
@@ -173,7 +209,7 @@ struct HitenryuSampleView: View {
                 // 召喚バースト(放射線+手裏剣+中央発光)を「召喚断面=カード平面」に仕込む。
                 // ルートをカード平面の位置に置くと、下半分がオクルーダーで隠れて
                 // 「断面から出る半球ドーム」になる。竜の出現に合わせて発火する。
-                if let burst = await SummonBurstController.make(scale: Self.burstScale) {
+                if let burst = await SummonBurstController.make(scale: burstScale) {
                     // カード平面(scene ローカル y≒0)の pivot 空間での位置に合わせる
                     burst.root.position = scene.convert(position: SIMD3<Float>(0, 0.001, 0), to: pivot)
                     pivot.addChild(burst.root)
@@ -266,6 +302,15 @@ struct HitenryuSampleView: View {
         }
         // 召喚の終わりに合わせてキラキラも止める
         stopBurst()
+
+        // autoLoopモード: 浮遊を1周(4秒)見せたら、召喚シーケンスを最初から再生し直す。
+        // replay完了 → PlaybackCompleted → 再びここに来るので、無限に召喚がループする
+        if mode == .autoLoop {
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 4_000_000_000)
+                replayAnimation()
+            }
+        }
     }
 
     private func replayAnimation() {
@@ -316,9 +361,9 @@ struct HitenryuSampleView: View {
 
     // MARK: - 召喚バースト(共通コントローラ)
 
-    /// 竜のスケール(maxExtent→0.62)に合わせたバーストの拡大率。
-    /// バースト素材は約1m基準なので、竜サイズに収まるよう縮小する。
-    private static let burstScale: Float = 0.6
+    /// 竜のスケール(modelScale)に合わせたバーストの拡大率。
+    /// バースト素材は約1m基準なので、竜サイズに収まるよう縮小する(既定 0.62→0.6 の比率を維持)。
+    private var burstScale: Float { modelScale * (0.6 / 0.62) }
 
     private func logTree(_ entity: Entity, depth: Int) {
         let indent = String(repeating: "  ", count: depth)

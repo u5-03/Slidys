@@ -20,7 +20,13 @@ public struct iOSDC2026SlideView: SlideViewProtocol {
     public init() {}
 
     public var body: some View {
-        SlideBaseView(slideConfiguration: configuration, timerDuration: Duration.seconds(60 * 20), listTextStyle: .large)
+        // 総ページ数を出すと締めのネタ(次回予告)の存在が予想できてしまうため、現在ページ番号のみ表示する
+        SlideBaseView(
+            slideConfiguration: configuration,
+            timerDuration: Duration.seconds(60 * 20),
+            showsTotalSlideCount: false,
+            listTextStyle: .large
+        )
     }
 }
 
@@ -43,7 +49,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "みなさん")
         CenterTextSlide(text: "アニメやゲーム、映画を見ながら\nかっこいいな、すごいなと思った\n場面はないでしょうか？")
         CenterTextSlide(text: "その場面を見ながら、\n「自分もこんな体験をしてみたい」と\n思ったことはないでしょうか？")
-        CenterTextSlide(text: "空間コンピューティングデバイスの登場で、\nその憧れを自分の手で実装しやすい\n時代になりました")
+        CenterTextSlide(text: "空間コンピューティングデバイスの\n登場で、その憧れを自分の\n手で実装しやすい時代\nになりました")
 
         TitleSlide()
         ReadmeSlide(
@@ -52,10 +58,10 @@ struct SlideConfiguration: SlideConfigurationProtocol {
                 name: "すぎー/Sugiy",
                 image: .icon,
                 firstText: "iOS/Flutterエンジニアです",
-                secondText: "iOSDCのスタッフしてます",
-                thirdText: "最近車を買いました🚗",
-                fourthText: "3Dプリンターも買いました。ものづくりが捗っています🖨️",
-                fifthText: "" // TODO: 5つ目の近況ネタが決まったら差し替え(空なら非表示)
+                secondText: "iOSDCのスタッフもしてます",
+                thirdText: "最近車を買いました",
+                fourthText: "3Dプリンターも買いました。お金が...💸",
+                fifthText: "こないだまで庭でメロンを育ててました"
             )
         )
         PastTalksSlide()
@@ -63,13 +69,12 @@ struct SlideConfiguration: SlideConfigurationProtocol {
 
         // デモ1: 最初に一連の流れを全部見せる(たい焼きのモンスターを召喚するまで)
         LiveDemoSlide(title: "デモ 1", caption: "カードを引いて、手札に加えて、\n配置して、召喚するまで")
-        MediaPlaceholderSlide(title: "", caption: "TODO: デモ1の保険動画\n(ドロー→手札→配置→たい焼き召喚の一連の流れ)")
+        VideoSlide(videoType: .duelDemoFull) // デモ1の保険動画
 
         // 1. 3Dモデルを用意して表示する
         ChapterDividerSlide(activeIndex: 0)
         BlenderModelingSlide()
         ModelPipelineSlide()
-        CenterTextSlide(text: "正直に言うと、\nモデルづくりでRCPアプリは\n一度も開いていません")
         RcpUsageSlide()
         BlenderMcpSlide()
         NodeContractSlide()
@@ -80,8 +85,6 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         ChapterDividerSlide(activeIndex: 1)
         TrackingSetupSlide()
         TrackingGestureListSlide()
-        CenterTextSlide(text: "手首アンカーの子にすれば終わり\n……ではなかった")
-        WristAttachmentSlide()
         HandFanSlide()
         DeckDrawSlide()
         CardPlacementSlide()
@@ -89,11 +92,11 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         // 3. エフェクトとアニメーションで演出する
         ChapterDividerSlide(activeIndex: 2)
         SummonSequenceSlide()
-        ParticleEffectSlide()
 
-        // デモ2: 終盤のライブデモ(竜のモンスターの召喚)
-        LiveDemoSlide(title: "デモ 2", caption: "竜のモンスターを召喚する")
-        MediaPlaceholderSlide(title: "", caption: "TODO: デモ2の保険動画\n(竜のモンスターの召喚エフェクト)")
+        // デモ2: 終盤のライブデモ(竜のモンスターの召喚)。パーティクルの説明はデモの後
+        LiveDemoSlide(title: "デモ 2", caption: "別のモンスターを召喚する")
+        VideoSlide(videoType: .duelDemoDragon) // デモ2の保険動画
+        ParticleEffectSlide()
         DragonSummonMakingSlide()
 
         // iOS/iPadOSへの応用
@@ -106,13 +109,15 @@ struct SlideConfiguration: SlideConfigurationProtocol {
 
         // 締め: アニメの次回予告風
         CenterTextSlide(text: "この発表を機に、みなさんも\n何か自分が作ってみたいものを\n作ってもらえるとうれしいです！")
-        CenterTextSlide(text: "ということで、")
+        CenterTextSlide(text: "おっと、そろそろ時間が")
+        CenterTextSlide(text: "今ここで終わったら、残りの\nスライドはどうなっちゃうの？")
         CenterTextSlide(text: "時間はまだ残ってる。")
-        CenterTextSlide(text: "ここを耐えれば、発表は終わるんだから！")
+        CenterTextSlide(text: "ここを耐えれば、発表は無事終わるんだから！")
         NextEpisodePreviewSlide(mainText: "城⚫︎内死す")
         NextEpisodePreviewSlide(
             content: .imageWithQR(image: .kanagawaSwiftEvent, qrImage: .qrKanagawaEvent)
         )
+        CenterTextSlide(text: "デュエルスタンバイ！")
         EndSlide()
     }
 }

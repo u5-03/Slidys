@@ -18,6 +18,10 @@ public enum VideoType {
     case handGestureEntitySample
     case handGestureSignLanguage
     case visionProPianoDemo
+    /// iOSDC2026 デモ1の保険動画(ドロー→手札→配置→たい焼き召喚の一連の流れ)
+    case duelDemoFull
+    /// iOSDC2026 デモ2の保険動画(竜のモンスターの召喚エフェクト)
+    case duelDemoDragon
 
     var fileName: String {
         switch self {
@@ -33,6 +37,10 @@ public enum VideoType {
             return "hand_gesture_sign_language"
         case .visionProPianoDemo:
             return "vision_pro_piano_demo"
+        case .duelDemoFull:
+            return "duel_demo_full"
+        case .duelDemoDragon:
+            return "duel_demo_dragon"
         }
     }
 
@@ -43,6 +51,7 @@ public enum VideoType {
 
 // Frameworks, Libraries, and Embedded ContentにAVKitを追加しないと、Previewでクラッシュする
 public struct VideoView: View {
+    @Environment(\.isSlideThumbnail) private var isSlideThumbnail
     @State private var player: AVPlayer?
     @State private var playerItem: AVPlayerItem?
     @State private var cancellableSet = Set<AnyCancellable>()
@@ -57,7 +66,20 @@ public struct VideoView: View {
 
     public var body: some View {
         Group {
-            if let player {
+            if isSlideThumbnail {
+                // スライド一覧のサムネイルでは動画を起動しない
+                // (AVPlayerやAssetPackManagerがプレビューエージェント内で全数起動してクラッシュするため)
+                ZStack {
+                    Color.black
+                    VStack(spacing: 16) {
+                        Image(systemName: "play.rectangle.fill")
+                            .font(.system(size: 160, weight: .light))
+                        Text(videoType.fileName)
+                            .font(.system(size: 40, design: .monospaced))
+                    }
+                    .foregroundStyle(.gray)
+                }
+            } else if let player {
                 VideoPlayer(player: player)
             } else if let loadError {
                 VStack(spacing: 8) {
@@ -74,6 +96,7 @@ public struct VideoView: View {
             }
         }
         .task {
+            guard !isSlideThumbnail else { return }
             do {
                 let url = try await resolveVideoURL(for: videoType)
                 let item = AVPlayerItem(url: url)
@@ -112,6 +135,11 @@ public struct VideoView: View {
             return url
         }
         // 2. AssetPackManager から取得（TestFlight / App Store）
+        // バンドルIDを持たない実行環境(スナップショット用CLIツールなど)では
+        // AssetPackManagerがfatalErrorになるため、その前にエラーで抜ける
+        guard Bundle.main.bundleIdentifier != nil else {
+            throw CocoaError(.fileNoSuchFile)
+        }
         let pack = try await AssetPackManager.shared.assetPack(withID: "slidys-videos")
         try await AssetPackManager.shared.ensureLocalAvailability(of: pack)
         let filePath = FilePath("payload/\(videoType.fileName).\(videoType.fileExtension)")

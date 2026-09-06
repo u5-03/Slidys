@@ -3,7 +3,8 @@
     "objectMetadataList" : [
       [
         "C7F2A9E1-3B4D-4A6C-9E12-8F5D2A1B0C34",
-        "Root"
+        "Root",
+        "SummonSparkle"
       ],
       {
         "isExpanded" : true,
@@ -11,8 +12,7 @@
       },
       [
         "C7F2A9E1-3B4D-4A6C-9E12-8F5D2A1B0C34",
-        "Root",
-        "SummonSparkle"
+        "Root"
       ],
       {
         "isExpanded" : true,

@@ -15,10 +15,27 @@ struct SummonSequenceSlide: View {
 
     var body: some View {
         HeaderSlide("召喚シーケンスの全体像") {
-            Item("ディスク上: 置いたゾーンから盤面全体へ光のライン", keywords: [], accessory: .number(1))
-            Item("フィールド: カードが出現して上昇 + 足元で放射状の光のバースト", keywords: [], accessory: .number(2))
-            Item("1秒後、光の中からモンスターがフェードイン + せり上がり", keywords: [], accessory: .number(3))
-            Item("置く場所と出る場所が離れている → 両方に演出を入れて視線を誘導", keywords: ["視線を誘導"], accessory: .bullet)
+            HStack(alignment: .top, spacing: 60) {
+                VStack(alignment: .leading, spacing: 44) {
+                    Item("ディスク上: 置いたゾーンから盤面全体へ光のライン", keywords: [], accessory: .number(1))
+                    Item("フィールド: カードが出現して上昇 + 足元で放射状の光のバースト", keywords: [], accessory: .number(2))
+                    Item("1秒後、光の中からモンスターがフェードイン + せり上がり", keywords: [], accessory: .number(3))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                // ラインエフェクトの実機シーン
+                Image(.summonLineCapture)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.15), lineWidth: 2)
+                    }
+                    .frame(width: 620)
+                    .frame(maxHeight: .infinity)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }

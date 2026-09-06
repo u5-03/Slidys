@@ -20,15 +20,14 @@ struct MonsterVariationSlide: View {
         HeaderSlide("モンスターは1モデルで4バリエーション") {
             HStack(alignment: .top, spacing: 60) {
                 VStack(alignment: .leading, spacing: 44) {
-                    Item("具材4種を同梱して、1つだけ表示する", keywords: ["1つだけ表示"], accessory: .number(1))
-                    Item("Blender製たい焼き。\nカードに対応するパーツだけON", keywords: [], accessory: .number(2))
-                    Item("形ごと変える → パーツ切り替え\n絵だけ変える → テクスチャ差し替え", keywords: ["パーツ切り替え"], accessory: .number(3))
+                    Item("Blender製たい焼き。具材4種を同梱して、1つだけ表示する", keywords: ["1つだけ表示"], accessory: .number(1))
+                    Item("具材の形ごと変更したいので、\nテクスチャ単位ではなく\nパーツ単位で切り替え", keywords: ["パーツ単位"], accessory: .number(2))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                TaiyakiFocusView(mode: .fillingOnly)
+                TaiyakiFocusView(mode: .fillingOnly, modelScale: 1.2)
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                    .frame(width: 760)
+                    .frame(width: 840)
                     .frame(maxHeight: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

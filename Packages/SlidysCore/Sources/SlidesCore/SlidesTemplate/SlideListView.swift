@@ -13,6 +13,20 @@
 import SwiftUI
 import SlideKit
 
+private struct SlideThumbnailKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+public extension EnvironmentValues {
+    /// スライド一覧(サムネイル)として描画中かどうか。
+    /// 動画再生やRealityViewなどの重い実表示は、trueのとき軽量なプレースホルダーに
+    /// 置き換える(Xcodeプレビューのエージェントで全スライドが同時起動してクラッシュするのを防ぐ)。
+    var isSlideThumbnail: Bool {
+        get { self[SlideThumbnailKey.self] }
+        set { self[SlideThumbnailKey.self] = newValue }
+    }
+}
+
 /// スクロール無しでスライドを列数×タイル幅のグリッドに敷き詰めるView。
 /// 高さは行数から決まる固有サイズになる(プレビューや画像書き出し向き)。
 public struct SlideGridView: View {
@@ -88,6 +102,7 @@ public struct SlideGridView: View {
     /// スライドを原寸で描画し、タイル枠へ縮小したサムネイル。
     private func thumbnail(of slide: any Slide, width: CGFloat, height: CGFloat) -> some View {
         AnyView(slide)
+            .environment(\.isSlideThumbnail, true)
             .slideTheme(theme)
             .foregroundColor(.black)
             .background(.white)

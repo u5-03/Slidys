@@ -19,6 +19,7 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
     case pixelImage
     case blenderSample
     case taiyakiFocus
+    case taiyakiRealityKit
     case immersiveSpaceControl
     case yugiohDuelDisk
     case hitenryuSummon
@@ -27,9 +28,9 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
 
     public static var allCases: [SamplePageType] {
 #if os(visionOS)
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .immersiveSpaceControl, .yugiohDuelDisk, .hitenryuSummon]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .immersiveSpaceControl, .yugiohDuelDisk, .hitenryuSummon]
 #else
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .hitenryuSummon]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .hitenryuSummon]
 #endif
     }
 
@@ -53,6 +54,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             return "Blenderサンプル"
         case .taiyakiFocus:
             return "たい焼きフォーカス"
+        case .taiyakiRealityKit:
+            return "Taiyaki RealityKit"
         case .immersiveSpaceControl:
             return "Immersive Space Control"
         case .yugiohDuelDisk:
@@ -108,6 +111,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             BlenderSampleView()
         case .taiyakiFocus:
             TaiyakiFocusView()
+        case .taiyakiRealityKit:
+            TaiyakiRealityKitSampleView()
         case .immersiveSpaceControl:
 #if os(visionOS)
             StartDemoView()

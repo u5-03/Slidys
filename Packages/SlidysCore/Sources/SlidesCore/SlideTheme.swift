@@ -54,9 +54,13 @@ public struct CustomSlideTheme: SlideTheme {
     public let itemStyle = CustomItemStyle()
     public let indexStyle: CustomIndexStyle
 
-    public init(showSlideIndex: Bool = true, listTextStyle: ListTextStyle = .standard) {
+    public init(
+        showSlideIndex: Bool = true,
+        showsTotalSlideCount: Bool = true,
+        listTextStyle: ListTextStyle = .standard
+    ) {
         self.headerSlideStyle = CustomHeaderSlideStyle(listTextStyle: listTextStyle)
-        self.indexStyle = CustomIndexStyle(isVisible: showSlideIndex)
+        self.indexStyle = CustomIndexStyle(isVisible: showSlideIndex, showsTotalSlideCount: showsTotalSlideCount)
     }
 }
 
@@ -146,9 +150,11 @@ public struct CustomItemStyle: ItemStyle {
 
 public struct CustomIndexStyle: IndexStyle {
     private let isVisible: Bool
+    private let showsTotalSlideCount: Bool
 
-    public init(isVisible: Bool = true) {
+    public init(isVisible: Bool = true, showsTotalSlideCount: Bool = true) {
         self.isVisible = isVisible
+        self.showsTotalSlideCount = showsTotalSlideCount
     }
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -156,7 +162,12 @@ public struct CustomIndexStyle: IndexStyle {
         EmptyView()
 #else
         if isVisible {
-            Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
+            // 総数を出すと「残り何枚か」が分かってしまうデッキ向けに、現在ページのみの表示も選べる
+            let current = configuration.slideIndexController.currentIndex + 1
+            let text = showsTotalSlideCount
+                ? "\(current) / \(configuration.slideIndexController.slides.count)"
+                : "\(current)"
+            Text(text)
                 .foregroundColor(.gray)
                 .font(.system(size: 30))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)

@@ -109,8 +109,10 @@ public struct FieldInteractionComponent: Component {
 public struct FieldHandleComponent: Component {
     /// - move: 召喚エリアを平行移動する。
     /// - rotate: 召喚エリアを中央軸で回転する。
-    /// - area: ハンドル3つのかたまり(=ハンドルエリア)自体を、好きな位置へ動かす。
-    public enum Kind: Sendable { case move, rotate, area }
+    /// - scale: 召喚エリアの大小(スケール)を調整する(ドラッグ上=拡大/下=縮小)。
+    /// - area: ハンドルのかたまり(=ハンドルエリア)自体を、好きな位置へ動かす。
+    /// - recenter: タップで、現在のヘッド(視線)正面を基準に召喚エリアを再配置する。
+    public enum Kind: Sendable, Hashable { case move, rotate, scale, area, recenter }
     public var kind: Kind
     public init(kind: Kind) { self.kind = kind }
 }

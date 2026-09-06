@@ -58,6 +58,14 @@ struct NextEpisodePreviewSlide: View {
         case .text(let text, let fontSize):
             OutlinedText(text: text, fontSize: fontSize)
         case .imageWithQR(let image, let qrImage):
+            VStack(spacing: 48) {
+                imageWithQRRow(image: image, qrImage: qrImage)
+                OutlinedText(text: "2026/10/31 小田原にて開催", fontSize: 96)
+            }
+        }
+    }
+
+    private func imageWithQRRow(image: ImageResource, qrImage: ImageResource) -> some View {
             // バナーとQRは同じ高さで横に並べる
             HStack(spacing: 80) {
                 Image(image)
@@ -79,7 +87,6 @@ struct NextEpisodePreviewSlide: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .shadow(color: .black.opacity(0.4), radius: 12, x: 4, y: 8)
             }
-        }
     }
 
     // MARK: - 背景(青の光 + キラキラ)
