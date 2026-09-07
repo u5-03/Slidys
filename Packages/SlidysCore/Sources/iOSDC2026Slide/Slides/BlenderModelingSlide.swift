@@ -25,17 +25,21 @@ struct BlenderModelingSlide: View {
         }
     }
 
-    /// 2枚を同じ枠サイズ(等分)で、アスペクト比を保ったまま表示する
+    /// 2枚を同じ枠サイズ・同じアスペクト比(16:10)で表示する(はみ出す分は中央基準でクロップ)
     private func captureImage(_ resource: ImageResource) -> some View {
-        Image(resource)
-            .resizable()
-            .scaledToFit()
+        Color.clear
+            .aspectRatio(16.0 / 10.0, contentMode: .fit)
+            .overlay {
+                Image(resource)
+                    .resizable()
+                    .scaledToFill()
+            }
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.15), lineWidth: 2)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
     }
 }
 

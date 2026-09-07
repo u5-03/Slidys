@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "hand_fan_capture.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

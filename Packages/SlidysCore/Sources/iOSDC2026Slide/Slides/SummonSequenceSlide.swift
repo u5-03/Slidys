@@ -23,20 +23,32 @@ struct SummonSequenceSlide: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                // ラインエフェクトの実機シーン
-                Image(.summonLineCapture)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 24, style: .continuous)
-                            .strokeBorder(Color.white.opacity(0.15), lineWidth: 2)
-                    }
-                    .frame(width: 620)
-                    .frame(maxHeight: .infinity)
+                // 上: ラインエフェクト / 下: モンスター出現の実機シーン(同じ枠サイズで縦に並べる)
+                VStack(spacing: 24) {
+                    captureImage(.summonLineCapture)
+                    captureImage(.summonTaiyakiCapture)
+                }
+                .frame(width: 620)
+                .frame(maxHeight: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+    }
+
+    /// 2枚を同じ枠サイズ・同じアスペクト比(16:10)で表示する(はみ出す分は中央基準でクロップ)
+    private func captureImage(_ resource: ImageResource) -> some View {
+        Color.clear
+            .aspectRatio(16.0 / 10.0, contentMode: .fit)
+            .overlay {
+                Image(resource)
+                    .resizable()
+                    .scaledToFill()
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.15), lineWidth: 2)
+            }
     }
 }
 

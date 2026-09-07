@@ -8,23 +8,20 @@ enum SurfacePatternBuilder {
         var logo = TaiyakiMesh()
     }
 
-    static func build(surface: TaiyakiBodySurface) -> Result {
+    static func build(surface: TaiyakiBodySurface, bodyMesh: TaiyakiMesh? = nil) -> Result {
         let c = surface.configuration
+        let projection = TaiyakiBodyProjection(mesh: bodyMesh ?? BodyMeshBuilder.build(surface: surface), surface: surface)
         var result = Result()
         // Deliberately sparse, broad mold marks matching the icon's graphic language.
-        let face: [[SIMD2<Float>]] = [
-            [[-0.445, -0.177], [-0.350, -0.180], [-0.309, -0.203], [-0.351, -0.233], [-0.437, -0.237]],
-            [[-0.283, 0.083], [-0.234, 0.040], [-0.205, -0.044], [-0.190, -0.139], [-0.218, -0.242]],
-            [[-0.195, -0.111], [-0.147, -0.088], [-0.093, -0.069]],
-            [[-0.194, -0.156], [-0.141, -0.145], [-0.075, -0.145]],
-            [[-0.201, -0.205], [-0.126, -0.219], [-0.060, -0.209]],
-            [[-0.263, 0.256], [-0.215, 0.236], [-0.194, 0.192], [-0.199, 0.158], [-0.159, 0.123], [-0.157, 0.090]]
-        ]
+        let face = TaiyakiDesign.facePaths
         for side: Float in [1, -1] {
-            let bodyPoint: (SIMD2<Float>) -> SIMD3<Float> = { surface.point($0, side: side) }
+            let bodyPoint: (SIMD2<Float>) -> SIMD3<Float> = {
+                projection.point($0, side: side)
+                    + surface.normal($0, side: side) * c.scaleDepth * TaiyakiDesign.patternNormalClearance
+            }
             for path in face {
-                result.mold.append(stroke(path.map { scaled($0, c) }, width: TaiyakiDesign.lineWidth * 2,
-                                          depth: c.scaleDepth, side: side, project: bodyPoint))
+                result.mold.append(stroke(path.map { scaled($0, c) }, width: c.faceLineWidth,
+                                          depth: c.scaleDepth, side: side, curvedEdge: true, project: bodyPoint))
             }
             // In the back view the uninterrupted center continues the scale motif.
             let columns = side > 0 ? c.scaleDensity : c.scaleDensity + 1
@@ -50,24 +47,57 @@ enum SurfacePatternBuilder {
             result.mold.append(stroke(seamTrimmed.map { scaled($0, c) }, width: 0.020,
                                       depth: c.scaleDepth, side: side, project: bodyPoint))
 
-            let eye = scaled(TaiyakiDesign.eye, c)
-            let center = surface.point(eye, side: side, offset: -c.eyeSize * 0.09)
-            let rotation = simd_quatf(from: [0, 0, 1], to: surface.normal(eye, side: side))
-            result.eyes.append(FillingBuilder.ellipsoid(center: center,
-                radii: [c.eyeSize * 0.56, c.eyeSize * 0.56, c.eyeSize * 0.20], rotation: rotation,
-                segments: 20, rings: 12))
-            // The slanted heavy eyelid is as recognizable as the round eye itself.
-            result.mold.append(stroke([[-0.389, 0.106], [-0.349, 0.136], [-0.308, 0.160]].map { scaled($0, c) },
-                                      width: 0.035, depth: c.scaleDepth * 1.2, side: side, project: bodyPoint))
+            let eyeContour = (0..<48).map { i -> SIMD2<Float> in
+                let angle = Float(i) / 48 * 2 * .pi
+                return scaled(TaiyakiDesign.eye + SIMD2<Float>(cos(angle), sin(angle)) * c.eyeSize * 0.56, c)
+            }
+            result.eyes.append(stamp(eyeContour, depth: c.scaleDepth * 0.6,
+                                     side: side, project: bodyPoint))
+            let lid = TaiyakiCurves.spline(TaiyakiDesign.eyelidContour.map { scaled($0, c) }, closed: true)
+            result.mold.append(stamp(lid, depth: c.scaleDepth * 1.4, side: side, project: bodyPoint))
             appendFinMarks(to: &result.mold, configuration: c, side: side)
         }
-        result.logo = logo(surface: surface)
+        result.logo = logo(surface: surface, projection: projection)
         return result
     }
 
     private static func scaled(_ p: SIMD2<Float>, _ c: TaiyakiConfiguration) -> SIMD2<Float> {
         let headWeight = max(0, min(1, -p.x / 0.30))
         return [p.x, p.y * c.bodyHeight / 0.67 * (1 + (c.headScale - 1) * headWeight)]
+    }
+
+    /// A shallow closed stamp follows the shell, retaining the graphic silhouette
+    /// of the round eye and triangular lid when the fish is seen from the front.
+    private static func stamp(_ contour: [SIMD2<Float>], depth: Float, side: Float,
+                              project: (SIMD2<Float>) -> SIMD3<Float>) -> TaiyakiMesh {
+        let center = contour.reduce(.zero, +) / Float(contour.count)
+        let rings = 8, count = contour.count
+        var mesh = TaiyakiMesh()
+        var edge: [UInt32] = []
+        for face: Float in [1, -1] {
+            func point(_ p: SIMD2<Float>, radius: Float) -> SIMD3<Float> {
+                var v = project(p)
+                v.z += side * face * depth * (1 - pow(radius, 8))
+                return v
+            }
+            let pole = mesh.vertex(point(center, radius: 0))
+            var previous: [UInt32] = []
+            for ring in 1...rings {
+                let t = Float(ring) / Float(rings)
+                let current = contour.indices.map { i in
+                    face < 0 && ring == rings ? edge[i]
+                        : mesh.vertex(point(center * (1 - t) + contour[i] * t, radius: t))
+                }
+                for i in 0..<count {
+                    let j = (i + 1) % count
+                    if ring == 1 { mesh.triangle(pole, current[i], current[j], reversed: side * face < 0) }
+                    else { mesh.quad(previous[i], current[i], current[j], previous[j], reversed: side * face < 0) }
+                }
+                if face > 0 && ring == rings { edge = current }
+                previous = current
+            }
+        }
+        return mesh
     }
 
     private static func appendFinMarks(to mesh: inout TaiyakiMesh, configuration c: TaiyakiConfiguration, side: Float) {
@@ -101,12 +131,12 @@ enum SurfacePatternBuilder {
 
     /// Flattened round strokes with closed, rounded ends. All vertices are
     /// projected individually, allowing the marks to follow curved pastry.
-    static func stroke(_ control: [SIMD2<Float>], width: Float, depth: Float, side: Float,
+    static func stroke(_ control: [SIMD2<Float>], width: Float, depth: Float, side: Float, curvedEdge: Bool = false,
                        project: (SIMD2<Float>) -> SIMD3<Float>) -> TaiyakiMesh {
-        let points = TaiyakiCurves.spline(control, subdivisions: 7)
+        let points = TaiyakiCurves.spline(control, subdivisions: curvedEdge ? TaiyakiDesign.patternCurveSubdivisions : 7)
         guard points.count > 1 else { return TaiyakiMesh() }
         var mesh = TaiyakiMesh()
-        let segments = 10
+        let segments = curvedEdge ? TaiyakiDesign.patternCrossSections : 10
         let firstTangent = simd_normalize(points[1] - points[0])
         let lastTangent = simd_normalize(points[points.count - 1] - points[points.count - 2])
         let capAngles: [Float] = [0.15, .pi / 6, .pi / 3]
@@ -124,7 +154,7 @@ enum SurfacePatternBuilder {
                 let angle = Float(j) / Float(segments) * 2 * .pi
                 let xy = p + normal * cos(angle) * width * 0.5 * factor
                 var v = project(xy)
-                v.z += side * (sin(angle) * depth * factor + depth * 0.15)
+                v.z += side * (sin(angle) * depth * factor + depth * TaiyakiDesign.patternSeating)
                 mesh.vertex(v)
             }
         }
@@ -146,7 +176,7 @@ enum SurfacePatternBuilder {
         return mesh
     }
 
-    private static func logo(surface: TaiyakiBodySurface) -> TaiyakiMesh {
+    private static func logo(surface: TaiyakiBodySurface, projection: TaiyakiBodyProjection) -> TaiyakiMesh {
         // Handwritten single-line glyphs avoid font or image assets. The descenders
         // are retained, while every stroke conforms to the pastry surface.
         let glyphs: [[[SIMD2<Float>]]] = [
@@ -166,11 +196,13 @@ enum SurfacePatternBuilder {
         for (i, glyph) in glyphs.enumerated() {
             for path in glyph {
                 let transformed = path.map { p -> SIMD2<Float> in
-                    let u = (p.x + x) * 0.073
-                    return [0.172 + u, (-0.252 + p.y * 0.069 + u * 0.26) * surface.configuration.bodyHeight / 0.67]
+                    let u = (p.x + x) * TaiyakiDesign.logoScale.x
+                    return [TaiyakiDesign.logoOrigin.x + u,
+                            (TaiyakiDesign.logoOrigin.y + p.y * TaiyakiDesign.logoScale.y
+                             + u * TaiyakiDesign.logoSlope) * surface.configuration.bodyHeight / 0.67]
                 }
                 mesh.append(stroke(transformed, width: 0.008, depth: 0.0007, side: 1,
-                                   project: { surface.point($0) }))
+                                   project: { projection.point($0, side: 1) }))
             }
             x += advances[i]
         }

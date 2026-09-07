@@ -27,13 +27,22 @@ public final class SummonBurstController {
     /// エフェクトを読み込んで生成する。
     /// - Parameters:
     ///   - scale: バースト全体の拡大率(素材は約1m基準)。配置先のスケールに合わせて調整する。
+    ///   - intensity: パーティクル発生量(birthRate)の倍率。明るいパススルー環境では
+    ///     加算発光が背景に埋もれるため、1より大きくして密度で明るさを稼ぐ。
     ///   - clipsLowerHalf: true のとき、原点より下(y<0)をオクルーダーで隠して上半分ドームにする。
-    public static func make(scale: Float, clipsLowerHalf: Bool = true) async -> SummonBurstController? {
+    public static func make(
+        scale: Float,
+        intensity: Float = 1,
+        clipsLowerHalf: Bool = true
+    ) async -> SummonBurstController? {
         guard let effect = try? await Entity(named: "Scene", in: Bundle.module) else {
             return nil
         }
         effect.name = "SummonBurstEffect"
         effect.scale = SIMD3<Float>(repeating: scale)
+        if intensity != 1 {
+            forEachEmitter(on: effect) { $0.mainEmitter.birthRate *= intensity }
+        }
 
         let root = Entity()
         root.name = "SummonBurst"

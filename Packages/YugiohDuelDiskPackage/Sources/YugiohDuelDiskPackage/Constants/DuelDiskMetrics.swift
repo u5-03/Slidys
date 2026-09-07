@@ -97,9 +97,16 @@ public enum DuelDiskMetrics {
     public static let fieldHandleRadius: Float = 0.08
     /// ハンドル(角丸パネル)のサイズ (m)。アイコン+ラベルを載せる正面向きのボタン風にする。
     /// (横 x 縦 x 厚み。正面 +Z 面にアイコン/ラベルのテクスチャを貼る)
-    public static let fieldHandleSize = SIMD3<Float>(0.11, 0.11, 0.02)
+    public static let fieldHandleSize = SIMD3<Float>(0.16, 0.16, 0.022)
     /// ハンドルの横並び間隔 (m)。5個を1列に並べる。
-    public static let fieldHandleSpacing: Float = 0.135
+    public static let fieldHandleSpacing: Float = 0.2
+    /// ハンドル面の上向き傾き(ラジアン)。
+    /// ハンドルは手元の低い位置に置くため、面が真横(こちら向き)だと見下ろして操作しづらい。
+    /// ヘッド方向へのヨーに加えて、この角度だけ面を上に倒す(0=真横 / π/2=真上)。
+    /// 既定は約 72°。ほぼ真上を向きつつ、わずかにこちら側へ傾けて文字を読みやすくする。
+    public static let fieldHandleFacePitch: Float = 72.0 * .pi / 180.0
+    /// 「まとめて移動(ハンドル群ごと)」と、フィールド操作ハンドル群の間に置く区切りの余白 (m)。
+    public static let fieldHandleSeparatorGap: Float = 0.12
     /// ハンドルのかたまり(=ハンドルエリア)の初期ワールド位置(プレイヤーのすぐ手前・低め)。
     /// この container を「エリア移動ハンドル」で好きな位置へ動かせる。
     public static let fieldHandleAreaWorldPosition = SIMD3<Float>(0.0, -0.42, -0.5)
@@ -249,8 +256,17 @@ public enum DuelDiskMetrics {
     public static let fieldSummonDelay: TimeInterval = 2.0
 
     /// 召喚バースト(共通コントローラ)の拡大率。
-    /// フィールドは 3x スケールなので、素材(約1m基準)を控えめに縮小して配置する。
-    public static let summonBurstScale: Float = 0.3
+    /// フィールドは 3x スケールなので、素材(約1m基準)を縮小して配置する。
+    public static let summonBurstScale: Float = 0.45
+
+    /// 召喚バーストのパーティクル発生量の倍率。
+    /// 明るい部屋のパススルーでは加算発光が埋もれて「光の球」が視認できないため、
+    /// 密度を上げて明るさを稼ぐ(サンプルビューの暗背景では1のままでよい)。
+    public static let summonBurstIntensity: Float = 2.0
+
+    /// 召喚バーストの発生時間 (秒)。中央発光(GradualFadeIn)が立ち上がる前に
+    /// 終わらないよう、共通コントローラの既定(1.2秒)より長めにする。
+    public static let summonBurstEmitDuration: TimeInterval = 1.8
 
     /// 緋天竜USDZの焼き込みアニメで「揺れ(浮遊)区間」が始まる時刻 (秒)。
     /// Blender タイムライン 1..237F / 30fps のうち、F=116 以降が先頭・末尾同ポーズの完全周期。

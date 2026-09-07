@@ -172,10 +172,19 @@ struct DuelSessionStoreTests {
         #expect(store.hand.count == 1)
     }
 
-    @Test func summonRightHandCardToDiskSlotFillsSlotAndFieldBack() {
+    /// 「手札から選択して右手に持ち替えた」状態を作るヘルパー。
+    /// 配置系APIは選択中のカードだけを受け付けるため、正常系はこの状態から始める。
+    private func makeStoreHoldingSelectedCard(_ card: DuelCard) -> DuelSessionStore {
         let store = DuelSessionStore()
+        store.hand = [card]
+        store.selectHandCard(id: card.id)
+        store.moveSelectedCardToRightHand()
+        return store
+    }
+
+    @Test func summonRightHandCardToDiskSlotFillsSlotAndFieldBack() {
         let card = TestCards.monster()
-        store.rightHandCard = card
+        let store = makeStoreHoldingSelectedCard(card)
         let summoned = store.summonRightHandCardToDiskSlot(index: 2)
         #expect(summoned)
         #expect(store.diskSlots[2]?.id == card.id)
@@ -183,9 +192,18 @@ struct DuelSessionStoreTests {
         #expect(store.rightHandCard == nil)
     }
 
-    @Test func summonRightHandCardToDiskSlotRejectsSpell() {
+    @Test func summonRightHandCardToDiskSlotRejectsDrawnUnselectedCard() {
+        // ドロー直後のカード(未選択)は、置き場に重なっても召喚されない
         let store = DuelSessionStore()
-        store.rightHandCard = TestCards.spell()
+        store.rightHandCard = TestCards.monster()
+        let summoned = store.summonRightHandCardToDiskSlot(index: 2)
+        #expect(!summoned)
+        #expect(store.diskSlots[2] == nil)
+        #expect(store.rightHandCard != nil)
+    }
+
+    @Test func summonRightHandCardToDiskSlotRejectsSpell() {
+        let store = makeStoreHoldingSelectedCard(TestCards.spell())
         let summoned = store.summonRightHandCardToDiskSlot(index: 0)
         #expect(!summoned)
         #expect(store.diskSlots[0] == nil)
@@ -193,9 +211,8 @@ struct DuelSessionStoreTests {
     }
 
     @Test func placeRightHandCardToSpellSlotFillsSlotAndFieldFront() {
-        let store = DuelSessionStore()
         let card = TestCards.spell()
-        store.rightHandCard = card
+        let store = makeStoreHoldingSelectedCard(card)
         let placed = store.placeRightHandCardToSpellSlot(index: 3)
         #expect(placed)
         #expect(store.spellSlots[3]?.id == card.id)
@@ -204,9 +221,18 @@ struct DuelSessionStoreTests {
         #expect(store.rightHandCard == nil)
     }
 
-    @Test func placeRightHandCardToSpellSlotRejectsMonster() {
+    @Test func placeRightHandCardToSpellSlotRejectsDrawnUnselectedCard() {
+        // ドロー直後のカード(未選択)が挿入口に意図せず重なっても設置されない(不具合の再発防止)
         let store = DuelSessionStore()
-        store.rightHandCard = TestCards.monster()
+        store.rightHandCard = TestCards.spell()
+        let placed = store.placeRightHandCardToSpellSlot(index: 3)
+        #expect(!placed)
+        #expect(store.spellSlots[3] == nil)
+        #expect(store.rightHandCard != nil)
+    }
+
+    @Test func placeRightHandCardToSpellSlotRejectsMonster() {
+        let store = makeStoreHoldingSelectedCard(TestCards.monster())
         let placed = store.placeRightHandCardToSpellSlot(index: 0)
         #expect(!placed)
         #expect(store.spellSlots[0] == nil)
@@ -214,9 +240,8 @@ struct DuelSessionStoreTests {
     }
 
     @Test func summonRightHandCardToDiskSlotRejectsOccupiedSlot() {
-        let store = DuelSessionStore()
+        let store = makeStoreHoldingSelectedCard(TestCards.monster())
         store.diskSlots[1] = TestCards.monster()
-        store.rightHandCard = TestCards.monster()
         let summoned = store.summonRightHandCardToDiskSlot(index: 1)
         #expect(!summoned)
         #expect(store.rightHandCard != nil)

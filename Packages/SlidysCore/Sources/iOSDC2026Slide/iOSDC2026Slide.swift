@@ -109,9 +109,18 @@ struct SlideConfiguration: SlideConfigurationProtocol {
 
         // 締め: アニメの次回予告風
         CenterTextSlide(text: "この発表を機に、みなさんも\n何か自分が作ってみたいものを\n作ってもらえるとうれしいです！")
+
+        // One more thing: Swiftだけでたい焼きを生成するおまけデモ
+        CenterTextSlide(text: "おわり")
+        OneMoreThingSlide()
+        CenterTextSlide(text: "最近出たAstraがすごいという\n情報を見たので、\n私のアイコンを作らせてみた")
+        AstraIconCompareSlide()
+        TaiyakiRealityKitDemoSlide()
+        CenterTextSlide(text: "AIすごいな")
+
         CenterTextSlide(text: "おっと、そろそろ時間が")
         CenterTextSlide(text: "今ここで終わったら、残りの\nスライドはどうなっちゃうの？")
-        CenterTextSlide(text: "時間はまだ残ってる。")
+        CenterTextSlide(text: "時間はまだ残ってる。(？)")
         CenterTextSlide(text: "ここを耐えれば、発表は無事終わるんだから！")
         NextEpisodePreviewSlide(mainText: "城⚫︎内死す")
         NextEpisodePreviewSlide(

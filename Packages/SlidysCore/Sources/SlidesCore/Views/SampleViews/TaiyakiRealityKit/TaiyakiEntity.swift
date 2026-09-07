@@ -28,14 +28,15 @@ enum TaiyakiEntity {
         let c = configuration.validated
         let worker = Task.detached(priority: .userInitiated) {
             let surface = TaiyakiBodySurface(c)
+            let body = BodyMeshBuilder.build(surface: surface)
             let mouth = MouthMeshBuilder.build(surface: surface)
-            return Geometry(body: BodyMeshBuilder.build(surface: surface),
+            return Geometry(body: body,
                             tail: TailMeshBuilder.build(c),
                             dorsal: FinMeshBuilder.build(FinMeshBuilder.dorsal(c)),
                             ventral: FinMeshBuilder.build(FinMeshBuilder.ventral(c)),
                             crumb: mouth.crumb, interior: mouth.interior,
                             beans: FillingBuilder.build(surface: surface),
-                            patterns: SurfacePatternBuilder.build(surface: surface),
+                            patterns: SurfacePatternBuilder.build(surface: surface, bodyMesh: body),
                             pixels: TaiyakiMaterialFactory.pixels(surface: surface))
         }
         let geometry = await withTaskCancellationHandler {
@@ -67,16 +68,9 @@ enum TaiyakiEntity {
             try add(mesh, name: "Beans_\(i)", material: TaiyakiMaterialFactory.bean(i), parent: filling)
         }
         try add(geometry.patterns.mold, name: "SurfacePatterns", material: TaiyakiMaterialFactory.mold(c))
-        try add(geometry.patterns.eyes, name: "Eye", material: TaiyakiMaterialFactory.eye)
+        try add(geometry.patterns.eyes, name: "Eye", material: TaiyakiMaterialFactory.mold(c))
         try add(geometry.patterns.logo, name: "Logo", material: TaiyakiMaterialFactory.logo)
         root.scale = .init(repeating: c.bodyLength)
-        // Temporary inspection transform; removed after multi-angle visual review.
-        if let degrees = ProcessInfo.processInfo.environment["TAIYAKI_INSPECTION_YAW"].flatMap(Float.init) {
-            root.orientation = simd_quatf(angle: degrees * .pi / 180, axis: [0, 1, 0])
-        }
-        if let degrees = ProcessInfo.processInfo.environment["TAIYAKI_INSPECTION_PITCH"].flatMap(Float.init) {
-            root.orientation *= simd_quatf(angle: degrees * .pi / 180, axis: [1, 0, 0])
-        }
         let bounds = root.visualBounds(relativeTo: nil)
         root.position = -bounds.center
         // A single inexpensive input volume; no per-bean collision shapes.

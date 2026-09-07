@@ -56,7 +56,7 @@ struct TrackingGestureListSlide: View {
     var body: some View {
         HeaderSlide("ジェスチャーやトラッキングまわりの構成") {
             Item("検知の基礎はHandGestureKit: 関節の位置や指の形などを指定する", keywords: [], accessory: .number(1))
-            Item("今回載せたのは、手首装着のトラッキングとジェスチャー:\n3本指で手札を表示 / 2本指ドローで選択中のカード保持など", keywords: [], accessory: .number(2))
+            Item("今回載せたのは、手首装着のトラッキング、ジェスチャー\n(3本指で手札を表示 / 2本指ドローで選択中のカード保持)など", keywords: [], accessory: .number(2))
             Item("ディスクの位置は手首の座標にディスクのロケーターの位置を合わせて配置", keywords: [], accessory: .number(3))
         }
     }

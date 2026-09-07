@@ -117,3 +117,65 @@ enum BodyMeshBuilder {
         return mesh
     }
 }
+
+/// A small spatial index of the actual tessellated shell. Near the rolled edge,
+/// the analytic dome and its triangles differ enough to swallow shallow marks.
+/// Barycentric projection keeps the embossing seated on the rendered surface.
+struct TaiyakiBodyProjection {
+    private let mesh: TaiyakiMesh
+    private let surface: TaiyakiBodySurface
+    private let minimum: SIMD2<Float>
+    private let extent: SIMD2<Float>
+    private let resolution = 32
+    private var cells: [[Int]]
+
+    init(mesh: TaiyakiMesh, surface: TaiyakiBodySurface) {
+        self.mesh = mesh
+        self.surface = surface
+        var lower = SIMD2<Float>(repeating: .greatestFiniteMagnitude)
+        var upper = SIMD2<Float>(repeating: -.greatestFiniteMagnitude)
+        for p in mesh.positions {
+            lower = simd_min(lower, [p.x, p.y])
+            upper = simd_max(upper, [p.x, p.y])
+        }
+        minimum = lower
+        extent = upper - lower
+        cells = Array(repeating: [], count: resolution * resolution)
+        for i in stride(from: 0, to: mesh.triangles.count, by: 3) {
+            let a = mesh.positions[Int(mesh.triangles[i])]
+            let b = mesh.positions[Int(mesh.triangles[i + 1])]
+            let c = mesh.positions[Int(mesh.triangles[i + 2])]
+            let lo = grid(simd_min([a.x, a.y], simd_min([b.x, b.y], [c.x, c.y])))
+            let hi = grid(simd_max([a.x, a.y], simd_max([b.x, b.y], [c.x, c.y])))
+            for y in lo.y...hi.y {
+                for x in lo.x...hi.x { cells[y * resolution + x].append(i) }
+            }
+        }
+    }
+
+    func point(_ p: SIMD2<Float>, side: Float) -> SIMD3<Float> {
+        let cell = grid(p)
+        func cross(_ a: SIMD2<Float>, _ b: SIMD2<Float>) -> Float { a.x * b.y - a.y * b.x }
+        for i in cells[cell.y * resolution + cell.x] {
+            let a = mesh.positions[Int(mesh.triangles[i])]
+            let b = mesh.positions[Int(mesh.triangles[i + 1])]
+            let c = mesh.positions[Int(mesh.triangles[i + 2])]
+            let ab = SIMD2<Float>(b.x - a.x, b.y - a.y)
+            let ac = SIMD2<Float>(c.x - a.x, c.y - a.y)
+            let ap = p - SIMD2<Float>(a.x, a.y)
+            let determinant = cross(ab, ac)
+            guard determinant * side > 1e-12 else { continue }
+            let u = cross(ap, ac) / determinant
+            let v = cross(ab, ap) / determinant
+            if u >= -1e-5, v >= -1e-5, u + v <= 1.00001 {
+                return [p.x, p.y, a.z + (b.z - a.z) * u + (c.z - a.z) * v]
+            }
+        }
+        return surface.point(p, side: side)
+    }
+
+    private func grid(_ p: SIMD2<Float>) -> SIMD2<Int> {
+        let uv = simd_clamp((p - minimum) / extent, .zero, .one) * Float(resolution - 1)
+        return [Int(uv.x), Int(uv.y)]
+    }
+}

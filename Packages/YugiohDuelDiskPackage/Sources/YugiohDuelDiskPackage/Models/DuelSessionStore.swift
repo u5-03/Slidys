@@ -161,12 +161,15 @@ public final class DuelSessionStore: @unchecked Sendable {
 
     /// 右手に持っているカードを、ディスクの空き召喚スロットに「召喚」する。
     /// (右手カードをカード置き場に重ねたときに呼ぶ)
+    /// - 手札から選択して持ち替えたカード(選択中)だけが対象。ドロー直後の未選択カードは、
+    ///   置き場にたまたま重なっても配置しない(まず扇に取り込み、選択してから置く)。
     /// - 右手カードがモンスターでない/スロットが埋まっている場合は拒否。
     /// - placeSelectedCardToDiskSlot と同様に fieldBackRow にも反映する。
     @discardableResult
     public func summonRightHandCardToDiskSlot(index: Int) -> Bool {
         guard (0..<Self.diskSlotCount).contains(index) else { return false }
         guard let card = rightHandCard, card.kind == .monster else { return false }
+        guard selectedHandCardId == card.id else { return false } // ドロー直後(未選択)は配置不可
         guard diskSlots[index] == nil else { return false }
         diskSlots[index] = card
         fieldBackRow[index] = card
@@ -179,10 +182,13 @@ public final class DuelSessionStore: @unchecked Sendable {
 
     /// 右手に持っている魔法・トラップカードを、ディスクの空き挿入口に設置する。
     /// (右手カードを挿入口の空間に重ねたときに呼ぶ)
+    /// - 手札から選択して持ち替えたカード(選択中)だけが対象。ドロー直後の未選択カードが
+    ///   挿入口に意図せず重なって設置される不具合を防ぐ。
     @discardableResult
     public func placeRightHandCardToSpellSlot(index: Int) -> Bool {
         guard (0..<Self.diskSlotCount).contains(index) else { return false }
         guard let card = rightHandCard, card.isSpellOrTrap else { return false }
+        guard selectedHandCardId == card.id else { return false } // ドロー直後(未選択)は配置不可
         guard spellSlots[index] == nil else { return false }
         spellSlots[index] = card
         fieldFrontRow[index] = card

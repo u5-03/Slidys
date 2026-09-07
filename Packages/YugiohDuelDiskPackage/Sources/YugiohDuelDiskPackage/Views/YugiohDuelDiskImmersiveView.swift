@@ -1142,48 +1142,74 @@ private extension YugiohDuelDiskImmersiveView {
         rootEntity.addChild(area)
         fieldHandleArea = area
 
-        // 左→右の並び順。中央(0)を基準に fieldHandleSpacing 間隔で配置。
-        let specs: [(kind: FieldHandleComponent.Kind, color: UIColor, name: String)] = [
+        // 左端に「まとめて移動(=このハンドル群ごと動かす)」を独立配置し、区切り(セパレータ)を挟んで
+        // その右にフィールド操作ハンドル群(移動/回転/サイズ/正面へ)を並べる。
+        // 「まとめて」だけ操作対象が違う(ハンドル自身 vs フィールド)ので視覚的に分ける。
+        let S = DuelDiskMetrics.fieldHandleSpacing
+        let G = DuelDiskMetrics.fieldHandleSeparatorGap
+        let group: [(kind: FieldHandleComponent.Kind, color: UIColor, name: String)] = [
             (.move, .systemCyan, "FieldMoveHandle"),
             (.rotate, .systemOrange, "FieldRotateHandle"),
             (.scale, .systemPurple, "FieldScaleHandle"),
-            (.area, .systemGreen, "FieldAreaHandle"),
             (.recenter, .systemYellow, "FieldRecenterHandle"),
         ]
-        let spacing = DuelDiskMetrics.fieldHandleSpacing
-        let startX = -spacing * Float(specs.count - 1) / 2
-        for (i, spec) in specs.enumerated() {
+        // X 座標(未センタリング): area=0、群は S+G から S 間隔。全体を中央寄せする。
+        let areaX: Float = 0
+        let groupStartX = S + G
+        let lastX = groupStartX + S * Float(group.count - 1)
+        let center = (areaX + lastX) / 2
+        func x(_ raw: Float) -> Float { raw - center }
+
+        // まとめて(左端・緑)
+        let areaHandle = makeFieldHandle(kind: .area, color: .systemGreen, name: "FieldAreaHandle")
+        areaHandle.position = SIMD3<Float>(x(areaX), 0, 0)
+        area.addChild(areaHandle)
+        fieldAreaHandle = areaHandle
+
+        // 区切り(縦のセパレータ)= まとめて と 群 の中間。
+        let separator = makeHandleSeparator()
+        separator.position = SIMD3<Float>(x((areaX + groupStartX) / 2), 0, 0)
+        area.addChild(separator)
+
+        // フィールド操作ハンドル群
+        for (i, spec) in group.enumerated() {
             let handle = makeFieldHandle(kind: spec.kind, color: spec.color, name: spec.name)
-            handle.position = SIMD3<Float>(startX + spacing * Float(i), 0, 0)
+            handle.position = SIMD3<Float>(x(groupStartX + S * Float(i)), 0, 0)
             area.addChild(handle)
             switch spec.kind {
             case .move: fieldMoveHandle = handle
             case .rotate: fieldRotateHandle = handle
             case .scale: fieldScaleHandle = handle
-            case .area: fieldAreaHandle = handle
             case .recenter: fieldRecenterHandle = handle
+            case .area: break
             }
         }
 
         // 生成直後に一度、正面(ヘッド)を向かせる。以降は毎tickの billboard 更新で追従。
         updateFieldHandleBillboard()
-        DuelLog.event("FieldHandlesReady", "count=\(specs.count) areaWorld=\(shortVector(area.position(relativeTo: nil)))")
+        DuelLog.event("FieldHandlesReady", "count=\(group.count + 1) areaWorld=\(shortVector(area.position(relativeTo: nil)))")
     }
 
-    /// 全ハンドルを常に Vision Pro(ヘッド)の方へ向ける(ヨーのみ)。文字/アイコン面が常にこちらを向く。
+    /// 全ハンドルを常に Vision Pro(ヘッド)の方へヨーで向け、さらに面を上へ倒す。
+    /// ハンドルは手元の低い位置に置くため、面が真横(こちら向き)だと見下ろして操作しづらい。
+    /// ヘッド方向へのヨーに加えて `fieldHandleFacePitch` だけ面を上に傾け、上から操作しやすくする。
     /// 各ハンドルを個別に「自分の原点まわり」で回すので、ワールド位置は変わらない。
     func updateFieldHandleBillboard() {
         guard let head = menuHeadAnchor else { return }
         let headWorld = head.position(relativeTo: nil)
         guard simd_length(headWorld) > 0.05 else { return }
+        // ローカル X 軸まわりに面を上へ倒す(-Pitch で +Z 面が上向きになる)。
+        let pitch = simd_quatf(angle: -DuelDiskMetrics.fieldHandleFacePitch, axis: SIMD3<Float>(1, 0, 0))
         let handles = [fieldMoveHandle, fieldRotateHandle, fieldScaleHandle, fieldAreaHandle, fieldRecenterHandle]
         for handle in handles.compactMap({ $0 }) {
             let hp = handle.position(relativeTo: nil)
             let toHead = headWorld - hp
             let flat = SIMD3<Float>(toHead.x, 0, toHead.z)
             guard simd_length(flat) > 0.0001 else { continue }
-            let yaw = atan2(flat.x, flat.z)  // 正面(+Z面)をヘッドへ向ける
-            handle.setOrientation(simd_quatf(angle: yaw, axis: SIMD3<Float>(0, 1, 0)), relativeTo: nil)
+            let yaw = atan2(flat.x, flat.z)  // まず +Z 面をヘッド方向へ向ける
+            let yawQuat = simd_quatf(angle: yaw, axis: SIMD3<Float>(0, 1, 0))
+            // ヨー(ワールド)→ ピッチ(ローカルX)の順に合成し、面を上へ倒す。
+            handle.setOrientation(yawQuat * pitch, relativeTo: nil)
         }
     }
 
@@ -1226,6 +1252,20 @@ private extension YugiohDuelDiskImmersiveView {
         face.position = SIMD3<Float>(0, 0, size.z / 2 + 0.001)  // 正面(+Z)手前
         panel.addChild(face)
         return panel
+    }
+
+    /// 「まとめて」と操作ハンドル群の間に置く縦の区切り(細い半透明の板)。
+    func makeHandleSeparator() -> ModelEntity {
+        let h = DuelDiskMetrics.fieldHandleSize.y * 1.05
+        var mat = UnlitMaterial()
+        mat.color = .init(tint: UIColor.white.withAlphaComponent(0.35))
+        mat.blending = .transparent(opacity: .init(floatLiteral: 0.35))
+        let bar = ModelEntity(
+            mesh: .generateBox(size: SIMD3<Float>(0.006, h, 0.006), cornerRadius: 0.003),
+            materials: [mat]
+        )
+        bar.name = "FieldHandleSeparator"
+        return bar
     }
 
     /// ハンドル正面テクスチャ(SFシンボル + ラベル)を一度だけ生成してキャッシュする。
@@ -1770,6 +1810,15 @@ private extension YugiohDuelDiskImmersiveView {
         }
 
         if let locationComp = target?.components[PlacedCardLocationComponent.self] {
+            // 召喚エフェクト再生中の誤爆ガード:
+            // モンスター召喚直後、演出中に同じスロットのカードをタップ扱いしてしまうと、
+            // 「このカードを消しますか?」のアラートが意図せず出てしまう。
+            // 該当スロットの召喚エフェクトが終わるまでは、配置カードのタップを無視する。
+            if case .diskSlot(let i) = locationComp.location,
+               isDiskSummonEffectActive(forSlot: i) {
+                DuelLog.place("placedTapBlocked", "slot=\(i) reason=summonEffectPlaying")
+                return
+            }
             DuelLog.event("PlacedCardTapped", "location=\(locationComp.location)")
             sessionStore.tappedPlacedCardContext = mapToContext(locationComp.location)
             return
@@ -2237,10 +2286,12 @@ private extension YugiohDuelDiskImmersiveView {
     /// 右手に持っているカードがディスクの置き場/挿入口に重なったら設置(召喚)する。
     /// - モンスター: カード置き場(diskSlot)に重ねると召喚。
     /// - 魔法・トラップ: 挿入口(spellSlot)の空間に重ねると設置。
-    /// (右手カード = デッキドロー or 選択カードの持ち替え、どちらでも対象)
+    /// 対象は「手札から選択して右手に持ち替えたカード」だけ。ドロー直後の未選択カードは、
+    /// 置き場に意図せず重なっても配置しない(まず扇に取り込んで選択するのが正規フロー)。
     func updateRightHandCardSummonOverlap() {
         guard let card = sessionStore.rightHandCard,
               let cardEntity = rightHandCardEntity else { return }
+        guard sessionStore.selectedHandCardId == card.id else { return }
         let cardPos = cardEntity.position(relativeTo: nil)
 
         if card.kind == .monster {
@@ -2381,6 +2432,12 @@ private extension YugiohDuelDiskImmersiveView {
         let position = anchor.position(relativeTo: nil)
         guard position != .zero else { return nil }
         return position
+    }
+
+    /// 指定スロットで召喚エフェクトが再生中かどうか。
+    /// 再生中は配置カードのタップ(=削除アラート)を抑止して、召喚直後の誤爆を防ぐ。
+    func isDiskSummonEffectActive(forSlot slotIndex: Int) -> Bool {
+        activeDiskSummonEffects.values.contains { $0.slotIndex == slotIndex }
     }
 
     func triggerDiskSummonEffect(slotIndex: Int, card: DuelCard) {
@@ -2873,7 +2930,10 @@ private extension YugiohDuelDiskImmersiveView {
 #if canImport(SummonEffectAssets)
         // 共通コントローラ SummonBurstController を使用(緋天竜と同一実装)。
         // フィールドは 3x スケールなので、素材は控えめに縮小して配置する。
-        guard let burst = await SummonBurstController.make(scale: DuelDiskMetrics.summonBurstScale) else {
+        guard let burst = await SummonBurstController.make(
+            scale: DuelDiskMetrics.summonBurstScale,
+            intensity: DuelDiskMetrics.summonBurstIntensity
+        ) else {
             DuelLog.warning("Failed to load summon burst")
             return
         }
@@ -2881,7 +2941,7 @@ private extension YugiohDuelDiskImmersiveView {
         burst.root.position = position
         field.addChild(burst.root)
         fieldSummonEffects[col] = burst
-        burst.fire()
+        burst.fire(emitDuration: DuelDiskMetrics.summonBurstEmitDuration)
         DuelLog.event("SummonEffectStarted", "col=\(col) position=\(shortVector(position))")
 #endif
     }

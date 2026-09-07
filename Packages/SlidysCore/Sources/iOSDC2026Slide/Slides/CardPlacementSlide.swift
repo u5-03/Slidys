@@ -14,11 +14,11 @@ struct CardPlacementSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("カード配置: 配置先の判定") {
+        HeaderSlide("カード配置・配置先の判定") {
             HStack(alignment: .top, spacing: 60) {
                 VStack(alignment: .leading, spacing: 44) {
                     Item("標準の視線フォーカス + タップ or カードを召喚エリアに重ねることで配置", keywords: [], accessory: .number(1))
-                    Item("どのスロットかは自作Componentを持つかどうかで判定(Entity名での文字列比較はしない)", keywords: ["Component"], accessory: .number(2))
+                    Item("どのスロットかはカスタムのComponentを持つかどうかで判定(Entity名での文字列比較はしない)", keywords: ["Component"], accessory: .number(2))
                     Item("持っているカードの種類で、置けるスロットだけハイライト", keywords: ["置けるスロットだけ"], accessory: .number(3))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

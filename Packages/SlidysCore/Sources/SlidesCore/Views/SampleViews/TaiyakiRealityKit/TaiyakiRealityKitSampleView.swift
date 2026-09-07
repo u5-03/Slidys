@@ -1,8 +1,19 @@
 import RealityKit
 import SwiftUI
 import simd
+import Sugiy
 
-struct TaiyakiRealityKitSampleView: View {
+public struct TaiyakiRealityKitSampleView: View {
+    /// 表示するたい焼きモデルの種類。
+    /// ビューア(背景・ライト・カメラ・操作)は共通で、モデルの出どころだけを切り替える。
+    public enum ModelSource {
+        /// Swiftコードで手続き的に生成したたい焼き(Astra製サンプル)
+        case procedural
+        /// Blenderでモデリングした Taiyaki.usdz(Sugiyパッケージ)
+        case blenderUSDZ
+    }
+
+    @Environment(\.isSlideThumbnail) private var isSlideThumbnail
     @State private var pivot: Entity?
     @State private var camera: PerspectiveCamera?
     @State private var rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
@@ -14,60 +25,132 @@ struct TaiyakiRealityKitSampleView: View {
     @State private var errorMessage: String?
     @State private var selectedAngle = TaiyakiInspectionAngle.front
 
-    var body: some View {
+    /// 表示するモデル(既定はSwift手続き生成)
+    private let source: ModelSource
+    /// タイトル・操作ヒント・メッシュ統計などの補足テキストを表示するか(スライド埋め込み時はfalse)
+    private let showsInfoTexts: Bool
+    /// コントロール(表示方向タブ・リセットボタン)の文字/余白の倍率
+    private let fontScale: CGFloat
+    /// オブジェクトの表示倍率(カメラ距離を縮めて大きく見せる)
+    private let modelScale: Float
+
+    private let textColor = Color(red: 0.25, green: 0.21, blue: 0.17)
+
+    public init(
+        source: ModelSource = .procedural,
+        showsInfoTexts: Bool = true,
+        fontScale: CGFloat = 1,
+        modelScale: Float = 1
+    ) {
+        self.source = source
+        self.showsInfoTexts = showsInfoTexts
+        self.fontScale = fontScale
+        self.modelScale = modelScale
+    }
+
+    public var body: some View {
+        // スライド一覧のサムネイルではRealityViewを起動せず、プレースホルダーだけ出す
+        if isSlideThumbnail {
+            ZStack {
+                Color.black
+                Image(systemName: "cube.transparent")
+                    .font(.system(size: 160, weight: .light))
+                    .foregroundStyle(.gray)
+            }
+        } else {
+            mainContent
+        }
+    }
+
+    private var mainContent: some View {
+        // RealityViewを全面に敷き、コントロールは下端のオーバーレイにする
+        // (コントロール分の高さもオブジェクトの表示領域として使えるようにする)
         GeometryReader { geometry in
-            VStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("Procedural Taiyaki")
-                        .font(.title2.weight(.semibold))
-                    Text("たい焼きのかたちを、Swiftから。")
-                        .font(.subheadline).foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 24).padding(.top, 28).padding(.bottom, 8)
-
-                GeometryReader { viewport in
-                    realityView(size: viewport.size)
-                        .overlay {
-                            if let errorMessage {
-                                ContentUnavailableView("生成できませんでした", systemImage: "exclamationmark.triangle",
-                                                       description: Text(errorMessage))
-                            } else if pivot == nil {
-                                ProgressView("たい焼きを焼いています…")
-                            }
-                        }
-                        .onChange(of: viewport.size) { _, size in fitCamera(size) }
-                }
-
-                VStack(spacing: 17) {
-                    Text("ドラッグで回転 · ピンチで拡大")
-                        .font(.footnote).foregroundStyle(.secondary)
-                    Picker("表示方向", selection: $selectedAngle) {
-                        ForEach(TaiyakiInspectionAngle.allCases) { angle in
-                            Text(angle.rawValue).tag(angle)
-                        }
+            realityView(size: geometry.size)
+                .overlay {
+                    if let errorMessage {
+                        ContentUnavailableView("生成できませんでした", systemImage: "exclamationmark.triangle",
+                                               description: Text(errorMessage))
+                    } else if pivot == nil {
+                        ProgressView("たい焼きを焼いています…")
                     }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("taiyaki.inspectionAngle")
-                    HStack {
+                }
+                .overlay(alignment: .topLeading) {
+                    if showsInfoTexts {
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Procedural Taiyaki")
+                                .font(.title2.weight(.semibold))
+                            Text("たい焼きのかたちを、Swiftから。")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        .padding(.horizontal, 24).padding(.top, 28)
+                    }
+                }
+                .overlay(alignment: .bottom) {
+                    VStack(spacing: 14 * fontScale) {
+                        if showsInfoTexts {
+                            Text("ドラッグで回転 · ピンチで拡大")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                        anglePicker
+                    }
+                    .padding(.bottom, 20 * fontScale)
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    Button {
+                        reset()
+                    } label: {
+                        Label("正面にリセット", systemImage: "arrow.counterclockwise")
+                            .font(.system(size: 15 * fontScale, weight: .medium))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("taiyaki.reset")
+                    .padding(.trailing, 24).padding(.bottom, 22 * fontScale)
+                }
+                .overlay(alignment: .bottomLeading) {
+                    if showsInfoTexts {
                         Text(statistics ?? "メッシュを生成中")
                             .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                        Spacer()
-                        Button("正面にリセット", systemImage: "arrow.counterclockwise") { reset() }
-                            .font(.subheadline.weight(.medium))
-                            .accessibilityIdentifier("taiyaki.reset")
+                            .padding(.leading, 24).padding(.bottom, 24)
                     }
                 }
-                .padding(.horizontal, 24).padding(.top, 8).padding(.bottom, 24)
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .background(Color(red: 0.91, green: 0.90, blue: 0.87).ignoresSafeArea())
-            .foregroundStyle(Color(red: 0.25, green: 0.21, blue: 0.17))
+                .onChange(of: geometry.size) { _, size in fitCamera(size) }
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .background(Color(red: 0.91, green: 0.90, blue: 0.87).ignoresSafeArea())
+                .foregroundStyle(textColor)
         }
         .onChange(of: selectedAngle) { _, angle in
             rotation = angle.rotation
             pivot?.orientation = rotation
         }
+    }
+
+    /// 標準のsegmented Pickerはフォント指定で大きくできないため、
+    /// スライド埋め込み時にも拡大できるカプセル型のカスタムタブにしている。
+    private var anglePicker: some View {
+        HStack(spacing: 14 * fontScale) {
+            Text("表示方向")
+                .font(.system(size: 13 * fontScale, weight: .semibold))
+                .foregroundStyle(textColor.opacity(0.7))
+            HStack(spacing: 8 * fontScale) {
+                ForEach(TaiyakiInspectionAngle.allCases) { angle in
+                    Button {
+                        selectedAngle = angle
+                    } label: {
+                        Text(angle.rawValue)
+                            .font(.system(size: 16 * fontScale, weight: .semibold))
+                            .foregroundStyle(selectedAngle == angle ? Color.white : textColor)
+                            .padding(.horizontal, 16 * fontScale)
+                            .padding(.vertical, 7 * fontScale)
+                            .background(
+                                Capsule().fill(selectedAngle == angle ? textColor : textColor.opacity(0.12))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .accessibilityIdentifier("taiyaki.inspectionAngle")
     }
 
     private func realityView(size: CGSize) -> some View {
@@ -90,16 +173,16 @@ struct TaiyakiRealityKitSampleView: View {
                 content.add(light)
             }
             do {
-                let result = try await TaiyakiEntity.make()
+                let loaded = try await loadModel()
                 try Task.checkCancellation()
                 let newPivot = Entity()
                 newPivot.name = "TaiyakiInspectionPivot"
-                newPivot.addChild(result.root)
+                newPivot.addChild(loaded.root)
                 newPivot.orientation = rotation
                 content.add(newPivot)
                 pivot = newPivot
-                radius = simd_length(result.bounds.extents) * 0.5
-                statistics = "\(result.triangleCount.formatted()) tris · \(result.modelCount) meshes"
+                radius = simd_length(loaded.boundsExtents) * 0.5
+                statistics = loaded.statistics
                 fitCamera(size)
             } catch is CancellationError {
                 // The user closed the sample while it was being generated.
@@ -123,11 +206,39 @@ struct TaiyakiRealityKitSampleView: View {
         .accessibilityLabel("手続き的に生成した3Dたい焼き")
     }
 
+    /// source に応じてたい焼きモデルを読み込む(どちらも原点中心に整えて返す)。
+    private func loadModel() async throws -> (root: Entity, boundsExtents: SIMD3<Float>, statistics: String?) {
+        switch source {
+        case .procedural:
+            let result = try await TaiyakiEntity.make()
+            return (
+                result.root,
+                result.bounds.extents,
+                "\(result.triangleCount.formatted()) tris · \(result.modelCount) meshes"
+            )
+        case .blenderUSDZ:
+            let scene = try await Entity(named: "Taiyaki", in: sugiyBundle)
+            // 具材は複数内包されているため、あんこだけを表示する
+            for filling in TaiyakiFilling.allCases {
+                scene.findEntity(named: filling.rawValue)?.isEnabled = (filling == .redBeans)
+            }
+            let bounds = scene.visualBounds(relativeTo: nil)
+            scene.position = -bounds.center
+            scene.generateCollisionShapes(recursive: true)
+            scene.components.set(InputTargetComponent())
+            return (scene, bounds.extents, nil)
+        }
+    }
+
     private func fitCamera(_ size: CGSize) {
         guard size.width > 0, size.height > 0 else { return }
         let aspect = Float(size.width / size.height)
         let halfAngle = atan(tan(Float.pi / 10) * min(1, aspect))
-        camera?.position = [0, 0, radius / sin(halfAngle) * 1.10]
+        let distance = radius / sin(halfAngle) * 1.10 / modelScale
+        // 下端のコントロールに被らないよう、カメラを少し下げてオブジェクトを画面のやや上に寄せる
+        // (画面半分の高さに対する割合。垂直半画角はfov 36°の半分 = π/10)
+        let verticalShift = distance * tan(Float.pi / 10) * 0.18
+        camera?.position = [0, -verticalShift, distance]
     }
 
     private func reset() {
@@ -158,4 +269,3 @@ private enum TaiyakiInspectionAngle: String, CaseIterable, Identifiable {
 #Preview {
     TaiyakiRealityKitSampleView()
 }
-

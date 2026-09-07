@@ -17,8 +17,8 @@ struct ModelPipelineSlide: View {
         HeaderSlide("3Dモデルがアプリに表示されるまで") {
             Item("Blenderでゼロからモデリング", keywords: ["Blender"], accessory: .number(1))
             Item("USDZに書き出す", keywords: ["USDZ"], accessory: .number(2))
-            Item("Reality Composer Pro(以下RCP)のパッケージ形式(.rkassets)に配置し、ビルド時に.realityへ", keywords: [".rkassets"], accessory: .number(3))
-            Item("RealityKitでそのモデルを読み込む。タップ判定などはコードで付与", keywords: ["コードで付与"], accessory: .number(4))
+            Item("Reality Composer Pro(以下RCP)の.rkassetsフォルダに配置。ビルド時にXcodeのCLIツールが.realityへ変換", keywords: [".rkassetsフォルダ"], accessory: .number(3))
+            Item("RealityKitでそのファイルを読み込む。タップ判定などはコードで付与", keywords: ["コードで付与"], accessory: .number(4))
         }
     }
 }
