@@ -96,16 +96,20 @@ public struct TaiyakiRealityKitSampleView: View {
                     }
                     .padding(.bottom, 20 * fontScale)
                 }
-                .overlay(alignment: .bottomTrailing) {
+                .overlay(alignment: .topTrailing) {
+                    // 右上に配置(下端の表示方向タブと重ならないようにする)
                     Button {
                         reset()
                     } label: {
                         Label("正面にリセット", systemImage: "arrow.counterclockwise")
-                            .font(.system(size: 15 * fontScale, weight: .medium))
+                            .font(.system(size: 14 * fontScale, weight: .semibold))
+                            .padding(.horizontal, 14 * fontScale)
+                            .padding(.vertical, 7 * fontScale)
+                            .background(Capsule().fill(textColor.opacity(0.10)))
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("taiyaki.reset")
-                    .padding(.trailing, 24).padding(.bottom, 22 * fontScale)
+                    .padding(.top, 20).padding(.trailing, 20)
                 }
                 .overlay(alignment: .bottomLeading) {
                     if showsInfoTexts {

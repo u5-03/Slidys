@@ -50,7 +50,14 @@ enum TaiyakiEntity {
         root.name = "TaiyakiEntity"
         var triangleCount = 0, modelCount = 0
         func add(_ mesh: TaiyakiMesh, name: String, material: PhysicallyBasedMaterial, parent: Entity? = nil) throws {
-            let model = ModelEntity(mesh: try mesh.resource(name: name), materials: [material])
+            // Apply the same smooth head extension to shell and facial marks;
+            // normals are regenerated from the deformed vertices on upload.
+            var shaped = mesh
+            shaped.positions = mesh.positions.map { p in
+                let weight = max(0, -p.x / 0.52)
+                return SIMD3<Float>(p.x - c.headExtension * weight * weight, p.y, p.z)
+            }
+            let model = ModelEntity(mesh: try shaped.resource(name: name), materials: [material])
             model.name = name
             (parent ?? root).addChild(model)
             triangleCount += mesh.triangles.count / 3

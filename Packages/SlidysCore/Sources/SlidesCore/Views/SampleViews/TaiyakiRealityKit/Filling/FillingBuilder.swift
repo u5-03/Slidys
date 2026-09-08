@@ -10,17 +10,27 @@ enum FillingBuilder {
         var random = TaiyakiRandom(state: c.seed)
         let rows = Int(23 * c.fillingAmount)
         let halfHeight = TaiyakiDesign.cutHalfHeight * c.bodyHeight / 0.67 - 0.035
+        let inner = MouthMeshBuilder.boundary(configuration: c, count: c.contourSegments,
+                                               inset: TaiyakiDesign.crumbWidth)
         for row in 0..<rows {
             let t = (Float(row) + 0.5) / Float(rows) * 2 - 1
             let y = TaiyakiDesign.cutCenter.y + t * halfHeight
-            let width = (c.mouthOpening * 0.5 - 0.029) * pow(max(0, 1 - pow(abs(t), 4)), 0.5)
-            for column in 0..<3 {
-                let x = TaiyakiDesign.cutCenter.x + 0.020 * t
-                    + (Float(column) - 1) * width * 0.76 + random.signed() * 0.006
-                let p = SIMD2<Float>(x, y + random.signed() * 0.006)
+            guard let span = MouthMeshBuilder.horizontalSpan(at: y, contour: inner) else { continue }
+            let columns = max(1, min(4, Int((span.upperBound - span.lowerBound) / 0.030)))
+            for column in 0..<columns {
+                let py = y + random.signed() * 0.003
+                guard let local = MouthMeshBuilder.horizontalSpan(at: py, contour: inner) else { continue }
+                let halfWidth = (local.upperBound - local.lowerBound) * 0.5
+                let size = min(1, max(0.15, (halfWidth - 0.003) / 0.026))
                 let radius = SIMD3<Float>(0.014 + random.unit() * 0.004,
                                           0.018 + random.unit() * 0.007,
-                                          0.012 + random.unit() * 0.005)
+                                          0.012 + random.unit() * 0.005) * size
+                let available = max(0, halfWidth - max(radius.x, radius.y) - 0.003)
+                let u = columns == 1 ? Float(0) : Float(column) / Float(columns - 1) * 2 - 1
+                let jitter = random.signed() * min(0.002, available * 0.1)
+                let x = (local.lowerBound + local.upperBound) * 0.5
+                    + max(-available, min(available, u * available + jitter))
+                let p = SIMD2<Float>(x, py)
                 let rotation = simd_quatf(angle: random.signed() * .pi, axis: [0, 0, 1])
                     * simd_quatf(angle: random.signed() * 0.6, axis: [1, 0, 0])
                 let z = surface.height(p) - 0.019 + random.signed() * 0.006

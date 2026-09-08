@@ -10,13 +10,30 @@ enum MouthMeshBuilder {
             let x = cos(angle), y = sin(angle)
             let scallop = 1 + TaiyakiDesign.cutScallop * sin(13 * angle)
                 + TaiyakiDesign.cutFineScallop * sin(21 * angle + 1)
-            let halfWidth = c.mouthOpening * 0.5 - inset
             let halfHeight = TaiyakiDesign.cutHalfHeight * c.bodyHeight / 0.67 - inset
             let sx = (x < 0 ? -1 as Float : 1) * pow(abs(x), 0.76)
             let sy = (y < 0 ? -1 as Float : 1) * pow(abs(y), 0.90)
-            return TaiyakiDesign.cutCenter + SIMD2<Float>(sx * halfWidth * scallop + 0.020 * sy,
+            let waist = 1 - c.mouthWaist * exp(-pow((sy + 0.48) / 0.30, 2))
+            let halfWidth = max(0.001, c.mouthOpening * 0.5 * (1 + c.mouthTaper * sy) * waist - inset)
+            let bend = c.mouthTilt * sy + c.mouthCurve * (1 - sy * sy)
+            // Broad broken edges, rather than an evenly tapered slit.
+            let brokenEdge = c.mouthEdgeVariation * sin(sy * 15 + (x < 0 ? 0 : 1.7)) * abs(sx)
+            return TaiyakiDesign.cutCenter + SIMD2<Float>(sx * halfWidth * scallop + bend + brokenEdge,
                                                           sy * halfHeight * scallop)
         }
+    }
+
+    /// Intersect the actual cut so beans follow its taper and curved centerline.
+    static func horizontalSpan(at y: Float, contour: [SIMD2<Float>]) -> ClosedRange<Float>? {
+        var intersections: [Float] = []
+        for i in contour.indices {
+            let a = contour[i], b = contour[(i + 1) % contour.count]
+            if (a.y <= y && b.y > y) || (b.y <= y && a.y > y) {
+                intersections.append(a.x + (b.x - a.x) * (y - a.y) / (b.y - a.y))
+            }
+        }
+        guard let left = intersections.min(), let right = intersections.max(), right > left else { return nil }
+        return left...right
     }
 
     static func build(surface: TaiyakiBodySurface) -> (crumb: TaiyakiMesh, interior: TaiyakiMesh) {

@@ -73,9 +73,13 @@ enum BodyMeshBuilder {
         var outer: [SIMD2<Float>] = []
         // The front is an annulus. No hidden body triangles span the opening.
         for i in 0..<count {
-            // Uniform outer angles preserve the rounded nose. Using the tall,
-            // narrow cut's rays here starved the forehead and lips of vertices.
-            let angle = Float(i) / Float(count) * 2 * .pi
+            // Blend uniform sampling with cut rays: preserve nose detail while
+            // avoiding folded triangles around the curved, tapered opening.
+            let uniformAngle = Float(i) / Float(count) * 2 * .pi
+            let delta = cut[i] - center
+            let cutAngle = atan2(delta.y, delta.x)
+            let correction = atan2(sin(cutAngle - uniformAngle), cos(cutAngle - uniformAngle))
+            let angle = uniformAngle + correction * 0.5
             let d = SIMD2<Float>(cos(angle), sin(angle))
             outer.append(center + d * TaiyakiCurves.radius(from: center, direction: d, contour: surface.contour))
         }

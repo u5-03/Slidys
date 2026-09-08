@@ -19,6 +19,12 @@ struct TaiyakiConfiguration: Sendable, Equatable {
     var tailCurve: Float = 0.010
     var finSize: Float = 1
     var mouthOpening: Float = 0.17
+    var mouthTaper: Float = 0.28
+    var mouthTilt: Float = -0.005
+    var mouthCurve: Float = 0.028
+    var mouthWaist: Float = 0.22
+    var mouthEdgeVariation: Float = 0.008
+    var headExtension: Float = 0.10
     var fillingAmount: Float = 1
     var eyeSize: Float = 0.060
     var faceLineWidth: Float = 0.030
@@ -52,6 +58,12 @@ struct TaiyakiConfiguration: Sendable, Equatable {
         c.tailCurve = clamp(tailCurve, -0.04, 0.04)
         c.finSize = clamp(finSize, 0.7, 1.25)
         c.mouthOpening = clamp(mouthOpening, 0.10, 0.20)
+        c.mouthTaper = clamp(mouthTaper, 0, 0.65)
+        c.mouthTilt = clamp(mouthTilt, -0.08, 0.04)
+        c.mouthCurve = clamp(mouthCurve, -0.04, 0.04)
+        c.mouthWaist = clamp(mouthWaist, 0, 0.3)
+        c.mouthEdgeVariation = clamp(mouthEdgeVariation, 0, 0.01)
+        c.headExtension = clamp(headExtension, 0, 0.16)
         c.fillingAmount = clamp(fillingAmount, 0.4, 1.3)
         c.eyeSize = clamp(eyeSize, 0.02, 0.08)
         c.faceLineWidth = clamp(faceLineWidth, 0.018, 0.040)
@@ -110,6 +122,8 @@ enum TaiyakiDesign {
     static let logoOrigin = SIMD2<Float>(0.172, -0.228)
     static let logoScale = SIMD2<Float>(0.073, 0.069)
     static let logoSlope: Float = 0.26
+    static let logoDepth: Float = 0.0007
+    static let logoClearance: Float = 0.0005
     // Counter-clockwise, beginning at the upper lip. These are deliberately
     // asymmetric: a broad forehead, rounded belly, and small caudal peduncle.
     static let bodyContour: [SIMD2<Float>] = [

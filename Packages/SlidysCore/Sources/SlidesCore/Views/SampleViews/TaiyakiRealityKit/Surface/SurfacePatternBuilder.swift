@@ -177,6 +177,11 @@ enum SurfacePatternBuilder {
     }
 
     private static func logo(surface: TaiyakiBodySurface, projection: TaiyakiBodyProjection) -> TaiyakiMesh {
+        // Clear the complete mold relief, including its seating offset. Moving
+        // along the surface normal preserves the curved stamp at oblique angles.
+        let lift = surface.configuration.scaleDepth
+            * (1 + TaiyakiDesign.patternSeating + TaiyakiDesign.patternNormalClearance)
+            + TaiyakiDesign.logoDepth + TaiyakiDesign.logoClearance
         // Handwritten single-line glyphs avoid font or image assets. The descenders
         // are retained, while every stroke conforms to the pastry surface.
         let glyphs: [[[SIMD2<Float>]]] = [
@@ -201,8 +206,9 @@ enum SurfacePatternBuilder {
                             (TaiyakiDesign.logoOrigin.y + p.y * TaiyakiDesign.logoScale.y
                              + u * TaiyakiDesign.logoSlope) * surface.configuration.bodyHeight / 0.67]
                 }
-                mesh.append(stroke(transformed, width: 0.008, depth: 0.0007, side: 1,
-                                   project: { projection.point($0, side: 1) }))
+                mesh.append(stroke(transformed, width: 0.008, depth: TaiyakiDesign.logoDepth, side: 1,
+                                   project: { projection.point($0, side: 1)
+                    + surface.normal($0, side: 1) * lift }))
             }
             x += advances[i]
         }
