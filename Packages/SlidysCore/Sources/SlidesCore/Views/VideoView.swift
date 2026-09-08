@@ -80,7 +80,15 @@ public struct VideoView: View {
                     .foregroundStyle(.gray)
                 }
             } else if let player {
+#if os(macOS)
+                // SwiftUIのVideoPlayerはmacOSで「デバッガ非接続の起動」(TestFlight配布版など)だと
+                // 内部クラスVideoPlayerViewのスーパークラスAVPlayerViewのメタデータ解決に失敗して
+                // クラッシュする既知バグがあるため、AVPlayerViewを直接ラップして使う。
+                // (failed to demangle superclass of VideoPlayerView from 'So12AVPlayerViewC')
+                MacVideoPlayerView(player: player)
+#else
                 VideoPlayer(player: player)
+#endif
             } else if let loadError {
                 VStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle")
@@ -146,6 +154,27 @@ public struct VideoView: View {
         return try AssetPackManager.shared.url(for: filePath)
     }
 }
+
+#if os(macOS)
+/// AVPlayerViewを直接使うmacOS用プレイヤー(VideoViewのコメント参照)。
+private struct MacVideoPlayerView: NSViewRepresentable {
+    let player: AVPlayer
+
+    func makeNSView(context: Context) -> AVPlayerView {
+        let view = AVPlayerView()
+        view.player = player
+        view.controlsStyle = .inline
+        view.showsFullScreenToggleButton = false
+        return view
+    }
+
+    func updateNSView(_ view: AVPlayerView, context: Context) {
+        if view.player !== player {
+            view.player = player
+        }
+    }
+}
+#endif
 
 #Preview {
     VideoView(videoType: .visionProDemoInput)
