@@ -17,6 +17,10 @@ fi
 
 mkdir -p "$PACKAGE_DIR/Sources/AppStoreScreenshotTestCore" "$PACKAGE_DIR/Sources/AppStoreScreenshotTest"
 
+# NOTE: dependencies は本物の Package.swift と同一にすること。
+# ワークスペースの Package.resolved はローカル(本物のパッケージ)で解決された内容なので、
+# スタブの依存グラフがそれと食い違うと、Xcode が件数不一致の内部エラーでクラッシュする
+# (-[NSMutableArray insertObjects:atIndexes:] count mismatch / FB16426594 系のバグ)。
 cat > "$PACKAGE_DIR/Package.swift" <<'EOF'
 // swift-tools-version: 6.2
 // Xcode Cloud用のスタブ。実装は含まない(ci_post_clone.sh のコメント参照)。
@@ -33,9 +37,18 @@ let package = Package(
         .library(name: "AppStoreScreenshotTest", targets: ["AppStoreScreenshotTest"]),
         .library(name: "AppStoreScreenshotTestCore", targets: ["AppStoreScreenshotTestCore"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0")
+    ],
     targets: [
         .target(name: "AppStoreScreenshotTestCore"),
-        .target(name: "AppStoreScreenshotTest", dependencies: ["AppStoreScreenshotTestCore"])
+        .target(
+            name: "AppStoreScreenshotTest",
+            dependencies: [
+                "AppStoreScreenshotTestCore",
+                .product(name: "SnapshotTesting", package: "swift-snapshot-testing")
+            ]
+        )
     ]
 )
 EOF
