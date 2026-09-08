@@ -43,14 +43,19 @@ enum TaiyakiMaterialFactory {
                 let p = SIMD2<Float>(u * 1.5 - 0.6, v * 1.1 - 0.5)
                 let edge = pow(min(1, surface.radialFraction(p)), 5)
                 let cloud = noise(u * 9, v * 9) - 0.5
-                let grain = (noise(u * 175, v * 175) - 0.5) * 0.055
-                let toasted = c.browningAmount * (edge * 0.29 + cloud * 0.16)
+                let pores = noise(u * 115, v * 115)
+                let grain = (pores - 0.5) * c.pastryGrain
+                    + (noise(u * 230, v * 230) - 0.5) * c.pastryGrain * 0.35
+                let flecks = max(0, pores - 0.52) * 1.8
+                let toasted = c.browningAmount * (edge * 0.40 + cloud * 0.32 + flecks * 0.50)
                 colors += [byte(0.89 - toasted * 0.40 + grain),
                            byte(0.675 - toasted * 0.66 + grain),
                            byte(0.380 - toasted * 0.45 + grain * 0.7), 255]
-                let nx = (hash(x + 1, y) - hash(x - 1, y)) * 0.055
-                let ny = (hash(x, y + 1) - hash(x, y - 1)) * 0.055
-                normals += [byte(0.5 + nx), byte(0.5 + ny), 255, 255]
+                let step = 115 / Float(size - 1)
+                let nx = (noise(u * 115 - step, v * 115) - noise(u * 115 + step, v * 115)) * c.pastryRelief
+                let ny = (noise(u * 115, v * 115 - step) - noise(u * 115, v * 115 + step)) * c.pastryRelief
+                let n = simd_normalize(SIMD3<Float>(nx * 2, ny * 2, 1))
+                normals += [byte(n.x * 0.5 + 0.5), byte(n.y * 0.5 + 0.5), byte(n.z * 0.5 + 0.5), 255]
             }
         }
         return TexturePixels(color: colors, normal: normals, size: size)

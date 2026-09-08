@@ -11,14 +11,16 @@ enum MouthMeshBuilder {
             let scallop = 1 + TaiyakiDesign.cutScallop * sin(13 * angle)
                 + TaiyakiDesign.cutFineScallop * sin(21 * angle + 1)
             let halfHeight = TaiyakiDesign.cutHalfHeight * c.bodyHeight / 0.67 - inset
-            let sx = (x < 0 ? -1 as Float : 1) * pow(abs(x), 0.76)
+            let exponent = y > 0 ? c.mouthTopSquareness : 0.76
+            let sx = (x < 0 ? -1 as Float : 1) * pow(abs(x), exponent)
             let sy = (y < 0 ? -1 as Float : 1) * pow(abs(y), 0.90)
             let waist = 1 - c.mouthWaist * exp(-pow((sy + 0.48) / 0.30, 2))
             let halfWidth = max(0.001, c.mouthOpening * 0.5 * (1 + c.mouthTaper * sy) * waist - inset)
             let bend = c.mouthTilt * sy + c.mouthCurve * (1 - sy * sy)
             // Broad broken edges, rather than an evenly tapered slit.
             let brokenEdge = c.mouthEdgeVariation * sin(sy * 15 + (x < 0 ? 0 : 1.7)) * abs(sx)
-            return TaiyakiDesign.cutCenter + SIMD2<Float>(sx * halfWidth * scallop + bend + brokenEdge,
+            let upperBreak = x < 0 ? -c.mouthUpperBreak * exp(-pow((sy - 0.78) / 0.23, 2)) * abs(sx) : 0
+            return TaiyakiDesign.cutCenter + SIMD2<Float>(sx * halfWidth * scallop + bend + brokenEdge + upperBreak,
                                                           sy * halfHeight * scallop)
         }
     }

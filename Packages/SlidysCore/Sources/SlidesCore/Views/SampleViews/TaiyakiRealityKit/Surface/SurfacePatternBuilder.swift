@@ -206,7 +206,7 @@ enum SurfacePatternBuilder {
                             (TaiyakiDesign.logoOrigin.y + p.y * TaiyakiDesign.logoScale.y
                              + u * TaiyakiDesign.logoSlope) * surface.configuration.bodyHeight / 0.67]
                 }
-                mesh.append(stroke(transformed, width: 0.008, depth: TaiyakiDesign.logoDepth, side: 1,
+                mesh.append(stroke(transformed, width: TaiyakiDesign.logoStrokeWidth, depth: TaiyakiDesign.logoDepth, side: 1,
                                    project: { projection.point($0, side: 1)
                     + surface.normal($0, side: 1) * lift }))
             }

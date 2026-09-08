@@ -24,6 +24,10 @@ struct TaiyakiConfiguration: Sendable, Equatable {
     var mouthCurve: Float = 0.028
     var mouthWaist: Float = 0.22
     var mouthEdgeVariation: Float = 0.008
+    var mouthTopSquareness: Float = 0.38
+    var mouthUpperBreak: Float = 0.026
+    var pastryGrain: Float = 0.14
+    var pastryRelief: Float = 0.16
     var headExtension: Float = 0.10
     var fillingAmount: Float = 1
     var eyeSize: Float = 0.060
@@ -63,6 +67,10 @@ struct TaiyakiConfiguration: Sendable, Equatable {
         c.mouthCurve = clamp(mouthCurve, -0.04, 0.04)
         c.mouthWaist = clamp(mouthWaist, 0, 0.3)
         c.mouthEdgeVariation = clamp(mouthEdgeVariation, 0, 0.01)
+        c.mouthTopSquareness = clamp(mouthTopSquareness, 0.3, 0.9)
+        c.mouthUpperBreak = clamp(mouthUpperBreak, 0, 0.04)
+        c.pastryGrain = clamp(pastryGrain, 0, 0.25)
+        c.pastryRelief = clamp(pastryRelief, 0, 0.25)
         c.headExtension = clamp(headExtension, 0, 0.16)
         c.fillingAmount = clamp(fillingAmount, 0.4, 1.3)
         c.eyeSize = clamp(eyeSize, 0.02, 0.08)
@@ -123,6 +131,7 @@ enum TaiyakiDesign {
     static let logoScale = SIMD2<Float>(0.073, 0.069)
     static let logoSlope: Float = 0.26
     static let logoDepth: Float = 0.0007
+    static let logoStrokeWidth: Float = 0.013
     static let logoClearance: Float = 0.0005
     // Counter-clockwise, beginning at the upper lip. These are deliberately
     // asymmetric: a broad forehead, rounded belly, and small caudal peduncle.
