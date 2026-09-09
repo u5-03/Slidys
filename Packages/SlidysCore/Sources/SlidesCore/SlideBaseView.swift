@@ -8,6 +8,9 @@
 import SwiftUI
 import SlideKit
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 
 public protocol SlideConfigurationProtocol {
     var size: CGSize { get }
@@ -60,7 +63,36 @@ public struct SlideBaseView: View {
         )
     }
 
+#if os(iOS)
+    /// iPad/iPhoneでの原稿確認用: スライド+スピーカーノートの2分割表示にするか。
+    /// 既定はスライドのみ。スライド中央上部の不可視領域を5秒長押し、
+    /// またはハードウェアキーボードの「P」で切り替える。
+    @State private var showsSpeakerNotesPanel = false
+#endif
+
     public var body: some View {
+#if os(iOS)
+        GeometryReader { proxy in
+            if showsSpeakerNotesPanel {
+                // YouTube(iPad)風: 左にスライド、右にスピーカーノート
+                HStack(spacing: 0) {
+                    presentationBody
+                    SpeakerNotesPanel(slideIndexController: slideConfiguration.slideIndexController)
+                        .frame(width: proxy.size.width * 0.34)
+                }
+            } else {
+                presentationBody
+            }
+        }
+        // 画面上端のシステムジェスチャー(通知センター等)を1段遅らせて、
+        // 上部の長押し領域へのタッチ配送が保留されないようにする
+        .defersSystemGestures(on: .top)
+#else
+        presentationBody
+#endif
+    }
+
+    private var presentationBody: some View {
         NavigationStack {
             PresentationView(slideSize: slideConfiguration.size) {
                 GeometryReader { proxy in
@@ -90,6 +122,20 @@ public struct SlideBaseView: View {
                                     slideConfiguration.slideIndexController.forward()
                                 }
                             }
+#if os(iOS)
+                        // 中央上部: スピーカーノートパネルの表示切り替え(不可視の隠し領域を5秒長押し)。
+                        // タップは消費しないので、左右上のページ送り領域とスライド操作はそのまま機能する
+                        Rectangle()
+                            .frame(width: proxy.size.width * 0.4, height: proxy.size.height * 0.18)
+                            .foregroundStyle(Color.black.opacity(0.01))
+                            .position(x: proxy.size.width / 2, y: proxy.size.height * 0.09)
+                            // maximumDistance: 長押し中の指の微動でキャンセルされないよう大きめに取る
+                            // (既定10ptはスライド縮小表示だと実画面6pt程度になり、5秒の静止はほぼ不可能)
+                            .onLongPressGesture(minimumDuration: 2, maximumDistance: 200) {
+                                showsSpeakerNotesPanel.toggle()
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            }
+#endif
 #endif
                     }
                 }
@@ -168,6 +214,34 @@ public struct SlideBaseView: View {
             }
             return .handled
         }
+        // 「P」でスピーカーノートWindowを開閉(ノートは各スライドの script プロパティから表示)
+        .onKeyPress(KeyEquivalent("p")) {
+            Task { @MainActor in
+                SpeakerNotesWindowPresenter.toggle(
+                    slideIndexController: slideConfiguration.slideIndexController,
+                    slideTheme: slideTheme
+                )
+            }
+            return .handled
+        }
+#endif
+#if os(iOS)
+        .focusable()
+        .focused($isFocused)
+        // ハードウェアキーボード接続時: 「P」でノートパネル切り替え、矢印/Page Up/Downで送り
+        .onKeyPress(KeyEquivalent("p")) {
+            showsSpeakerNotesPanel.toggle()
+            return .handled
+        }
+        .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
+            Task { slideConfiguration.slideIndexController.back() }
+            return .handled
+        }
+        .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
+            Task { slideConfiguration.slideIndexController.forward() }
+            return .handled
+        }
+        .onAppear { isFocused = true }
 #endif
     }
 }

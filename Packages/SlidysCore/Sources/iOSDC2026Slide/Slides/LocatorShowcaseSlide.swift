@@ -12,6 +12,11 @@ import SwiftUI
 
 @Slide
 struct LocatorShowcaseSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "Blenderではこんな感じになっています。この辺はすべて空オブジェクトです。この命名をSwiftのコード側で参照します。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }

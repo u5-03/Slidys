@@ -22,13 +22,17 @@ struct NextEpisodePreviewSlide: View {
     }
 
     let content: Content
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    let script: String
 
-    init(mainText: String, mainFontSize: CGFloat = 170) {
+    init(mainText: String, mainFontSize: CGFloat = 170, script: String = "") {
         self.content = .text(mainText, fontSize: mainFontSize)
+        self.script = script
     }
 
-    init(content: Content) {
+    init(content: Content, script: String = "") {
         self.content = content
+        self.script = script
     }
 
     public var transition: AnyTransition {

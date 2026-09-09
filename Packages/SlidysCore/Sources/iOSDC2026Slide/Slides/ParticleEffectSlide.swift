@@ -11,17 +11,41 @@ import SwiftUI
 
 @Slide
 struct ParticleEffectSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "足元の光のバーストは、Reality Composer ProのGUIで作ったパーティクルです。\n線・スパークル・光の球の3つのエミッタを重ねていて、プレビューしながら挙動を微調整できるのはGUIならではのメリットです。\nまぶしい光の定番は、光をにじませる「ブルーム」という加工ですが、visionOSにはありません。\nそこで、ぼんやり光る粒をたくさん重ねて、中心を真っ白に飛ばしています。人の目は真っ白な部分を強い光と感じるので、これで十分光って見えます。\nパーティクルや光の球が床を突き抜ける問題は、OcclusionMaterialという見えない壁で下半分を隠して解決しました。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
+    }
+    @Environment(\.revealsAllPhases) private var revealsAllPhases
+    @Environment(\.previewPhaseStep) private var previewPhaseStep
+    @Phase private var phase: SlidePhase
+
+    enum SlidePhase: Int, PhasedState {
+        case initial, second, third
+    }
+
+    /// フェーズ表示の判定。通常は@Phaseの進行、スピーカーノートのプレビューでは
+    /// previewPhaseStep(段階の直接指定)、一覧サムネイルでは全表示になる。
+    private func shows(_ step: SlidePhase) -> Bool {
+        if revealsAllPhases { return true }
+        if let previewPhaseStep { return previewPhaseStep >= step.rawValue }
+        return phase.isAfter(step)
     }
 
     var body: some View {
         HeaderSlide("召喚バーストはRCPで作ったパーティクル") {
             HStack(alignment: .top, spacing: 60) {
                 VStack(alignment: .leading, spacing: 44) {
-                    Item("線・スパークル・光の球の3エミッタ。見た目はRCPのGUIでプレビューしながら調整", keywords: [], accessory: .number(1))
-                    Item("光をにじませる機能(ブルーム)が無いので、\nぼけた光の粒をたくさん重ねて、\n中心を真っ白にして光らせる", keywords: ["真っ白"], accessory: .number(2))
-                    Item("光の球は見えない壁で下半分を隠して上だけ見える半球ドームにする", keywords: ["見えない壁"], accessory: .number(3))
+                    Item("線・スパークル・光の球の3エミッタをRCPで調整", keywords: [], accessory: .number(1))
+                    if shows(.second) {
+                        Item("ブルームが無いので、光の粒を重ねて白く光らせる", keywords: ["白く"], accessory: .number(2))
+                    }
+                    if shows(.third) {
+                        Item("見えない壁で下半分を隠して半球ドームに", keywords: ["見えない壁"], accessory: .number(3))
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 

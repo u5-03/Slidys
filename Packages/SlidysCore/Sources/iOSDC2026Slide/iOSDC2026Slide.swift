@@ -14,6 +14,18 @@ import SlideKit
 import SlidesCore
 import SwiftUI
 
+extension ListTextStyle {
+    /// iOSDC2026用: キーポイント化で短くなった本文を、大きめの文字と広めの行間で見せる。
+    /// 数値を変えればデッキ全体の文字サイズ・行間をまとめて調整できる。
+    static let iosdc2026 = ListTextStyle(
+        contentFontSize: 68,
+        contentSpacing: 64,
+        contentLineSpacing: 14,
+        headerFontSize: 84,
+        headerHeight: 120
+    )
+}
+
 public struct iOSDC2026SlideView: SlideViewProtocol {
     let configuration = SlideConfiguration()
 
@@ -25,7 +37,7 @@ public struct iOSDC2026SlideView: SlideViewProtocol {
             slideConfiguration: configuration,
             timerDuration: Duration.seconds(60 * 20),
             showsTotalSlideCount: false,
-            listTextStyle: .large
+            listTextStyle: .iosdc2026
         )
     }
 }
@@ -37,42 +49,48 @@ public extension iOSDC2026SlideView {
     }
 
     /// このデッキで使っているリスト文字サイズ(自動化ツールが同じ見た目で描画するために公開)。
-    static let listTextStyle: ListTextStyle = .large
+    static let listTextStyle: ListTextStyle = .iosdc2026
 }
 
 struct SlideConfiguration: SlideConfigurationProtocol {
     @MainActor
     let slideIndexController = SlideIndexController {
-        CenterTextSlide(text: "iOSDC Japan 2026")
+        CenterTextSlide(text: "iOSDC Japan 2026", script: "(登壇前の待機スライド。話し始めたら次へ)")
 
         // つかみ
-        CenterTextSlide(text: "みなさん")
-        CenterTextSlide(text: "アニメやゲーム、映画を見ながら\nかっこいいな、すごいなと思った\n場面はないでしょうか？")
-        CenterTextSlide(text: "その場面を見ながら、\n「自分もこんな体験をしてみたい」と\n思ったことはないでしょうか？")
-        CenterTextSlide(text: "空間コンピューティングデバイスの\n登場で、その憧れを自分の\n手で実装しやすい時代\nになりました")
+        CenterTextSlide(text: "みなさん", script: "みなさん。")
+        CenterTextSlide(
+            text: "アニメやゲーム、映画を見ながら\nかっこいいな、すごいなと思った\n場面はないでしょうか？",
+            script: "アニメやゲーム、映画を見ながら、「かっこいいな」「すごいな」と思った場面はないですか？"
+        )
+        CenterTextSlide(
+            text: "その場面を見ながら、\n「自分もこんな体験をしてみたい」と\n思ったことはないでしょうか？",
+            script: "そして、その場面を見ながら、「自分もこんな体験をしてみたいなー」と思ったことはないですか？"
+        )
+        CenterTextSlide(
+            text: "空間コンピューティングデバイスの\n登場で、その憧れを自分の\n手で実装しやすい時代\nになりました",
+            script: "空間コンピューティングデバイスの登場で、その憧れを自分の手で実装しやすい時代になりました。今日はその実例の話をします。"
+        )
 
         TitleSlide()
-        ReadmeSlide(
-            title: "README",
-            info: .init(
-                name: "すぎー/Sugiy",
-                image: .icon,
-                firstText: "iOS/Flutterエンジニアです",
-                secondText: "iOSDCのスタッフもしてます",
-                thirdText: "最近車を買いました",
-                fourthText: "3Dプリンターも買いました。お金が...💸",
-                fifthText: "こないだまで庭でメロンを育ててました"
-            )
-        )
+        // 自己紹介は項目が多いので、従来スタイルで収めるラッパーを使う
+        Readme2026Slide()
         PastTalksSlide()
         TalkPlanSlide()
 
         // デモ1: 最初に一連の流れを全部見せる(たい焼きのモンスターを召喚するまで)
-        LiveDemoSlide(title: "デモ 1", caption: "カードを引いて、手札に加えて、\n配置して、召喚するまで")
-        VideoSlide(videoType: .duelDemoFull) // デモ1の保険動画
+        LiveDemoSlide(
+            title: "デモ 1",
+            caption: "カードを引いて、手札に加えて、\n配置して、召喚するまで",
+            script: "まずはデモします。カードを引いて、手札に加えて、配置し、そのカードを召喚する様子を紹介します。"
+        )
+        VideoSlide(
+            videoType: .duelDemoFull, // デモ1の保険動画
+            script: "(デモ失敗時のみ使用。「実機デモの神様が不在のようなので、動画でご覧ください」。成功時はスキップ)"
+        )
 
         // 1. 3Dモデルを用意して表示する
-        ChapterDividerSlide(activeIndex: 0)
+        ChapterDividerSlide(activeIndex: 0, script: "ではまず1章から始めます。")
         BlenderModelingSlide()
         ModelPipelineSlide()
         RcpUsageSlide()
@@ -82,7 +100,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         MonsterVariationSlide()
 
         // 2. Hand Gestureでカードを操作する
-        ChapterDividerSlide(activeIndex: 1)
+        ChapterDividerSlide(activeIndex: 1, script: "それでは次に、Hand Gestureについてです。")
         TrackingSetupSlide()
         TrackingGestureListSlide()
         HandFanSlide()
@@ -90,12 +108,19 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CardPlacementSlide()
 
         // 3. エフェクトとアニメーションで演出する
-        ChapterDividerSlide(activeIndex: 2)
+        ChapterDividerSlide(activeIndex: 2, script: "では最後にエフェクトとアニメーションです。")
         SummonSequenceSlide()
 
         // デモ2: 終盤のライブデモ(竜のモンスターの召喚)。パーティクルの説明はデモの後
-        LiveDemoSlide(title: "デモ 2", caption: "別のモンスターを召喚する")
-        VideoSlide(videoType: .duelDemoDragon) // デモ2の保険動画
+        LiveDemoSlide(
+            title: "デモ 2",
+            caption: "別のモンスターを召喚する",
+            script: "では別のデモをしましょう"
+        )
+        VideoSlide(
+            videoType: .duelDemoDragon, // デモ2の保険動画
+            script: "(デモ失敗時のみ使用。動画を流しながら「動画でご覧ください。こういう竜が召喚されます」)"
+        )
         ParticleEffectSlide()
         DragonSummonMakingSlide()
 
@@ -108,25 +133,41 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         ReferenceSlide()
 
         // 締め: アニメの次回予告風
-        CenterTextSlide(text: "この発表を機に、みなさんも\n何か自分が作ってみたいものを\n作ってもらえるとうれしいです！")
+        CenterTextSlide(
+            text: "この発表を機に、みなさんも\n何か自分が作ってみたいものを\n作ってもらえるとうれしいです！",
+            script: "この発表を機に、みなさんも何か自分が「作ってみたかったもの」を作ってもらえるとうれしいです！"
+        )
 
         // One more thing: Swiftだけでたい焼きを生成するおまけデモ
-        CenterTextSlide(text: "おわり")
-        OneMoreThingSlide()
-        CenterTextSlide(text: "最近出たAstraがすごいという\n情報を見たので、\n私のアイコンを作らせてみた")
+        CenterTextSlide(text: "おわり", script: "(「おわり」")
+        OneMoreThingSlide(script: "ではなく実はもう少しだけ続きます。")
+        CenterTextSlide(
+            text: "最近出たAstraがすごいという\n情報をXで見たので、\n私のアイコンを作らせてみた",
+            script: "最近出たAstraがすごいという情報をXで見たので、私のアイコンを作らせてみました。"
+        )
         AstraIconCompareSlide()
         TaiyakiRealityKitDemoSlide()
-        CenterTextSlide(text: "AIすごいな")
+        CenterTextSlide(text: "AIすごいな", script: "AIすごいな。という感想でした")
 
-        CenterTextSlide(text: "おっと、そろそろ時間が")
-        CenterTextSlide(text: "今ここで終わったら、残りの\nスライドはどうなっちゃうの？")
-        CenterTextSlide(text: "時間はまだ残ってる。(？)")
-        CenterTextSlide(text: "ここを耐えれば、発表は無事終わるんだから！")
-        NextEpisodePreviewSlide(mainText: "城⚫︎内死す")
-        NextEpisodePreviewSlide(
-            content: .imageWithQR(image: .kanagawaSwiftEvent, qrImage: .qrKanagawaEvent)
+        CenterTextSlide(text: "おっと、そろそろ時間が", script: "おっと、そろそろ時間が。")
+        CenterTextSlide(
+            text: "今ここで終わったら、残りの\nスライドはどうなっちゃうの？",
+            script: "今ここで終わったら、残りのスライドはどうなっちゃうの？"
         )
-        CenterTextSlide(text: "デュエルスタンバイ！")
+        CenterTextSlide(text: "時間はまだ残ってる。(？)", script: "時間はまだ残ってる。")
+        CenterTextSlide(
+            text: "ここを耐えれば、発表は無事終わるんだから！",
+            script: "ここを耐えれば、発表は無事終わるんだから！"
+        )
+        NextEpisodePreviewSlide(
+            mainText: "城⚫︎内死す",
+            script: ""
+        )
+        NextEpisodePreviewSlide(
+            content: .imageWithQR(image: .kanagawaSwiftEvent, qrImage: .qrKanagawaEvent),
+            script: ""
+        )
+        CenterTextSlide(text: "デュエルスタンバイ！", script: "デュエルスタンバイ！")
         EndSlide()
     }
 }

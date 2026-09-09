@@ -9,6 +9,11 @@ import SlidesCore
 
 @Slide
 struct TitleSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "ということで、「『いつかやってみたかった』を形にする -アニメのカードバトルを再現するまで-」というタイトルで発表します。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }
@@ -44,7 +49,7 @@ struct TitleSlide: View {
                     Text(authorName)
                         .font(.system(size: 100, weight: .heavy))
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                    Image(.icon)
+                    Image(.iconDynamic)
                         .resizable()
                         .frame(width: 160, height: 160)
                         .aspectRatio(contentMode: .fit)

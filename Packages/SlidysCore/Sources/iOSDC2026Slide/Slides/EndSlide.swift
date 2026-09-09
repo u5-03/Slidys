@@ -9,6 +9,11 @@ import SlidesCore
 
 @Slide
 struct EndSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "発表の詳細とコードは、すべてこちらのブログにまとめています。たい焼きのiOS応用も別記事があります。QRコードから飛べます。実装はGitHubで公開しているので、ぜひ見てみてください。\nご清聴ありがとうございました！"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }

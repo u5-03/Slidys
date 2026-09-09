@@ -12,6 +12,11 @@ import SwiftUI
 
 @Slide
 struct TaiyakiRealityKitDemoSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "こちらがその後調整したものです。左側はBlenderもReality Composer Proも使っていません。メッシュもテクスチャも全部Swiftで手続き的に生成しています。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }

@@ -80,7 +80,7 @@ iOSDCでは2022年から毎年登壇していて、今年で5回目になって�
 
 モデルがアプリに表示されるまでの流れはこうです。
 Blenderでモデリングして、USDZという形式に書き出します。
-それをReality Composer Proの.rkassetsというフォルダに置きます。すると、ビルド時にXcodeに含まれるCLIツール(realitytool)が、.realityという読み込みに最適化された形式にコンパイルします。
+それをXcode内のReality Composer Pro用の.rkassetsというフォルダに置きます。すると、ビルド時にXcodeに含まれるCLIツール(realitytool)が、.realityという読み込みに最適化された形式にコンパイルします。
 あとはRealityKitで読み込んで、タップ判定などの振る舞いをコードで付けていきます。
 
 (原稿用のコード詳細: 読み込みは `Entity(named: "YugiohDuelDisk", in: bundle)` の1行。タップ判定は `generateCollisionShapes(recursive:)` + `InputTargetComponent` を付けるだけ)
@@ -207,7 +207,8 @@ if let zone = tappedEntity.components[ZoneComponent.self] {
 
 足元の光のバーストは、Reality Composer ProのGUIで作ったパーティクルです。1章で「Reality Composer ProのGUIが活きた場面」と言ったのがここです。
 線・スパークル・光球の3つのエミッタを重ねていて、パラメータをスライダーでいじって即プレビューできるのはGUIならではでした。
-visionOSにはブルームという「光があふれる」後処理がないので、加算ブレンドで白飛びさせて「白飛び=光」に見せています。
+まぶしい光の定番は、光をにじませる「ブルーム」という加工ですが、visionOSにはありません。
+そこで、ぼんやり光る粒をたくさん重ねて、中心を真っ白に飛ばしています。人の目は真っ白な部分を強い光と感じるので、これで十分光って見えます。
 あとパーティクルが床を突き抜ける問題は、見えない壁——OcclusionMaterialの半球で下半分を隠して解決しました。
 
 (原稿用のコード詳細: パーティクルは `ParticleEmitterComponent` として読み込まれ、`isEmitting` で開始/停止を制御。`restart()` は実行時にクラッシュする既知の落とし穴があるので使っていない)

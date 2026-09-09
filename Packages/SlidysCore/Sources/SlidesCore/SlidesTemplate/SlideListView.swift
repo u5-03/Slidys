@@ -27,6 +27,35 @@ public extension EnvironmentValues {
     }
 }
 
+private struct RevealsAllPhasesKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+public extension EnvironmentValues {
+    /// フェーズ(1項目ずつ表示)を持つスライドで、全フェーズの内容をまとめて表示するかどうか。
+    /// スライド一覧のサムネイルなどはtrueにして全項目を見せる。
+    /// スピーカーノートのプレビューはfalseのまま(フェーズの断面をそのまま見せる)。
+    var revealsAllPhases: Bool {
+        get { self[RevealsAllPhasesKey.self] }
+        set { self[RevealsAllPhasesKey.self] = newValue }
+    }
+}
+
+private struct PreviewPhaseStepKey: EnvironmentKey {
+    static let defaultValue: Int? = nil
+}
+
+public extension EnvironmentValues {
+    /// スピーカーノートのプレビュー用: フェーズの表示段階を直接指定する(rawValue)。
+    /// 非nilのとき、スライドは@Phaseの状態ではなくこの値までの項目を表示する。
+    /// (@Phaseのストア参照はスライド構造体のコピー間で共有キャッシュされるため、
+    /// 同じスライドを別の段階で同時に描画するにはこの環境値を使う)
+    var previewPhaseStep: Int? {
+        get { self[PreviewPhaseStepKey.self] }
+        set { self[PreviewPhaseStepKey.self] = newValue }
+    }
+}
+
 /// スクロール無しでスライドを列数×タイル幅のグリッドに敷き詰めるView。
 /// 高さは行数から決まる固有サイズになる(プレビューや画像書き出し向き)。
 public struct SlideGridView: View {
@@ -103,6 +132,7 @@ public struct SlideGridView: View {
     private func thumbnail(of slide: any Slide, width: CGFloat, height: CGFloat) -> some View {
         AnyView(slide)
             .environment(\.isSlideThumbnail, true)
+            .environment(\.revealsAllPhases, true)
             .slideTheme(theme)
             .foregroundColor(.black)
             .background(.white)

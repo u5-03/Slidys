@@ -14,6 +14,8 @@ import SwiftUI
 struct ChapterDividerSlide: View {
     /// これから話す章(0始まり)
     let activeIndex: Int
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String = ""
 
     static let chapters = [
         "3Dモデルを用意して表示する",

@@ -13,6 +13,11 @@ import SwiftUI
 
 @Slide
 struct PastTalksSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "iOSDCの登壇も今年で5回目になってしまいました。パイナップルを育てたり、ピアノを弾いたり、手話を検知したり、色々やってきました。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }

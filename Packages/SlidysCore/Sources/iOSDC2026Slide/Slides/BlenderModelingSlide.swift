@@ -11,6 +11,11 @@ import SwiftUI
 
 @Slide
 struct BlenderModelingSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "モンスターやディスクのモデルは、Blenderという無料の3DCGソフトでモデリングしました。これがそのモデリング画面のキャプチャです。左が見覚えのあるディスクで、右は私のアイコンを3Dにしたものです。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }

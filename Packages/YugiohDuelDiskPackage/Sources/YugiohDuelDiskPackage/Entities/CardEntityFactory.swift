@@ -45,8 +45,7 @@ public enum DuelCardVisualFactory {
                 art = hitenryuArt()
                 backgroundColor = Color(red: 0.18, green: 0.03, blue: 0.05) // 深紅
             case .taiyaki:
-                art = .image(image: Image(systemName: "fish.fill"), aspectRatio: 1)
-                backgroundColor = flavorColor(monster.flavor)
+                (art, backgroundColor) = taiyakiArt(monster.flavor)
             }
             return YugiohCardEffect.CardModel(
                 id: monster.id,
@@ -102,6 +101,31 @@ public enum DuelCardVisualFactory {
         case .cream: return Color(red: 0.98, green: 0.93, blue: 0.72)       // クリーム(淡黄)
         case .chocolate: return Color(red: 0.55, green: 0.40, blue: 0.28)   // チョコ(茶)
         case .redBean: return Color(red: 0.78, green: 0.45, blue: 0.50)     // あんこ(小豆色)
+        }
+    }
+
+    /// たい焼きカードの絵。パッケージ内のアイコン画像(taiyaki_card_*)があればそれを使い、
+    /// 無ければ仮のシンボル(魚)+具材色にフォールバックする。
+    /// アイコンは正方形で、カードの絵の領域とはアスペクト比が合わないため、
+    /// 見切れないように収めて、余白はアイコンの背景色(#F3DDA4)で埋めて地続きに見せる。
+    static func taiyakiArt(_ flavor: TaiyakiFlavor) -> (YugiohCardEffect.ImageType, Color) {
+#if canImport(UIKit)
+        if let uiImage = UIImage(named: taiyakiCardAssetName(flavor), in: .module, with: nil) {
+            return (
+                .image(image: Image(uiImage: uiImage), aspectRatio: 1),
+                Color(red: 0.955, green: 0.869, blue: 0.645)
+            )
+        }
+#endif
+        return (.image(image: Image(systemName: "fish.fill"), aspectRatio: 1), flavorColor(flavor))
+    }
+
+    static func taiyakiCardAssetName(_ flavor: TaiyakiFlavor) -> String {
+        switch flavor {
+        case .redBean: "taiyaki_card_red_bean"
+        case .matcha: "taiyaki_card_matcha"
+        case .cream: "taiyaki_card_cream"
+        case .chocolate: "taiyaki_card_chocolate"
         }
     }
 

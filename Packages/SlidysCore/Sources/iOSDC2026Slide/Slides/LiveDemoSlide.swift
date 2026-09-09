@@ -18,6 +18,8 @@ import YugiohDuelDiskPackage
 struct LiveDemoSlide: View {
     let title: String
     let caption: String
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String = ""
 
     public var transition: AnyTransition {
         SlideTransition.defaultTransition

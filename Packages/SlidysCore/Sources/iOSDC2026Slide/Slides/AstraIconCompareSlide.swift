@@ -11,6 +11,11 @@ import SwiftUI
 
 @Slide
 struct AstraIconCompareSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "これは最初のOutputですが、それなりにいい感じかもしれません。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }

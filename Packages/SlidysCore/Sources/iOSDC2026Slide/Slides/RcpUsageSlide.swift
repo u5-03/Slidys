@@ -11,14 +11,39 @@ import SwiftUI
 
 @Slide
 struct RcpUsageSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "形を作るのは全部Blender。Reality Composer Proを使ったのは、後ほど紹介する召喚エフェクトのシーンの調整だけです。\n当初はGUIでコンポーネントを付けることも想定していましたが、今回の設定は複雑で、コードで管理する方が楽でした。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
+    }
+    @Environment(\.revealsAllPhases) private var revealsAllPhases
+    @Environment(\.previewPhaseStep) private var previewPhaseStep
+    @Phase private var phase: SlidePhase
+
+    enum SlidePhase: Int, PhasedState {
+        case initial, second, third
+    }
+
+    /// フェーズ表示の判定。通常は@Phaseの進行、スピーカーノートのプレビューでは
+    /// previewPhaseStep(段階の直接指定)、一覧サムネイルでは全表示になる。
+    private func shows(_ step: SlidePhase) -> Bool {
+        if revealsAllPhases { return true }
+        if let previewPhaseStep { return previewPhaseStep >= step.rawValue }
+        return phase.isAfter(step)
     }
 
     var body: some View {
         HeaderSlide("BlenderとRCPの使い分け(実際はこうなった)") {
-            Item("形を作るのはBlender。RCPを使ったのは召喚エフェクトのシーンの調整だけ(3章で)", keywords: ["召喚エフェクトのシーンの調整だけ"], accessory: .number(1))
-            Item("当初はRCPでコンポーネント付与も想定してたが、複雑な設定はコードの方が管理しやすくコードへ", keywords: ["コードへ"], accessory: .number(2))
+            Item("形を作るのはBlender", keywords: ["Blender"], accessory: .number(1))
+            if shows(.second) {
+                Item("RCPを使ったのは召喚エフェクトの調整だけ(3章で)", keywords: ["召喚エフェクトの調整だけ"], accessory: .number(2))
+            }
+            if shows(.third) {
+                Item("複雑な設定はコードで付与", keywords: ["コードで"], accessory: .number(3))
+            }
         }
     }
 }

@@ -9,6 +9,11 @@ import SlidesCore
 
 @Slide
 struct ReferenceSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "参考情報です。Reality Composer ProとARKitのWWDCセッション、それから去年の発表のブログを載せています。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }

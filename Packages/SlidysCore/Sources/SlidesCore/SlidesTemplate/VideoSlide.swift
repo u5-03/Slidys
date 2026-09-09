@@ -16,8 +16,12 @@ public struct VideoSlide: View {
         SlideTransition.defaultTransition
     }
 
-    public init(videoType: VideoType) {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    public let script: String
+
+    public init(videoType: VideoType, script: String = "") {
         self.videoType = videoType
+        self.script = script
     }
 
     public var body: some View {

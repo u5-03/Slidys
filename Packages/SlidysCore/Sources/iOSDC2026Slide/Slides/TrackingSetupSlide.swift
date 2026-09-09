@@ -13,6 +13,11 @@ import SwiftUI
 
 @Slide
 struct TrackingSetupSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "ジェスチャー検知の土台は、去年のiOSDC2025の発表で作ったHandGestureKitをそのまま使っています。\n去年は手話ジェスチャーの検知と翻訳というテーマで、話しました。この写真はただピースサインをしているのではなく、ピースサインの形を検知できるかのデモの様子を激写されただけで、決してテンションが上がっていたわけではないです。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }
@@ -49,15 +54,39 @@ struct TrackingSetupSlide: View {
 
 @Slide
 struct TrackingGestureListSlide: View {
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    var script: String {
+        "検知の基礎はHandGestureKitで、関節ごとのAnchor情報から、指の形や距離の条件に一致しているかどうかをクエリのように指定して判定できるようにしたライブラリです。ここは去年と同じです。\n今回のアプリに載せたのは、ディスクを手首に装着させるトラッキングと、3本指の手札・ドローなどのジェスチャーです。\nディスクは手首の座標にロケーターの位置を合わせて配置しています。"
+    }
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
+    }
+    @Environment(\.revealsAllPhases) private var revealsAllPhases
+    @Environment(\.previewPhaseStep) private var previewPhaseStep
+    @Phase private var phase: SlidePhase
+
+    enum SlidePhase: Int, PhasedState {
+        case initial, second, third
+    }
+
+    /// フェーズ表示の判定。通常は@Phaseの進行、スピーカーノートのプレビューでは
+    /// previewPhaseStep(段階の直接指定)、一覧サムネイルでは全表示になる。
+    private func shows(_ step: SlidePhase) -> Bool {
+        if revealsAllPhases { return true }
+        if let previewPhaseStep { return previewPhaseStep >= step.rawValue }
+        return phase.isAfter(step)
     }
 
     var body: some View {
         HeaderSlide("ジェスチャーやトラッキングまわりの構成") {
-            Item("検知の基礎はHandGestureKit: 関節の位置や指の形などを指定する", keywords: [], accessory: .number(1))
-            Item("今回載せたのは、手首装着のトラッキング、ジェスチャー\n(3本指で手札を表示 / 2本指ドローで選択中のカード保持)など", keywords: [], accessory: .number(2))
-            Item("ディスクの位置は手首の座標にディスクのロケーターの位置を合わせて配置", keywords: [], accessory: .number(3))
+            Item("検知の基礎はHandGestureKit(去年の発表)", keywords: ["HandGestureKit"], accessory: .number(1))
+            if shows(.second) {
+                Item("手首装着トラッキング + ジェスチャー3つ", keywords: [], accessory: .number(2))
+            }
+            if shows(.third) {
+                Item("ディスクは手首の座標に合わせて配置", keywords: [], accessory: .number(3))
+            }
         }
     }
 }

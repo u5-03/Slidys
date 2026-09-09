@@ -8,43 +8,51 @@
 import SwiftUI
 import SlideKit
 
-/// リスト(HeaderSlide 内の Item)本文の文字サイズのプリセット。
-/// デッキ単位で切り替えられるようにし、既存デッキは `.standard` のまま影響を受けない。
-public enum ListTextStyle: Sendable {
+/// リスト(HeaderSlide 内の Item)本文の文字サイズ・行間の設定。
+/// デッキ単位で調整できるようにし、既存デッキはプリセット(`.standard` / `.large`)のまま影響を受けない。
+public struct ListTextStyle: Sendable {
+    /// 本文(Item)のフォントサイズ
+    public var contentFontSize: CGFloat
+    /// 項目同士の縦スペース
+    public var contentSpacing: CGFloat
+    /// 本文が折り返したときの行間
+    public var contentLineSpacing: CGFloat
+    /// 見出し(HeaderSlideのタイトル)のフォントサイズ。
+    /// 本文とのジャンプ率を上げたいデッキは本文と一緒に大きくする。
+    public var headerFontSize: CGFloat
+    /// 見出し領域の高さ。フォントサイズに合わせて確保する。
+    public var headerHeight: CGFloat
+
+    public init(
+        contentFontSize: CGFloat = 45,
+        contentSpacing: CGFloat = 30,
+        contentLineSpacing: CGFloat = 0,
+        headerFontSize: CGFloat = 72,
+        headerHeight: CGFloat = 100
+    ) {
+        self.contentFontSize = contentFontSize
+        self.contentSpacing = contentSpacing
+        self.contentLineSpacing = contentLineSpacing
+        self.headerFontSize = headerFontSize
+        self.headerHeight = headerHeight
+    }
+
     /// 従来どおり(45pt)
-    case standard
+    public static let standard = ListTextStyle()
     /// 文字少なめ・話し中心のデッキ向け(60pt、行間広め)
-    case large
+    public static let large = ListTextStyle(
+        contentFontSize: 60,
+        contentSpacing: 44,
+        headerFontSize: 84,
+        headerHeight: 120
+    )
 
     var contentFont: Font {
-        switch self {
-        case .standard: return .regularFont
-        case .large: return .listLargeFont
-        }
+        .system(size: contentFontSize, weight: .semibold)
     }
 
-    var contentSpacing: CGFloat {
-        switch self {
-        case .standard: return 30
-        case .large: return 44
-        }
-    }
-
-    /// 見出し(HeaderSlideのタイトル)のフォント。
-    /// .large は本文とのジャンプ率を上げるため見出しも一回り大きくする。
     var headerFont: Font {
-        switch self {
-        case .standard: return .mediumFont
-        case .large: return .system(size: 84, weight: .bold)
-        }
-    }
-
-    /// 見出し領域の高さ。フォントサイズに合わせて確保する。
-    var headerHeight: CGFloat {
-        switch self {
-        case .standard: return 100
-        case .large: return 120
-        }
+        .system(size: headerFontSize, weight: .bold)
     }
 }
 
@@ -107,6 +115,7 @@ public struct CustomHeaderSlideStyle: HeaderSlideStyle {
                 VStack(alignment: .leading, spacing: listTextStyle.contentSpacing) {
                     configuration.content
                         .font(listTextStyle.contentFont)
+                        .lineSpacing(listTextStyle.contentLineSpacing)
                         .foregroundStyle(.defaultForegroundColor)
                 }
             }
