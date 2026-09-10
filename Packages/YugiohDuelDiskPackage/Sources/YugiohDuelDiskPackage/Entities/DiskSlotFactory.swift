@@ -23,7 +23,7 @@ public enum DiskSlotFactory {
         )
         var material = SimpleMaterial()
 #if canImport(UIKit)
-        material.color = .init(tint: UIColor.systemBlue.withAlphaComponent(0.4))
+        material.color = .init(tint: UIColor.systemBlue.withAlphaComponent(0.45))
 #endif
         material.metallic = 0.0
         material.roughness = 0.7
@@ -31,6 +31,9 @@ public enum DiskSlotFactory {
         slot.name = "DiskSlot_\(index)" // デバッグ用
 #if os(visionOS)
         slot.components.set(DiskSlotIndexComponent(index: index))
+        slot.components.set(InputTargetComponent())
+        // 視線を向けたときに「召喚できる」ことがはっきり分かるよう、強めのハイライトにする
+        slot.components.set(DuelHoverStyle.summonSlot)
 #endif
         return slot
     }

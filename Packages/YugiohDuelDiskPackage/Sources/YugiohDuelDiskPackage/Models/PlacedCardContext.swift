@@ -8,10 +8,12 @@
 import Foundation
 
 public enum PlacedCardContext: Hashable, Sendable {
-    /// ディスク上の召喚スロット(0〜4)
+    /// ディスク上の召喚スロット(0〜4) — モンスター
     case diskSlot(Int)
-    /// 召喚エリア奥列(0〜4)
-    case arenaBack(Int)
-    /// 召喚エリア手前列(0〜4) — 将来用
-    case arenaFront(Int)
+    /// ディスク上の魔法・トラップ挿入口(0〜4) — 魔法 / トラップ
+    case spellSlot(Int)
+    /// フィールド奥列(0〜4) — モンスター
+    case fieldBack(Int)
+    /// フィールド手前列(0〜4) — 魔法 / トラップ
+    case fieldFront(Int)
 }

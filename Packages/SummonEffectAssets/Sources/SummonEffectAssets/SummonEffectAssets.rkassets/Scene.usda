@@ -1,0 +1,169 @@
+#usda 1.0
+(
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    reorder nameChildren = ["RadialLines", "StarSparkles", "CenterHaze"]
+    def Xform "RadialLines" (
+        active = true
+    )
+    {
+        def RealityKitComponent "VFXEmitter"
+        {
+            uniform token info:id = "RealityKit.VFXEmitter"
+
+            def RealityKitStruct "currentState"
+            {
+                token birthDirection = "Normal"
+                token birthLocation = "Surface"
+                float3 emissionDirection = (0, 1, 0)
+                double emissionDuration = 2
+                token emitterShape = "Sphere"
+                float3 emitterShapeSize = (0.02, 0.02, 0.02)
+                bool isEmitting = 1
+                bool isLocal = 1
+                bool loops = 1
+                float particleSpeed = 3
+                float particleSpeedVariation = 0.6
+                double warmupDuration = 0
+
+                def RealityKitStruct "mainEmitter"
+                {
+                    token billboardMode = "Billboard"
+                    # 細いまま本数を戻して「密な放射線」に
+                    float birthRate = 340
+                    token blendMode = "Additive"
+                    float colorEvolutionPower = 2
+                    float dampingFactor = 1
+                    float4 endColorA = (1, 0.85, 0.5, 0)
+                    token opacityOverLife = "QuickFadeInOut"
+                    double particleLifeSpan = 0.55
+                    double particleLifeSpanVariation = 0.2
+                    float particleSize = 0.0035
+                    float particleSizeVariation = 0.0015
+                    float sizeMultiplierAtEndOfLifespan = 0.2
+                    float spreadingAngle = 0.05
+                    float4 startColorA = (1, 1, 1, 1)
+                    float stretchFactor = 18
+                    bool useEndColor = 1
+                    bool useStartColorRange = 0
+                }
+
+                def RealityKitStruct "spawnedEmitter"
+                {
+                }
+            }
+        }
+    }
+
+    def Xform "StarSparkles" (
+        active = true
+    )
+    {
+        def RealityKitComponent "VFXEmitter"
+        {
+            uniform token info:id = "RealityKit.VFXEmitter"
+
+            def RealityKitStruct "currentState"
+            {
+                token birthDirection = "Normal"
+                token birthLocation = "Surface"
+                float3 emissionDirection = (0, 1, 0)
+                double emissionDuration = 2
+                token emitterShape = "Sphere"
+                float3 emitterShapeSize = (0.03, 0.03, 0.03)
+                bool isEmitting = 1
+                bool isLocal = 1
+                bool loops = 1
+                float particleSpeed = 0.9
+                float particleSpeedVariation = 0.4
+                double warmupDuration = 0
+
+                def RealityKitStruct "mainEmitter"
+                {
+                    token billboardMode = "Billboard"
+                    float birthRate = 240
+                    token blendMode = "Additive"
+                    float colorEvolutionPower = 2
+                    float dampingFactor = 0.6
+                    float4 endColorA = (0.8, 0.95, 1, 0)
+                    token opacityOverLife = "QuickFadeInOut"
+                    asset particleImage = @star.png@
+                    double particleLifeSpan = 0.9
+                    double particleLifeSpanVariation = 0.5
+                    float particleSize = 0.05
+                    float particleSizeVariation = 0.02
+                    float sizeMultiplierAtEndOfLifespan = 0.1
+                    float spreadingAngle = 0.4
+                    float4 startColorA = (1, 1, 1, 1)
+                    float4 startColorB = (1, 0.92, 0.6, 1)
+                    float stretchFactor = 0
+                    bool useEndColor = 1
+                    bool useStartColorRange = 1
+                }
+
+                def RealityKitStruct "spawnedEmitter"
+                {
+                }
+            }
+        }
+    }
+
+    def Xform "CenterHaze" (
+        active = true
+    )
+    {
+        def RealityKitComponent "VFXEmitter"
+        {
+            uniform token info:id = "RealityKit.VFXEmitter"
+
+            def RealityKitStruct "currentState"
+            {
+                token birthDirection = "Normal"
+                token birthLocation = "Volume"
+                float3 emissionDirection = (0, 1, 0)
+                double emissionDuration = 2
+                token emitterShape = "Sphere"
+                float3 emitterShapeSize = (0.09, 0.06, 0.09)
+                bool isEmitting = 1
+                bool isLocal = 1
+                bool loops = 1
+                float particleSpeed = 0.02
+                float particleSpeedVariation = 0.01
+                double warmupDuration = 0
+
+                def RealityKitStruct "mainEmitter"
+                {
+                    token billboardMode = "Billboard"
+                    # 中央の白い発光。放射線を潰さないよう「控えめな核」に留める(膨張・数・不透明度を抑制)
+                    float birthRate = 70
+                    token blendMode = "Additive"
+                    float colorEvolutionPower = 1
+                    float dampingFactor = 2
+                    float4 endColorA = (1, 1, 1, 0)
+                    asset particleImage = @haze.png@
+                    token opacityOverLife = "GradualFadeInOut"
+                    double particleLifeSpan = 0.8
+                    double particleLifeSpanVariation = 0.3
+                    float particleSize = 0.18
+                    float particleSizeVariation = 0.05
+                    float sizeMultiplierAtEndOfLifespan = 1.1
+                    float spreadingAngle = 3.14
+                    float4 startColorA = (1, 1, 1, 0.65)
+                    float stretchFactor = 0
+                    bool useEndColor = 1
+                    bool useStartColorRange = 0
+                }
+
+                def RealityKitStruct "spawnedEmitter"
+                {
+                }
+            }
+        }
+    }
+}
+

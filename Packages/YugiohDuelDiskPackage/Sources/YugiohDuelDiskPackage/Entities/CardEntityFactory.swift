@@ -2,49 +2,143 @@
 //  CardEntityFactory.swift
 //  YugiohDuelDiskPackage
 //
-//  カード本体(単色の薄い直方体)を生成するファクトリ。
+//  カード本体を生成するファクトリ。
+//  見た目の attachment 差し込みは View 側で行うため、ここでは土台 Entity のみを作る。
 //
 
 import Foundation
+#if os(visionOS)
 import RealityKit
+import SwiftUI
+import YugiohCardEffect
 #if canImport(UIKit)
 import UIKit
 #endif
 
 public enum CardEntityFactory {
-    /// すべてのカードに使う共通色(裏面風の濃紺)。
-    /// Phase B1 確定: 全カード同色。
-#if canImport(UIKit)
-    public static let cardColor = UIColor(red: 0.15, green: 0.18, blue: 0.35, alpha: 1.0)
-#endif
+    public static func make(model: DuelCard) -> Entity {
+        let root = Entity()
+        root.name = "Card_\(model.id.uuidString)"
 
-    /// カード Entity を作る。
-    /// - hover 表現用に `InputTargetComponent` + `HoverEffectComponent` を常時付ける。
-    /// - `CardIdentityComponent` で card.id を保持する(衝突判定で識別する用)。
-    /// - `CollisionComponent` (mode/filter) の付与は呼び出し側の責務(扇 / 右手 / ディスク / アリーナで条件が違うため)。
-    public static func make(model: CardModel) -> ModelEntity {
-        let mesh = MeshResource.generateBox(
-            width: DuelDiskMetrics.cardWidth,
-            height: DuelDiskMetrics.cardThickness,
-            depth: DuelDiskMetrics.cardDepth
-        )
-        var material = SimpleMaterial()
-#if canImport(UIKit)
-        material.color = .init(tint: Self.cardColor)
-#endif
-        material.metallic = 0.0
-        material.roughness = 0.4
-        let entity = ModelEntity(mesh: mesh, materials: [material])
-        entity.name = "Card_\(model.id.uuidString)" // デバッグ用。ID 判定には Component を使う。
-
-        // visionOS 標準の hover ハイライト
-        entity.components.set(InputTargetComponent())
-        entity.components.set(HoverEffectComponent())
-
-#if os(visionOS)
-        // Card 識別用の Component
-        entity.components.set(CardIdentityComponent(id: model.id))
-#endif
-        return entity
+        // 触り判定と hover は root 側に持たせる。
+        root.components.set(InputTargetComponent())
+        root.components.set(HoverEffectComponent())
+        root.components.set(CardIdentityComponent(id: model.id))
+        return root
     }
 }
+
+/// `DuelCard` を、見た目描画用の `YugiohCardEffect.CardModel` に変換するファクトリ。
+public enum DuelCardVisualFactory {
+    public static let designWidth: Float = 590
+    public static let designHeight: Float = 860
+
+    public static func visualModel(for card: DuelCard) -> YugiohCardEffect.CardModel {
+        switch card {
+        case .monster(let monster):
+            // カードにモンスターの種類が分かるよう、実データから組み立てる。
+            // 画像は差し替え可能: 緋天竜は専用画像(あれば)、たい焼きは色分け仮アイコン。
+            let art: YugiohCardEffect.ImageType
+            let backgroundColor: Color
+            switch monster.summonModel {
+            case .hitenryu:
+                art = hitenryuArt()
+                backgroundColor = Color(red: 0.18, green: 0.03, blue: 0.05) // 深紅
+            case .taiyaki:
+                (art, backgroundColor) = taiyakiArt(monster.flavor)
+            }
+            return YugiohCardEffect.CardModel(
+                id: monster.id,
+                name: monster.name,
+                attribute: monster.attribute,
+                starCount: monster.level,
+                imageType: art,
+                imageBackgroundColor: backgroundColor,
+                species: monster.species,
+                description: monster.text,
+                attackPoint: monster.attack,
+                defencePoint: monster.defense,
+                isRare: monster.isRare,
+                kind: .monster
+            )
+        case .spell(let spell):
+            return YugiohCardEffect.CardModel(
+                id: spell.id,
+                name: spell.name,
+                attribute: "",
+                starCount: 0,
+                imageType: .image(image: Image(systemName: spell.symbolName), aspectRatio: 1),
+                imageBackgroundColor: Color(red: 0.80, green: 0.95, blue: 0.88),
+                species: "",
+                description: spell.text,
+                attackPoint: 0,
+                defencePoint: 0,
+                isRare: false,
+                kind: .spell
+            )
+        case .trap(let trap):
+            return YugiohCardEffect.CardModel(
+                id: trap.id,
+                name: trap.name,
+                attribute: "",
+                starCount: 0,
+                imageType: .image(image: Image(systemName: trap.symbolName), aspectRatio: 1),
+                imageBackgroundColor: Color(red: 0.95, green: 0.86, blue: 0.93),
+                species: "",
+                description: trap.text,
+                attackPoint: 0,
+                defencePoint: 0,
+                isRare: false,
+                kind: .trap
+            )
+        }
+    }
+
+    /// たい焼きの具材ごとのカード画像背景色(種類が一目で分かるように色分け)。
+    static func flavorColor(_ flavor: TaiyakiFlavor) -> Color {
+        switch flavor {
+        case .matcha: return Color(red: 0.66, green: 0.82, blue: 0.55)      // 抹茶(緑)
+        case .cream: return Color(red: 0.98, green: 0.93, blue: 0.72)       // クリーム(淡黄)
+        case .chocolate: return Color(red: 0.55, green: 0.40, blue: 0.28)   // チョコ(茶)
+        case .redBean: return Color(red: 0.78, green: 0.45, blue: 0.50)     // あんこ(小豆色)
+        }
+    }
+
+    /// たい焼きカードの絵。パッケージ内のアイコン画像(taiyaki_card_*)があればそれを使い、
+    /// 無ければ仮のシンボル(魚)+具材色にフォールバックする。
+    /// アイコンは正方形で、カードの絵の領域とはアスペクト比が合わないため、
+    /// 見切れないように収めて、余白はアイコンの背景色(#F3DDA4)で埋めて地続きに見せる。
+    static func taiyakiArt(_ flavor: TaiyakiFlavor) -> (YugiohCardEffect.ImageType, Color) {
+#if canImport(UIKit)
+        if let uiImage = UIImage(named: taiyakiCardAssetName(flavor), in: .module, with: nil) {
+            return (
+                .image(image: Image(uiImage: uiImage), aspectRatio: 1),
+                Color(red: 0.955, green: 0.869, blue: 0.645)
+            )
+        }
+#endif
+        return (.image(image: Image(systemName: "fish.fill"), aspectRatio: 1), flavorColor(flavor))
+    }
+
+    static func taiyakiCardAssetName(_ flavor: TaiyakiFlavor) -> String {
+        switch flavor {
+        case .redBean: "taiyaki_card_red_bean"
+        case .matcha: "taiyaki_card_matcha"
+        case .cream: "taiyaki_card_cream"
+        case .chocolate: "taiyaki_card_chocolate"
+        }
+    }
+
+    /// 緋天竜カードの絵。パッケージに画像 "hitenryu_card" があればそれを使い、
+    /// 無ければ仮のシンボル(爬虫類)を使う。画像提供後は asset を追加するだけで差し替わる。
+    static func hitenryuArt() -> YugiohCardEffect.ImageType {
+#if canImport(UIKit)
+        if let uiImage = UIImage(named: "hitenryu_card", in: .module, with: nil) {
+            let aspect = uiImage.size.height > 0 ? uiImage.size.width / uiImage.size.height : 1
+            return .image(image: Image(uiImage: uiImage), aspectRatio: aspect)
+        }
+#endif
+        return .image(image: Image(systemName: "lizard.fill"), aspectRatio: 1)
+    }
+}
+#endif

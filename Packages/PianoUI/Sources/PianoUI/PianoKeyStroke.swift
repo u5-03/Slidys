@@ -80,7 +80,7 @@ extension Array where Element == PianoKeyStroke {
     }
 }
 
-extension Array: Identifiable where Element == PianoKeyStroke {
+extension Array: @retroactive Identifiable where Element == PianoKeyStroke {
     public var id: String {
         return reduce("") { initialValue, value in
             return initialValue + value.id

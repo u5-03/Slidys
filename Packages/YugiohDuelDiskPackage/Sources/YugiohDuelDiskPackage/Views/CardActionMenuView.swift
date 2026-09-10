@@ -10,6 +10,9 @@ import SwiftUI
 
 struct CardActionMenuView: View {
     let context: PlacedCardContext
+    /// 裏向きの魔法・トラップなど「オープン」できるカードのときだけ true。
+    var canOpen: Bool = false
+    var onOpen: () -> Void = {}
     let onDelete: () -> Void
     let onCancel: () -> Void
 
@@ -20,6 +23,11 @@ struct CardActionMenuView: View {
             Text(contextDescription)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            if canOpen {
+                Button(action: onOpen) {
+                    Label("オープン", systemImage: "eye")
+                }
+            }
             Button(role: .destructive, action: onDelete) {
                 Label("削除", systemImage: "trash")
             }
@@ -32,9 +40,10 @@ struct CardActionMenuView: View {
 
     private var contextDescription: String {
         switch context {
-        case .diskSlot(let i): return "ディスク・スロット \(i + 1)"
-        case .arenaBack(let c): return "召喚エリア(奥) 列 \(c + 1)"
-        case .arenaFront(let c): return "召喚エリア(前) 列 \(c + 1)"
+        case .diskSlot(let i): return "ディスク・召喚スロット \(i + 1)"
+        case .spellSlot(let i): return "ディスク・魔法/罠スロット \(i + 1)"
+        case .fieldBack(let c): return "フィールド(奥) 列 \(c + 1)"
+        case .fieldFront(let c): return "フィールド(前) 列 \(c + 1)"
         }
     }
 }

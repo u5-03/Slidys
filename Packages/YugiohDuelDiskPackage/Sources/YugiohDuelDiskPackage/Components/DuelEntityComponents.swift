@@ -12,6 +12,43 @@
 #if os(visionOS)
 import Foundation
 import RealityKit
+#if canImport(UIKit)
+import UIKit
+#endif
+
+/// 視線ホバー時のハイライト表現をまとめたヘルパー。
+/// 既定の `HoverEffectComponent()` は弱く、「今フォーカスされている / タップできる」ことが
+/// 分かりづらいため、色付きの強いハイライトを共通で使う。
+public enum DuelHoverStyle {
+    /// 召喚スロット(カード召喚置き場)用。
+    /// スロット面はシアン系なので、同色のハイライトだと変化が見えない。
+    /// 視線が当たると「白く強く光る」よう白ハイライト(最大強度)にして視認性を上げる。
+    public static var summonSlot: HoverEffectComponent {
+#if canImport(UIKit)
+        HoverEffectComponent(.highlight(.init(color: UIColor.white, strength: 1.0)))
+#else
+        HoverEffectComponent()
+#endif
+    }
+
+    /// 魔法・トラップ挿入口用。ピンク系の面に対し、白く強く光らせる。
+    public static var spellSlot: HoverEffectComponent {
+#if canImport(UIKit)
+        HoverEffectComponent(.highlight(.init(color: UIColor.white, strength: 1.0)))
+#else
+        HoverEffectComponent()
+#endif
+    }
+
+    /// 手札カード用。視線を合わせたカードがはっきり分かるよう、明るい黄で強くハイライトする。
+    public static var handCard: HoverEffectComponent {
+#if canImport(UIKit)
+        HoverEffectComponent(.highlight(.init(color: UIColor.systemYellow, strength: 1.0)))
+#else
+        HoverEffectComponent()
+#endif
+    }
+}
 
 /// カード(扇手札 / 右手 / ディスク配置 / アリーナ配置 すべて) に付与する識別 Component。
 public struct CardIdentityComponent: Component {
@@ -21,6 +58,12 @@ public struct CardIdentityComponent: Component {
 
 /// ディスク上の召喚スロット(横並び5枚)に付与する index Component。
 public struct DiskSlotIndexComponent: Component {
+    public var index: Int
+    public init(index: Int) { self.index = index }
+}
+
+/// ディスク上の魔法・トラップ挿入口ハイライト板に付与する index Component。
+public struct SpellSlotIndexComponent: Component {
     public var index: Int
     public init(index: Int) { self.index = index }
 }
@@ -47,10 +90,30 @@ public struct DeckMarkerComponent: Component {
 public struct PlacedCardLocationComponent: Component {
     public enum Location: Hashable, Sendable {
         case diskSlot(Int)
-        case arenaBack(Int)
-        case arenaFront(Int)
+        case spellSlot(Int)
+        case fieldBack(Int)
+        case fieldFront(Int)
     }
     public var location: Location
     public init(location: Location) { self.location = location }
+}
+
+/// 召喚エリア全体を標準ジェスチャーで移動・回転するためのマーカー。
+public struct FieldInteractionComponent: Component {
+    public init() {}
+}
+
+/// 召喚エリア移動用の丸いハンドル(右下)に付与するマーカー。
+/// このハンドルをドラッグ/回転したときだけ召喚エリアを操作する
+/// (指ピンチでの誤操作を防ぐため、フィールド操作はハンドル限定)。
+public struct FieldHandleComponent: Component {
+    /// - move: 召喚エリアを平行移動する。
+    /// - rotate: 召喚エリアを中央軸で回転する。
+    /// - scale: 召喚エリアの大小(スケール)を調整する(ドラッグ上=拡大/下=縮小)。
+    /// - area: ハンドルのかたまり(=ハンドルエリア)自体を、好きな位置へ動かす。
+    /// - recenter: タップで、現在のヘッド(視線)正面を基準に召喚エリアを再配置する。
+    public enum Kind: Sendable, Hashable { case move, rotate, scale, area, recenter }
+    public var kind: Kind
+    public init(kind: Kind) { self.kind = kind }
 }
 #endif

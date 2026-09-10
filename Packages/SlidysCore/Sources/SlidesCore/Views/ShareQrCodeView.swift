@@ -13,7 +13,7 @@ public enum QrCodeType {
     case all
 
     @ViewBuilder
-    var view: some View {
+    public var view: some View {
         switch self {
         case .native:
             Image(.qrCodeTestFlight)

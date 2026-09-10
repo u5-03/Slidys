@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "taiyaki_card_red_bean.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

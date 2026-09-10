@@ -7,7 +7,6 @@
 
 import ARKit
 import Foundation
-import HandGestureKit
 import RealityKit
 
 /// Integrated gesture detection system

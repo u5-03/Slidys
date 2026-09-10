@@ -1,0 +1,40 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "plan-preview",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8901",
+        "--directory",
+        "/private/tmp/claude-501/-Users-yugo-sugiyama-Dev-Swift-Slidys/09787731-21ea-442c-ac7a-b80fc506757f/scratchpad"
+      ],
+      "port": 8901
+    },
+    {
+      "name": "sugiyblog",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "/Users/yugo.sugiyama/Dev/Web/SugiyBlog"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "slide-snapshots",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8902",
+        "--directory",
+        "/Users/yugo.sugiyama/Dev/Swift/Slidys/build/slide-snapshots/iosdc2026"
+      ],
+      "port": 8902
+    }
+  ]
+}

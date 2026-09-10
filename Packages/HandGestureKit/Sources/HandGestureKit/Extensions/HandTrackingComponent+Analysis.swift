@@ -2,6 +2,10 @@ import ARKit
 import RealityKit
 import simd
 
+/// Toggle for verbose per-finger joint logging. Kept off by default to avoid log spam;
+/// declared at file scope so the debug blocks are not flagged as unreachable code.
+private let isDetailedFingerLoggingEnabled = false
+
 // Vector normalization function
 func normalize(_ vector: SIMD3<Float>) -> SIMD3<Float> {
     let length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
@@ -33,7 +37,7 @@ extension HandTrackingComponent {
 
         // Don't output detailed logs for fingers other than index finger
         // Suppress index finger logs in sign language mode too
-        let shouldLogDetails = false  // finger == .index
+        let shouldLogDetails = isDetailedFingerLoggingEnabled  // finger == .index
 
         // Get joints sequentially from finger base to tip
         var positions: [SIMD3<Float>] = []

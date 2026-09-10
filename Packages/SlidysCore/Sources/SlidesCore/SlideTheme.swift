@@ -8,14 +8,67 @@
 import SwiftUI
 import SlideKit
 
+/// リスト(HeaderSlide 内の Item)本文の文字サイズ・行間の設定。
+/// デッキ単位で調整できるようにし、既存デッキはプリセット(`.standard` / `.large`)のまま影響を受けない。
+public struct ListTextStyle: Sendable {
+    /// 本文(Item)のフォントサイズ
+    public var contentFontSize: CGFloat
+    /// 項目同士の縦スペース
+    public var contentSpacing: CGFloat
+    /// 本文が折り返したときの行間
+    public var contentLineSpacing: CGFloat
+    /// 見出し(HeaderSlideのタイトル)のフォントサイズ。
+    /// 本文とのジャンプ率を上げたいデッキは本文と一緒に大きくする。
+    public var headerFontSize: CGFloat
+    /// 見出し領域の高さ。フォントサイズに合わせて確保する。
+    public var headerHeight: CGFloat
+
+    public init(
+        contentFontSize: CGFloat = 45,
+        contentSpacing: CGFloat = 30,
+        contentLineSpacing: CGFloat = 0,
+        headerFontSize: CGFloat = 72,
+        headerHeight: CGFloat = 100
+    ) {
+        self.contentFontSize = contentFontSize
+        self.contentSpacing = contentSpacing
+        self.contentLineSpacing = contentLineSpacing
+        self.headerFontSize = headerFontSize
+        self.headerHeight = headerHeight
+    }
+
+    /// 従来どおり(45pt)
+    public static let standard = ListTextStyle()
+    /// 文字少なめ・話し中心のデッキ向け(60pt、行間広め)
+    public static let large = ListTextStyle(
+        contentFontSize: 60,
+        contentSpacing: 44,
+        headerFontSize: 84,
+        headerHeight: 120
+    )
+
+    var contentFont: Font {
+        .system(size: contentFontSize, weight: .semibold)
+    }
+
+    var headerFont: Font {
+        .system(size: headerFontSize, weight: .bold)
+    }
+}
+
 @MainActor
 public struct CustomSlideTheme: SlideTheme {
-    public let headerSlideStyle = CustomHeaderSlideStyle()
+    public let headerSlideStyle: CustomHeaderSlideStyle
     public let itemStyle = CustomItemStyle()
     public let indexStyle: CustomIndexStyle
 
-    public init(showSlideIndex: Bool = true) {
-        self.indexStyle = CustomIndexStyle(isVisible: showSlideIndex)
+    public init(
+        showSlideIndex: Bool = true,
+        showsTotalSlideCount: Bool = true,
+        listTextStyle: ListTextStyle = .standard
+    ) {
+        self.headerSlideStyle = CustomHeaderSlideStyle(listTextStyle: listTextStyle)
+        self.indexStyle = CustomIndexStyle(isVisible: showSlideIndex, showsTotalSlideCount: showsTotalSlideCount)
     }
 }
 
@@ -43,21 +96,26 @@ public struct CustomStyleSlide: View {
 
 
 public struct CustomHeaderSlideStyle: HeaderSlideStyle {
-    public init() {}
+    private let listTextStyle: ListTextStyle
+
+    public init(listTextStyle: ListTextStyle = .standard) {
+        self.listTextStyle = listTextStyle
+    }
 
     public func makeBody(configuration: Configuration) -> some View {
         GeometryReader { proxy in
             VStack(alignment: .leading, spacing: 40) {
                 configuration.header
-                    .font(.mediumFont)
+                    .font(listTextStyle.headerFont)
                     .lineLimit(1)
                     .minimumScaleFactor(0.1)
                     .foregroundStyle(.themeColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(height: 100)
-                VStack(alignment: .leading, spacing: 30) {
+                    .frame(height: listTextStyle.headerHeight)
+                VStack(alignment: .leading, spacing: listTextStyle.contentSpacing) {
                     configuration.content
-                        .font(.regularFont)
+                        .font(listTextStyle.contentFont)
+                        .lineSpacing(listTextStyle.contentLineSpacing)
                         .foregroundStyle(.defaultForegroundColor)
                 }
             }
@@ -101,9 +159,11 @@ public struct CustomItemStyle: ItemStyle {
 
 public struct CustomIndexStyle: IndexStyle {
     private let isVisible: Bool
+    private let showsTotalSlideCount: Bool
 
-    public init(isVisible: Bool = true) {
+    public init(isVisible: Bool = true, showsTotalSlideCount: Bool = true) {
         self.isVisible = isVisible
+        self.showsTotalSlideCount = showsTotalSlideCount
     }
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -111,7 +171,12 @@ public struct CustomIndexStyle: IndexStyle {
         EmptyView()
 #else
         if isVisible {
-            Text("\(configuration.slideIndexController.currentIndex + 1) / \(configuration.slideIndexController.slides.count)")
+            // 総数を出すと「残り何枚か」が分かってしまうデッキ向けに、現在ページのみの表示も選べる
+            let current = configuration.slideIndexController.currentIndex + 1
+            let text = showsTotalSlideCount
+                ? "\(current) / \(configuration.slideIndexController.slides.count)"
+                : "\(current)"
+            Text(text)
                 .foregroundColor(.gray)
                 .font(.system(size: 30))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)

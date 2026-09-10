@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "summon_line_capture.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

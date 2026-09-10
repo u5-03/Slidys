@@ -14,7 +14,12 @@ public struct OneMoreThingSlide: View {
         SlideTransition.defaultTransition
     }
 
-    public init() {}
+    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
+    public let script: String
+
+    public init(script: String = "") {
+        self.script = script
+    }
 
     public var body: some View {
         VStack {

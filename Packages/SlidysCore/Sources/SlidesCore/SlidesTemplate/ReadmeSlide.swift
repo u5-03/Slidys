@@ -32,14 +32,17 @@ public struct ReadmeInfo {
 public struct ReadmeSlide: View {
     let title: String
     let info: ReadmeInfo
-    
+    /// 右上のアイコンの直径(既定340)
+    let iconSize: CGFloat
+
     public var transition: AnyTransition {
         SlideTransition.defaultTransition
     }
 
-    public init(title: String, info: ReadmeInfo) {
+    public init(title: String, info: ReadmeInfo, iconSize: CGFloat = 340) {
         self.title = title
         self.info = info
+        self.iconSize = iconSize
     }
 
     public var body: some View {
@@ -51,12 +54,14 @@ public struct ReadmeSlide: View {
             Item(.init(stringLiteral: info.secondText), accessory: .number(2))
             Item(.init(stringLiteral: info.thirdText), accessory: .number(3))
             Item(.init(stringLiteral: info.fourthText), accessory: .number(4))
-            Item(.init(stringLiteral: info.fifthText), accessory: .number(5))
+            if !info.fifthText.isEmpty {
+                Item(.init(stringLiteral: info.fifthText), accessory: .number(5))
+            }
         }
         .overlay {
             Image(info.image)
                 .resizable()
-                .frame(width: 340, height: 340)
+                .frame(width: iconSize, height: iconSize)
                 .aspectRatio(contentMode: .fit)
                 .clipShape(Circle())
                 .padding(40)
