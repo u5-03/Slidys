@@ -15,7 +15,7 @@ import SwiftUI
 struct TrackingSetupSlide: View {
     /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
     var script: String {
-        "ジェスチャー検知の土台は、去年のiOSDC2025の発表で作ったHandGestureKitをそのまま使っています。\n去年は手話ジェスチャーの検知と翻訳というテーマで話しました。この写真はただピースサインをしているのではなく、ピースサインの手の形を検知できるかのデモの様子を激写されただけで、決してテンションが上がっていたわけではないです。"
+        "ジェスチャー検知の土台は、去年のiOSDC2025の発表で作ったHandGestureKitをそのまま使っています。\n去年は手話ジェスチャーの検知と翻訳というテーマで話しました。この写真はただピースをしているのではなく、ピースサインの手の形を検知できるかのデモの様子を激写されただけで、決してテンションが上がっていたわけではないです。"
     }
 
     public var transition: AnyTransition {
@@ -57,8 +57,8 @@ struct TrackingGestureListSlide: View, PhasedScriptProviding {
     /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
     var scriptSegments: [String] {
         [
-        "検知の基礎はHandGestureKitで、関節ごとのAnchor情報から、指の形や距離の条件に一致しているかどうかをクエリのように指定して判定できるようにしたライブラリです。ここは去年と同じです。",
-        "今回のアプリに載せたのは、ディスクを手首に装着させるトラッキングと、3本指での手札表示・ドローなどのジェスチャーです。",
+        "検知の基礎はHandGestureKitで、関節ごとのAnchor情報から、指の形や距離が条件に一致しているかどうかをクエリのように指定して判定できるようにしたライブラリです。",
+        "今回のアプリで実装したのは、ディスクを手首に装着させるトラッキングと、3本指での手札表示・ドローなどのジェスチャーです。",
         "ディスクは手首の座標にディスクの底面のロケーターの位置を合わせて配置しています。",
         ]
     }
@@ -86,7 +86,7 @@ struct TrackingGestureListSlide: View, PhasedScriptProviding {
         HeaderSlide("ジェスチャーやトラッキングまわりの構成") {
             Item("検知の基礎はHandGestureKit(去年の発表)", keywords: ["HandGestureKit"], accessory: .number(1))
             if shows(.second) {
-                Item("手首装着トラッキング + ジェスチャー3つ", keywords: [], accessory: .number(2))
+                Item("手首装着トラッキング + いくつかのジェスチャー操作", keywords: [], accessory: .number(2))
             }
             if shows(.third) {
                 Item("ディスクは手首の座標にディスクのロケーターの座標を合わせて配置", keywords: [], accessory: .number(3))

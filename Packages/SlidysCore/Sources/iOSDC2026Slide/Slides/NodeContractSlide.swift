@@ -39,13 +39,31 @@ struct NodeContractSlide: View, PhasedScriptProviding {
 
     var body: some View {
         HeaderSlide("モデル内の部品の座標をコードから取得する") {
-            Item("カード置き場やデッキ、手首の座標を取りたい", keywords: [], accessory: .number(1))
-            if shows(.second) {
-                Item("ロケーター = Blenderの空オブジェクト(Empty)を目印に", keywords: ["ロケーター"], accessory: .number(2))
+            HStack(alignment: .top, spacing: 60) {
+                VStack(alignment: .leading, spacing: 44) {
+                    Item("カード置き場やデッキ、手首の座標を取りたい", keywords: [], accessory: .number(1))
+                    if shows(.second) {
+                        Item("ロケーター = Blenderの空オブジェクト(Empty)を目印に", keywords: ["ロケーター"], accessory: .number(2))
+                    }
+                    if shows(.third) {
+                        Item("アプリは名前で探すだけ。コードは変更不要", keywords: ["コードは変更不要"], accessory: .number(3))
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                // ディスクのBlenderモデリング画面(ロケーターを置いているモデルの実物)
+                Image(.blenderDiskModeling)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.15), lineWidth: 2)
+                    }
+                    .frame(width: 620)
+                    .frame(maxHeight: .infinity)
             }
-            if shows(.third) {
-                Item("アプリは名前で探すだけ。コードは変更不要", keywords: ["コードは変更不要"], accessory: .number(3))
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }

@@ -14,7 +14,7 @@ struct HandFanSlide: View, PhasedScriptProviding {
         [
         "次に手札の表示の仕組みについて説明します。手札は、左手の親指・人差し指・中指の3本を合わせている間だけ、扇状に表示されます。",
         "なぜ3本かというと、visionOS標準の親指と人差し指の2本指ピンチはタップ操作として予約されているので、それと混同しないようにするためです。",
-        "3本の指先を合わせると指先は1点に集まって、手の向きが取れなくなります。なので扇の向きを計算するために、つまみ中も指の付け根のナックルも利用しています。",
+        "3本の指先を合わせると指先は1点に集まって、角度や向きが取れなくなります。なので扇の角度や向きを計算するために、指の付け根のナックルも利用しています。",
         ]
     }
 
@@ -46,7 +46,7 @@ struct HandFanSlide: View, PhasedScriptProviding {
                         Item("標準の2本指ピンチと区別", keywords: [], accessory: .number(2))
                     }
                     if shows(.third) {
-                        Item("手札の向きは付け根(ナックル)で判断", keywords: ["付け根(ナックル)"], accessory: .number(3))
+                        Item("手札の向きや角度は付け根(ナックル)も利用", keywords: ["付け根(ナックル)"], accessory: .number(3))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

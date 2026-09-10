@@ -157,7 +157,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "時間はまだ残ってる。(？)", script: "時間はまだ残ってる。")
         CenterTextSlide(
             text: "ここを耐えれば、発表は無事終わるんだから！",
-            script: "ここを耐えれば、発表は無事終わるんだから！"
+            script: "ここを耐えれば、発表は無事終わるんだから！次回"
         )
         NextEpisodePreviewSlide(
             mainText: "城⚫︎内死す",

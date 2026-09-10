@@ -16,7 +16,7 @@ struct RcpUsageSlide: View, PhasedScriptProviding {
         [
         "形を作るのは全部Blenderです。",
         "Reality Composer Proを使ったのは、後ほど紹介する召喚エフェクトのシーンの調整だけです。",
-        "当初はReality Composer Proでコンポーネントを付けることも想定していましたが、今回の設定は複雑で、コードで管理する方が楽でした。",
+        "当初はReality Composer Proでコンポーネントを付けることも想定していましたが、今回の設定は複雑で、コードで管理する方が楽でした。AI活用も考えると、コードの方が設定はしやすいです。",
         ]
     }
 
