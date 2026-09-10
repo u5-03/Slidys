@@ -31,8 +31,12 @@ public struct SlideBaseView: View {
     
     private let timerDuration: Duration
 
+    // NOTE: コントローラの参照は必ず @StateObject の slideIndexController を使うこと。
+    // slideConfiguration はデッキ側(computed な `var view` 等)の再評価で
+    // 新しいインスタンスに差し替わることがあり、slideConfiguration.slideIndexController を
+    // 直接使うと「スライド送りとスピーカーノートが別のコントローラを見る」事故が起きる。
     var presentationContentView: some View {
-        SlideRouterView(slideIndexController: slideConfiguration.slideIndexController)
+        SlideRouterView(slideIndexController: slideIndexController)
             .slideTheme(slideTheme)
             .foregroundColor(.black)
             .background(.white)
@@ -77,7 +81,7 @@ public struct SlideBaseView: View {
                 // YouTube(iPad)風: 左にスライド、右にスピーカーノート
                 HStack(spacing: 0) {
                     presentationBody
-                    SpeakerNotesPanel(slideIndexController: slideConfiguration.slideIndexController)
+                    SpeakerNotesPanel(slideIndexController: slideIndexController)
                         .frame(width: proxy.size.width * 0.34)
                 }
             } else {
@@ -109,7 +113,7 @@ public struct SlideBaseView: View {
                                 // SymbolQuizのViewなどでFocusが移動した時に、再度Focusを有効にする処理
                                 isFocused = true
                                 Task {
-                                    slideConfiguration.slideIndexController.back()
+                                    slideIndexController.back()
                                 }
                             }
                         Circle()
@@ -119,7 +123,7 @@ public struct SlideBaseView: View {
                             .onTapGesture {
                                 isFocused = true
                                 Task {
-                                    slideConfiguration.slideIndexController.forward()
+                                    slideIndexController.forward()
                                 }
                             }
 #if os(iOS)
@@ -203,14 +207,14 @@ public struct SlideBaseView: View {
         .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
             isFocused = true
             Task {
-                slideConfiguration.slideIndexController.back()
+                slideIndexController.back()
             }
             return .handled
         }
         .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
             isFocused = true
             Task {
-                slideConfiguration.slideIndexController.forward()
+                slideIndexController.forward()
             }
             return .handled
         }
@@ -218,7 +222,7 @@ public struct SlideBaseView: View {
         .onKeyPress(KeyEquivalent("p")) {
             Task { @MainActor in
                 SpeakerNotesWindowPresenter.toggle(
-                    slideIndexController: slideConfiguration.slideIndexController,
+                    slideIndexController: slideIndexController,
                     slideTheme: slideTheme
                 )
             }
@@ -234,11 +238,11 @@ public struct SlideBaseView: View {
             return .handled
         }
         .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
-            Task { slideConfiguration.slideIndexController.back() }
+            Task { slideIndexController.back() }
             return .handled
         }
         .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
-            Task { slideConfiguration.slideIndexController.forward() }
+            Task { slideIndexController.forward() }
             return .handled
         }
         .onAppear { isFocused = true }

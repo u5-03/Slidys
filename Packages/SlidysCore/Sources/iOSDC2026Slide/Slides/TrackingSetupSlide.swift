@@ -15,7 +15,7 @@ import SwiftUI
 struct TrackingSetupSlide: View {
     /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
     var script: String {
-        "ジェスチャー検知の土台は、去年のiOSDC2025の発表で作ったHandGestureKitをそのまま使っています。\n去年は手話ジェスチャーの検知と翻訳というテーマで、話しました。この写真はただピースサインをしているのではなく、ピースサインの形を検知できるかのデモの様子を激写されただけで、決してテンションが上がっていたわけではないです。"
+        "ジェスチャー検知の土台は、去年のiOSDC2025の発表で作ったHandGestureKitをそのまま使っています。\n去年は手話ジェスチャーの検知と翻訳というテーマで話しました。この写真はただピースサインをしているのではなく、ピースサインの手の形を検知できるかのデモの様子を激写されただけで、決してテンションが上がっていたわけではないです。"
     }
 
     public var transition: AnyTransition {
@@ -53,10 +53,14 @@ struct TrackingSetupSlide: View {
 }
 
 @Slide
-struct TrackingGestureListSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "検知の基礎はHandGestureKitで、関節ごとのAnchor情報から、指の形や距離の条件に一致しているかどうかをクエリのように指定して判定できるようにしたライブラリです。ここは去年と同じです。\n今回のアプリに載せたのは、ディスクを手首に装着させるトラッキングと、3本指の手札・ドローなどのジェスチャーです。\nディスクは手首の座標にロケーターの位置を合わせて配置しています。"
+struct TrackingGestureListSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "検知の基礎はHandGestureKitで、関節ごとのAnchor情報から、指の形や距離の条件に一致しているかどうかをクエリのように指定して判定できるようにしたライブラリです。ここは去年と同じです。",
+        "今回のアプリに載せたのは、ディスクを手首に装着させるトラッキングと、3本指での手札表示・ドローなどのジェスチャーです。",
+        "ディスクは手首の座標にディスクの底面のロケーターの位置を合わせて配置しています。",
+        ]
     }
 
     public var transition: AnyTransition {
@@ -85,7 +89,7 @@ struct TrackingGestureListSlide: View {
                 Item("手首装着トラッキング + ジェスチャー3つ", keywords: [], accessory: .number(2))
             }
             if shows(.third) {
-                Item("ディスクは手首の座標に合わせて配置", keywords: [], accessory: .number(3))
+                Item("ディスクは手首の座標にディスクのロケーターの座標を合わせて配置", keywords: [], accessory: .number(3))
             }
         }
     }

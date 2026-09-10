@@ -8,10 +8,15 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct ModelPipelineSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "次にモデルがアプリに表示されるまでの流れです。\nまずは頑張ってBlenderでモデリングします。\nそしてそれをUSDZの形式で書き出します。\nその後、そのファイルをXcode内のReality Composer Pro用の.rkassetsというフォルダに置く。\nそうするとビルド時にXcodeのCLIツールのrealitytoolが.realityという最適化された形式にコンパイルし、RealityKitで読み込むことができます。タップ判定などの振る舞いはコードで付与します。"
+struct ModelPipelineSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "次にモデルがアプリに表示されるまでの流れです。\nまずは頑張ってBlenderでモデリングします。",
+        "そしてそれをUSDZの形式で書き出します。",
+        "その後、そのファイルをXcode内のReality Composer Pro用の.rkassetsというフォルダに置く。",
+        "そうするとビルド時にXcodeのCLIツールのrealitytoolが.realityという最適化された形式にコンパイルし、RealityKitで読み込むことができます。タップ判定などの振る舞いはコードで付与します。",
+        ]
     }
 
     public var transition: AnyTransition {

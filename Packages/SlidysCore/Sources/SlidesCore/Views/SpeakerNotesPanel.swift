@@ -19,7 +19,10 @@ public struct SpeakerNotesPanel: View {
     private var currentIndex: Int { slideIndexController.currentIndex }
 
     private var currentNote: String {
+        // 連続する改行(空行)は表示上1つにまとめる
         let script = slideIndexController.currentSlide.script
+            .replacingOccurrences(of: "\n{2,}", with: "\n", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         return script.isEmpty ? "(このスライドのノートはありません)" : script
     }
 

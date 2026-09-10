@@ -8,10 +8,13 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct DeckDrawSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "ドローは2段階のジェスチャーにしました。人差し指と中指でデッキに触れた後、そのまま指を離すか引き抜くとカードが1枚ドローできます。\n引いたカードは右手の指の間に追従します。\nこれでこのカードに全てをかけることもできます。"
+struct DeckDrawSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "ドローは2段階のジェスチャーにしました。人差し指と中指でデッキに触れた後、そのまま指を離すとカードが1枚ドローできます。",
+        "引いたカードは右手の指の間に追従します。\nこれであのデステニー・ドローを再現することも可能です。",
+        ]
     }
 
     public var transition: AnyTransition {

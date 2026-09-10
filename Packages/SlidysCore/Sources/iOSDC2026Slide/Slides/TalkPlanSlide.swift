@@ -8,10 +8,14 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct TalkPlanSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "今日話すのはこの3つです。\nまずは3Dモデルを用意して表示する話。ここでは主にBlenderが出てきます。\n次にHand Gestureでカードを引いて、持って、置く実装の話です。\n最後にエフェクトとアニメーションで体験や演出を改善する話です。\n\nコードは最近だとAIに聞けば大抵解決できるので、今日はコードの詳細はほとんど出てきません。詳細はブログとコード、スライドはTestFlightで配布します。"
+struct TalkPlanSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "今日話すのはこの3つです。\nまずは3Dモデルを用意して表示する話。ここでは主にBlenderが出てきます。",
+        "次にHand Gestureでカードを引いて、持って、置く実装の話です。",
+        "最後にエフェクトとアニメーションで体験や演出を改善する話です。\n\nコードは最近だとAIに聞けば大抵解決できるので、今日はコードの詳細はほとんど出てきません。詳細はブログとGitHub、スライドはTestFlightで配布します。",
+        ]
     }
 
     public var transition: AnyTransition {

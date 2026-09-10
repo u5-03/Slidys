@@ -10,10 +10,14 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct RcpUsageSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "形を作るのは全部Blender。Reality Composer Proを使ったのは、後ほど紹介する召喚エフェクトのシーンの調整だけです。\n当初はGUIでコンポーネントを付けることも想定していましたが、今回の設定は複雑で、コードで管理する方が楽でした。"
+struct RcpUsageSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "形を作るのは全部Blenderです。",
+        "Reality Composer Proを使ったのは、後ほど紹介する召喚エフェクトのシーンの調整だけです。",
+        "当初はReality Composer Proでコンポーネントを付けることも想定していましたが、今回の設定は複雑で、コードで管理する方が楽でした。",
+        ]
     }
 
     public var transition: AnyTransition {

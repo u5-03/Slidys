@@ -8,10 +8,14 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct SummonSequenceSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "召喚の演出は2つの場所で起きます。\nまずディスク上では、カードを置いたゾーンから周囲へ光のラインが走ります。\nフィールドではカードが出現して上昇し、放射状の光のバーストが弾けます。\n1秒後、光の中からモンスターがフェードインしながらせり上がってきます。"
+struct SummonSequenceSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "召喚の演出は2つの場所で起きます。\nまずディスク上では、カードを置いたゾーンから周囲へ光のラインが走ります。",
+        "フィールドではカードが出現して上昇し、放射状の光のバーストが弾けます。",
+        "1秒後、光の中からモンスターがフェードインしながらせり上がってきます。",
+        ]
     }
 
     public var transition: AnyTransition {

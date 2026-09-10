@@ -10,10 +10,14 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct ParticleEffectSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "足元の光のバーストは、Reality Composer ProのGUIで作ったパーティクルです。\n線・スパークル・光の球の3つのエミッタを重ねていて、プレビューしながら挙動を微調整できるのはGUIならではのメリットです。\nまぶしい光の定番は、光をにじませる「ブルーム」という加工ですが、visionOSにはありません。\nそこで、ぼんやり光る粒をたくさん重ねて、中心を真っ白に飛ばしています。人の目は真っ白な部分を強い光と感じるので、これで十分光って見えます。\nパーティクルや光の球が床を突き抜ける問題は、OcclusionMaterialという見えない壁で下半分を隠して解決しました。"
+struct ParticleEffectSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "足元の光のバーストは、Reality Composer ProのGUIで作ったパーティクルです。\n線・スパークル・光の球の3つのエミッタを重ねていて、プレビューしながら挙動を微調整できるのはGUIならではのメリットです。",
+        "まぶしい光の定番は、光をにじませる「ブルーム」という加工ですが、visionOSにはありません。\nそこで、ぼんやり光る粒をたくさん重ねて、中心を真っ白に飛ばしています。人の目は真っ白な部分を強い光と感じるので、これで十分光って見えます。",
+        "パーティクルや光の球が床を突き抜ける問題は、OcclusionMaterialという見えない壁で下半分を隠して解決しました。",
+        ]
     }
 
     public var transition: AnyTransition {

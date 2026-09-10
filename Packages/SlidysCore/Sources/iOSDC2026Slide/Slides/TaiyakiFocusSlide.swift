@@ -11,10 +11,13 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct TaiyakiFocusSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "ここまではvisionOSの話でしたが、同じ仕組みはiOS/iPadOSでも使えます。\n2Dの写真より3Dモデルのほうが伝えられる情報は圧倒的に多いです。\n見てほしいポイントにアンカーを置いておけば、タップでその部位にズームして詳細を見せるような体験が作れます。\nモデルを回すと手前を向いた部位にだけボタンが出て、タップするとズームして解説が出ます。\nAIのおかげで、3Dオブジェクトを作るハードルも大きく下がっています。このような体験によって、もしかすると皆さんのプロダクトで新しい価値をユーザーに届けることができるかもしれません。"
+struct TaiyakiFocusSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "ここまではvisionOSの話でしたが、同じ仕組みはiOS/iPadOSでも使えます。\n2Dの写真より3Dモデルのほうが伝えられる情報は圧倒的に多いです。",
+        "見てほしいポイントにアンカーを置いておけば、タップでその部位にズームして詳細を見せるような体験が作れます。\nモデルを回すと手前を向いた部位にだけボタンが出て、タップするとズームして解説が出ます。\nAIのおかげで、3Dオブジェクトを作るハードルも大きく下がっています。このような実装によって、もしかすると皆さんのプロダクトで新しい価値をユーザーに届けることができるかもしれません。",
+        ]
     }
 
     public var transition: AnyTransition {
@@ -25,7 +28,7 @@ struct TaiyakiFocusSlide: View {
     @Phase private var phase: SlidePhase
 
     enum SlidePhase: Int, PhasedState {
-        case initial, second
+        case initial, second, third
     }
 
     /// フェーズ表示の判定。通常は@Phaseの進行、スピーカーノートのプレビューでは
@@ -43,6 +46,9 @@ struct TaiyakiFocusSlide: View {
                     Item("2Dより3Dの方が伝わるものもある", keywords: [], accessory: .number(1))
                     if shows(.second) {
                         Item("アンカーを置けば、タップで部位の解説へ", keywords: ["アンカー"], accessory: .number(2))
+                    }
+                    if shows(.third) {
+                        Item("AIのおかげで、3Dモデルを作るハードルは下がった", keywords: ["AI"], accessory: .number(3))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

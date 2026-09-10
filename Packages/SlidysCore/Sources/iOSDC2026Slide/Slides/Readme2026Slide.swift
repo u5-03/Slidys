@@ -15,7 +15,7 @@ import SwiftUI
 struct Readme2026Slide: View {
     /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
     var script: String {
-        "簡単に自己紹介です。すぎーといいます。このたい焼きのアイコンを使ってます。iOS/Flutterエンジニアです。iOSDCのスタッフもしています。\n最近は車を買って、さらに3Dプリンターも買って、お金が大変です。最近まで庭でメロンも育ててました"
+        "簡単に自己紹介です。すぎーといいます。このたい焼きのアイコンを使ってます。iOSエンジニアです。\n最近は車を買って、さらに3Dプリンターも買って、お金が大変です。会場にもいると思いますが、iPhone Duoに心惹かれますが、お財布と相談です"
     }
 
     public var transition: AnyTransition {
@@ -28,11 +28,11 @@ struct Readme2026Slide: View {
             info: .init(
                 name: "すぎー/Sugiy",
                 image: .iconDynamic,
-                firstText: "iOS/Flutterエンジニアです",
+                firstText: "iOSエンジニアです",
                 secondText: "iOSDCのスタッフもしてます",
                 thirdText: "最近車を買いました",
                 fourthText: "3Dプリンターも買いました。お金が...💸",
-                fifthText: "こないだまで庭でメロンを育ててました"
+                fifthText: "iPhone Duoに心惹かれる..."
             ),
             iconSize: 510 // 既定(340)の1.5倍
         )

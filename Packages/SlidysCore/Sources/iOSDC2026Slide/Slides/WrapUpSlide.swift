@@ -8,10 +8,14 @@ import SlideKit
 import SlidesCore
 
 @Slide
-struct WrapUpSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "まとめです。\nオブジェクトの形はBlender、エフェクト調整はReality Composer Pro、細かい振る舞いはコード、と役割を分けて実現しました。\nハンドトラッキングのロストやブレはvisionOS側の制約なのでゼロにはできません。起きる前提で、逃げ道を設計に組み込むことが大事です。\n制約は多いですが、「いつかやってみたかった」は個人開発でも形にできます。"
+struct WrapUpSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "まとめです。\nオブジェクトの形はBlender、エフェクト調整はReality Composer Pro、細かい振る舞いはコード、と役割を分けて実現しました。",
+        "ハンドトラッキングのロストやブレはvisionOS側の制約なのでゼロにはできません。起きる前提で、逃げ道を設計に組み込むことが大事です。\nまたAIがあれば、実は3Dモデリングは思ったよりもハードルは高くないということです。",
+        "「いつかやってみたかった」、ロマンある個人開発は楽しいです",
+        ]
     }
 
     public var transition: AnyTransition {
@@ -22,7 +26,7 @@ struct WrapUpSlide: View {
     @Phase private var phase: SlidePhase
 
     enum SlidePhase: Int, PhasedState {
-        case initial, second, third
+        case initial, second, third, fourth
     }
 
     /// フェーズ表示の判定。通常は@Phaseの進行、スピーカーノートのプレビューでは
@@ -40,7 +44,10 @@ struct WrapUpSlide: View {
                 Item("ロストやブレは起きる前提で設計する", keywords: ["起きる前提"], accessory: .number(2))
             }
             if shows(.third) {
-                Item("「いつかやってみたかった」は個人開発でも形にできる", keywords: ["個人開発でも形にできる"], accessory: .number(3))
+                Item("AIがあれば3Dモデリングはコワくないよ", accessory: .number(3))
+            }
+            if shows(.fourth) {
+                Item("「いつかやってみたかった」、ロマンある個人開発は楽しい", keywords: ["いつかやってみたかった」"], accessory: .number(4))
             }
         }
     }

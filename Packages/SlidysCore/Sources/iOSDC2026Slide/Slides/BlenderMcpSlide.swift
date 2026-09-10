@@ -10,10 +10,13 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct BlenderMcpSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "ではBlender初心者の私が全て一からモデリングしたかというと、最初は手動で作りましたが、途中からはBlender MCPをメインで使っています。\nBlender MCPを使うと、ClaudeのようなAIがBlenderを直接操作してモデリングできます。「こういうモデルを作って」と頼むだけで、土台になる形はできてしまいます。\n細かい調整は必要ですが、「3Dモデリングは経験がないから無理」と思っている方も、まずAIに任せてみると結構いい感じになります。"
+struct BlenderMcpSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "ではBlender初心者の私が全て一からモデリングしたかというと、最初は手動で作りましたが、途中からはBlender MCPをメインで使っています。\nBlender MCPを使うと、ClaudeのようなAIがBlenderを直接操作してモデリングできます。「こういうモデルを作って」と頼むだけで、土台になる形はできてしまいます。",
+        "細かい調整は必要ですが、「3Dモデリングは経験がないから無理」と思っている方も、まずAIに任せてみると結構いい感じになります。",
+        ]
     }
 
     public var transition: AnyTransition {

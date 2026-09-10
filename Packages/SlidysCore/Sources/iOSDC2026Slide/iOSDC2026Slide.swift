@@ -90,7 +90,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         )
 
         // 1. 3Dモデルを用意して表示する
-        ChapterDividerSlide(activeIndex: 0, script: "ではまず1章から始めます。")
+        ChapterDividerSlide(activeIndex: 0, script: "ではまずは「3Dモデルを用意して表示する」から始めます。")
         BlenderModelingSlide()
         ModelPipelineSlide()
         RcpUsageSlide()
@@ -147,7 +147,7 @@ struct SlideConfiguration: SlideConfigurationProtocol {
         )
         AstraIconCompareSlide()
         TaiyakiRealityKitDemoSlide()
-        CenterTextSlide(text: "AIすごいな", script: "AIすごいな。という感想でした")
+        CenterTextSlide(text: "AIすごいな", script: "AIすごいな。という感想でした。AIの発展でより一層3Dモデル作成のハードルが下がっていきそうですね。")
 
         CenterTextSlide(text: "おっと、そろそろ時間が", script: "おっと、そろそろ時間が。")
         CenterTextSlide(

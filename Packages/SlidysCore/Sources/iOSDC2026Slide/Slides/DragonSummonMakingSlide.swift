@@ -11,10 +11,14 @@ import SlidesCore
 import SwiftUI
 
 @Slide
-struct DragonSummonMakingSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
-    var script: String {
-        "次にこの竜の召喚エフェクトをどう作ったかです。\nまず動きのシーケンスを、ぱらぱら漫画のような絵コンテとして作りました。何コマ目で光が出て、何コマ目で竜が現れて、という設計図です。\nその絵コンテをベースに、さっき紹介したBlender MCP経由でAIにモデルと動きを作ってもらいました。\n正直細かい作り込みは自分の技術では手が届かず、正直このクオリティが今の限界でした。"
+struct DragonSummonMakingSlide: View, PhasedScriptProviding {
+    /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
+    var scriptSegments: [String] {
+        [
+        "次にこの竜の召喚エフェクトをどう作ったかです。\nまず動きのシーケンスを、ぱらぱら漫画のような絵コンテとして作りました。何コマ目で光が出て、何コマ目で竜が現れて、という設計図です。",
+        "その絵コンテをベースに、さっき紹介したBlender MCP経由でAIにモデルと動きを作ってもらいました。",
+        "正直細かい作り込みは自分の技術では手が届かず、このクオリティが今の限界でした。",
+        ]
     }
 
     public var transition: AnyTransition {

@@ -122,30 +122,60 @@ struct SpeakerNotesView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 14) {
                 Text("\(currentIndex + 1) / \(slideIndexController.slides.count)")
-                    .font(.system(size: 28, weight: .heavy, design: .monospaced))
+                    .font(.system(size: 34, weight: .heavy, design: .monospaced))
                 Text(currentSlideName)
-                    .font(.system(size: 15))
+                    .font(.system(size: 16))
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button {
                     startDate = Date()
                 } label: {
                     Image(systemName: "arrow.counterclockwise.circle.fill")
-                        .font(.system(size: 18))
+                        .font(.system(size: 22))
                 }
                 .buttonStyle(.plain)
                 Text(startDate, style: .timer)
-                    .font(.system(size: 26, weight: .bold, design: .monospaced))
+                    .font(.system(size: 32, weight: .bold, design: .monospaced))
             }
 
-            ScrollView {
-                Text(currentNote)
-                    .font(.system(size: 23, weight: .medium))
-                    .lineSpacing(8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
+            ScrollViewReader { scrollProxy in
+                ScrollView {
+                    // フェーズ持ちのスライドは、セグメントごとに「ここで次を表示」の
+                    // 区切りを挟んで描画する(現在のセグメントを白、それ以外を淡色に)
+                    if let segments = (slideIndexController.currentSlide as? any PhasedScriptProviding)?.scriptSegments,
+                       !segments.isEmpty {
+                        let activeIndex = min(currentPhase.current, segments.count - 1)
+                        VStack(alignment: .leading, spacing: 14) {
+                            ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
+                                if index > 0 {
+                                    phaseSeparator(isNext: index == activeIndex + 1)
+                                }
+                                Text(normalizedNote(segment))
+                                    .font(.system(size: noteFontSize, weight: .medium))
+                                    .lineSpacing(10)
+                                    .foregroundStyle(index == activeIndex ? .white : .white.opacity(0.35))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .textSelection(.enabled)
+                                    .id(index)
+                            }
+                        }
+                    } else {
+                        Text(normalizedNote(currentNote))
+                            .font(.system(size: noteFontSize, weight: .medium))
+                            .lineSpacing(10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                            .id(0)
+                    }
+                }
+                // ページ/フェーズが進んだら、いま話すセグメントを上端へ自動スクロールする
+                .onChange(of: autoScrollKey) { _, _ in
+                    scrollProxy.scrollTo(activeSegmentIndex, anchor: .top)
+                }
+                .onAppear {
+                    scrollProxy.scrollTo(activeSegmentIndex, anchor: .top)
+                }
             }
-            .id(currentIndex) // ページが変わったらスクロール位置を先頭へ戻す
         }
         .padding(20)
         .frame(minWidth: 640, minHeight: 480)
@@ -168,6 +198,43 @@ struct SpeakerNotesView: View {
             return .handled
         }
         .onAppear { isFocused = true }
+    }
+
+    /// ノート本文の文字サイズ。Vision Proを装着したまま読めるよう大きめにしている。
+    private var noteFontSize: CGFloat { 45 }
+
+    /// 表示用の整形: 連続する改行(空行)を1つにまとめ、前後の余白を落とす
+    private func normalizedNote(_ text: String) -> String {
+        text.replacingOccurrences(of: "\n{2,}", with: "\n", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// いま話すべきセグメントの位置(自動スクロールの対象)
+    private var activeSegmentIndex: Int {
+        guard let segments = (slideIndexController.currentSlide as? any PhasedScriptProviding)?.scriptSegments,
+              !segments.isEmpty else { return 0 }
+        return min(currentPhase.current, segments.count - 1)
+    }
+
+    /// ページ移動・フェーズ送りのどちらでも自動スクロールを発火させるためのキー
+    private var autoScrollKey: String {
+        "\(currentIndex)-\(currentPhase.current)"
+    }
+
+    /// 「ここで次を表示」の区切り線。次に進むべき箇所(現在の直後)は強調する。
+    private func phaseSeparator(isNext: Bool) -> some View {
+        HStack(spacing: 10) {
+            Rectangle()
+                .frame(height: 3)
+                .foregroundStyle(isNext ? Color.orange : Color.white.opacity(0.25))
+            Text("▼ ここで次を表示")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(isNext ? Color.orange : Color.white.opacity(0.35))
+                .fixedSize()
+            Rectangle()
+                .frame(height: 3)
+                .foregroundStyle(isNext ? Color.orange : Color.white.opacity(0.25))
+        }
     }
 
     private var nextPaneTitle: String {
