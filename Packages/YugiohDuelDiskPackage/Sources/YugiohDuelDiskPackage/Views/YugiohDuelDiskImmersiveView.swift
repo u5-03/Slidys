@@ -112,15 +112,15 @@ public struct YugiohDuelDiskImmersiveView: View {
     @State private var fieldHandleAreaDragStart: SIMD3<Float>?
     /// スケール調整ドラッグ開始時のフィールド一様スケール。
     @State private var fieldScaleDragStart: Float?
-    @State private var fieldCardEntities: [Int: Entity] = [:]
-    /// フィールド手前列(魔法・トラップ)に配置したカード Entity
-    @State private var fieldFrontCardEntities: [Int: Entity] = [:]
-    @State private var fieldMonsterEntities: [Int: Entity] = [:]
-    /// col ごとの召喚 Task。新しい召喚要求が来たら旧 Task をキャンセルする。
-    @State private var fieldSummonTasks: [Int: Task<Void, Never>] = [:]
-    /// col ごとの召喚バースト(共通コントローラ SummonBurstController)。
-    /// スロット削除/退室時に stop() で片付ける。
-    @State private var fieldSummonEffects: [Int: SummonBurstController] = [:]
+    /// 自陣フィールドのカード / モンスター / 召喚 Task / 召喚バースト(col キー)。
+    @State private var ownFieldEntities = FieldEntityState()
+    /// 相手陣フィールドの同上。`isMultiplayerActive` が false になったら全て片付ける。
+    @State private var opponentFieldEntities = FieldEntityState()
+    /// 相手陣ルート。`fieldInteractionRoot` の子として奥(−Z)に π 回転で置く
+    /// (ハンドルの移動/回転/スケールは自陣と一緒に「1 つのテーブル」として動く)。
+    @State private var opponentFieldRoot: Entity?
+    /// 相手の名前ラベル attachment を相手陣に設置済みか
+    @State private var opponentNameLabelInstalled: Bool = false
     /// 移動ハンドルのドラッグ開始時のフィールド位置(ワールド)
     @State private var fieldDragStartPosition: SIMD3<Float>?
     /// 回転ハンドルのドラッグ開始時の状態(フィールド中央を軸に回すために使う)
@@ -154,6 +154,12 @@ public struct YugiohDuelDiskImmersiveView: View {
     public init() {}
 
     public var body: some View {
+        // RealityView + 既存の onChange 群(mainContent)と、対戦モード用の onChange 群を分けて
+        // 1 つの式に詰め込みすぎない(型チェックがタイムアウトするため)。
+        installMultiplayerObservers(mainContent)
+    }
+
+    private var mainContent: some View {
         RealityView { content, attachments in
             content.add(rootEntity)
             await requestHandTrackingAuthorization()
@@ -178,6 +184,7 @@ public struct YugiohDuelDiskImmersiveView: View {
             // 初回 make で attachments を取り損ねていた場合の保険 + 位置更新
             installAttachmentIfNeeded(attachments)
             installLifeDisplayIfNeeded(attachments)
+            installOpponentNameLabelIfNeeded(attachments)
             syncCardAttachments(attachments)
             syncDiskSummonEffectAttachments(attachments)
             updateAttachmentPlacement(attachments)
@@ -191,8 +198,8 @@ public struct YugiohDuelDiskImmersiveView: View {
                         context: ctx,
                         canOpen: sessionStore.canOpenCard(at: ctx),
                         onOpen: {
-                            // 裏の魔法・トラップを表にする。Entity の向き更新は
-                            // `onChange(of: fieldFrontRevealed)` 経由で反映する。
+                            // 裏の魔法・トラップを表にする。見た目の切替は手前列カードの attachment が
+                            // `fieldFrontRevealed` を観測して CardBackView → CardView に差し替わることで反映される。
                             sessionStore.openPlacedCard(at: ctx)
                         },
                         onDelete: {
@@ -287,6 +294,8 @@ public struct YugiohDuelDiskImmersiveView: View {
                     }
                 }
             }
+            // 相手陣(対戦モード)のカード + 名前ラベル(型チェック負荷を下げるため別プロパティに分離)
+            opponentFieldAttachments
             ForEach(Array(activeDiskSummonEffects.values), id: \.id) { effect in
                 Attachment(id: AttachmentID.diskSummonEffect(effect.id)) {
 #if canImport(YugiohCardEffect)
@@ -363,17 +372,101 @@ public struct YugiohDuelDiskImmersiveView: View {
         }
         // フィールド奥列 → カード + モンスター Entity 同期
         .onChange(of: sessionStore.fieldBackRow) { _, newSlots in
-            syncFieldBackEntities(newSlots: newSlots)
+            syncFieldBackEntities(side: .mine, newSlots: newSlots)
             DuelLog.state("FieldBackSlots", summarizeSlots(newSlots))
         }
         // フィールド手前列(魔法・トラップ) → カード Entity 同期
         .onChange(of: sessionStore.fieldFrontRow) { _, newSlots in
-            syncFieldFrontEntities(newSlots: newSlots)
+            syncFieldFrontEntities(side: .mine, newSlots: newSlots)
             DuelLog.state("FieldFrontSlots", summarizeSlots(newSlots))
         }
         .onChange(of: sessionStore.tappedPlacedCardContext) { _, ctx in
             DuelLog.state("PlacedCardMenu", "context=\(String(describing: ctx))")
         }
+    }
+
+    /// 手前列の表裏 + 対戦モード(相手陣)の Store 変化を Entity に反映する onChange 群。
+    private func installMultiplayerObservers<Content: View>(_ content: Content) -> some View {
+        content
+            // 手前列の表裏。見た目の切替は attachment(CardView / CardBackView)が Store を直接観測して行うため、
+            // ここではログのみ(Entity 自体は作り直さない)。
+            .onChange(of: sessionStore.fieldFrontRevealed) { _, revealed in
+                DuelLog.state("FieldFrontRevealed", summarizeFlags(revealed))
+            }
+            // ---- 対戦(相手陣) ----
+            // 相手陣は相手からの DuelEvent でのみ変わる。自陣と同じ召喚演出で同期する。
+            .onChange(of: sessionStore.opponentFieldBackRow) { _, newSlots in
+                syncFieldBackEntities(side: .opponent, newSlots: newSlots)
+                DuelLog.state("OpponentFieldBackSlots", summarizeSlots(newSlots))
+            }
+            .onChange(of: sessionStore.opponentFieldFrontRow) { _, newSlots in
+                syncFieldFrontEntities(side: .opponent, newSlots: newSlots)
+                DuelLog.state("OpponentFieldFrontSlots", summarizeSlots(newSlots))
+            }
+            .onChange(of: sessionStore.opponentFieldFrontRevealed) { _, revealed in
+                // 表裏の見た目は attachment 側(opponentFieldFrontRevealed を観測)で切り替わる。
+                DuelLog.state("OpponentFieldFrontRevealed", summarizeFlags(revealed))
+            }
+            .onChange(of: sessionStore.isMultiplayerActive) { _, isActive in
+                applyMultiplayerActive(isActive)
+            }
+            .onChange(of: sessionStore.opponentInfo) { _, info in
+                DuelLog.state("OpponentInfo", "name=\(info?.displayName ?? "nil") device=\(info?.deviceKind ?? "nil")")
+            }
+    }
+
+    /// 相手陣(対戦モード)の attachment 群。
+    /// 奥列は常に表、手前列は `opponentFieldFrontRevealed` を観測して表裏を切り替える
+    /// (Entity は作り直さず、attachment の中身だけが差し替わる)。
+    @AttachmentContentBuilder
+    private var opponentFieldAttachments: some AttachmentContent {
+        ForEach(Array(sessionStore.opponentFieldBackRow.enumerated()), id: \.offset) { col, card in
+            if let card {
+                Attachment(id: AttachmentID.opponentFieldBackCard(column: col, cardID: card.id)) {
+                    FieldCardAttachmentContent(card: card, revealed: true)
+                }
+            }
+        }
+        ForEach(Array(sessionStore.opponentFieldFrontRow.enumerated()), id: \.offset) { col, card in
+            if let card {
+                Attachment(id: AttachmentID.opponentFieldFrontCard(column: col, cardID: card.id)) {
+                    FieldCardAttachmentContent(
+                        card: card,
+                        revealed: sessionStore.opponentFieldFrontRevealed[safe: col] == true
+                    )
+                }
+            }
+        }
+        Attachment(id: AttachmentID.opponentNameLabel) {
+            OpponentNameLabelView(
+                name: sessionStore.opponentInfo?.displayName,
+                deviceKind: sessionStore.opponentInfo?.deviceKind
+            )
+        }
+    }
+}
+
+/// フィールド上のカード attachment の中身。表なら CardView、裏なら CardBackView をカード設計寸法で描く。
+private struct FieldCardAttachmentContent: View {
+    let card: DuelCard
+    let revealed: Bool
+
+    var body: some View {
+#if canImport(YugiohCardEffect)
+        Group {
+            if revealed {
+                CardView(card: DuelCardVisualFactory.visualModel(for: card))
+            } else {
+                CardBackView()
+            }
+        }
+        .frame(
+            width: CGFloat(DuelCardVisualFactory.designWidth),
+            height: CGFloat(DuelCardVisualFactory.designHeight)
+        )
+#else
+        EmptyView()
+#endif
     }
 }
 
@@ -396,7 +489,72 @@ private enum AttachmentID {
     static func fieldFrontCard(column: Int, cardID: UUID) -> String {
         "duelFieldFrontCard-\(column)-\(cardID.uuidString)"
     }
+    static func opponentFieldBackCard(column: Int, cardID: UUID) -> String {
+        "duelOpponentFieldBackCard-\(column)-\(cardID.uuidString)"
+    }
+    static func opponentFieldFrontCard(column: Int, cardID: UUID) -> String {
+        "duelOpponentFieldFrontCard-\(column)-\(cardID.uuidString)"
+    }
+    static let opponentNameLabel = "duelOpponentNameLabel"
     static func diskSummonEffect(_ id: UUID) -> String { "duelDiskSummonEffect-\(id.uuidString)" }
+}
+
+/// フィールドの側。自陣(`.mine`)と相手陣(`.opponent`)で、親 Entity / Entity 辞書 / 参照する Store 配列を切り替える。
+private enum FieldSide {
+    case mine
+    case opponent
+
+    var logLabel: String {
+        switch self {
+        case .mine: "mine"
+        case .opponent: "opponent"
+        }
+    }
+}
+
+/// 片側フィールドのカード / モンスター / 召喚 Task / 召喚バースト(すべて col キー)。
+/// 自陣・相手陣で同じ構造を持ち、`FieldSide` で選んで使う。
+/// (SummonBurstController が MainActor 隔離のため、この構造体も MainActor に置く)
+@MainActor
+private struct FieldEntityState {
+    /// 奥列(モンスター)のカード Entity
+    var cardEntities: [Int: Entity] = [:]
+    /// 手前列(魔法・トラップ)のカード Entity
+    var frontCardEntities: [Int: Entity] = [:]
+    var monsterEntities: [Int: Entity] = [:]
+    /// col ごとの召喚 Task。新しい召喚要求が来たら旧 Task をキャンセルする。
+    var summonTasks: [Int: Task<Void, Never>] = [:]
+    /// col ごとの召喚バースト(共通コントローラ SummonBurstController)。
+    /// スロット削除/退室時に stop() で片付ける。
+    var summonEffects: [Int: SummonBurstController] = [:]
+
+    /// col の関連 Entity / Task / エフェクトをすべて片付ける(奥列側)。
+    mutating func removeBack(col: Int) {
+        cardEntities[col]?.removeFromParent()
+        cardEntities.removeValue(forKey: col)
+        monsterEntities[col]?.removeFromParent()
+        monsterEntities.removeValue(forKey: col)
+        summonTasks[col]?.cancel()
+        summonTasks.removeValue(forKey: col)
+        summonEffects[col]?.stop()
+        summonEffects.removeValue(forKey: col)
+    }
+
+    /// col の手前列カードを片付ける。
+    mutating func removeFront(col: Int) {
+        frontCardEntities[col]?.removeFromParent()
+        frontCardEntities.removeValue(forKey: col)
+    }
+
+    /// 全 Entity / Task / エフェクトを片付ける。
+    mutating func removeAll() {
+        for col in Set(cardEntities.keys).union(monsterEntities.keys).union(summonTasks.keys).union(summonEffects.keys) {
+            removeBack(col: col)
+        }
+        for col in Array(frontCardEntities.keys) {
+            removeFront(col: col)
+        }
+    }
 }
 
 private enum DuelCollisionGroup {
@@ -1127,10 +1285,74 @@ private extension YugiohDuelDiskImmersiveView {
         interactionRoot.addChild(slots)
         DuelLog.event("FieldSetupCompleted", "slotCount=10")
 
+        setupOpponentField(under: interactionRoot)
+
         // 召喚エリアの「移動」「回転」ハンドル(丸い球)を、フィールドの手前に設置する。
         // rootEntity 直下(回転しないワールド系)に置き、位置だけをフィールド中央に追従させる。
         // → 置き場と重ならない(手前)/ドラッグ計算が安定する/フィールド移動に追従する。
         setupFieldHandles()
+    }
+
+    /// 相手陣(対戦モード)のルートとスロット枠を、自陣ルートの子として奥(−Z)に置く。
+    /// - 自陣ルートの子にすることで、ハンドルの移動/回転/スケールが両陣に同時に効く(=1 つのテーブル)。
+    /// - Y 軸に π 回転して向かい合わせにする。これで相手の奥列(モンスター)が中央線側、
+    ///   手前列(魔法・トラップ)が相手側になり、実際の対戦と同じ配置になる。
+    /// - 対戦モード外では非表示(isEnabled=false)。
+    /// - ImmersiveSpace 入室前から対戦が始まっていた場合に備え、現在の相手陣を即時同期する。
+    func setupOpponentField(under interactionRoot: Entity) {
+        let root = Entity()
+        root.name = "OpponentFieldRoot"
+        root.position = SIMD3<Float>(0, 0, DuelDiskMetrics.opponentFieldOffsetZ)
+        root.orientation = simd_quatf(angle: .pi, axis: SIMD3<Float>(0, 1, 0))
+        root.isEnabled = sessionStore.isMultiplayerActive
+        root.addChild(FieldSlotFactory.makeField())
+        interactionRoot.addChild(root)
+        opponentFieldRoot = root
+        DuelLog.event(
+            "OpponentFieldSetupCompleted",
+            "offsetZ=\(DuelDiskMetrics.opponentFieldOffsetZ) enabled=\(root.isEnabled)"
+        )
+
+        if sessionStore.isMultiplayerActive {
+            syncFieldBackEntities(side: .opponent, newSlots: sessionStore.opponentFieldBackRow)
+            syncFieldFrontEntities(side: .opponent, newSlots: sessionStore.opponentFieldFrontRow)
+        }
+    }
+
+    /// 対戦モードの ON/OFF を相手陣の表示と、既存モンスターの向きに反映する。
+    /// OFF になったら相手陣の Entity / Task / エフェクトをすべて片付ける
+    /// (Store 側の相手陣配列も `stop()` で空に戻るが、onChange の順序に依存しないよう明示的に消す)。
+    func applyMultiplayerActive(_ isActive: Bool) {
+        opponentFieldRoot?.isEnabled = isActive
+        if !isActive {
+            opponentFieldEntities.removeAll()
+        }
+        // 自陣の既存モンスターの向きも切り替える(対戦中は敵側=奥、通常時はこちら側)。
+        // 出現アニメ(move(to:) + フェードイン)の途中だと、終了時にアニメ側の transform で
+        // 上書きされてヨーが戻ってしまうため、container 自身のアニメだけ止めて最終状態を直接書く
+        // (子の緋天竜に焼き込まれたアニメは止めない。上昇が途中で打ち切られるのは許容)。
+        let yaw = monsterYaw()
+        for (col, container) in ownFieldEntities.monsterEntities {
+            container.stopAllAnimations(recursive: false)
+            var transform = container.transform
+            if let cardEntity = ownFieldEntities.cardEntities[col] {
+                // 出現アニメの到達位置(spawnTaiyaki / spawnHitenryu の goal と同じ)
+                transform.translation = cardEntity.transform.translation
+                    + SIMD3<Float>(0, 0.15 + DuelDiskMetrics.cardRiseHeight, 0)
+            }
+            transform.rotation = simd_quatf(angle: yaw, axis: SIMD3<Float>(0, 1, 0))
+            container.transform = transform
+            container.components.set(OpacityComponent(opacity: 1))
+        }
+        DuelLog.event("MultiplayerActiveChanged", "isActive=\(isActive) monsterYawDeg=\(String(format: "%.0f", yaw * 180 / .pi))")
+    }
+
+    /// モンスター container のヨー(フィールドローカル)。
+    /// 通常(1 人)モードではプレイヤー(+Z=こちら)を向く 0。
+    /// 対戦モードでは両陣とも「敵側(自陣ローカルの奥=−Z)」を向く π。
+    /// 相手陣ルート自体が π 回転しているので、相手のモンスターは結果的にプレイヤーの方を向く。
+    func monsterYaw() -> Float {
+        sessionStore.isMultiplayerActive ? .pi : 0
     }
 
     /// 5種類のハンドル(移動/回転/サイズ/エリア移動/再配置)を生成し、手元に横1列で並べる。
@@ -1408,7 +1630,7 @@ private extension YugiohDuelDiskImmersiveView {
         }
 
         for (col, optCard) in sessionStore.fieldBackRow.enumerated() {
-            guard let card = optCard, let entity = fieldCardEntities[col] else { continue }
+            guard let card = optCard, let entity = ownFieldEntities.cardEntities[col] else { continue }
             attachCardViewIfNeeded(
                 to: entity,
                 attachmentID: AttachmentID.fieldBackCard(column: col, cardID: card.id),
@@ -1419,7 +1641,7 @@ private extension YugiohDuelDiskImmersiveView {
         }
 
         for (col, optCard) in sessionStore.fieldFrontRow.enumerated() {
-            guard let card = optCard, let entity = fieldFrontCardEntities[col] else { continue }
+            guard let card = optCard, let entity = ownFieldEntities.frontCardEntities[col] else { continue }
             attachCardViewIfNeeded(
                 to: entity,
                 attachmentID: AttachmentID.fieldFrontCard(column: col, cardID: card.id),
@@ -1428,6 +1650,44 @@ private extension YugiohDuelDiskImmersiveView {
                 surface: .horizontal
             )
         }
+
+        // 相手陣(対戦モード)
+        for (col, optCard) in sessionStore.opponentFieldBackRow.enumerated() {
+            guard let card = optCard, let entity = opponentFieldEntities.cardEntities[col] else { continue }
+            attachCardViewIfNeeded(
+                to: entity,
+                attachmentID: AttachmentID.opponentFieldBackCard(column: col, cardID: card.id),
+                attachments: attachments,
+                context: "OpponentFieldBack",
+                surface: .horizontal
+            )
+        }
+
+        for (col, optCard) in sessionStore.opponentFieldFrontRow.enumerated() {
+            guard let card = optCard, let entity = opponentFieldEntities.frontCardEntities[col] else { continue }
+            attachCardViewIfNeeded(
+                to: entity,
+                attachmentID: AttachmentID.opponentFieldFrontCard(column: col, cardID: card.id),
+                attachments: attachments,
+                context: "OpponentFieldFront",
+                surface: .horizontal
+            )
+        }
+    }
+
+    /// 相手の名前ラベル(attachment)を相手陣ルートの上空に一度だけ設置する。
+    /// 相手陣ルートは π 回転しているため、ラベルはさらに π 回してプレイヤー側(+Z)を向かせる。
+    /// 表示/非表示は親(opponentFieldRoot)の isEnabled に従う。
+    func installOpponentNameLabelIfNeeded(_ attachments: RealityViewAttachments) {
+        guard !opponentNameLabelInstalled,
+              let root = opponentFieldRoot,
+              let label = attachments.entity(for: AttachmentID.opponentNameLabel) else { return }
+        label.name = "OpponentNameLabel"
+        label.position = SIMD3<Float>(0, DuelDiskMetrics.opponentNameLabelHeight, 0)
+        label.orientation = simd_quatf(angle: .pi, axis: SIMD3<Float>(0, 1, 0))
+        root.addChild(label)
+        opponentNameLabelInstalled = true
+        DuelLog.event("OpponentNameLabelInstalled")
     }
 
     /// エフェクト holder の名前 prefix(シーングラフ上の走査に使う)。
@@ -2750,63 +3010,48 @@ private extension YugiohDuelDiskImmersiveView {
 // MARK: - 召喚エリア(地面) Entity 同期 + sugiy 召喚
 
 private extension YugiohDuelDiskImmersiveView {
-    func syncFieldBackEntities(newSlots: [DuelCard?]) {
-        guard let field = fieldInteractionRoot else { return }
+    // MARK: 自陣 / 相手陣の切替ヘルパー
 
-        // 削除分: col 単位で field 子エンティティをクリーンアップ + Task をキャンセル
-        for (col, entity) in fieldCardEntities {
-            if newSlots.indices.contains(col) == false || newSlots[col] == nil {
-                entity.removeFromParent()
-                fieldCardEntities.removeValue(forKey: col)
-                fieldMonsterEntities[col]?.removeFromParent()
-                fieldMonsterEntities.removeValue(forKey: col)
-                fieldSummonTasks[col]?.cancel()
-                fieldSummonTasks.removeValue(forKey: col)
-                fieldSummonEffects[col]?.stop()
-                fieldSummonEffects.removeValue(forKey: col)
-            }
-        }
-
-        // 追加分: 各 col で並列に Task 起動(直列 await による累積待ちを回避)
-        for (col, optCard) in newSlots.enumerated() {
-            guard let card = optCard else { continue }
-            if fieldCardEntities[col] != nil { continue }
-            // 旧 Task が残っていればキャンセル
-            fieldSummonTasks[col]?.cancel()
-            let task = Task { @MainActor in
-                await summon(into: field, at: col, card: card)
-            }
-            fieldSummonTasks[col] = task
+    /// 側に応じたフィールドの親 Entity(自陣: fieldInteractionRoot / 相手陣: opponentFieldRoot)。
+    func fieldParent(for side: FieldSide) -> Entity? {
+        switch side {
+        case .mine: fieldInteractionRoot
+        case .opponent: opponentFieldRoot
         }
     }
 
-    /// フィールド手前列(魔法・トラップ)のカード Entity を同期する。
-    /// モンスターと違い召喚エフェクト/モンスター出現は無く、カードを伏せる(置く)だけ。
-    func syncFieldFrontEntities(newSlots: [DuelCard?]) {
-        guard let field = fieldInteractionRoot else { return }
-
-        // 削除分
-        for (col, entity) in fieldFrontCardEntities {
-            if newSlots.indices.contains(col) == false || newSlots[col] == nil {
-                entity.removeFromParent()
-                fieldFrontCardEntities.removeValue(forKey: col)
-            }
+    /// 側に応じた Entity 辞書(読み取り)。
+    func fieldEntities(_ side: FieldSide) -> FieldEntityState {
+        switch side {
+        case .mine: ownFieldEntities
+        case .opponent: opponentFieldEntities
         }
+    }
 
-        // 追加分
-        let pitchX = DuelDiskMetrics.fieldSlotWidth + DuelDiskMetrics.fieldGapX
-        let totalCols = DuelDiskMetrics.diskSlotCount
-        for (col, optCard) in newSlots.enumerated() {
-            guard let card = optCard else { continue }
-            if fieldFrontCardEntities[col] != nil { continue }
-            let offsetX = (Float(col) - Float(totalCols - 1) / 2) * pitchX
-            let position = SIMD3<Float>(
-                offsetX,
-                DuelDiskMetrics.fieldSurfaceHeight + 0.003,
-                DuelDiskMetrics.fieldFrontZ - fieldLocalCenterOffsetZ
-            )
+    /// 側に応じた Entity 辞書を更新する。
+    func updateFieldEntities(_ side: FieldSide, _ body: (inout FieldEntityState) -> Void) {
+        switch side {
+        case .mine: body(&ownFieldEntities)
+        case .opponent: body(&opponentFieldEntities)
+        }
+    }
 
-            let entity = CardEntityFactory.make(model: card)
+    /// 側に応じた Store の奥列(召喚 Task の stale チェックに使う)。
+    func fieldBackRow(for side: FieldSide) -> [DuelCard?] {
+        switch side {
+        case .mine: sessionStore.fieldBackRow
+        case .opponent: sessionStore.opponentFieldBackRow
+        }
+    }
+
+    /// フィールド上のカード土台 Entity を作る。
+    /// 自陣のカードはタップでメニューを開くため当たり判定 + 配置場所 Component を持つ。
+    /// 相手陣のカードは操作対象ではないので、当たり判定・ホバー・入力ターゲットを付けない
+    /// (誤って自分の Store に対するメニューが開かないようにする)。
+    func makeFieldCardEntity(side: FieldSide, card: DuelCard, location: PlacedCardLocationComponent.Location) -> Entity {
+        let entity = CardEntityFactory.make(model: card)
+        switch side {
+        case .mine:
             entity.components.set(CollisionComponent(
                 shapes: [
                     .generateBox(size: SIMD3<Float>(
@@ -2821,23 +3066,100 @@ private extension YugiohDuelDiskImmersiveView {
                     mask: DuelCollisionGroup.rightIndexProbe
                 )
             ))
-            entity.transform.scale = SIMD3<Float>(repeating: DuelDiskMetrics.fieldCardScale)
-            entity.transform.translation = position
-            entity.transform.rotation = faceUpCardRotation(topDirection: SIMD3<Float>(0, 0, -1))
-            entity.components.set(PlacedCardLocationComponent(location: .fieldFront(col)))
-            field.addChild(entity)
-            fieldFrontCardEntities[col] = entity
-            DuelLog.event("FieldFrontCardSpawned", "col=\(col) cardId=\(card.id.uuidString)")
+            entity.components.set(PlacedCardLocationComponent(location: location))
+        case .opponent:
+            entity.components.remove(InputTargetComponent.self)
+            entity.components.remove(HoverEffectComponent.self)
+        }
+        entity.transform.scale = SIMD3<Float>(repeating: DuelDiskMetrics.fieldCardScale)
+        entity.transform.rotation = faceUpCardRotation(topDirection: SIMD3<Float>(0, 0, -1))
+        return entity
+    }
+
+    // MARK: 同期
+
+    /// フィールド奥列(モンスター)のカード + モンスター Entity を同期する。
+    /// 自陣・相手陣とも同じ召喚演出(上昇 → バースト → モンスター出現)を使う。
+    func syncFieldBackEntities(side: FieldSide, newSlots: [DuelCard?]) {
+        guard fieldParent(for: side) != nil else { return }
+
+        // 削除分: col 単位で field 子エンティティをクリーンアップ + Task をキャンセル。
+        // - スロットが空になった col(カード Entity が無くても、進行中の召喚 Task / バースト /
+        //   モンスターが残っていれば片付ける。restart で active フラグの変化が潰れても取りこぼさない)
+        // - 同 col でカードが別の ID に差し替わった col(1 回の変更で X→Y になったとき、
+        //   旧 Entity を消して追加分で新カードを召喚し直す)
+        let entities = fieldEntities(side)
+        let occupiedCols = Set(entities.cardEntities.keys)
+            .union(entities.monsterEntities.keys)
+            .union(entities.summonTasks.keys)
+            .union(entities.summonEffects.keys)
+        for col in occupiedCols {
+            let newCardId = newSlots.indices.contains(col) ? newSlots[col]?.id : nil
+            let currentCardId = entities.cardEntities[col]?.components[CardIdentityComponent.self]?.id
+            if newCardId == nil || (entities.cardEntities[col] != nil && currentCardId != newCardId) {
+                updateFieldEntities(side) { $0.removeBack(col: col) }
+            }
+        }
+
+        // 追加分: 各 col で並列に Task 起動(直列 await による累積待ちを回避)
+        for (col, optCard) in newSlots.enumerated() {
+            guard let card = optCard else { continue }
+            if fieldEntities(side).cardEntities[col] != nil { continue }
+            // 旧 Task が残っていればキャンセル
+            fieldEntities(side).summonTasks[col]?.cancel()
+            let task = Task { @MainActor in
+                await summon(side: side, at: col, card: card)
+            }
+            updateFieldEntities(side) { $0.summonTasks[col] = task }
         }
     }
 
-    func summon(into field: Entity, at col: Int, card: DuelCard) async {
+    /// フィールド手前列(魔法・トラップ)のカード Entity を同期する。
+    /// モンスターと違い召喚エフェクト/モンスター出現は無く、カードを伏せる(置く)だけ。
+    /// 表裏(オープン)の見た目は attachment(CardView / CardBackView)が Store の revealed 配列を観測して切り替える。
+    func syncFieldFrontEntities(side: FieldSide, newSlots: [DuelCard?]) {
+        guard let field = fieldParent(for: side) else { return }
+
+        // 削除分(スロットが空になった col と、同 col で別カードに差し替わった col)
+        for (col, entity) in fieldEntities(side).frontCardEntities {
+            let newCardId = newSlots.indices.contains(col) ? newSlots[col]?.id : nil
+            let currentCardId = entity.components[CardIdentityComponent.self]?.id
+            if newCardId == nil || currentCardId != newCardId {
+                updateFieldEntities(side) { $0.removeFront(col: col) }
+            }
+        }
+
+        // 追加分
+        let pitchX = DuelDiskMetrics.fieldSlotWidth + DuelDiskMetrics.fieldGapX
+        let totalCols = DuelDiskMetrics.diskSlotCount
+        for (col, optCard) in newSlots.enumerated() {
+            guard let card = optCard else { continue }
+            if fieldEntities(side).frontCardEntities[col] != nil { continue }
+            let offsetX = (Float(col) - Float(totalCols - 1) / 2) * pitchX
+            let position = SIMD3<Float>(
+                offsetX,
+                DuelDiskMetrics.fieldSurfaceHeight + 0.003,
+                DuelDiskMetrics.fieldFrontZ - fieldLocalCenterOffsetZ
+            )
+
+            let entity = makeFieldCardEntity(side: side, card: card, location: .fieldFront(col))
+            entity.transform.translation = position
+            field.addChild(entity)
+            updateFieldEntities(side) { $0.frontCardEntities[col] = entity }
+            DuelLog.event("FieldFrontCardSpawned", "side=\(side.logLabel) col=\(col) cardId=\(card.id.uuidString)")
+        }
+    }
+
+    func summon(side: FieldSide, at col: Int, card: DuelCard) async {
         // デモ用: ディスクにカードを置いてからフィールドに出現するまで少し待つ。
         // 遅延が無いと配置と同時に召喚され、確認する間もなく出現を見逃すため。
+        // (相手陣も同じ遅延にして、相手側の見え方と大きくずれないようにする)
         try? await Task.sleep(nanoseconds: UInt64(DuelDiskMetrics.fieldSummonDelay * 1_000_000_000))
-        // 待機中にスロットが変更/削除されていたら中止
-        guard sessionStore.fieldBackRow.indices.contains(col),
-              sessionStore.fieldBackRow[col]?.id == card.id else { return }
+        // 待機中にキャンセル / スロットが変更・削除されていたら中止
+        guard !Task.isCancelled else { return }
+        let backRow = fieldBackRow(for: side)
+        guard backRow.indices.contains(col), backRow[col]?.id == card.id else { return }
+        guard let field = fieldParent(for: side) else { return }
 
         let pitchX = DuelDiskMetrics.fieldSlotWidth + DuelDiskMetrics.fieldGapX
         let totalCols = DuelDiskMetrics.diskSlotCount
@@ -2848,33 +3170,13 @@ private extension YugiohDuelDiskImmersiveView {
             DuelDiskMetrics.fieldBackZ - fieldLocalCenterOffsetZ
         )
 
-        // カード本体
-        let cardEntity = CardEntityFactory.make(model: card)
-        cardEntity.components.set(CollisionComponent(
-            shapes: [
-                .generateBox(size: SIMD3<Float>(
-                    DuelDiskMetrics.cardWidth,
-                    DuelDiskMetrics.cardThickness * 5,
-                    DuelDiskMetrics.cardDepth
-                ))
-            ],
-            mode: .trigger,
-            filter: CollisionFilter(
-                group: DuelCollisionGroup.placedCard,
-                mask: DuelCollisionGroup.rightIndexProbe
-            )
-        ))
-        cardEntity.transform.scale = SIMD3<Float>(
-            repeating: DuelDiskMetrics.fieldCardScale
-        )
+        // カード本体(自陣: タップ時に「アリーナ奥列 col 番目」と Component で確定識別できる)
+        let cardEntity = makeFieldCardEntity(side: side, card: card, location: .fieldBack(col))
         cardEntity.transform.translation = basePosition
-        cardEntity.transform.rotation = faceUpCardRotation(topDirection: SIMD3<Float>(0, 0, -1))
-        // タップ時に「アリーナ奥列 col 番目」と Component で確定識別できるようにする
-        cardEntity.components.set(PlacedCardLocationComponent(location: .fieldBack(col)))
         field.addChild(cardEntity)
-        fieldCardEntities[col] = cardEntity
-        logCardVisualState(entity: cardEntity, context: "FieldBack[\(col)]")
-        DuelLog.event("FieldCardSpawned", "col=\(col) cardId=\(card.id.uuidString) position=\(basePosition)")
+        updateFieldEntities(side) { $0.cardEntities[col] = cardEntity }
+        logCardVisualState(entity: cardEntity, context: "FieldBack[\(side.logLabel)][\(col)]")
+        DuelLog.event("FieldCardSpawned", "side=\(side.logLabel) col=\(col) cardId=\(card.id.uuidString) position=\(basePosition)")
 
         // 上昇アニメ
         var goal = cardEntity.transform
@@ -2888,8 +3190,8 @@ private extension YugiohDuelDiskImmersiveView {
 
         // 召喚エフェクト: 共通コントローラで放射バーストを発火する。
         // 同 col の旧エフェクトが残っていれば先に片付ける。
-        fieldSummonEffects[col]?.stop()
-        await spawnSummonBurst(into: field, at: col, position: SIMD3<Float>(
+        fieldEntities(side).summonEffects[col]?.stop()
+        await spawnSummonBurst(side: side, into: field, at: col, above: cardEntity, position: SIMD3<Float>(
             basePosition.x,
             DuelDiskMetrics.fieldSurfaceHeight,
             basePosition.z
@@ -2902,31 +3204,39 @@ private extension YugiohDuelDiskImmersiveView {
             return // キャンセルされた
         }
 
-        // stale チェック: 待っている間に削除/再追加で col の Entity が変わっていたら中止
-        guard fieldCardEntities[col] === cardEntity else { return }
+        // stale チェック: 待っている間にキャンセル / 削除・再追加で col の Entity が変わっていたら中止
+        guard isSummonStillValid(side: side, col: col, cardEntity: cardEntity) else { return }
 
         // モンスターカードに応じた 3D オブジェクト(たい焼き / 緋天竜)を出す
         let model: SummonModel = {
             if case .monster(let m) = card { return m.summonModel }
             return .taiyaki(.redBean)
         }()
-        await spawnMonster(into: field, at: col, above: cardEntity, model: model)
+        await spawnMonster(side: side, into: field, at: col, above: cardEntity, model: model)
     }
 
     /// 召喚モデルの種類に応じて 3D オブジェクトを出す。
-    func spawnMonster(into field: Entity, at col: Int, above cardEntity: Entity, model: SummonModel) async {
+    func spawnMonster(side: FieldSide, into field: Entity, at col: Int, above cardEntity: Entity, model: SummonModel) async {
         switch model {
         case .taiyaki(let flavor):
-            await spawnTaiyaki(into: field, at: col, above: cardEntity, flavor: flavor)
+            await spawnTaiyaki(side: side, into: field, at: col, above: cardEntity, flavor: flavor)
         case .hitenryu:
-            await spawnHitenryu(into: field, at: col, above: cardEntity)
+            await spawnHitenryu(side: side, into: field, at: col, above: cardEntity)
         }
+    }
+
+    /// 召喚 Task がまだ有効かどうか(アセット読み込みなどの await 後にシーンへ触る前の再検証)。
+    /// `stop()` / 退室 / 同 col の差し替えが await 中に起きると、読み込み完了後に
+    /// 無効化済みのフィールド配下へモンスター/バーストを追加してしまう(次の対戦で亡霊表示)ため、
+    /// Task のキャンセルと「col のカード Entity が召喚開始時と同一か」を必ず確認する。
+    func isSummonStillValid(side: FieldSide, col: Int, cardEntity: Entity) -> Bool {
+        !Task.isCancelled && fieldEntities(side).cardEntities[col] === cardEntity
     }
 
     /// RCP(SummonEffectAssets)の放射バーストを読み込んで発火する。
     /// ループ emitter なので、一定時間発生させたあと発生停止 → 粒の寿命分待って取り外す
     /// (いきなり remove すると粒が瞬断するため)。
-    func spawnSummonBurst(into field: Entity, at col: Int, position: SIMD3<Float>) async {
+    func spawnSummonBurst(side: FieldSide, into field: Entity, at col: Int, above cardEntity: Entity, position: SIMD3<Float>) async {
 #if canImport(SummonEffectAssets)
         // 共通コントローラ SummonBurstController を使用(緋天竜と同一実装)。
         // フィールドは 3x スケールなので、素材は控えめに縮小して配置する。
@@ -2937,21 +3247,25 @@ private extension YugiohDuelDiskImmersiveView {
             DuelLog.warning("Failed to load summon burst")
             return
         }
+        // 読み込み中にキャンセル / 差し替えされていたら、読み込んだバーストは捨てて何もしない
+        guard isSummonStillValid(side: side, col: col, cardEntity: cardEntity) else { return }
         // 召喚断面(フィールド面)に置く → 下半分はオクルーダーで隠れて半球ドームになる
         burst.root.position = position
         field.addChild(burst.root)
-        fieldSummonEffects[col] = burst
+        updateFieldEntities(side) { $0.summonEffects[col] = burst }
         burst.fire(emitDuration: DuelDiskMetrics.summonBurstEmitDuration)
-        DuelLog.event("SummonEffectStarted", "col=\(col) position=\(shortVector(position))")
+        DuelLog.event("SummonEffectStarted", "side=\(side.logLabel) col=\(col) position=\(shortVector(position))")
 #endif
     }
 
-    func spawnTaiyaki(into field: Entity, at col: Int, above cardEntity: Entity, flavor: TaiyakiFlavor) async {
+    func spawnTaiyaki(side: FieldSide, into field: Entity, at col: Int, above cardEntity: Entity, flavor: TaiyakiFlavor) async {
 #if canImport(Sugiy)
         do {
             // Sugiy.rkassets には Taiyaki.usdz が含まれ、具材4種(Filling_*)を内包する。
             // カードの種類に対応する具材だけを表示する。
             let monster = try await Entity(named: "Taiyaki", in: sugiyBundle)
+            // 読み込み中にキャンセル / 差し替えされていたら、読み込んだモデルは捨てて何もしない
+            guard isSummonStillValid(side: side, col: col, cardEntity: cardEntity) else { return }
             let fillingNames = ["Filling_RedBeans", "Filling_Custard", "Filling_Matcha", "Filling_Chocolate"]
             for name in fillingNames {
                 monster.findEntity(named: name)?.isEnabled = (name == flavor.fillingNodeName)
@@ -2971,12 +3285,13 @@ private extension YugiohDuelDiskImmersiveView {
             // フェードイン + 上昇で出現させる(上昇パーティクルのピークに紛れる)。
             container.transform.translation = cardEntity.transform.translation
                 + SIMD3<Float>(0, 0.15 - DuelDiskMetrics.monsterRevealRise, 0)
-            // デモ用にモンスターの正面はプレイヤー(こちら)側を向かせる(既定のまま=回転なし)。
-            container.transform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
+            // 通常モードではモンスターの正面をプレイヤー(こちら)側へ(yaw 0)、
+            // 対戦モードでは敵側(このフィールドの奥)へ向ける(yaw π)。
+            container.transform.rotation = simd_quatf(angle: monsterYaw(), axis: SIMD3<Float>(0, 1, 0))
             container.components.set(OpacityComponent(opacity: 0))
             field.addChild(container)
-            fieldMonsterEntities[col] = container
-            DuelLog.event("MonsterSpawned", "col=\(col) entity=\(container.name)")
+            updateFieldEntities(side) { $0.monsterEntities[col] = container }
+            DuelLog.event("MonsterSpawned", "side=\(side.logLabel) col=\(col) entity=\(container.name)")
 
             var goal = container.transform
             goal.translation.y += DuelDiskMetrics.monsterRevealRise + DuelDiskMetrics.cardRiseHeight
@@ -3006,10 +3321,12 @@ private extension YugiohDuelDiskImmersiveView {
     }
 
     /// 緋天竜(アニメ付き USDZ)を召喚する。出現アニメ(上昇→とぐろ)を再生する。
-    func spawnHitenryu(into field: Entity, at col: Int, above cardEntity: Entity) async {
+    func spawnHitenryu(side: FieldSide, into field: Entity, at col: Int, above cardEntity: Entity) async {
 #if canImport(Sugiy)
         do {
             let dragon = try await Entity(named: "Hitenryu", in: sugiyBundle)
+            // 読み込み中にキャンセル / 差し替えされていたら、読み込んだモデルは捨てて何もしない
+            guard isSummonStillValid(side: side, col: col, cardEntity: cardEntity) else { return }
             let bounds = dragon.visualBounds(relativeTo: nil)
             let maxExtent = max(bounds.extents.x, max(bounds.extents.y, bounds.extents.z))
             let targetMax: Float = 0.6
@@ -3028,19 +3345,21 @@ private extension YugiohDuelDiskImmersiveView {
             container.addChild(dragon)
             container.transform.translation = cardEntity.transform.translation
                 + SIMD3<Float>(0, 0.15 - DuelDiskMetrics.monsterRevealRise, 0)
-            // デモ用にモンスターの正面はプレイヤー(こちら)側を向かせる(既定のまま=回転なし)。
-            container.transform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
+            // 通常モードではモンスターの正面をプレイヤー(こちら)側へ(yaw 0)、
+            // 対戦モードでは敵側(このフィールドの奥)へ向ける(yaw π)。
+            // 焼き込みアニメは子(dragon)側で再生されるため container のヨーは保たれる。
+            container.transform.rotation = simd_quatf(angle: monsterYaw(), axis: SIMD3<Float>(0, 1, 0))
             container.components.set(OpacityComponent(opacity: 0))
             field.addChild(container)
-            fieldMonsterEntities[col] = container
-            DuelLog.event("HitenryuSpawned", "col=\(col)")
+            updateFieldEntities(side) { $0.monsterEntities[col] = container }
+            DuelLog.event("HitenryuSpawned", "side=\(side.logLabel) col=\(col)")
 
             // USDZ に焼き込まれた「出現(上昇→とぐろ)→ 揺れ(浮遊)」アニメを再生する。
             // 全体を1回再生 → 完了後に「揺れ区間」だけをトリムして無限ループ再生する。
             // (コードで上下を付けるのではなく、モデル本来の揺れアニメを使う)
             if let (holder, animation) = firstAvailableAnimation(in: dragon) {
                 holder.playAnimation(animation, transitionDuration: 0)
-                startHitenryuFloatLoop(holder: holder, fullAnimation: animation, container: container, col: col)
+                startHitenryuFloatLoop(side: side, holder: holder, fullAnimation: animation, container: container, col: col)
             }
 
             var goal = container.transform
@@ -3070,13 +3389,13 @@ private extension YugiohDuelDiskImmersiveView {
     /// 出現アニメ(全体)を1回再生し終えたら、USDZ に焼き込まれた「揺れ(浮遊)区間」だけを
     /// トリムして無限ループ再生する。コードで上下を付けず、モデル本来の揺れアニメを使う。
     /// (Blender タイムライン: 出現 = 先頭〜hitenryuFloatLoopStart、以降が完全周期の揺れ)
-    func startHitenryuFloatLoop(holder: Entity, fullAnimation: AnimationResource, container: Entity, col: Int) {
+    func startHitenryuFloatLoop(side: FieldSide, holder: Entity, fullAnimation: AnimationResource, container: Entity, col: Int) {
         let duration = fullAnimation.definition.duration
         Task { @MainActor in
             // 出現アニメ全体を再生し終えるまで待つ。
             try? await Task.sleep(nanoseconds: UInt64(max(duration, 0.1) * 1_000_000_000))
             // 待機中に差し替え/削除されていたら何もしない。
-            guard fieldMonsterEntities[col] === container else { return }
+            guard fieldEntities(side).monsterEntities[col] === container else { return }
             // 揺れ区間だけをトリムしてループ。
             let trimmed = AnimationView(
                 source: fullAnimation.definition,
@@ -3127,11 +3446,11 @@ private extension YugiohDuelDiskImmersiveView {
                 return entity.position(relativeTo: nil)
             }
         case .fieldBack(let c):
-            if let entity = fieldCardEntities[c] {
+            if let entity = ownFieldEntities.cardEntities[c] {
                 return entity.position(relativeTo: nil)
             }
         case .fieldFront(let c):
-            if let entity = fieldFrontCardEntities[c] {
+            if let entity = ownFieldEntities.frontCardEntities[c] {
                 return entity.position(relativeTo: nil)
             }
         }
@@ -3159,13 +3478,10 @@ private extension YugiohDuelDiskImmersiveView {
         collisionSubscriptions.forEach { $0.cancel() }
         collisionSubscriptions.removeAll()
 
-        // 召喚 Task
-        fieldSummonTasks.values.forEach { $0.cancel() }
-        fieldSummonTasks.removeAll()
-
-        // 召喚エフェクト(Entity 取り外し。粒が残留したまま再入場するのを防ぐ)
-        fieldSummonEffects.values.forEach { $0.stop() }
-        fieldSummonEffects.removeAll()
+        // 召喚 Task + 召喚エフェクト(Entity 取り外し。粒が残留したまま再入場するのを防ぐ)+ カード/モンスター辞書
+        // 自陣・相手陣とも同じ構造なのでまとめて片付ける。
+        ownFieldEntities.removeAll()
+        opponentFieldEntities.removeAll()
 
         // rootEntity 配下のすべての子(anchor / board / deck / fieldRoot / attachment menu 等)を取り外す。
         // Array コピーを取ってから iterate(removeFromParent で children が変動するため)。
@@ -3175,11 +3491,8 @@ private extension YugiohDuelDiskImmersiveView {
         fanCardEntities.removeAll()
         placedDiskCardEntities.removeAll()
         placedSpellCardEntities.removeAll()
-        fieldFrontCardEntities.removeAll()
         diskSummonEffectEntities.removeAll()
         activeDiskSummonEffects.removeAll()
-        fieldCardEntities.removeAll()
-        fieldMonsterEntities.removeAll()
         rightHandCardEntity = nil
 
         // anchor / probe / fieldRoot の参照もクリア
@@ -3210,6 +3523,8 @@ private extension YugiohDuelDiskImmersiveView {
         isRightHandNearLeftFan = false
         fieldRoot = nil
         fieldInteractionRoot = nil
+        opponentFieldRoot = nil
+        opponentNameLabelInstalled = false
         fieldMoveHandle = nil
         fieldRotateHandle = nil
         fieldScaleHandle = nil
@@ -3244,6 +3559,13 @@ private extension YugiohDuelDiskImmersiveView {
             "\(index):\(card == nil ? "-" : "X")"
         }.joined(separator: ",")
         return "slots=[\(summary)]"
+    }
+
+    func summarizeFlags(_ flags: [Bool]) -> String {
+        let summary = flags.enumerated().map { index, flag in
+            "\(index):\(flag ? "open" : "set")"
+        }.joined(separator: ",")
+        return "revealed=[\(summary)]"
     }
 }
 
@@ -3312,6 +3634,31 @@ private struct LifeDisplayView: View {
         .padding(.horizontal, 26)
         .padding(.vertical, 14)
         // 黒い半透明の背景板は付けない(ディスク面に直接、数字だけが乗るように)。
+        .fixedSize()
+    }
+}
+
+/// 相手陣の上空に浮かべる相手の名前ラベル(対戦モード)。
+/// 相手陣ルート(3x スケール)の子に置くため、数 m 先からでも読めるよう大きめの文字にする。
+private struct OpponentNameLabelView: View {
+    let name: String?
+    let deviceKind: String?
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "person.fill")
+                .font(.system(size: 44, weight: .semibold))
+            Text(name ?? "対戦相手")
+                .font(.system(size: 56, weight: .bold, design: .rounded))
+            if let deviceKind, !deviceKind.isEmpty {
+                Text(deviceKind)
+                    .font(.system(size: 30, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.horizontal, 32)
+        .padding(.vertical, 18)
+        .glassBackgroundEffect()
         .fixedSize()
     }
 }

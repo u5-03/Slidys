@@ -135,7 +135,7 @@ public enum DuelCard: Identifiable, Equatable, Sendable {
     case trap(TrapCard)
 
     /// 種類の判別に使う軽量 enum。
-    public enum Kind: Equatable, Sendable {
+    public enum Kind: String, Equatable, Sendable {
         case monster
         case spell
         case trap
@@ -169,6 +169,22 @@ public enum DuelCard: Identifiable, Equatable, Sendable {
         lhs.id == rhs.id && lhs.kind == rhs.kind
     }
 }
+
+// MARK: - Codable(対戦モードのワイヤーモデル用)
+//
+// 型宣言の継承句ではなく extension で付与している。
+// `.rkassets` を持つターゲットでは Xcode ビルド時に realitytool が Swift ソースを走査し、
+// 継承句に `Codable` を持つ型を RealityKit カスタムコンポーネントのスキーマ候補として解析するため、
+// associated value 付き enum などで "Enums with associated values are not supported" エラーになる。
+// extension 経由の合成であれば走査対象外になり、通常の Codable 合成はそのまま機能する。
+
+extension TaiyakiFlavor: Codable {}
+extension SummonModel: Codable {}
+extension MonsterCard: Codable {}
+extension SpellCard: Codable {}
+extension TrapCard: Codable {}
+extension DuelCard: Codable {}
+extension DuelCard.Kind: Codable {}
 
 // MARK: - サンプル / ランダム生成
 

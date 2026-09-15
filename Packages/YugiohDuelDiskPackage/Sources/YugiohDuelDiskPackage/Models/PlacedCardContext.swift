@@ -17,3 +17,6 @@ public enum PlacedCardContext: Hashable, Sendable {
     /// フィールド手前列(0〜4) — 魔法 / トラップ
     case fieldFront(Int)
 }
+
+// realitytool のスキーマ走査を避けるため extension で Codable を付与(DuelCard.swift 参照)。
+extension PlacedCardContext: Codable {}

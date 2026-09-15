@@ -7,13 +7,16 @@
 //
 
 import Foundation
-#if os(visionOS)
-import RealityKit
+#if os(visionOS) || os(iOS)
 import SwiftUI
 import YugiohCardEffect
 #if canImport(UIKit)
 import UIKit
 #endif
+#endif
+
+#if os(visionOS)
+import RealityKit
 
 public enum CardEntityFactory {
     public static func make(model: DuelCard) -> Entity {
@@ -27,8 +30,11 @@ public enum CardEntityFactory {
         return root
     }
 }
+#endif
 
+#if os(visionOS) || os(iOS)
 /// `DuelCard` を、見た目描画用の `YugiohCardEffect.CardModel` に変換するファクトリ。
+/// RealityKit に依存しない純粋な SwiftUI 変換なので、iPhone 用盤面(DuelBoardView)からも使う。
 public enum DuelCardVisualFactory {
     public static let designWidth: Float = 590
     public static let designHeight: Float = 860
@@ -51,7 +57,9 @@ public enum DuelCardVisualFactory {
                 id: monster.id,
                 name: monster.name,
                 attribute: monster.attribute,
-                starCount: monster.level,
+                // CardView は `ForEach(0..<starCount)` で星を描くため、負値 / 巨大値は必ず丸める
+                // (対戦相手から受信したカードは Store 側でも丸めているが、描画側でも防衛する)。
+                starCount: max(0, min(monster.level, 12)),
                 imageType: art,
                 imageBackgroundColor: backgroundColor,
                 species: monster.species,

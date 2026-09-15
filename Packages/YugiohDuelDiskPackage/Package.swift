@@ -3,6 +3,7 @@
 //
 // 本来は visionOS 26 だけでよいが、純粋なロジック層 (DuelSessionStore など) を
 // macOS で `swift test` できるようにするため、プラットフォームに macOS を追加している。
+// また対戦モード (Multiplayer/) は iPhone 側の 2D ボード UI からも利用するため iOS も追加。
 // visionOS 専用 API を使う View / Scene 系ファイルは `#if os(visionOS)` でガード済み。
 import PackageDescription
 
@@ -11,6 +12,7 @@ let package = Package(
     platforms: [
         .visionOS(.v26),
         .macOS(.v26),
+        .iOS(.v26),
     ],
     products: [
         .library(name: "YugiohDuelDiskPackage", targets: ["YugiohDuelDiskPackage"]),
@@ -45,7 +47,8 @@ let package = Package(
                 .product(
                     name: "YugiohCardEffect",
                     package: "YugiohCardEffect",
-                    condition: .when(platforms: [.visionOS])
+                    // iPhone 用盤面(DuelBoardView)でもデモと同じ CardView / CardBackView を使うため iOS にもリンクする。
+                    condition: .when(platforms: [.visionOS, .iOS])
                 ),
                 .product(
                     name: "Sugiy",

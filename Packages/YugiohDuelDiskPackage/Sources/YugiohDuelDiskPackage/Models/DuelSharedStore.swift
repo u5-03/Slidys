@@ -17,6 +17,8 @@ import Foundation
 public enum DuelSharedStore {
     public static let appModel = DuelAppModel()
     public static let session = DuelSessionStore()
+    /// 対戦モードの入口。`session` を共有する。
+    public static let multiplayer = DuelMultiplayerController(store: session)
 }
 
 /// ImmersiveSpace の ID 定数。Scene の `init` などで MainActor 隔離を踏まずに参照したいため

@@ -18,5 +18,14 @@
 		<key>UIImageName</key>
 		<string></string>
 	</dict>
+	<!-- 対戦モード(MultipeerConnectivity)用: ローカルネットワーク権限と Bonjour サービス宣言。
+	     サービス種別 "slidys-duel" は MultipeerDuelTransport と一致させること。 -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>近くのデバイスと対戦(デュエル)するために、ローカルネットワークを使用します。</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_slidys-duel._tcp</string>
+		<string>_slidys-duel._udp</string>
+	</array>
 </dict>
 </plist>

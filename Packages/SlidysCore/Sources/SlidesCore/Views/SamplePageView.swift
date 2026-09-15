@@ -22,13 +22,18 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
     case taiyakiRealityKit
     case immersiveSpaceControl
     case yugiohDuelDisk
+    /// 2人対戦モード(Vision Pro ↔ iPhone / 1台デモ)。
+    case yugiohDuelMatch
     case hitenryuSummon
 
     public static let samplePageWindowKey = "samplePageWindowKey"
 
     public static var allCases: [SamplePageType] {
 #if os(visionOS)
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .immersiveSpaceControl, .yugiohDuelDisk, .hitenryuSummon]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .immersiveSpaceControl, .yugiohDuelDisk, .yugiohDuelMatch, .hitenryuSummon]
+#elseif os(iOS)
+        // iOS では対戦モードの 2D ボード(DuelBoardView)だけを出す(ImmersiveSpace 前提のものは除外)。
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .yugiohDuelMatch, .hitenryuSummon]
 #else
         return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .hitenryuSummon]
 #endif
@@ -60,6 +65,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             return "Immersive Space Control"
         case .yugiohDuelDisk:
             return "Yugioh Duel Disk"
+        case .yugiohDuelMatch:
+            return "Yugioh Duel 対戦(2人)"
         case .hitenryuSummon:
             return "緋天竜(召喚モンスター)"
         }
@@ -122,6 +129,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
 #endif
         case .yugiohDuelDisk:
             YugiohDuelDiskSampleEntryView()
+        case .yugiohDuelMatch:
+            YugiohDuelMatchSampleEntryView()
         case .hitenryuSummon:
             HitenryuSampleView()
         }

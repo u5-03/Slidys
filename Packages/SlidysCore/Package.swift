@@ -91,7 +91,8 @@ let package = Package(
                 "Sugiy",
                 "SummonEffectAssets",
                 .product(name: "HandGesturePackage", package: "HandGesturePackage", condition: .when(platforms: [.visionOS])),
-                .product(name: "YugiohDuelDiskPackage", package: "YugiohDuelDiskPackage", condition: .when(platforms: [.visionOS])),
+                // 対戦モードの iPhone 用盤面 UI(DuelBoardView)を iOS でも使うため、iOS にもリンクする。
+                .product(name: "YugiohDuelDiskPackage", package: "YugiohDuelDiskPackage", condition: .when(platforms: [.visionOS, .iOS])),
                 .product(name: "Algorithms", package: "swift-algorithms"),
             ],
             // Assets/Sugiy はネストされた独立Swiftパッケージ(Reality Composer Pro)。

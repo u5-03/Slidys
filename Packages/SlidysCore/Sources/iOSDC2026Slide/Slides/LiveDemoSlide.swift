@@ -5,12 +5,14 @@
 //  Vision Proのライブデモ起動スライド(デモ1: 一連の流れ / デモ2: 竜の召喚)。
 //  visionOS では YugiohDuelDiskPackage の ImmersiveSpace を直接開閉できる。
 //  (シーン自体はアプリ側で YugiohDuelDiskScene として登録済み)
+//  YugiohDuelDiskPackage は iOS でもリンクされるが、ImmersiveSpace API は visionOS 専用のため
+//  os(visionOS) も併せて条件にしている。
 //
 
 import SlideKit
 import SlidesCore
 import SwiftUI
-#if canImport(YugiohDuelDiskPackage)
+#if os(visionOS) && canImport(YugiohDuelDiskPackage)
 import YugiohDuelDiskPackage
 #endif
 
@@ -36,7 +38,7 @@ struct LiveDemoSlide: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.defaultForegroundColor)
 
-#if canImport(YugiohDuelDiskPackage)
+#if os(visionOS) && canImport(YugiohDuelDiskPackage)
             DemoImmersiveSpaceButton()
 #endif
         }
@@ -48,7 +50,7 @@ struct LiveDemoSlide: View {
     }
 }
 
-#if canImport(YugiohDuelDiskPackage)
+#if os(visionOS) && canImport(YugiohDuelDiskPackage)
 /// スライド内から ImmersiveSpace を開閉するボタン。
 /// DuelAppModel は EnvironmentKey の defaultValue 経由で共有インスタンスが入る。
 private struct DemoImmersiveSpaceButton: View {

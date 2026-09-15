@@ -53,6 +53,21 @@ public final class DuelSessionStore: @unchecked Sendable {
     /// 配置済みカードをタップしたときに表示するメニューのコンテキスト
     public var tappedPlacedCardContext: PlacedCardContext?
 
+    // MARK: - 対戦(相手陣)
+
+    /// 相手フィールド奥列(モンスター)。相手からの `DuelEvent` でのみ更新される。
+    public var opponentFieldBackRow: [DuelCard?] = Array(repeating: nil, count: diskSlotCount)
+    /// 相手フィールド手前列(魔法・トラップ)。
+    public var opponentFieldFrontRow: [DuelCard?] = Array(repeating: nil, count: diskSlotCount)
+    /// 相手フィールド手前列のカードが表(オープン済み)かどうか。
+    public var opponentFieldFrontRevealed: [Bool] = Array(repeating: false, count: diskSlotCount)
+    /// 相手のピア情報(`.hello` 受信で設定)。
+    public var opponentInfo: DuelPeerInfo?
+    /// true のとき View は相手陣を描画する。
+    public var isMultiplayerActive: Bool = false
+    /// ローカル操作で盤面が変わったときに呼ばれる(送信用)。nil なら何もしない。
+    public var eventSink: ((DuelEvent) -> Void)?
+
     // MARK: - ハンドトラッキング状態(System から書き戻される)
 
     public var isLeftPinching: Bool = false
@@ -112,6 +127,8 @@ public final class DuelSessionStore: @unchecked Sendable {
         fieldFrontRevealed = Array(repeating: false, count: Self.diskSlotCount)
         tappedPlacedCardContext = nil
         phase = .idle
+        // 相手陣(opponent*)と isMultiplayerActive は相手側が所有する状態なのでここでは触らない。
+        eventSink?(.newDuel)
     }
 
     // MARK: - 操作
@@ -177,6 +194,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         // 右手のカード=選択中のカードだった場合があるため選択も解除する。
         selectedHandCardId = nil
         phase = .idle
+        eventSink?(.summonMonster(slot: index, card: card))
         return true
     }
 
@@ -195,6 +213,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         fieldFrontRevealed[index] = false // 魔法・トラップは基本裏で置く
         rightHandCard = nil
         phase = .idle
+        eventSink?(.setSpellOrTrap(slot: index, card: card))
         return true
     }
 
@@ -226,6 +245,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         fieldBackRow[index] = card
         selectedHandCardId = nil
         phase = .idle
+        eventSink?(.summonMonster(slot: index, card: card))
     }
 
     /// 選択中の *魔法・トラップ* カードをディスクの空き挿入口に配置する。
@@ -243,6 +263,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         fieldFrontRevealed[index] = false // 魔法・トラップは基本裏で置く
         selectedHandCardId = nil
         phase = .idle
+        eventSink?(.setSpellOrTrap(slot: index, card: card))
     }
 
     /// 配置済みカードを表にする(オープン)。フィールド手前列(魔法・トラップ)が対象。
@@ -250,7 +271,10 @@ public final class DuelSessionStore: @unchecked Sendable {
         switch context {
         case .fieldFront(let c), .spellSlot(let c):
             guard (0..<Self.diskSlotCount).contains(c) else { return }
+            // 実際に裏→表へ変わったときだけ相手へ通知する。
+            let didReveal = fieldFrontRow[c] != nil && fieldFrontRevealed[c] == false
             fieldFrontRevealed[c] = true
+            if didReveal { eventSink?(.openCard(slot: c)) }
         case .diskSlot, .fieldBack:
             break // モンスターは常に表なのでオープン不要
         }
@@ -275,12 +299,83 @@ public final class DuelSessionStore: @unchecked Sendable {
             guard (0..<Self.diskSlotCount).contains(i) else { return }
             diskSlots[i] = nil
             fieldBackRow[i] = nil
+            eventSink?(.removeCard(row: .back, slot: i))
         case .spellSlot(let i), .fieldFront(let i):
             guard (0..<Self.diskSlotCount).contains(i) else { return }
             spellSlots[i] = nil
             fieldFrontRow[i] = nil
             fieldFrontRevealed[i] = false
+            eventSink?(.removeCard(row: .front, slot: i))
         }
         tappedPlacedCardContext = nil
+    }
+
+    // MARK: - 対戦(相手陣)
+
+    /// 自分のフィールド(奥列 / 手前列 / 表裏)のスナップショット。接続直後の同期送信に使う。
+    public func fieldSnapshot() -> DuelFieldSnapshot {
+        DuelFieldSnapshot(
+            backRow: fieldBackRow,
+            frontRow: fieldFrontRow,
+            frontRevealed: fieldFrontRevealed
+        )
+    }
+
+    /// 相手から受信したイベントを、自分の相手陣(opponent*)へ適用する。
+    /// 相手が送ってきた値は信用しない:
+    /// - 範囲外 slot のイベントは無視する。
+    /// - カードは `sanitizedForWire()` で値域を丸めてから保存する(描画側のクラッシュ防止)。
+    /// - `.summonMonster` はモンスター、`.setSpellOrTrap` は魔法・トラップ以外を無視する。
+    /// - `.snapshot` は 3 配列すべてが `diskSlotCount` 長でなければイベントごと無視し、
+    ///   列に合わない種類のカードは nil に置き換える。
+    /// - `.hello` の文字列は 64 文字に切り詰める。
+    public func applyOpponentEvent(_ event: DuelEvent) {
+        let range = 0..<Self.diskSlotCount
+        switch event {
+        case .hello(let info):
+            opponentInfo = info.sanitizedForWire()
+        case .snapshot(let snapshot):
+            guard snapshot.backRow.count == Self.diskSlotCount,
+                  snapshot.frontRow.count == Self.diskSlotCount,
+                  snapshot.frontRevealed.count == Self.diskSlotCount
+            else { return }
+            opponentFieldBackRow = snapshot.backRow.map { card in
+                guard let card, card.kind == .monster else { return nil }
+                return card.sanitizedForWire()
+            }
+            opponentFieldFrontRow = snapshot.frontRow.map { card in
+                guard let card, card.isSpellOrTrap else { return nil }
+                return card.sanitizedForWire()
+            }
+            opponentFieldFrontRevealed = snapshot.frontRevealed
+        case .summonMonster(let slot, let card):
+            guard range.contains(slot), card.kind == .monster else { return }
+            opponentFieldBackRow[slot] = card.sanitizedForWire()
+        case .setSpellOrTrap(let slot, let card):
+            guard range.contains(slot), card.isSpellOrTrap else { return }
+            opponentFieldFrontRow[slot] = card.sanitizedForWire()
+            opponentFieldFrontRevealed[slot] = false
+        case .openCard(let slot):
+            guard range.contains(slot) else { return }
+            opponentFieldFrontRevealed[slot] = true
+        case .removeCard(let row, let slot):
+            guard range.contains(slot) else { return }
+            switch row {
+            case .back:
+                opponentFieldBackRow[slot] = nil
+            case .front:
+                opponentFieldFrontRow[slot] = nil
+                opponentFieldFrontRevealed[slot] = false
+            }
+        case .newDuel:
+            resetOpponentField()
+        }
+    }
+
+    /// 相手陣の盤面(3配列)を空に戻す。`opponentInfo` は保持する。
+    public func resetOpponentField() {
+        opponentFieldBackRow = Array(repeating: nil, count: Self.diskSlotCount)
+        opponentFieldFrontRow = Array(repeating: nil, count: Self.diskSlotCount)
+        opponentFieldFrontRevealed = Array(repeating: false, count: Self.diskSlotCount)
     }
 }

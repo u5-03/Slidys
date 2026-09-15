@@ -91,6 +91,24 @@ public enum DuelDiskMetrics {
     /// フィールド全体の拡大率(スロット・カード・モンスターをまとめて拡大)
     public static let fieldScale: Float = 3.0
 
+    // MARK: - 対戦(相手陣)
+
+    /// 自陣フィールド 1 面の奥行き(フィールドローカル、スケール前)。
+    /// 奥列と手前列の中心間距離 + スロット 1 枚分の奥行き(両列の外側半分ずつ)。
+    /// = |fieldFrontZ - fieldBackZ| + fieldSlotDepth = 0.8 + 0.704 = 1.504
+    public static var fieldDepth: Float { abs(fieldFrontZ - fieldBackZ) + fieldSlotDepth }
+    /// 自陣と相手陣の間に空ける隙間(フィールドローカル、スケール前)。
+    /// 相手陣は Y 軸に π 回転して置くため、向かい合うのは両者の「奥列(モンスター)」同士になる
+    /// (実際の対戦と同じく、モンスター同士が中央線を挟んでにらみ合う配置)。
+    /// fieldScale(3x)適用後は 0.45m の隙間になる。
+    public static let opponentFieldGapZ: Float = 0.15
+    /// 相手陣ルートを自陣ルート(fieldInteractionRoot)からどれだけ −Z(奥)へずらすか(ローカル)。
+    /// 自陣の奥端 = -fieldDepth/2、π 回転した相手陣の手前端(=相手の奥列側) = offset + fieldDepth/2 なので、
+    /// 隙間 gap を空けるには offset = -(fieldDepth + gap) = -(1.504 + 0.15) = -1.654。
+    public static var opponentFieldOffsetZ: Float { -(fieldDepth + opponentFieldGapZ) }
+    /// 相手の名前ラベルを相手陣の面からどれだけ上に浮かせるか(ローカル)。
+    public static let opponentNameLabelHeight: Float = 0.55
+
     // MARK: - 召喚エリア操作ハンドル(右下の丸いハンドル)
 
     /// ハンドル球の半径 (m)。遠く(数m先)でも視認できるよう大きめ。
