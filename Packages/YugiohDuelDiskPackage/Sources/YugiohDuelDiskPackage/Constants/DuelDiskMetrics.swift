@@ -100,12 +100,19 @@ public enum DuelDiskMetrics {
     /// 自陣と相手陣の間に空ける隙間(フィールドローカル、スケール前)。
     /// 相手陣は Y 軸に π 回転して置くため、向かい合うのは両者の「奥列(モンスター)」同士になる
     /// (実際の対戦と同じく、モンスター同士が中央線を挟んでにらみ合う配置)。
-    /// fieldScale(3x)適用後は 0.45m の隙間になる。
-    public static let opponentFieldGapZ: Float = 0.15
+    /// 隙間が狭いと 2 面が 1 枚の板に見えて自陣/相手陣の区別がつきにくいため、
+    /// フィールド奥行き(1.504)の 4 割ほど空ける。fieldScale(3x)適用後は 1.8m の隙間になる。
+    public static let opponentFieldGapZ: Float = 0.6
     /// 相手陣ルートを自陣ルート(fieldInteractionRoot)からどれだけ −Z(奥)へずらすか(ローカル)。
     /// 自陣の奥端 = -fieldDepth/2、π 回転した相手陣の手前端(=相手の奥列側) = offset + fieldDepth/2 なので、
-    /// 隙間 gap を空けるには offset = -(fieldDepth + gap) = -(1.504 + 0.15) = -1.654。
+    /// 隙間 gap を空けるには offset = -(fieldDepth + gap) = -(1.504 + 0.6) = -2.104。
     public static var opponentFieldOffsetZ: Float { -(fieldDepth + opponentFieldGapZ) }
+    /// 自陣と相手陣の境界に置くセンターライン(仕切り)の奥行き(ローカル)。3x 適用後は 18cm。
+    public static let fieldDividerDepth: Float = 0.06
+    /// センターラインの Z 位置(相手陣ルートのローカル座標)。
+    /// 隙間の中央 = 自陣の奥端から gap/2 奥。相手陣ルートは π 回転しているが、ラインは前後対称なので
+    /// ルート原点から「相手陣の手前端 + gap/2」ぶん −Z 側に置けば隙間の中央に来る。
+    public static var fieldDividerLocalZ: Float { -(fieldDepth / 2 + opponentFieldGapZ / 2) }
     /// 相手の名前ラベルを相手陣の面からどれだけ上に浮かせるか(ローカル)。
     public static let opponentNameLabelHeight: Float = 0.55
 

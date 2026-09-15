@@ -1305,7 +1305,13 @@ private extension YugiohDuelDiskImmersiveView {
         root.position = SIMD3<Float>(0, 0, DuelDiskMetrics.opponentFieldOffsetZ)
         root.orientation = simd_quatf(angle: .pi, axis: SIMD3<Float>(0, 1, 0))
         root.isEnabled = sessionStore.isMultiplayerActive
-        root.addChild(FieldSlotFactory.makeField())
+        // 相手陣のスロットは赤系の配色にして、自陣(グレー)との区別を一目で付ける。
+        root.addChild(FieldSlotFactory.makeField(style: .opponent))
+        // 自陣と相手陣の隙間の中央に、発光するセンターライン(仕切り)を置く。
+        // 相手陣ルートの子にしておけば、対戦モードの ON/OFF(isEnabled)と一緒に出し入れされる。
+        let divider = FieldSlotFactory.makeCenterDivider()
+        divider.position = SIMD3<Float>(0, DuelDiskMetrics.fieldSurfaceHeight + 0.002, DuelDiskMetrics.fieldDividerLocalZ)
+        root.addChild(divider)
         interactionRoot.addChild(root)
         opponentFieldRoot = root
         DuelLog.event(
