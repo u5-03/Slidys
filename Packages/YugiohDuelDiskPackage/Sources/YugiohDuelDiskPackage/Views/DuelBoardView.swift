@@ -153,6 +153,12 @@ public struct DuelBoardView: View {
         return "iPhone-" + suffix
     }
 
+    /// 相手陣の表示位置(左→右)を、相手側の列番号に変換する(左右反転)。
+    /// 向かい合っているので、相手の列 0(相手の左端)はこちらの右端に表示する。
+    static func mirroredColumn(_ displayIndex: Int) -> Int {
+        DuelSessionStore.diskSlotCount - 1 - displayIndex
+    }
+
     // MARK: - 対戦バー
 
     private var matchBar: some View {
@@ -300,8 +306,12 @@ public struct DuelBoardView: View {
                 subtitle: "相手フィールド",
                 alignment: .leading
             )
+            // 相手の盤面は 180° 回転して向かい合っている(visionOS 側の相手陣と同じ)。
+            // 相手から見た列 0(相手の左端)は、こちらから見ると右端に来るので、
+            // 表示位置 → 列番号 を左右反転して参照する。
             // 相手の手前列(魔法・トラップ)。相手側から見て手前 = こちらから見て奥。
-            cardRow(count: DuelSessionStore.diskSlotCount) { index in
+            cardRow(count: DuelSessionStore.diskSlotCount) { displayIndex in
+                let index = Self.mirroredColumn(displayIndex)
                 DuelCardCellView(
                     card: store.opponentFieldFrontRow[index],
                     isFaceDown: store.opponentFieldFrontRevealed[index] == false,
@@ -309,7 +319,8 @@ public struct DuelBoardView: View {
                 )
             }
             // 相手の奥列(モンスター)。センターラインに最も近い列。
-            cardRow(count: DuelSessionStore.diskSlotCount) { index in
+            cardRow(count: DuelSessionStore.diskSlotCount) { displayIndex in
+                let index = Self.mirroredColumn(displayIndex)
                 DuelCardCellView(
                     card: store.opponentFieldBackRow[index],
                     isFaceDown: false,
