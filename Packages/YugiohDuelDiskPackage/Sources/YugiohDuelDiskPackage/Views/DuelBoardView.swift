@@ -637,11 +637,18 @@ struct DuelCardCellView: View {
     var body: some View {
         ZStack {
             if let card {
-                if isFaceDown {
-                    CardBackView()
-                } else {
-                    CardView(card: DuelCardVisualFactory.visualModel(for: card))
+                Group {
+                    if isFaceDown {
+                        CardBackView()
+                    } else {
+                        CardView(card: DuelCardVisualFactory.visualModel(for: card))
+                    }
                 }
+                // カード絵は表示専用にして当たり判定から外す。
+                // `CardView` は内部で 590×860 の固定フレームを作ってから scaleEffect で縮めるため、
+                // 縮小前の領域が隣のセルまではみ出してヒット判定に残り、HStack で後ろ(=上)に並ぶ
+                // カードが手前のカードへのタップを横取りしていた(左端を押すと真ん中が選ばれる)。
+                .allowsHitTesting(false)
             } else {
                 emptySlot
             }
@@ -649,6 +656,8 @@ struct DuelCardCellView: View {
         .aspectRatio(Self.aspectRatio, contentMode: .fit)
         // `CardView` は角が直角なので、ハイライト枠と同じ角丸で切り抜いてシルエットを揃える。
         .clipShape(RoundedRectangle(cornerRadius: 6))
+        // 当たり判定はセルの見た目の範囲(角丸の矩形)に限定する。
+        .contentShape(RoundedRectangle(cornerRadius: 6))
         .overlay {
             RoundedRectangle(cornerRadius: 6)
                 .strokeBorder(isHighlighted ? Color.accentColor : .clear, lineWidth: 3)
