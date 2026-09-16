@@ -66,7 +66,7 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
         case .yugiohDuelDisk:
             return "Yugioh Duel Disk"
         case .yugiohDuelMatch:
-            return "Yugioh Duel 対戦(2人)"
+            return "Demo"
         case .hitenryuSummon:
             return "緋天竜(召喚モンスター)"
         }
