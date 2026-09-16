@@ -9,6 +9,11 @@
 //  MCPeerID 単位に追跡し、どちらかが埋まっている間は新たな招待を受諾も送信もしない。
 //  受信データは connected のピアからのものだけ受け付ける。
 //
+//  ペア名(`pairName`): 同じ部屋に多数のデバイスがいても、同じペア名を入力した者同士だけが接続されるようにする。
+//  host は広告の discoveryInfo にペア名を載せ、guest は一致するホストだけを招待する(招待 context にも自分のペア名を載せる)。
+//  host は招待 context のペア名が一致するときだけ受諾する。判定は `MultipeerPairMatcher` に切り出してある。
+//  一致しない相手は gate に触れない(候補として占有しない)。
+//
 //  切断 / 招待失敗で相手がいなくなったら、`stop()` されるまで役割に応じた探索・広告を再開する:
 //  - host: 広告を止めて再開する(次の招待を受諾できる状態に戻す)。
 //  - guest: 探索を止めて再開する。再開により、まだ見えているピアも含めて `foundPeer` が再配信されるので、
@@ -35,6 +40,8 @@ public final class MultipeerDuelTransport: NSObject, DuelTransport, @unchecked S
     static let maxDisplayNameBytes = 63
 
     public let role: Role
+    /// ペア名(`sanitizedPairName` 済み)。同じペア名の相手とだけ接続する。"" は「ペア名なし」。
+    public let pairName: String
     public let events: AsyncStream<DuelTransportEvent>
 
     private let continuation: AsyncStream<DuelTransportEvent>.Continuation
@@ -54,8 +61,9 @@ public final class MultipeerDuelTransport: NSObject, DuelTransport, @unchecked S
         return gate.connected?.displayName
     }
 
-    public init(role: Role, displayName: String) {
+    public init(role: Role, displayName: String, pairName: String = "") {
         self.role = role
+        self.pairName = Self.sanitizedPairName(pairName)
         self.localPeerID = MCPeerID(displayName: Self.sanitizedDisplayName(displayName))
         self.session = MCSession(peer: localPeerID, securityIdentity: nil, encryptionPreference: .required)
         let (stream, continuation) = AsyncStream<DuelTransportEvent>.makeStream()
@@ -87,6 +95,11 @@ public final class MultipeerDuelTransport: NSObject, DuelTransport, @unchecked S
         return name.isEmpty ? "Duelist" : name
     }
 
+    /// ペア名を整える(前後の空白・改行を除き、20 文字を超える分は末尾から削る)。空文字 = ペア名なし。
+    static func sanitizedPairName(_ pairName: String) -> String {
+        MultipeerPairMatcher.sanitizedPairName(pairName)
+    }
+
     // MARK: - DuelTransport
 
     public func start() {
@@ -98,7 +111,9 @@ public final class MultipeerDuelTransport: NSObject, DuelTransport, @unchecked S
         var browser: MCNearbyServiceBrowser?
         switch role {
         case .host:
-            let a = MCNearbyServiceAdvertiser(peer: localPeerID, discoveryInfo: nil, serviceType: Self.serviceType)
+            // discoveryInfo は Bonjour TXT レコードに載るので短く保つ(ペア名 + 表示名のみ)。
+            let info = MultipeerPairMatcher.discoveryInfo(pairName: pairName, displayName: localPeerID.displayName)
+            let a = MCNearbyServiceAdvertiser(peer: localPeerID, discoveryInfo: info, serviceType: Self.serviceType)
             a.delegate = self
             self.advertiser = a
             advertiser = a
@@ -273,6 +288,13 @@ extension MultipeerDuelTransport: MCNearbyServiceAdvertiserDelegate {
         withContext context: Data?,
         invitationHandler: @escaping (Bool, MCSession?) -> Void
     ) {
+        // ペア名が一致しない相手は拒否する(gate には触れない = 候補として占有しない)。
+        let remotePairName = MultipeerPairMatcher.pairName(fromInvitationContext: context)
+        guard MultipeerPairMatcher.matches(local: pairName, remote: remotePairName) else {
+            debugLog("declined invitation from \(peerID.displayName): pair \"\(remotePairName)\" != \"\(pairName)\"")
+            invitationHandler(false, nil)
+            return
+        }
         // 候補も接続済みもいない間だけ受諾し、受諾したピアを候補に登録する。
         lock.lock()
         let accepted = gate.accept(peerID)
@@ -295,12 +317,23 @@ extension MultipeerDuelTransport: MCNearbyServiceAdvertiserDelegate {
 
 extension MultipeerDuelTransport: MCNearbyServiceBrowserDelegate {
     public func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
+        // ペア名が一致しないホストは無視する(招待せず、gate にも触れない = 候補として占有しない)。
+        let remotePairName = MultipeerPairMatcher.pairName(fromDiscoveryInfo: info)
+        guard MultipeerPairMatcher.matches(local: pairName, remote: remotePairName) else {
+            debugLog("ignored peer \(peerID.displayName): pair \"\(remotePairName)\" != \"\(pairName)\"")
+            return
+        }
         // 候補も接続済みもいない間だけ招待し、招待したピアを候補に登録する。
         lock.lock()
         let shouldInvite = gate.accept(peerID)
         lock.unlock()
         guard shouldInvite else { return }
-        browser.invitePeer(peerID, to: session, withContext: nil, timeout: Self.invitationTimeout)
+        browser.invitePeer(
+            peerID,
+            to: session,
+            withContext: MultipeerPairMatcher.invitationContext(for: pairName),
+            timeout: Self.invitationTimeout
+        )
     }
 
     public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {

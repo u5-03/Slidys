@@ -48,6 +48,8 @@ public struct StartDuelDiskView: View {
     }
 
     @State private var selectedMatchMode: MatchModeOption = .loopbackDemo
+    /// ペア名。同じ部屋に多数のデバイスがいても、同じペア名を入力した相手とだけ接続する(空 = ペア名なし)。
+    @AppStorage("duelPairName") private var pairName: String = ""
 
     public init() {}
 
@@ -103,6 +105,16 @@ public struct StartDuelDiskView: View {
     /// 対戦中(モードがオフ以外)かどうか。
     private var isMatchRunning: Bool { multiplayer.mode != .off }
 
+    /// Picker で Multipeer モード(ホスト / ゲスト)が選ばれているか。ペア名欄の表示条件。
+    private var isMultipeerModeSelected: Bool {
+        selectedMatchMode == .host || selectedMatchMode == .guest
+    }
+
+    /// 状態行に出すペア名("" は「なし」)。
+    private var activePairNameText: String {
+        multiplayer.pairName.isEmpty ? "なし" : multiplayer.pairName
+    }
+
     @ViewBuilder
     private var matchSection: some View {
         VStack(spacing: 16) {
@@ -116,6 +128,17 @@ public struct StartDuelDiskView: View {
             }
             .pickerStyle(.segmented)
             .disabled(isMatchRunning)
+
+            // ペア名は Multipeer モードでだけ意味を持つので、オフ / 1 台デモでは出さない。
+            if isMultipeerModeSelected {
+                TextField("ペア名(同じ名前同士が接続)", text: $pairName)
+                    .textFieldStyle(.roundedBorder)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .submitLabel(.done)
+                    .disabled(isMatchRunning)
+                    .frame(maxWidth: 360)
+            }
 
             HStack(spacing: 16) {
                 Button(action: startMatch) {
@@ -151,14 +174,18 @@ public struct StartDuelDiskView: View {
         }
     }
 
-    /// 接続状態 + 相手の名前を 1 行にまとめる。
+    /// 接続状態 + 相手の名前(+ Multipeer ならペア名)を 1 行にまとめる。
     private var matchStatusText: String {
         let state: String
         switch multiplayer.connectionState {
         case .idle:
             state = isMatchRunning ? "準備中" : "未接続"
         case .waiting:
-            state = "相手を待っています…"
+            switch multiplayer.mode {
+            case .multipeer(.host): state = "ゲストを待機中 (ペア: \(activePairNameText))…"
+            case .multipeer(.guest): state = "ホストを探索中 (ペア: \(activePairNameText))…"
+            default: state = "相手を待っています…"
+            }
         case .connected(let peerName):
             state = "接続中: \(peerName)"
         case .disconnected:
@@ -166,10 +193,14 @@ public struct StartDuelDiskView: View {
             // 切断後は Transport が探索を再開するので、相手が戻れば自動で再接続される。
             state = sessionStore.opponentInfo == nil ? "接続できませんでした(相手を再探索中)" : "切断されました(相手を再探索中)"
         }
+        var text = state
         if let opponent = sessionStore.opponentInfo {
-            return "\(state)  /  相手: \(opponent.displayName) (\(opponent.deviceKind))"
+            text += "  /  相手: \(opponent.displayName) (\(opponent.deviceKind))"
         }
-        return state
+        if case .multipeer = multiplayer.mode, multiplayer.connectionState != .waiting {
+            text += "  /  ペア: \(activePairNameText)"
+        }
+        return text
     }
 
     /// このデバイスの表示名(相手側に `.hello` で送られる)。
@@ -183,7 +214,7 @@ public struct StartDuelDiskView: View {
     }
 
     private func startMatch() {
-        multiplayer.start(mode: selectedMatchMode.mode, displayName: localDisplayName)
+        multiplayer.start(mode: selectedMatchMode.mode, displayName: localDisplayName, pairName: pairName)
     }
 
     private func stopMatch() {

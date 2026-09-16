@@ -60,6 +60,8 @@ public struct DuelBoardView: View {
     /// 相手に見せる表示名。`UIDevice.current.name` は特別な entitlement なしでは "iPhone" 固定になるため、
     /// 初回に "iPhone-XXXX" を生成して永続化し、ユーザーが自由に変更できるようにする。
     @AppStorage("duelDisplayName") private var displayName: String = ""
+    /// ペア名。同じ部屋に多数のデバイスがいても、同じペア名を入力した相手とだけ接続する(空 = ペア名なし)。
+    @AppStorage("duelPairName") private var pairName: String = ""
     @State private var isEditingDisplayName = false
     @State private var draftDisplayName = ""
     /// Multipeer で探索が長引いたときにヒントを出すためのタイマー。
@@ -191,6 +193,16 @@ public struct DuelBoardView: View {
                     .buttonStyle(.borderedProminent)
                 }
             }
+            // ペア名は Multipeer モードでだけ意味を持つので、1 台デモでは出さない。
+            if selectedMode != .loopbackDemo {
+                TextField("ペア名(同じ名前同士が接続)", text: $pairName)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.subheadline)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .submitLabel(.done)
+                    .disabled(isMatchRunning)
+            }
             HStack(spacing: 6) {
                 Circle()
                     .fill(connectionColor)
@@ -208,7 +220,7 @@ public struct DuelBoardView: View {
                 }
             }
             if showsSearchHint, multiplayer.connectionState == .waiting {
-                Text("相手が見つかりません。相手側で開始しているか、設定 > プライバシーとセキュリティ > ローカルネットワーク で Slidys が許可されているか確認してください")
+                Text(searchHintText)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -231,7 +243,7 @@ public struct DuelBoardView: View {
     }
 
     private func startMatch(mode: DuelMultiplayerController.Mode) {
-        multiplayer.start(mode: mode, displayName: displayName)
+        multiplayer.start(mode: mode, displayName: displayName, pairName: pairName)
         scheduleSearchTimeout()
     }
 
@@ -267,6 +279,20 @@ public struct DuelBoardView: View {
         showsSearchHint = false
     }
 
+    /// 探索が長引いたときのヒント。ペア名を設定している場合は、相手と同じかどうかの確認も促す。
+    private var searchHintText: String {
+        var text = "相手が見つかりません。相手側で開始しているか、設定 > プライバシーとセキュリティ > ローカルネットワーク で Slidys が許可されているか確認してください"
+        if !multiplayer.pairName.isEmpty {
+            text += "。ペア名が相手と同じか確認してください"
+        }
+        return text
+    }
+
+    /// 対戦バーに出すペア名の表示("" は「なし」)。
+    private var activePairNameText: String {
+        multiplayer.pairName.isEmpty ? "なし" : multiplayer.pairName
+    }
+
     private var connectionColor: Color {
         switch multiplayer.connectionState {
         case .idle: return .gray
@@ -282,15 +308,21 @@ public struct DuelBoardView: View {
             return "未接続(モードを選んで開始)"
         case .waiting:
             switch multiplayer.mode {
-            case .multipeer(.host): return "ゲストを待機中…"
-            case .multipeer(.guest): return "ホストを探索中…"
+            case .multipeer(.host): return "ゲストを待機中 (ペア: \(activePairNameText))…"
+            case .multipeer(.guest): return "ホストを探索中 (ペア: \(activePairNameText))…"
             default: return "接続中…"
             }
         case .connected(let peerName):
+            let peer: String
             if let info = store.opponentInfo {
-                return "接続中: \(info.displayName) (\(info.deviceKind))"
+                peer = "\(info.displayName) (\(info.deviceKind))"
+            } else {
+                peer = peerName
             }
-            return "接続中: \(peerName)"
+            if case .multipeer = multiplayer.mode {
+                return "接続中: \(peer)  ·  ペア: \(activePairNameText)"
+            }
+            return "接続中: \(peer)"
         case .disconnected:
             // `.hello` を受け取る前に切れた = 一度も繋がっていない。
             return store.opponentInfo == nil ? "接続できませんでした" : "切断されました"

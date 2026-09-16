@@ -22,6 +22,8 @@ public final class DuelMultiplayerController: @unchecked Sendable {
 
     public private(set) var mode: Mode = .off
     public private(set) var session: DuelMatchSession?
+    /// 現在の対戦のペア名(整形済み)。Multipeer モード以外(off / 1 台デモ)では "" になる。
+    public private(set) var pairName: String = ""
 
     @ObservationIgnored private let store: DuelSessionStore
 
@@ -39,11 +41,13 @@ public final class DuelMultiplayerController: @unchecked Sendable {
     }
 
     /// 指定モードで対戦を開始する。既に開始済みのセッションがあれば先に停止する。
-    public func start(mode: Mode, displayName: String) {
+    /// `pairName` は Multipeer モードでのみ使い、同じペア名を入力した相手とだけ接続する("" = ペア名なし)。
+    public func start(mode: Mode, displayName: String, pairName: String = "") {
         stop()
         guard mode != .off else { return }
 
         let transport: any DuelTransport
+        var resolvedPairName = ""
         switch mode {
         case .off:
             return
@@ -51,7 +55,9 @@ public final class DuelMultiplayerController: @unchecked Sendable {
             transport = LoopbackDuelTransport(script: LoopbackDuelTransport.demoScript())
         case .multipeer(let role):
             #if canImport(MultipeerConnectivity)
-            transport = MultipeerDuelTransport(role: role, displayName: displayName)
+            let multipeer = MultipeerDuelTransport(role: role, displayName: displayName, pairName: pairName)
+            resolvedPairName = multipeer.pairName
+            transport = multipeer
             #else
             return
             #endif
@@ -61,6 +67,7 @@ public final class DuelMultiplayerController: @unchecked Sendable {
         let session = DuelMatchSession(store: store, transport: transport, localInfo: localInfo)
         self.session = session
         self.mode = mode
+        self.pairName = resolvedPairName
         session.start()
     }
 
@@ -69,6 +76,7 @@ public final class DuelMultiplayerController: @unchecked Sendable {
         session?.stop()
         session = nil
         mode = .off
+        pairName = ""
     }
 
     /// 実行中デバイスの種別("visionOS" / "iOS" / "macOS")。

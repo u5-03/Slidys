@@ -161,6 +161,16 @@ struct MultipeerDisplayNameTests {
         let transport = MultipeerDuelTransport(role: .host, displayName: String(repeating: "山", count: 100))
         #expect(transport.connectedPeerName == nil)
         #expect(transport.role == .host)
+        #expect(transport.pairName == "")
+    }
+
+    @Test func transportSanitizesPairName() {
+        #expect(MultipeerDuelTransport.sanitizedPairName("  team-a \n") == "team-a")
+        #expect(MultipeerDuelTransport.sanitizedPairName(String(repeating: "杉", count: 30)).count == 20)
+        #expect(MultipeerDuelTransport.sanitizedPairName("") == "")
+
+        let transport = MultipeerDuelTransport(role: .guest, displayName: "Guest", pairName: " 赤チーム ")
+        #expect(transport.pairName == "赤チーム")
     }
 }
 #endif
