@@ -53,6 +53,21 @@ public final class DuelSessionStore: @unchecked Sendable {
     /// 配置済みカードをタップしたときに表示するメニューのコンテキスト
     public var tappedPlacedCardContext: PlacedCardContext?
 
+    // MARK: - ドローのクールダウン
+
+    /// カードをセット(召喚/設置)した直後にドローを受け付けない時間。
+    /// セットした右手がそのままデッキに触れて、意図せずカードを引いてしまう誤爆を防ぐ。
+    public static let drawCooldownAfterPlacement: TimeInterval = 1.0
+    /// 最後にカードをセットした時刻(未セットなら nil)。
+    public var lastCardPlacedAt: Date?
+    /// 現在時刻の供給元。テストで時間を進めるために差し替え可能。
+    @ObservationIgnored public var now: () -> Date = Date.init
+    /// セット直後のクールダウン中で、いまはドローを受け付けない状態か。
+    public var isDrawBlockedByPlacementCooldown: Bool {
+        guard let placedAt = lastCardPlacedAt else { return false }
+        return now().timeIntervalSince(placedAt) < Self.drawCooldownAfterPlacement
+    }
+
     // MARK: - 対戦(相手陣)
 
     /// 相手フィールド奥列(モンスター)。相手からの `DuelEvent` でのみ更新される。
@@ -137,9 +152,11 @@ public final class DuelSessionStore: @unchecked Sendable {
     /// - 既に右手にカードがある場合は無視。
     /// - 手札上限に達している場合も無視。
     /// - 検証目的のためデッキ残り枚数の制限は設けない(無限ドロー可)。
+    /// - カードをセットした直後(`drawCooldownAfterPlacement` 以内)は無視。
     public func drawCard() {
         guard rightHandCard == nil else { return }
         guard hand.count < Self.handCapacity else { return }
+        guard !isDrawBlockedByPlacementCooldown else { return }
         rightHandCard = DuelCard.random()
         phase = .drawing
     }
@@ -194,6 +211,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         // 右手のカード=選択中のカードだった場合があるため選択も解除する。
         selectedHandCardId = nil
         phase = .idle
+        lastCardPlacedAt = now()
         eventSink?(.summonMonster(slot: index, card: card))
         return true
     }
@@ -213,6 +231,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         fieldFrontRevealed[index] = false // 魔法・トラップは基本裏で置く
         rightHandCard = nil
         phase = .idle
+        lastCardPlacedAt = now()
         eventSink?(.setSpellOrTrap(slot: index, card: card))
         return true
     }
@@ -245,6 +264,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         fieldBackRow[index] = card
         selectedHandCardId = nil
         phase = .idle
+        lastCardPlacedAt = now()
         eventSink?(.summonMonster(slot: index, card: card))
     }
 
@@ -263,6 +283,7 @@ public final class DuelSessionStore: @unchecked Sendable {
         fieldFrontRevealed[index] = false // 魔法・トラップは基本裏で置く
         selectedHandCardId = nil
         phase = .idle
+        lastCardPlacedAt = now()
         eventSink?(.setSpellOrTrap(slot: index, card: card))
     }
 

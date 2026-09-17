@@ -107,12 +107,6 @@ public enum DuelDiskMetrics {
     /// 自陣の奥端 = -fieldDepth/2、π 回転した相手陣の手前端(=相手の奥列側) = offset + fieldDepth/2 なので、
     /// 隙間 gap を空けるには offset = -(fieldDepth + gap) = -(1.504 + 0.6) = -2.104。
     public static var opponentFieldOffsetZ: Float { -(fieldDepth + opponentFieldGapZ) }
-    /// 自陣と相手陣の境界に置くセンターライン(仕切り)の奥行き(ローカル)。3x 適用後は 18cm。
-    public static let fieldDividerDepth: Float = 0.06
-    /// センターラインの Z 位置(相手陣ルートのローカル座標)。
-    /// 隙間の中央 = 自陣の奥端から gap/2 奥。相手陣ルートは π 回転しているが、ラインは前後対称なので
-    /// ルート原点から「相手陣の手前端 + gap/2」ぶん −Z 側に置けば隙間の中央に来る。
-    public static var fieldDividerLocalZ: Float { -(fieldDepth / 2 + opponentFieldGapZ / 2) }
     /// 相手の名前ラベルを相手陣の面からどれだけ上に浮かせるか(ローカル)。
     public static let opponentNameLabelHeight: Float = 0.55
 

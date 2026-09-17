@@ -108,49 +108,4 @@ public enum FieldSlotFactory {
 
         return field
     }
-
-    /// 対戦モードで自陣と相手陣の間に置く仕切りライン(センターライン)。
-    /// フィールドの横幅いっぱいに伸びる、発光して見える帯 + 中央の細い明るい芯線。
-    /// 位置(Z)は呼び出し側で決める(原点 = ラインの中心、Y = フィールド面の高さ基準)。
-    public static func makeCenterDivider() -> Entity {
-        let container = Entity()
-        container.name = "FieldCenterDivider"
-
-        let count: Float = Float(DuelDiskMetrics.diskSlotCount)
-        let slotWidth: Float = DuelDiskMetrics.fieldSlotWidth
-        let gapX: Float = DuelDiskMetrics.fieldGapX
-        let slotsWidth: Float = count * slotWidth
-        let gapsWidth: Float = (count - 1) * gapX
-        let fieldWidth: Float = slotsWidth + gapsWidth
-        // フィールドより少し長くして「台の境目」感を出す
-        let width: Float = fieldWidth + slotWidth * 0.5
-        let depth: Float = DuelDiskMetrics.fieldDividerDepth
-
-        // 外側の帯: 半透明のシアン(Unlit なので照明に関係なく発光して見える)
-        var bandMaterial = UnlitMaterial()
-#if canImport(UIKit)
-        bandMaterial.color = .init(tint: UIColor(red: 0.35, green: 0.85, blue: 1.0, alpha: 0.35))
-#endif
-        bandMaterial.blending = .transparent(opacity: 0.35)
-        let band = ModelEntity(
-            mesh: .generateBox(width: width, height: 0.003, depth: depth, cornerRadius: 0.0015),
-            materials: [bandMaterial]
-        )
-        container.addChild(band)
-
-        // 中央の芯線: 細く明るい
-        var coreMaterial = UnlitMaterial()
-#if canImport(UIKit)
-        coreMaterial.color = .init(tint: UIColor(red: 0.8, green: 0.97, blue: 1.0, alpha: 0.9))
-#endif
-        coreMaterial.blending = .transparent(opacity: 0.9)
-        let core = ModelEntity(
-            mesh: .generateBox(width: width, height: 0.004, depth: depth * 0.18),
-            materials: [coreMaterial]
-        )
-        core.position.y = 0.001
-        container.addChild(core)
-
-        return container
-    }
 }

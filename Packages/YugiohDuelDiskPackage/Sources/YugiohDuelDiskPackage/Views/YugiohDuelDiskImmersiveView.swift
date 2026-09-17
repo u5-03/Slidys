@@ -1307,11 +1307,6 @@ private extension YugiohDuelDiskImmersiveView {
         root.isEnabled = sessionStore.isMultiplayerActive
         // 相手陣のスロットは赤系の配色にして、自陣(グレー)との区別を一目で付ける。
         root.addChild(FieldSlotFactory.makeField(style: .opponent))
-        // 自陣と相手陣の隙間の中央に、発光するセンターライン(仕切り)を置く。
-        // 相手陣ルートの子にしておけば、対戦モードの ON/OFF(isEnabled)と一緒に出し入れされる。
-        let divider = FieldSlotFactory.makeCenterDivider()
-        divider.position = SIMD3<Float>(0, DuelDiskMetrics.fieldSurfaceHeight + 0.002, DuelDiskMetrics.fieldDividerLocalZ)
-        root.addChild(divider)
         interactionRoot.addChild(root)
         opponentFieldRoot = root
         DuelLog.event(
@@ -2738,6 +2733,12 @@ private extension YugiohDuelDiskImmersiveView {
             return
         }
 
+        // カードをセットした直後は、右手がそのままデッキに触れてもドローしない
+        // (セット → デッキ接触の誤爆防止。判定は Store 側のクールダウン)。
+        if sessionStore.isDrawBlockedByPlacementCooldown {
+            DuelLog.event("DrawBlocked", "trigger=\(trigger) reason=placementCooldown")
+            return
+        }
         DuelLog.event("DrawTriggered", "trigger=\(trigger) phase=\(String(describing: sessionStore.phase)) handCount=\(sessionStore.hand.count)")
         sessionStore.drawCard()
     }
