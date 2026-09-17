@@ -27,7 +27,7 @@ public enum InfoSectionType: String, CaseIterable, Identifiable, Codable, Equata
     public var displayValue: String {
         switch self {
         case .sampleViews:
-            return "Sample Views"
+            return "Demo"
         case .share:
             return "Share Page"
         case .howToUse:
