@@ -192,10 +192,27 @@ public struct SlidysCommonView: View {
             }
 #elseif os(iOS)
             .fullScreenCover(item: $selectedSectionType) { type in
-                ZStack(alignment: .topTrailing) {
-                    type.view
-                    closeButton
-                        .padding()
+                switch type {
+                case .slides:
+                    // 閉じるボタンは自前のオーバーレイではなく NavigationStack の toolbar に置く。
+                    // iPhone Duo のようにバーが縦向き(画面端)に出る端末でも、ステータスバーの下など
+                    // 適切な位置へシステムが配置してくれる(機種別の分岐が不要)。
+                    NavigationStack {
+                        AnyView(type.view)
+                            .toolbar {
+                                ToolbarItem(placement: .topBarTrailing) {
+                                    Button(role: .close) {
+                                        selectedSectionType = nil
+                                    }
+                                }
+                            }
+                    }
+                case .info:
+                    ZStack(alignment: .topTrailing) {
+                        type.view
+                        closeButton
+                            .padding()
+                    }
                 }
             }
 #elseif os(visionOS)

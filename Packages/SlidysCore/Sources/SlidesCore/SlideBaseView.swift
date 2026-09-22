@@ -69,20 +69,57 @@ public struct SlideBaseView: View {
 
 #if os(iOS)
     /// iPad/iPhoneでの原稿確認用: スライド+スピーカーノートの2分割表示にするか。
-    /// 既定はスライドのみ。スライド中央上部の不可視領域を5秒長押し、
+    /// 既定はスライドのみ。スライド中央上部の不可視領域を2秒長押し、
     /// またはハードウェアキーボードの「P」で切り替える。
     @State private var showsSpeakerNotesPanel = false
+    @Environment(\.supportsMultipleWindows) private var supportsMultipleWindows
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.openWindow) private var openWindow
+    /// ヒンジが閉じているか(iOS 27.1+ の onHingeChange から取得。非折りたたみ端末や未取得時は nil)
+    @State private var isHingeClosed: Bool?
+
+    /// iPhone Duo を開いた状態(内側ディスプレイ)では、同一画面の分割パネルではなく
+    /// 別Window(SpeakerNotesScene)でノートを開く。
+    /// - Note: 判定は3段階。
+    ///   1. iPhone idiom かつ supportsMultipleWindows(iPhone Duo 以外の iPhone は false)。
+    ///   2. ヒンジが閉じている(=外側ディスプレイ)なら別Windowにしない。シミュレーターで確認したところ、
+    ///      外側ディスプレイでも supportsMultipleWindows は true で、別Windowを開くとスライドを覆ってしまうため。
+    ///   3. ヒンジ状態が取れない場合は横幅のサイズクラスで代用(内側ディスプレイは regular、外側は compact)。
+    ///   iPad は従来どおりパネル表示(ユーザー要望: Duo のみ別Window)。
+    private var opensSpeakerNotesInSeparateWindow: Bool {
+        guard UIDevice.current.userInterfaceIdiom == .phone, supportsMultipleWindows else { return false }
+        if let isHingeClosed { return !isHingeClosed }
+        return horizontalSizeClass == .regular
+    }
+
+    private func toggleSpeakerNotes() {
+        if opensSpeakerNotesInSeparateWindow {
+            showsSpeakerNotesPanel = false
+            openWindow(id: SpeakerNotesScene.windowID)
+        } else {
+            showsSpeakerNotesPanel.toggle()
+        }
+    }
 #endif
 
     public var body: some View {
 #if os(iOS)
         GeometryReader { proxy in
             if showsSpeakerNotesPanel {
-                // YouTube(iPad)風: 左にスライド、右にスピーカーノート
-                HStack(spacing: 0) {
-                    presentationBody
-                    SpeakerNotesPanel(slideIndexController: slideIndexController)
-                        .frame(width: proxy.size.width * 0.34)
+                if proxy.size.width < proxy.size.height {
+                    // 縦長(iPhone Duo の外側ディスプレイなど): 上にスライド、下にスピーカーノート
+                    VStack(spacing: 0) {
+                        presentationBody
+                        SpeakerNotesPanel(slideIndexController: slideIndexController)
+                            .frame(height: proxy.size.height * 0.45)
+                    }
+                } else {
+                    // YouTube(iPad)風: 左にスライド、右にスピーカーノート
+                    HStack(spacing: 0) {
+                        presentationBody
+                        SpeakerNotesPanel(slideIndexController: slideIndexController)
+                            .frame(width: proxy.size.width * 0.34)
+                    }
                 }
             } else {
                 presentationBody
@@ -97,8 +134,10 @@ public struct SlideBaseView: View {
     }
 
     private var presentationBody: some View {
-        NavigationStack {
-            PresentationView(slideSize: slideConfiguration.size) {
+        // iOS は呼び出し側(SlidysCommonView)の NavigationStack に載せて閉じるボタン等を toolbar で出すため、
+        // ここでは NavigationStack を作らない(入れ子にすると toolbar の配置が崩れる)。
+        navigationContainer {
+            presentationContainer {
                 GeometryReader { proxy in
                     let circleHeight = proxy.size.height * 1
                     ZStack {
@@ -136,7 +175,7 @@ public struct SlideBaseView: View {
                             // maximumDistance: 長押し中の指の微動でキャンセルされないよう大きめに取る
                             // (既定10ptはスライド縮小表示だと実画面6pt程度になり、5秒の静止はほぼ不可能)
                             .onLongPressGesture(minimumDuration: 2, maximumDistance: 200) {
-                                showsSpeakerNotesPanel.toggle()
+                                toggleSpeakerNotes()
                                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                             }
 #endif
@@ -234,7 +273,7 @@ public struct SlideBaseView: View {
         .focused($isFocused)
         // ハードウェアキーボード接続時: 「P」でノートパネル切り替え、矢印/Page Up/Downで送り
         .onKeyPress(KeyEquivalent("p")) {
-            showsSpeakerNotesPanel.toggle()
+            toggleSpeakerNotes()
             return .handled
         }
         .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
@@ -246,11 +285,58 @@ public struct SlideBaseView: View {
             return .handled
         }
         .onAppear { isFocused = true }
+        // 別Window(SpeakerNotesScene)のノート画面に、発表中のデッキを共有する
+        .onAppear {
+            SpeakerNotesSession.shared.attach(slideIndexController, slideTheme: slideTheme)
+        }
+        .onDisappear {
+            SpeakerNotesSession.shared.detach(slideIndexController)
+        }
+        .modifier(HingeClosedObserver(isHingeClosed: $isHingeClosed))
 #endif
     }
 }
 
+#if os(iOS)
+/// iPhone Duo のヒンジ状態(閉じているか)を観測する。iOS 27.1 未満や非折りたたみ端末では nil のまま。
+private struct HingeClosedObserver: ViewModifier {
+    @Binding var isHingeClosed: Bool?
+
+    func body(content: Content) -> some View {
+        if #available(iOS 27.1, *) {
+            content.onHingeChange { _, context in
+                isHingeClosed = context.hinge.map { $0.status == .closed }
+            }
+        } else {
+            content
+        }
+    }
+}
+#endif
+
 private extension SlideBaseView {
+    /// macOS/visionOS は toolbar(ornament) を使うので NavigationStack で包む。iOS は包まない。
+    @ViewBuilder
+    func navigationContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+#if os(iOS)
+        content()
+#else
+        NavigationStack {
+            content()
+        }
+#endif
+    }
+
+    /// スライドを収めるコンテナ。iOS は safe area を尊重する自前のもの、他は SlideKit の PresentationView。
+    @ViewBuilder
+    func presentationContainer<Content: View>(@ViewBuilder content: @escaping () -> Content) -> some View {
+#if os(iOS)
+        SlidePresentationView(slideSize: slideConfiguration.size, content: content)
+#else
+        PresentationView(slideSize: slideConfiguration.size, content: content)
+#endif
+    }
+
     func startTimer() {
         isTimerRunning = true
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in

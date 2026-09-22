@@ -59,5 +59,9 @@ struct SlidysApp: App {
 #if os(visionOS)
         YugiohDuelDiskScene()
 #endif
+#if os(iOS)
+        // iPhone Duo(内側ディスプレイ)向け: スピーカーノートを別Windowで開く
+        SpeakerNotesScene()
+#endif
     }
 }

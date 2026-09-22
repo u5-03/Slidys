@@ -2,7 +2,9 @@
 //  SpeakerNotesWindow.swift
 //  SlidesCore
 //
-//  発表者用のスピーカーノートWindow(macOS専用)。
+//  発表者用のスピーカーノート画面。
+//  macOS では NSWindow(SpeakerNotesWindowPresenter)で、iPhone Duo(内側ディスプレイ)/iPad では
+//  SwiftUI の別Scene(SpeakerNotesScene)で開く。
 //  メインのスライドと同じ SlideIndexController を購読するため、
 //  スライド送り(フェーズ送り含む)に合わせてノートも自動で切り替わる。
 //
@@ -18,6 +20,7 @@
 
 #if os(macOS)
 import AppKit
+#endif
 import SlideKit
 import SwiftUI
 
@@ -31,7 +34,8 @@ extension Slide {
     }
 }
 
-/// スピーカーノートWindowの表示管理。
+#if os(macOS)
+/// スピーカーノートWindowの表示管理(macOS)。
 @MainActor
 public enum SpeakerNotesWindowPresenter {
     private static var window: NSWindow?
@@ -62,6 +66,7 @@ public enum SpeakerNotesWindowPresenter {
         Self.window = win
     }
 }
+#endif
 
 /// ノート本体のView。現在/次のプレビュー・ページ番号・経過時間・原稿を表示する。
 struct SpeakerNotesView: View {
@@ -69,6 +74,17 @@ struct SpeakerNotesView: View {
     let slideTheme: CustomSlideTheme
     @State private var startDate = Date()
     @FocusState private var isFocused: Bool
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    /// 幅が狭いWindow(iPhone Duo の内側ディスプレイを2分割した状態など)では、
+    /// 隣のWindowにスライド本体が見えているので「現在」のプレビューを省いて原稿の領域を確保する。
+    private var showsCurrentPreview: Bool {
+#if os(iOS)
+        horizontalSizeClass != .compact
+#else
+        true
+#endif
+    }
 
     private var currentIndex: Int { slideIndexController.currentIndex }
 
@@ -102,9 +118,11 @@ struct SpeakerNotesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 16) {
-                previewPane(title: "現在") {
-                    AnyView(slideIndexController.currentSlide)
-                        .environment(\.previewPhaseStep, currentPhase.current)
+                if showsCurrentPreview {
+                    previewPane(title: "現在") {
+                        AnyView(slideIndexController.currentSlide)
+                            .environment(\.previewPhaseStep, currentPhase.current)
+                    }
                 }
                 previewPane(title: nextPaneTitle) {
                     if let nextStep {
@@ -122,7 +140,8 @@ struct SpeakerNotesView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 14) {
                 Text("\(currentIndex + 1) / \(slideIndexController.slides.count)")
-                    .font(.system(size: 34, weight: .heavy, design: .monospaced))
+                    .font(.system(size: counterFontSize, weight: .heavy, design: .monospaced))
+                    .fixedSize()
                 Text(currentSlideName)
                     .font(.system(size: 16))
                     .foregroundStyle(.secondary)
@@ -178,7 +197,12 @@ struct SpeakerNotesView: View {
             }
         }
         .padding(20)
+#if os(macOS)
         .frame(minWidth: 640, minHeight: 480)
+#else
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(Color.black)
+#endif
         // ページ送り時のクロスフェード等を無効化(controller側のwithAnimationを打ち消す)
         .transaction { transaction in
             transaction.animation = nil
@@ -200,8 +224,33 @@ struct SpeakerNotesView: View {
         .onAppear { isFocused = true }
     }
 
-    /// ノート本文の文字サイズ。Vision Proを装着したまま読めるよう大きめにしている。
-    private var noteFontSize: CGFloat { 45 }
+    /// ノート本文の文字サイズ。macOS は Vision Pro を装着したまま読めるよう大きめ、
+    /// iOS(iPhone Duo / iPad の別Window)は手元で読む前提で小さめにしている。
+    private var noteFontSize: CGFloat {
+#if os(macOS)
+        45
+#else
+        horizontalSizeClass == .compact ? 22 : 28
+#endif
+    }
+
+    /// ページ番号の文字サイズ(狭いWindowでは折り返さないよう小さめに)
+    private var counterFontSize: CGFloat {
+#if os(macOS)
+        34
+#else
+        horizontalSizeClass == .compact ? 24 : 30
+#endif
+    }
+
+    /// 「ここで次を表示」区切りの文字サイズ(noteFontSize に合わせて縮める)
+    private var separatorFontSize: CGFloat {
+#if os(macOS)
+        28
+#else
+        horizontalSizeClass == .compact ? 15 : 18
+#endif
+    }
 
     /// 表示用の整形: 連続する改行(空行)を1つにまとめ、前後の余白を落とす
     private func normalizedNote(_ text: String) -> String {
@@ -228,7 +277,7 @@ struct SpeakerNotesView: View {
                 .frame(height: 3)
                 .foregroundStyle(isNext ? Color.orange : Color.white.opacity(0.25))
             Text("▼ ここで次を表示")
-                .font(.system(size: 28, weight: .bold))
+                .font(.system(size: separatorFontSize, weight: .bold))
                 .foregroundStyle(isNext ? Color.orange : Color.white.opacity(0.35))
                 .fixedSize()
             Rectangle()
@@ -272,4 +321,3 @@ struct SpeakerNotesView: View {
         .frame(maxWidth: .infinity)
     }
 }
-#endif
