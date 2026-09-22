@@ -3,7 +3,7 @@
 //  SlideSnapshot
 //
 //  指定デッキの全スライド(フェーズ込み)を 1920x1080 の PNG に書き出し、一覧 HTML も生成する。
-//  引数: <deck> <outputDir>   deck: iosdc2026
+//  引数: <deck> <outputDir>   deck: iosdc2026 | flutterkaigi2026
 //
 
 import AppKit
@@ -14,12 +14,13 @@ import SlidesCore
 import SwiftUI
 import UniformTypeIdentifiers
 import iOSDC2026Slide
+import FlutterKaigi2026Slide
 
 @MainActor
 func run() throws {
     let args = CommandLine.arguments
     guard args.count >= 3 else {
-        FileHandle.standardError.write("usage: SlideSnapshot <deck: iosdc2026> <outputDir>\n".data(using: .utf8)!)
+        FileHandle.standardError.write("usage: SlideSnapshot <deck: iosdc2026|flutterkaigi2026> <outputDir>\n".data(using: .utf8)!)
         exit(2)
     }
     let deck = args[1]
@@ -55,6 +56,10 @@ func run() throws {
     case "iosdc2026":
         controller = iOSDC2026SlideView.makeSlideIndexController()
         listTextStyle = iOSDC2026SlideView.listTextStyle
+    case "flutterkaigi2026":
+        // Flutter のデモ画面は DefaultRouter(EmptyView)になるので、スマホ枠だけが描画される
+        controller = FlutterKaigi2026SlideView.makeSlideIndexController()
+        listTextStyle = FlutterKaigi2026SlideView.listTextStyle
     default:
         FileHandle.standardError.write("unknown deck: \(deck)\n".data(using: .utf8)!)
         exit(2)

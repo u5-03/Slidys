@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slide/components/animated_svg_path_widget.dart';
 import 'package:flutter_slide/components/svg_path_widget.dart';
+import 'package:flutter_slide/widgets/feedback/feedback_demo_app.dart';
 import 'package:flutter_slide/widgets/calendar_ui/calendar_ui_widget.dart';
 import 'package:flutter_slide/widgets/icon_move_tab/icon_move_tab_widget.dart';
 import 'package:flutter_slide/widgets/path_animation/flight_route_animation_widget.dart';
@@ -28,6 +29,11 @@ enum PageType {
   moveTab,
   symbolQuiz1,
   symbolQuiz2,
+  // FlutterKaigi2026: アプリ内バグ起票のデモ(Swift 側 FlutterKaigi2026ViewType と揃える)
+  feedbackDemo,
+  elementPicker,
+  screenReplay,
+  widgetTree,
   ;
 
   String get routeName => '/$name';
@@ -100,6 +106,14 @@ enum PageType {
           loop: true,
           strokeColor: Colors.white,
         );
+      case PageType.feedbackDemo:
+        return const FeedbackDemoApp(mode: FeedbackDemoMode.feedbackDemo);
+      case PageType.elementPicker:
+        return const FeedbackDemoApp(mode: FeedbackDemoMode.elementPicker);
+      case PageType.screenReplay:
+        return const FeedbackDemoApp(mode: FeedbackDemoMode.screenReplay);
+      case PageType.widgetTree:
+        return const FeedbackDemoApp(mode: FeedbackDemoMode.widgetTree);
     }
   }
 

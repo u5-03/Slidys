@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		68E4E4062DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E4E4052DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift */; };
 		68E4E4082DD0B476003DF419 /* FlutterNinjasSlide in Frameworks */ = {isa = PBXBuildFile; productRef = 68E4E4072DD0B476003DF419 /* FlutterNinjasSlide */; };
+		68F026010000000000000001 /* FlutterKaigi2026Slide in Frameworks */ = {isa = PBXBuildFile; productRef = 68F026000000000000000001 /* FlutterKaigi2026Slide */; };
+		68F026030000000000000001 /* FlutterKaigi2026Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F026020000000000000001 /* FlutterKaigi2026Router.swift */; };
+		68F026050000000000000001 /* ScreenReplayChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F026040000000000000001 /* ScreenReplayChannel.swift */; };
 		6B5E7DB9A7832371F1CCAEE3 /* Pods_SlidysFlutter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63485D03684691BD8F920A33 /* Pods_SlidysFlutter.framework */; };
 		C3286A412CDBB41B007367BC /* opening_input.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C3286A402CDBB41B007367BC /* opening_input.mp4 */; };
 		C359A8A32CCE309E00370A72 /* SlidysFlutterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C359A8A22CCE309E00370A72 /* SlidysFlutterApp.swift */; };
@@ -45,6 +48,8 @@
 		68B303A62DD24EA900D9A424 /* icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = icon.svg; sourceTree = "<group>"; };
 		68B303A72DD24EA900D9A424 /* map.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = map.png; sourceTree = "<group>"; };
 		68E4E4052DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterNinjasTokyoRouter.swift; sourceTree = "<group>"; };
+		68F026020000000000000001 /* FlutterKaigi2026Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterKaigi2026Router.swift; sourceTree = "<group>"; };
+		68F026040000000000000001 /* ScreenReplayChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenReplayChannel.swift; sourceTree = "<group>"; };
 		99CA147A46BF6E71A48DACEC /* Pods_FlutterKaigiSlide.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FlutterKaigiSlide.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ACDB7B5993A0ECDAF07C147 /* Pods-Slidys.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Slidys.release.xcconfig"; path = "Target Support Files/Pods-Slidys/Pods-Slidys.release.xcconfig"; sourceTree = "<group>"; };
 		A51152F78CD5ADA3B98EF2DC /* Pods-SlidysFlutter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlidysFlutter.release.xcconfig"; path = "Target Support Files/Pods-SlidysFlutter/Pods-SlidysFlutter.release.xcconfig"; sourceTree = "<group>"; };
@@ -93,6 +98,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				68E4E4082DD0B476003DF419 /* FlutterNinjasSlide in Frameworks */,
+				68F026010000000000000001 /* FlutterKaigi2026Slide in Frameworks */,
 				C383EDEC2D29720700D84F6F /* FlutterKaigiSlide in Frameworks */,
 				C383EDEA2D296F8D00D84F6F /* SlidysCommon in Frameworks */,
 				6B5E7DB9A7832371F1CCAEE3 /* Pods_SlidysFlutter.framework in Frameworks */,
@@ -212,6 +218,7 @@
 				C359A8B52CCE3D3D00370A72 /* FlutterView.swift */,
 				C3D0D6B62CE077530055F861 /* FlutterEngineManager.swift */,
 				C3D0D6AF2CE049AA0055F861 /* FlutterAppDelegate.swift */,
+				68F026040000000000000001 /* ScreenReplayChannel.swift */,
 			);
 			path = Flutter;
 			sourceTree = "<group>";
@@ -221,6 +228,7 @@
 			children = (
 				C3D0D6B42CE055F60055F861 /* FlutterKaigiRouter.swift */,
 				68E4E4052DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift */,
+				68F026020000000000000001 /* FlutterKaigi2026Router.swift */,
 			);
 			path = Router;
 			sourceTree = "<group>";
@@ -271,6 +279,7 @@
 				C383EDE92D296F8D00D84F6F /* SlidysCommon */,
 				C383EDEB2D29720700D84F6F /* FlutterKaigiSlide */,
 				68E4E4072DD0B476003DF419 /* FlutterNinjasSlide */,
+				68F026000000000000000001 /* FlutterKaigi2026Slide */,
 			);
 			productName = Slidys;
 			productReference = C359A89F2CCE309E00370A72 /* SlidysFlutter.app */;
@@ -402,6 +411,8 @@
 				C359A8A52CCE309E00370A72 /* ContentView.swift in Sources */,
 				C3D0D6B02CE049AA0055F861 /* FlutterAppDelegate.swift in Sources */,
 				68E4E4062DCE6B76003DF419 /* FlutterNinjasTokyoRouter.swift in Sources */,
+				68F026030000000000000001 /* FlutterKaigi2026Router.swift in Sources */,
+				68F026050000000000000001 /* ScreenReplayChannel.swift in Sources */,
 				C3D0D6B52CE055F60055F861 /* FlutterKaigiRouter.swift in Sources */,
 				C359A8A32CCE309E00370A72 /* SlidysFlutterApp.swift in Sources */,
 				C359A8B62CCE3D3D00370A72 /* FlutterView.swift in Sources */,
@@ -730,6 +741,10 @@
 		68E4E4072DD0B476003DF419 /* FlutterNinjasSlide */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FlutterNinjasSlide;
+		};
+		68F026000000000000000001 /* FlutterKaigi2026Slide */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FlutterKaigi2026Slide;
 		};
 		C383EDE92D296F8D00D84F6F /* SlidysCommon */ = {
 			isa = XCSwiftPackageProductDependency;

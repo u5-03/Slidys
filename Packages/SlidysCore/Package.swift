@@ -67,6 +67,10 @@ let package = Package(
             name: "iOSDC2026Slide",
             targets: ["iOSDC2026Slide"]
         ),
+        .library(
+            name: "FlutterKaigi2026Slide",
+            targets: ["FlutterKaigi2026Slide"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
@@ -217,6 +221,12 @@ let package = Package(
                     package: "YugiohDuelDiskPackage",
                     condition: .when(platforms: [.visionOS])
                 ),
+            ]
+        ),
+        .target(
+            name: "FlutterKaigi2026Slide",
+            dependencies: [
+                "SlidesCore",
             ]
         ),
         .testTarget(
