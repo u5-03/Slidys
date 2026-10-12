@@ -15,12 +15,17 @@ import UIKit
 public protocol SlideConfigurationProtocol {
     var size: CGSize { get }
     var slideIndexController: SlideIndexController { get }
+    /// このデッキが対応している表示言語。2 つ以上あるデッキだけ、発表者メニューに言語の切り替えが出る
+    var supportedLanguages: [SlideLanguage] { get }
 }
 
 public extension SlideConfigurationProtocol {
     var size: CGSize {
         return SlideSize.standard16_9
     }
+
+    /// 既定は多言語対応なし
+    var supportedLanguages: [SlideLanguage] { [] }
 }
 
 public struct SlideBaseView: View {
@@ -40,7 +45,14 @@ public struct SlideBaseView: View {
             .slideTheme(slideTheme)
             .foregroundColor(.black)
             .background(.white)
+            // 文言は描画時に引くので、表示言語が変わったら作り直して引き直させる
+            .id(languageStore.language)
+            .environment(\.locale, languageStore.language.locale)
     }
+
+    /// 表示言語(多言語対応デッキで、発表中にメニューから切り替える)
+    @ObservedObject private var languageStore = SlideLanguageStore.shared
+    private let listTextStyle: ListTextStyle
 
     public let slideConfiguration: SlideConfigurationProtocol
     @StateObject private var slideIndexController: SlideIndexController
@@ -60,6 +72,7 @@ public struct SlideBaseView: View {
         let duration = min(timerDuration, Duration.seconds(60 * 60))
         timeRemaining = .init(duration.components.seconds)
         self.timerDuration = timerDuration
+        self.listTextStyle = listTextStyle
         self.slideTheme = CustomSlideTheme(
             showSlideIndex: showSlideIndex,
             showsTotalSlideCount: showsTotalSlideCount,
@@ -72,11 +85,24 @@ public struct SlideBaseView: View {
     /// 既定はスライドのみ。スライド中央上部の不可視領域を2秒長押し、
     /// またはハードウェアキーボードの「P」で切り替える。
     @State private var showsSpeakerNotesPanel = false
+    /// 発表者メニューの「ページを選ぶ」で出す一覧
+    @State private var showsPagePicker = false
     @Environment(\.supportsMultipleWindows) private var supportsMultipleWindows
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.openWindow) private var openWindow
     /// ヒンジが閉じているか(iOS 27.1+ の onHingeChange から取得。非折りたたみ端末や未取得時は nil)
     @State private var isHingeClosed: Bool?
+    /// 外部ディスプレイ(HDMI / AirPlay)の接続状態とモード
+    @ObservedObject private var externalDisplay = ExternalDisplayCoordinator.shared
+    /// 呼び出し側から渡される「スライドを閉じる」操作(発表者メニューに出す)
+    @Environment(\.slideCloseAction) private var slideCloseAction
+    /// 外部ディスプレイ用のスライドに環境値(Flutter の Router など)を付け直す処理(デッキが登録する)
+    @Environment(\.externalDisplaySlideDecorator) private var externalDisplaySlideDecorator
+
+    /// 外部ディスプレイにスライドを出し、手元(iPad)にはスピーカーノートを出す状態か
+    private var showsPresenterNotesForExternalDisplay: Bool {
+        externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation
+    }
 
     /// iPhone Duo を開いた状態(内側ディスプレイ)では、同一画面の分割パネルではなく
     /// 別Window(SpeakerNotesScene)でノートを開く。
@@ -105,7 +131,9 @@ public struct SlideBaseView: View {
     public var body: some View {
 #if os(iOS)
         GeometryReader { proxy in
-            if showsSpeakerNotesPanel {
+            if showsPresenterNotesForExternalDisplay {
+                externalDisplayPresenterBody
+            } else if showsSpeakerNotesPanel {
                 if proxy.size.width < proxy.size.height {
                     // 縦長(iPhone Duo の外側ディスプレイなど): 上にスライド、下にスピーカーノート
                     VStack(spacing: 0) {
@@ -128,10 +156,164 @@ public struct SlideBaseView: View {
         // 画面上端のシステムジェスチャー(通知センター等)を1段遅らせて、
         // 上部の長押し領域へのタッチ配送が保留されないようにする
         .defersSystemGestures(on: .top)
+        // 外部ディスプレイ側(ExternalDisplayRootView)と別Windowのノート画面に、発表中のデッキを共有する。
+        // (スライド本体の View はノート表示中に消えるので、ここで登録・解除する)
+        .onAppear {
+            // スライドを開いたときの言語は、アプリに適用されている言語にする
+            languageStore.resetToAppDefault()
+            SpeakerNotesSession.shared.attach(
+                slideIndexController,
+                slideTheme: slideTheme,
+                externalDisplaySlideDecorator: externalDisplaySlideDecorator
+            )
+        }
+        .onDisappear {
+            SpeakerNotesSession.shared.detach(slideIndexController)
+        }
+        // 発表者メニュー。スライド表示中は右上(旧・閉じるボタンの位置)、
+        // 外部ディスプレイ出力中(手元はノート)は左上に置く
+        .toolbar {
+            if showsPresenterNotesForExternalDisplay {
+                ToolbarItem(placement: .topBarLeading) { presenterMenu }
+            } else {
+                ToolbarItem(placement: .topBarTrailing) { presenterMenu }
+            }
+        }
+        // ハードウェアキーボード / クリッカー: 「P」でノートパネル切り替え、矢印/Page Up/Downで送り。
+        // スライド本体とノート画面はモード切り替えで入れ替わる(消える)ので、常に存在するこの外側の View が
+        // フォーカスを持つ。切り替え直後にフォーカスが外れることがあるので、モードが変わったら取り直す
+        .focusable()
+        .focused($isFocused)
+        .focusEffectDisabled()
+        .onKeyPress(KeyEquivalent("p")) {
+            toggleSpeakerNotes()
+            return .handled
+        }
+        .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
+            Task { slideIndexController.back() }
+            return .handled
+        }
+        .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
+            Task { slideIndexController.forward() }
+            return .handled
+        }
+        .onAppear { isFocused = true }
+        .sheet(isPresented: $showsPagePicker, onDismiss: refocusForKeyboardNavigation) {
+            SlidePagePickerView(slideIndexController: slideIndexController, listTextStyle: listTextStyle)
+                // iPad では既定のシートが小さいので、ページ大のシートにしてサムネイルを多く見せる
+                .presentationSizing(.page)
+        }
+        .onChange(of: showsPresenterNotesForExternalDisplay) { _, _ in
+            refocusForKeyboardNavigation()
+        }
+        .onChange(of: showsSpeakerNotesPanel) { _, _ in
+            refocusForKeyboardNavigation()
+        }
 #else
         presentationBody
+            .onAppear { languageStore.resetToAppDefault() }
 #endif
     }
+
+#if os(iOS)
+    /// 画面構成が入れ替わった直後はフォーカスが消えることがあるので、少し待ってから取り直す
+    private func refocusForKeyboardNavigation() {
+        isFocused = false
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            isFocused = true
+        }
+    }
+
+    /// 外部ディスプレイ接続中(手元はノート)の画面。ページ送りはノート画面内のバーで行う。
+    /// 手元にスライドを出す切り替えは左上の発表者メニューから
+    private var externalDisplayPresenterBody: some View {
+        SpeakerNotesView(
+            slideIndexController: slideIndexController,
+            slideTheme: slideTheme,
+            // キー入力(クリッカー)は外側の body で一括して受ける
+            handlesKeyboardNavigation: false
+        )
+            .background(Color.black)
+            .preferredColorScheme(.dark)
+    }
+
+    /// 発表者メニュー(ナビゲーションバー)。スピーカーノート・外部ディスプレイ・閉じる、をここに集約する
+    private var presenterMenu: some View {
+        Menu {
+            if !showsPresenterNotesForExternalDisplay {
+                Button {
+                    toggleSpeakerNotes()
+                } label: {
+                    Label(
+                        showsSpeakerNotesPanel ? "スピーカーノートを閉じる" : "右側にスピーカーノートを表示",
+                        systemImage: "note.text"
+                    )
+                }
+            }
+
+            Section("外部ディスプレイ") {
+                if externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation {
+                    // デモ操作用: 手元にスライドを出す(外部にはその画面が映る)
+                    Button {
+                        externalDisplay.preferredMode = .mirroring
+                    } label: {
+                        Label("手元にもスライドを表示(操作用)", systemImage: "rectangle.on.rectangle")
+                    }
+                } else if externalDisplay.isConnected {
+                    // 外部にスライド、手元にノート。デモ操作のあとに戻すときも同じ項目(続きのページから再開)
+                    Button {
+                        showsSpeakerNotesPanel = false
+                        externalDisplay.preferredMode = .presentation
+                    } label: {
+                        Label("外部ディスプレイに出力(手元はノート)", systemImage: "tv")
+                    }
+                } else {
+                    Button {} label: {
+                        Label("外部ディスプレイに出力", systemImage: "tv.slash")
+                    }
+                    .disabled(true)
+                    Text("未接続(HDMI / AirPlay でつなぐと選べます)")
+                }
+            }
+
+            Button {
+                slideIndexController.backToFirst()
+            } label: {
+                Label("最初のスライドへ", systemImage: "arrowshape.turn.up.backward.2")
+            }
+
+            Button {
+                showsPagePicker = true
+            } label: {
+                Label("ページを選ぶ", systemImage: "square.grid.3x3")
+            }
+
+            // 多言語対応しているデッキだけ、表示言語を切り替えられる
+            if slideConfiguration.supportedLanguages.count > 1 {
+                Picker(selection: $languageStore.language) {
+                    ForEach(slideConfiguration.supportedLanguages) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                } label: {
+                    Label("言語 / Language", systemImage: "globe")
+                }
+                .pickerStyle(.menu)
+            }
+
+            if let slideCloseAction {
+                Divider()
+                Button(role: .destructive) {
+                    slideCloseAction()
+                } label: {
+                    Label("スライドを閉じる", systemImage: "xmark.circle")
+                }
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+        }
+    }
+#endif
 
     private var presentationBody: some View {
         // iOS は呼び出し側(SlidysCommonView)の NavigationStack に載せて閉じるボタン等を toolbar で出すため、
@@ -143,11 +325,23 @@ public struct SlideBaseView: View {
                     ZStack {
                         presentationContentView
                             .frame(maxHeight: .infinity)
+                    }
+                    // GeometryReader いっぱいに広げ、overlay の原点を proxy の座標系と一致させる(穴の座標がずれないように)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 #if !os(visionOS)
+                    // 左上・右上を中心とする半径=画面高さの透明な円がページ送りのタップ領域。
+                    // スライド内で `.excludesFromSlideTapNavigation()` を付けた領域(埋め込みデモなど)は
+                    // 円からくり抜き、そこへのタップは中の View に届くようにする。
+                    // preference はスライド本体から上がってくるので、その親(この ZStack)に overlayPreferenceValue を付ける
+                    // (兄弟の Color.clear などに付けても値は届かず、穴が空かない)
+                    .overlayPreferenceValue(SlideTapNavigationExclusionKey.self) { anchors in
+                        let holes = anchors.map { proxy[$0] }
+                        let radius = circleHeight / 2
                         Circle()
                             .frame(width: circleHeight, height: circleHeight)
                             .foregroundStyle(Color.black.opacity(0.01))
-                            .position(x: 0, y: 0)
+                            // 円のローカル座標系は原点が (-r, -r) なので穴を平行移動する
+                            .contentShape(HoledCircleShape(holes: holes.map { $0.offsetBy(dx: radius, dy: radius) }))
                             .onTapGesture {
                                 // SymbolQuizのViewなどでFocusが移動した時に、再度Focusを有効にする処理
                                 isFocused = true
@@ -155,32 +349,21 @@ public struct SlideBaseView: View {
                                     slideIndexController.back()
                                 }
                             }
+                            .position(x: 0, y: 0)
                         Circle()
                             .frame(width: circleHeight, height: circleHeight)
                             .foregroundStyle(Color.black.opacity(0.01))
-                            .position(x: proxy.size.width, y: 0)
+                            // 右上の円のローカル原点は (width - r, -r)
+                            .contentShape(HoledCircleShape(holes: holes.map { $0.offsetBy(dx: -(proxy.size.width - radius), dy: radius) }))
                             .onTapGesture {
                                 isFocused = true
                                 Task {
                                     slideIndexController.forward()
                                 }
                             }
-#if os(iOS)
-                        // 中央上部: スピーカーノートパネルの表示切り替え(不可視の隠し領域を5秒長押し)。
-                        // タップは消費しないので、左右上のページ送り領域とスライド操作はそのまま機能する
-                        Rectangle()
-                            .frame(width: proxy.size.width * 0.4, height: proxy.size.height * 0.18)
-                            .foregroundStyle(Color.black.opacity(0.01))
-                            .position(x: proxy.size.width / 2, y: proxy.size.height * 0.09)
-                            // maximumDistance: 長押し中の指の微動でキャンセルされないよう大きめに取る
-                            // (既定10ptはスライド縮小表示だと実画面6pt程度になり、5秒の静止はほぼ不可能)
-                            .onLongPressGesture(minimumDuration: 2, maximumDistance: 200) {
-                                toggleSpeakerNotes()
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            }
-#endif
-#endif
+                            .position(x: proxy.size.width, y: 0)
                     }
+#endif
                 }
             }
 #if os(visionOS)
@@ -193,7 +376,7 @@ public struct SlideBaseView: View {
                             } label: {
                                 Image(systemName: "chevron.left")
                             }
-                            .disabled(slideIndexController.currentIndex == 0)
+                            .disabled(slideIndexController.isAtFirstStep)
 
                             Text("\(slideIndexController.currentIndex + 1)/\(slideIndexController.slides.count)")
                                 .font(.largeTitle)
@@ -203,7 +386,7 @@ public struct SlideBaseView: View {
                             } label: {
                                 Image(systemName: "chevron.right")
                             }
-                            .disabled(slideIndexController.currentIndex == slideIndexController.slides.count - 1)
+                            .disabled(slideIndexController.isAtLastStep)
                         }
                         
                         Divider()
@@ -269,29 +452,10 @@ public struct SlideBaseView: View {
         }
 #endif
 #if os(iOS)
-        .focusable()
-        .focused($isFocused)
-        // ハードウェアキーボード接続時: 「P」でノートパネル切り替え、矢印/Page Up/Downで送り
-        .onKeyPress(KeyEquivalent("p")) {
-            toggleSpeakerNotes()
-            return .handled
-        }
-        .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
-            Task { slideIndexController.back() }
-            return .handled
-        }
-        .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
-            Task { slideIndexController.forward() }
-            return .handled
-        }
-        .onAppear { isFocused = true }
-        // 別Window(SpeakerNotesScene)のノート画面に、発表中のデッキを共有する
-        .onAppear {
-            SpeakerNotesSession.shared.attach(slideIndexController, slideTheme: slideTheme)
-        }
-        .onDisappear {
-            SpeakerNotesSession.shared.detach(slideIndexController)
-        }
+        // NOTE: キー入力(クリッカー)の処理とデッキの共有(SpeakerNotesSession.attach/detach)は外側の body 側で行う。
+        // ここ(スライド本体)に付けると、外部ディスプレイ出力で手元がノート表示に切り替わった瞬間に
+        // この View が消えてフォーカスが失われ、戻ってきてもキー入力が届かなくなる
+        // (デッキ共有も同様に onDisappear で解除されてしまう)。
         .modifier(HingeClosedObserver(isHingeClosed: $isHingeClosed))
 #endif
     }
@@ -299,10 +463,14 @@ public struct SlideBaseView: View {
 
 #if os(iOS)
 /// iPhone Duo のヒンジ状態(閉じているか)を観測する。iOS 27.1 未満や非折りたたみ端末では nil のまま。
+/// - Note: `onHingeChange` / `UIHingeInteraction` は iOS 27.1 SDK(Xcode 27.1 以降)にしか無い。
+///   `#available` は実行時の判定なので、Xcode 27.0 の SDK ではコンパイル自体が通らない。
+///   SDK の有無は UIKit のモジュールバージョン(27.0 = 9127.0.84、27.1 = 9127.0.85)で見分ける。
 private struct HingeClosedObserver: ViewModifier {
     @Binding var isHingeClosed: Bool?
 
     func body(content: Content) -> some View {
+#if canImport(UIKit, _version: 9127.0.85)
         if #available(iOS 27.1, *) {
             content.onHingeChange { _, context in
                 isHingeClosed = context.hinge.map { $0.status == .closed }
@@ -310,6 +478,10 @@ private struct HingeClosedObserver: ViewModifier {
         } else {
             content
         }
+#else
+        // Xcode 27.0 以前の SDK: ヒンジ API が無いので観測しない(横幅サイズクラスでの判定にフォールバック)
+        content
+#endif
     }
 }
 #endif

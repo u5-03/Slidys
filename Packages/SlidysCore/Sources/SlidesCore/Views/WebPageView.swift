@@ -10,12 +10,22 @@ import WebKit
 
 public struct WebPageView: View {
     private let url: URL
+    @Environment(\.isSlideThumbnail) private var isSlideThumbnail
 
     public init(url: URL) {
         self.url = url
     }
 
     public var body: some View {
+        if isSlideThumbnail {
+            EmbeddedContentPlaceholder(title: "Web ページ", systemImage: "safari", caption: url.absoluteString)
+        } else {
+            webContent
+        }
+    }
+
+    @ViewBuilder
+    private var webContent: some View {
         #if os(iOS)
         SafariView(url: url)
             .edgesIgnoringSafeArea(.all) // iOSで全画面表示

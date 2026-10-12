@@ -58,7 +58,7 @@ struct ReplayDesignBranchSlide: View, PhasedScriptProviding {
     ]
 
     var body: some View {
-        HeaderSlide("③ 動画エンコードをどう解くか") {
+        HeaderSlide(loc: "③ 動画エンコードをどう解くか") {
             VStack(spacing: 24) {
                 // 見出し行
                 HStack(spacing: 24) {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'slide_language.dart';
+
 import 'debug/debug_floating_button.dart';
 import 'debug/debug_navigator_key.dart';
 import 'debug/feedback/app_log_buffer.dart';
@@ -8,6 +10,7 @@ import 'debug/feedback/screen_replay_recorder.dart';
 import 'debug/feedback/screen_replay_screen.dart';
 import 'debug/feedback/widget_tree_dumper.dart';
 import 'feedback_demo_home.dart';
+import 'log_slide_demo_page.dart';
 
 /// スライドに埋め込む Flutter デモの種類。Swift 側 `FlutterKaigi2026ViewType` と 1:1。
 enum FeedbackDemoMode {
@@ -22,6 +25,9 @@ enum FeedbackDemoMode {
 
   /// Widget 階層をテキスト化して表示する
   widgetTree,
+
+  /// 「最大の差分: ログは自分で溜める」のページを Flutter で描き、誤字をその場で起票する
+  logSlide,
 }
 
 /// FlutterKaigi2026 デモ本体。
@@ -64,7 +70,9 @@ class _FeedbackDemoAppState extends State<FeedbackDemoApp> {
           child: child ?? const SizedBox.shrink(),
         ),
       ),
-      home: _DemoHomeForMode(mode: widget.mode),
+      home: widget.mode == FeedbackDemoMode.logSlide
+          ? const LogSlideDemoPage()
+          : _DemoHomeForMode(mode: widget.mode),
     );
   }
 }
@@ -86,10 +94,11 @@ class _DemoHomeForModeState extends State<_DemoHomeForMode> {
   Widget build(BuildContext context) {
     return FeedbackDemoHome(
       title: switch (widget.mode) {
-        FeedbackDemoMode.feedbackDemo => 'アプリ内バグ起票',
-        FeedbackDemoMode.elementPicker => '要素ピッカー',
-        FeedbackDemoMode.screenReplay => '画面リプレイ',
-        FeedbackDemoMode.widgetTree => 'Widget 階層',
+        FeedbackDemoMode.feedbackDemo => tr('アプリ内バグ起票', 'In-app bug filing'),
+        FeedbackDemoMode.elementPicker => tr('要素ピッカー', 'Element picker'),
+        FeedbackDemoMode.screenReplay => tr('画面リプレイ', 'Screen replay'),
+        FeedbackDemoMode.widgetTree => tr('Widget 階層', 'Widget tree'),
+        FeedbackDemoMode.logSlide => tr('ログ', 'Logs'),
       },
       floatingActionButton: switch (widget.mode) {
         FeedbackDemoMode.feedbackDemo => null,
@@ -97,13 +106,14 @@ class _DemoHomeForModeState extends State<_DemoHomeForMode> {
         FeedbackDemoMode.screenReplay => FloatingActionButton.extended(
             onPressed: () => ScreenReplayScreen.show(context),
             icon: const Icon(Icons.videocam),
-            label: const Text('動画にする'),
+            label: Text(tr('動画にする', 'Make a video')),
           ),
         FeedbackDemoMode.widgetTree => FloatingActionButton.extended(
             onPressed: () => WidgetTreeScreen.show(context),
             icon: const Icon(Icons.account_tree),
-            label: const Text('階層を見る'),
+            label: Text(tr('階層を見る', 'Show the tree')),
           ),
+        FeedbackDemoMode.logSlide => null,
       },
     );
   }
@@ -127,7 +137,9 @@ class _DemoHomeForModeState extends State<_DemoHomeForMode> {
         }
       },
       icon: const Icon(Icons.center_focus_strong),
-      label: Text(selected == null ? '要素を選ぶ' : '選択中: $selected'),
+      label: Text(selected == null
+          ? tr('要素を選ぶ', 'Pick element')
+          : tr('選択中: $selected', 'Selected: $selected')),
     );
   }
 }

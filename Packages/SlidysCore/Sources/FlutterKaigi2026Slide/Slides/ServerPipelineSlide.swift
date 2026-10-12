@@ -12,9 +12,9 @@ struct ServerPipelineSlide: View, PhasedScriptProviding {
     /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
     var scriptSegments: [String] {
         [
-        "発展として、起票した後の話です。Issue に付けたラベルをトリガーに GitHub Actions で後処理を回しています。Project への自動振り分け、AI による下調べなどです。",
-        "GitHub 側のリポジトリ、Issue テンプレート、Actions は iOS と Flutter で共通です。書き換えるのはクライアントだけ。マーカーとラベルの規約さえ守れば同じ運用に乗れます。",
-        "小ネタですが、ラベルは2段階で付けています。作成と同時に全部付けると labeled イベントが同時に発火して、Actions の concurrency で後続の run がキャンセルされる。なので重要なラベルだけ 5 秒遅らせて付けています。",
+        "(時間が押していたらこのページはスキップ)\n起票後は、付けたラベルをトリガーに GitHub Actions を動かして、AI の下調べなどの後処理をしています。",
+        "ラベルの種類を見て、タスク管理の Projects に入れるか、バグ管理の Projects に入れるかを振り分けています。",
+        "小ネタとして、ラベルを同時に付けると Actions がキャンセルされるので、2段階で付けています。",
         ]
     }
 
@@ -36,13 +36,13 @@ struct ServerPipelineSlide: View, PhasedScriptProviding {
     }
 
     var body: some View {
-        HeaderSlide("起票後はGitHub Actionsにおまかせ(発展)") {
-            Item("ラベルをトリガーに Project へ振り分け・AI 下調べ", keywords: ["ラベルをトリガー"], accessory: .number(1))
+        HeaderSlide(loc: "起票後はGitHub Actionsにおまかせ(発展)") {
+            Item(loc: "ラベルをトリガーに Actions で後処理(AI の下調べなど)", keywords: ["ラベルをトリガー"], accessory: .number(1))
             if shows(.second) {
-                Item("repo / Issue テンプレート / Actions は iOS と Flutter で共通。書き換えるのはクライアントだけ", keywords: ["書き換えるのはクライアントだけ"], accessory: .number(2))
+                Item(loc: "ラベルの種類で、タスク管理 / バグ管理どちらの Projects に入れるかを判定", keywords: ["ラベルの種類"], accessory: .number(2))
             }
             if shows(.third) {
-                Item("小ネタ: ラベルは2段階で付ける(同時付与だと concurrency で run がキャンセルされる)", keywords: ["2段階"], accessory: .number(3))
+                Item(loc: "小ネタ: ラベルは2段階で付ける(同時付与だと concurrency で run がキャンセルされる)", keywords: ["2段階"], accessory: .number(3))
             }
         }
     }

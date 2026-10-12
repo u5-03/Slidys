@@ -36,6 +36,21 @@ public struct FlutterKaigi2026SlideView: SlideViewProtocol {
             listTextStyle: .flutterKaigi2026
         )
         .environment(\.router, router)
+        // 外部ディスプレイ(presentation モード)は別 Window に描くので、そちらにも Router を渡す
+        // (無いと DefaultRouter = EmptyView になり、Flutter のデモが表示されない)
+        .environment(\.externalDisplaySlideDecorator) { slide in
+            AnyView(slide.environment(\.router, router))
+        }
+    }
+
+    /// PDF 書き出し(スライド一覧の長押しメニュー)。Flutter の画面はプレースホルダーになる。
+    public var pdfExportSource: SlidePDFExportSource? {
+        SlidePDFExportSource(
+            slides: configuration.slideIndexController.slides,
+            slideTheme: CustomSlideTheme(showSlideIndex: true, listTextStyle: .flutterKaigi2026),
+            slideSize: configuration.size,
+            fileName: "FlutterKaigi2026_Sugiy"
+        )
     }
 }
 
@@ -53,12 +68,12 @@ public extension FlutterKaigi2026SlideView {
     FlutterKaigi2026SlideView(router: DefaultRouter())
 }
 
-#Preview("スライド一覧(グリッド)", traits: .fixedLayout(width: 1400, height: 1080)) {
+#Preview("スライド一覧(グリッド)", traits: .fixedLayout(width: 800, height: 1080)) {
     ScrollView([.vertical, .horizontal]) {
         SlideGridView(
             slideIndexController: FlutterKaigi2026SlideView.makeSlideIndexController(),
             listTextStyle: FlutterKaigi2026SlideView.listTextStyle,
-            columns: 3,
+            columns: 2,
             tileWidth: 456
         )
     }

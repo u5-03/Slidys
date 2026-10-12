@@ -20,5 +20,9 @@ public struct FlutterKaigiSlideView: SlideViewProtocol {
     public var body: some View {
         SlideBaseView(slideConfiguration: configuration)
             .environment(\.router, router)
+            // 外部ディスプレイ(presentation モード)は別 Window に描くので、そちらにも Router を渡す
+            .environment(\.externalDisplaySlideDecorator) { slide in
+                AnyView(slide.environment(\.router, router))
+            }
     }
 }

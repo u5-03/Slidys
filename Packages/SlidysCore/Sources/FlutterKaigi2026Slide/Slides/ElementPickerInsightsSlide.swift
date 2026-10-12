@@ -12,10 +12,10 @@ struct ElementPickerInsightsSlide: View, PhasedScriptProviding {
     /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
     var scriptSegments: [String] {
         [
-        "仕組みの肝は4つです。\nひとつ目、Widgetではなく Element を歩く。Widget は位置を持たないので、実体の Element から RenderObject に辿ります。",
-        "ふたつ目、RenderBox.localToGlobal で画面座標に変換する。左上の座標とサイズが取れるので、そのまま Rect になります。",
-        "みっつ目、全部の Widget に枠を出すとノイズだらけなので、Semantics(identifier:) か ValueKey を持つ要素だけを候補にする。\nアクセシビリティ対応がそのままデバッグ資産になります。",
-        "よっつ目、タップ位置を含む候補のうち面積が一番小さいものを選ぶ。入れ子でも一番具体的な要素が選ばれます。ヒットテストは自前で、矩形の包含判定だけで済みます。",
+        "仕組みの肝は4つです。\nひとつ目、Element ツリーをトップからたどって、RenderObject の位置を取る。",
+        "ふたつ目、localToGlobal で画面座標にして、そのまま枠にする。",
+        "みっつ目、候補は Semantics の identifier を持つ要素だけにします。付け忘れた部品は、一番近い親が選ばれます。アクセシビリティ 対応がそのままデバッグ機能でも活用できます。",
+        "よっつ目、タップ位置を含む候補のうち、一番小さいものを選ぶ。ざっくりこんな感じです！",
         ]
     }
 
@@ -37,16 +37,16 @@ struct ElementPickerInsightsSlide: View, PhasedScriptProviding {
     }
 
     var body: some View {
-        HeaderSlide("仕組みの肝") {
-            Item("Widget ではなく Element を歩く", keywords: ["Element"], accessory: .number(1))
+        HeaderSlide(loc: "仕組みの肝") {
+            Item(loc: "Element ツリーをたどり、RenderObject の位置を取る", keywords: ["Element"], accessory: .number(1))
             if shows(.second) {
-                Item("RenderBox.localToGlobal で画面座標に変換する", keywords: ["localToGlobal"], accessory: .number(2))
+                Item(loc: "RenderBox.localToGlobal で画面座標に変換する", keywords: ["localToGlobal"], accessory: .number(2))
             }
             if shows(.third) {
-                Item("目印は Semantics(identifier:) / ValueKey。a11y対応がデバッグ資産に", keywords: ["Semantics(identifier:)"], accessory: .number(3))
+                Item(loc: "目印は Semantics(identifier:) / ValueKey。a11y対応がデバッグ資産に", keywords: ["Semantics(identifier:)"], accessory: .number(3))
             }
             if shows(.fourth) {
-                Item("タップ位置を含む候補のうち、面積が最小の要素を選ぶ", keywords: ["面積が最小"], accessory: .number(4))
+                Item(loc: "タップ位置を含む候補のうち、面積が最小の要素を選ぶ", keywords: ["面積が最小"], accessory: .number(4))
             }
         }
     }

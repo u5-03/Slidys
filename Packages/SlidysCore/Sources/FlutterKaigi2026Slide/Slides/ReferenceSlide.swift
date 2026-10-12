@@ -19,7 +19,7 @@ struct ReferenceSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("参考情報") {
+        HeaderSlide(loc: "参考情報") {
             // 通常のリスト(60pt)だと長いタイトルが収まらないため、専用の少し小さめのレイアウトにする
             VStack(alignment: .leading, spacing: 44) {
                 referenceRow(

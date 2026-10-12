@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../slide_language.dart';
+
 /// 画面上の Widget をタップして選ぶ ElementPicker。
 ///
 /// iOS 版 `ElementPickerViewController` / `ViewFrameCollector` に相当。
@@ -167,8 +169,10 @@ class _ElementPickerOverlayState extends State<_ElementPickerOverlay> {
                     Expanded(
                       child: Text(
                         selected == null
-                            ? '報告したい要素をタップしてください'
-                            : '選択中: ${selected.identifier}',
+                            ? tr('報告したい要素をタップしてください',
+                                'Tap the element you want to report')
+                            : tr('選択中: ${selected.identifier}',
+                                'Selected: ${selected.identifier}'),
                         style: const TextStyle(color: Colors.white),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -176,13 +180,13 @@ class _ElementPickerOverlayState extends State<_ElementPickerOverlay> {
                     ),
                     TextButton(
                       onPressed: () => widget.onFinish(null),
-                      child: const Text('キャンセル'),
+                      child: Text(tr('キャンセル', 'Cancel')),
                     ),
                     FilledButton(
                       onPressed: selected == null
                           ? null
                           : () => widget.onFinish(selected.identifier),
-                      child: const Text('この要素にする'),
+                      child: Text(tr('この要素にする', 'Use this element')),
                     ),
                   ],
                 ),
@@ -193,11 +197,12 @@ class _ElementPickerOverlayState extends State<_ElementPickerOverlay> {
 
         // 候補が無いときの案内
         if (_candidates.isEmpty)
-          const Center(
+          Center(
             child: Card(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('この画面に選択可能な要素がありません'),
+                padding: const EdgeInsets.all(16),
+                child: Text(tr('この画面に選択可能な要素がありません',
+                    'No selectable elements on this screen')),
               ),
             ),
           ),

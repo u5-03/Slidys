@@ -35,7 +35,7 @@ struct IssueBodySlide: View {
         .init(text: "", auto: true),
         .init(text: "## Environment", auto: true),
         .init(text: "- App version: 1.0.0 (12)  - Device: iPhone 17 Pro, iOS 26.0", auto: true),
-        .init(text: "- Locale: ja_JP  - Captured at: 2026-11-XXT10:12:03Z", auto: true),
+        .init(text: "- Locale: ja_JP  - Captured at: 2026-10-29T10:12:03Z", auto: true),
         .init(text: "", auto: true),
         .init(text: "## 添付", auto: true),
         .init(text: "screenshot.png / video.mp4 / view-hierarchy.txt / logs.txt / stack-trace.txt", auto: true),
@@ -44,7 +44,7 @@ struct IssueBodySlide: View {
     ]
 
     var body: some View {
-        HeaderSlide("できあがるIssue") {
+        HeaderSlide(loc: "できあがるIssue") {
             HStack(alignment: .top, spacing: 48) {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(lines) { line in

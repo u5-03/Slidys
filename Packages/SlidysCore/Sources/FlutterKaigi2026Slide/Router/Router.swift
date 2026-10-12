@@ -17,6 +17,8 @@ public enum FlutterKaigi2026ViewType: String {
     case screenReplay
     /// Element ツリーを歩いて Widget 階層をテキスト化するデモ
     case widgetTree
+    /// 「最大の差分: ログは自分で溜める」のページを丸ごと Flutter で描き、わざと入れた誤字を起票するデモ
+    case logSlide
 
     public var path: String {
         return "/\(rawValue)"

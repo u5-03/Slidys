@@ -8,13 +8,16 @@ import 'package:flutter/widgets.dart';
 
 /// 画面リプレイ (直近 N 秒のリングバッファ録画) の Dart 側 recorder。
 ///
-/// iOS 版 `SnapshotRingBufferRecorder.swift` の移植。ただし **キャプチャ手段が違う**:
-/// iOS は UIKit の `drawHierarchy` で scene を撮っていたが、Flutter のUIはメタルで
-/// 描画されるためネイティブ screenshot では黒くなる。そこで Flutter 側で
-/// `RepaintBoundary` + `RenderRepaintBoundary.toImageSync()` によりシーンを撮る。
+/// iOS 版 `SnapshotRingBufferRecorder.swift` の移植。
 ///
-/// 溜めた PNG 連番は、書き出し時に iOS ネイティブの `SnapshotVideoEncoder`
-/// (AVAssetWriter / H.264) を MethodChannel 経由で叩いて mp4 化する。
+/// **撮影はネイティブで画面ごと**行う(MethodChannel `captureFrame`。iOS は `drawHierarchy`)。
+/// Flutter の `RenderRepaintBoundary.toImageSync()` は Flutter が描いたレイヤーしか撮れず、
+/// 地図・WebView・カメラなどの PlatformView が黒くなって実用にならないため。
+/// ネイティブ未実装のプラットフォームでは `toImageSync()` にフォールバックする
+/// (Android で PlatformView も撮るなら、ネイティブ側で PixelCopy を実装する)。
+///
+/// 溜める・古い順に消す(リングバッファ)は Dart 側で行い、書き出し時に iOS ネイティブの
+/// `SnapshotVideoEncoder`(AVAssetWriter / H.264)を MethodChannel 経由で叩いて mp4 化する。
 enum ReplayState { idle, buffering, unavailable }
 
 /// 書き出し結果
@@ -69,6 +72,10 @@ class ScreenReplayRecorder {
   Timer? _timer;
   Directory? _bufferDir;
   bool _capturing = false;
+  bool _paused = false;
+
+  /// ネイティブ撮影が使えるか(未実装なら false にして toImage にフォールバック)
+  bool _nativeCaptureAvailable = true;
 
   Directory get _dir {
     final dir = _bufferDir;
@@ -94,7 +101,26 @@ class ScreenReplayRecorder {
   void stopBuffering() {
     _timer?.cancel();
     _timer = null;
+    _paused = false;
     state.value = ReplayState.idle;
+  }
+
+  /// 撮影を一時停止する(バッファは残す)。起票画面を開いている間に使う。
+  /// 動画が「起票画面を開いた瞬間」で終わり、起票画面そのものが写り込まない。
+  void pause() {
+    if (state.value != ReplayState.buffering || _paused) return;
+    _timer?.cancel();
+    _timer = null;
+    _paused = true;
+  }
+
+  /// [pause] した撮影を再開する。
+  void resume() {
+    if (!_paused) return;
+    _paused = false;
+    if (state.value != ReplayState.buffering) return;
+    final interval = Duration(milliseconds: (1000 / frameRate).round());
+    _timer = Timer.periodic(interval, (_) => _captureFrame());
   }
 
   /// 直近 [duration] (省略時は [retain]) 秒分のフレームを mp4 にして返す。
@@ -103,10 +129,31 @@ class ScreenReplayRecorder {
   /// が飛ぶので、呼び出し側でハンドリングする。
   Future<ExportedClip> exportClip({Duration? duration}) async {
     final window = duration ?? retain;
-    final cutoff = DateTime.now().millisecondsSinceEpoch - window.inMilliseconds;
-    final frames = _framesSince(cutoff);
-    if (frames.isEmpty) {
+    final all = _framesSince(0);
+    if (all.isEmpty) {
       throw StateError('バッファに書き出せるフレームがありません');
+    }
+
+    // 最後に撮ったフレームから「撮れている時間」で window ぶん遡る。
+    // - 動画の各フレームの表示時刻には、実際に撮った時刻の差を使う。撮影が設定の fps より遅い端末でも、
+    //   10 秒ぶんのフレームがちゃんと 10 秒の動画になる(枚数 ÷ fps で決めると短くなってしまう)。
+    // - 一時停止(起票画面を開いていた間)などの長い空白は 1 コマぶんに詰める。
+    final intervalMs = (1000 / frameRate).round();
+    const pauseGapMs = 1000;
+    var first = all.length - 1;
+    var coveredMs = 0;
+    final deltas = <int>[]; // frames[i] と frames[i + 1] の間隔(新しい順に積む)
+    while (first > 0 && coveredMs < window.inMilliseconds) {
+      final gap = all[first].ts - all[first - 1].ts;
+      final delta = gap > pauseGapMs ? intervalMs : gap;
+      deltas.add(delta);
+      coveredMs += delta;
+      first--;
+    }
+    final frames = all.sublist(first);
+    final timestampsMs = <int>[0];
+    for (final delta in deltas.reversed) {
+      timestampsMs.add(timestampsMs.last + delta);
     }
 
     final outputPath =
@@ -115,19 +162,22 @@ class ScreenReplayRecorder {
     final result = await _channel.invokeMethod<String>('encodeClip', {
       'frames': frames.map((f) => f.file.path).toList(),
       'fps': frameRate,
+      // 各フレームの表示時刻(ms)。ネイティブ側はこれがあれば fps ではなくこちらを使う
+      'timestampsMs': timestampsMs,
       'outputPath': outputPath,
     });
     if (result == null) {
       throw StateError('エンコードに失敗しました (戻り値が null)');
     }
 
-    final first = frames.first.ts;
-    final last = frames.last.ts;
-    final actual = ((last - first) / 1000).clamp(1.0 / frameRate, double.infinity);
+    // 動画の長さ = 最後のフレームの表示時刻 + 1 コマぶん
+    final actual = (timestampsMs.last + intervalMs) / 1000;
+    debugPrint(
+        '[ScreenReplay] 書き出し: ${frames.length} フレーム / ${actual.toStringAsFixed(1)} 秒');
     return ExportedClip(
       path: result,
       frameCount: frames.length,
-      duration: actual.toDouble(),
+      duration: actual,
     );
   }
 
@@ -141,14 +191,48 @@ class ScreenReplayRecorder {
   // ---- 内部処理 ----
 
   Future<void> _captureFrame() async {
-    // 前フレームの toByteData がまだ終わっていなければスキップ (取りこぼしより安定優先)。
+    // 前フレームの撮影がまだ終わっていなければスキップ (取りこぼしより安定優先)。
     if (_capturing) return;
+    _capturing = true;
+    try {
+      if (_nativeCaptureAvailable && await _captureNative()) {
+        _evict();
+        bufferedFrames.value = _framesSince(0).length;
+        return;
+      }
+      await _captureWithToImage();
+    } finally {
+      _capturing = false;
+    }
+  }
+
+  /// ネイティブで画面ごと撮る(PlatformView も写る)。撮れたら true。
+  Future<bool> _captureNative() async {
+    final ts = DateTime.now().millisecondsSinceEpoch;
+    try {
+      await _channel.invokeMethod<bool>('captureFrame', {
+        'path': '${_dir.path}/$ts.png',
+        'scale': capturePixelRatio,
+      });
+      return true;
+    } on MissingPluginException {
+      debugPrint('[ScreenReplay] ネイティブ撮影が未実装のため toImage で撮ります(PlatformView は写りません)');
+      _nativeCaptureAvailable = false;
+      return false;
+    } on PlatformException catch (error) {
+      // 画面遷移中などで View が無いときは、このフレームだけ諦める
+      debugPrint('[ScreenReplay] capture 失敗: ${error.message}');
+      return true;
+    }
+  }
+
+  /// フォールバック: Flutter が描いたレイヤーだけを撮る(PlatformView は黒くなる)。
+  Future<void> _captureWithToImage() async {
     final context = boundaryKey.currentContext;
     if (context == null) return;
     final renderObject = context.findRenderObject();
     if (renderObject is! RenderRepaintBoundary) return;
 
-    _capturing = true;
     try {
       // まだ paint されていない (初回フレーム等) と toImageSync が投げるが、
       // その場合は下の catch で握って次の tick に回す。
@@ -167,8 +251,6 @@ class ScreenReplayRecorder {
       bufferedFrames.value = _framesSince(0).length;
     } catch (error, stack) {
       debugPrint('[ScreenReplay] capture 失敗: $error\n$stack');
-    } finally {
-      _capturing = false;
     }
   }
 

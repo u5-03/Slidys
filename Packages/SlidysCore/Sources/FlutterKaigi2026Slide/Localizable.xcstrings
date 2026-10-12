@@ -1,0 +1,1558 @@
+{
+  "sourceLanguage": "ja",
+  "strings": {
+    "2段階": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 steps"
+          }
+        }
+      }
+    },
+    "3段階": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 steps"
+          }
+        }
+      }
+    },
+    "3段階に分けて考える": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Break it into 3 steps"
+          }
+        }
+      }
+    },
+    "AI でツールを作るコストとハードルは大きく下がった": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI has greatly lowered the cost and hurdle of building tools"
+          }
+        }
+      }
+    },
+    "AI で増えるエンジニアのアウトプットに対して、QA の負荷を減らしたい": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As AI boosts engineering output, reduce the load on QA"
+          }
+        }
+      }
+    },
+    "AI に修正させる": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "handed to AI"
+          }
+        }
+      }
+    },
+    "AI に修正させるための正確なコンテキストとして、そのまま渡せるチケットにしたい": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tickets that can be handed to AI as accurate context for the fix"
+          }
+        }
+      }
+    },
+    "AI に修正を頼むとき": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "asking AI to fix it"
+          }
+        }
+      }
+    },
+    "AI に修正を頼むときも、どの Widget かが正確に直させる材料になる": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When asking AI to fix it, the exact Widget is key context"
+          }
+        }
+      }
+    },
+    "AI は機能開発だけでなく、効率化や QA の負荷削減にも": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use AI beyond features: for efficiency and a lighter QA load"
+          }
+        }
+      }
+    },
+    "Actionsで下調べ・振り分け": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triage in Actions"
+          }
+        }
+      }
+    },
+    "DeNAのiOS/Flutterエンジニア": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS/Flutter engineer at DeNA"
+          }
+        }
+      }
+    },
+    "Element": {
+      "shouldTranslate": false
+    },
+    "Element ツリーをたどり、RenderObject の位置を取る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walk the Element tree to get RenderObject positions"
+          }
+        }
+      }
+    },
+    "Flutter には iOS の OSLogStore 相当の API がない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flutter has no API like iOS's OSLogStore"
+          }
+        }
+      }
+    },
+    "Flutter デモ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flutter demo"
+          }
+        }
+      }
+    },
+    "FlutterKaigi 2026": {
+      "shouldTranslate": false
+    },
+    "FlutterKaigiは2024の前夜祭LT以来2回目": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2nd FlutterKaigi talk, after the 2024 pre-event LT"
+          }
+        }
+      }
+    },
+    "Flutterでも作れる？ 3段階に分けて検証": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can Flutter do it too? Tested in 3 steps"
+          }
+        }
+      }
+    },
+    "Flutterの3つのツリー": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flutter's three trees"
+          }
+        }
+      }
+    },
+    "Issueに載せる情報": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What goes into the Issue"
+          }
+        }
+      }
+    },
+    "OFF にできる": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "switchable OFF"
+          }
+        }
+      }
+    },
+    "OSLogStore 相当の API がない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "no API like iOS's OSLogStore"
+          }
+        }
+      }
+    },
+    "OS・デバイス・ビルド番号": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OS, device, build number"
+          }
+        }
+      }
+    },
+    "QA の負荷": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "load on QA"
+          }
+        }
+      }
+    },
+    "QA チームに聞いてみた": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We asked the QA team"
+          }
+        }
+      }
+    },
+    "QAテストをしたことある人？": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Who has done QA testing?"
+          }
+        }
+      }
+    },
+    "RenderBox.localToGlobal で画面座標に変換する": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RenderBox.localToGlobal gives screen coordinates"
+          }
+        }
+      }
+    },
+    "Semantics(identifier:)": {
+      "shouldTranslate": false
+    },
+    "Widget階層": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget tree"
+          }
+        }
+      }
+    },
+    "Widget階層・ログ・環境情報を一緒にチケットに添付する": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attach the Widget tree, logs, and environment info to the ticket"
+          }
+        }
+      }
+    },
+    "Widget階層・ログ・環境情報を添付する": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attach Widget tree, logs, environment info"
+          }
+        }
+      }
+    },
+    "YouTube で公開中": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Now on YouTube (in Japanese)"
+          }
+        }
+      }
+    },
+    "YouTube 動画の紹介": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A YouTube video to check out"
+          }
+        }
+      }
+    },
+    "build() で書く不変の構成。\n状態が変わるたび描き直される。\n位置もサイズも持たない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immutable config written in build().\nRebuilt whenever state changes.\nHas no position or size"
+          }
+        }
+      }
+    },
+    "iPad での長文入力は大変": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Typing long text on an iPad is hard"
+          }
+        }
+      }
+    },
+    "iPhone Duoを検討中…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thinking about getting an iPhone Duo…"
+          }
+        }
+      }
+    },
+    "localToGlobal": {
+      "shouldTranslate": false
+    },
+    "mein() で": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In mein(),"
+          }
+        }
+      }
+    },
+    "mein() で debugPrint / print / onError をフックして流し込む": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In mein(), hook debugPrint / print / onError and feed them in"
+          }
+        }
+      }
+    },
+    "tmp に PNG を書き続けて、古い分を削除": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep writing PNGs to tmp and delete the old ones"
+          }
+        }
+      }
+    },
+    "toImage では PlatformView が黒い → ネイティブで View 階層ごと撮る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "toImage shows PlatformViews as black → capture the whole view hierarchy natively"
+          }
+        }
+      }
+    },
+    "× Dartだけでは不可": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "× Not possible in Dart alone"
+          }
+        }
+      }
+    },
+    "― アプリ内で“直せるバグ報告”を作る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "― Building fixable bug reports, in-app"
+          }
+        }
+      }
+    },
+    "① フレーム取得": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "① Capture frames"
+          }
+        }
+      }
+    },
+    "② リングバッファ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "② Ring buffer"
+          }
+        }
+      }
+    },
+    "③ 動画エンコード": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "③ Video encoding"
+          }
+        }
+      }
+    },
+    "△ Flutterだけだと不十分": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "△ Flutter alone isn't enough"
+          }
+        }
+      }
+    },
+    "◎ Flutterだけで可": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "◎ Flutter alone works"
+          }
+        }
+      }
+    },
+    "「この要素にする」で確定して起票画面へ反映": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"Use this element\" confirms and fills the form"
+          }
+        }
+      }
+    },
+    "「画面のどこ」が明確だと直しやすい": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knowing exactly where makes fixing easier"
+          }
+        }
+      }
+    },
+    "「要素を選ぶ」で選択モードへ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"Pick element\" enters selection mode"
+          }
+        }
+      }
+    },
+    "いまの一般的な流れ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The usual flow today"
+          }
+        }
+      }
+    },
+    "その不具合、どのWidgetですか？": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which Widget Is That Bug In?"
+          }
+        }
+      }
+    },
+    "その瞬間の画面構造": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen structure at that moment"
+          }
+        }
+      }
+    },
+    "できる限り省力化して\nチケットを起票する方法の一例を\nお話しします": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today: one way to file tickets\nwith as little effort as possible"
+          }
+        }
+      }
+    },
+    "どの経路で来たか": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How execution got there"
+          }
+        }
+      }
+    },
+    "なぜ作ったのか(課題意識)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Why we built it"
+          }
+        }
+      }
+    },
+    "まずは自分で QA をして、課題意識を QA チームと共有": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do QA yourself first, and share the pain points with your QA team"
+          }
+        }
+      }
+    },
+    "まとめ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wrap-up"
+          }
+        }
+      }
+    },
+    "みなさん": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everyone"
+          }
+        }
+      }
+    },
+    "もちろん、バグチケットの起票も大変です": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Of course, filing bug tickets is hard too"
+          }
+        }
+      }
+    },
+    "よかった点": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What worked well"
+          }
+        }
+      }
+    },
+    "アプリが自動で撮影開始": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app records automatically"
+          }
+        }
+      }
+    },
+    "アプリ内バグ起票(iPadOSアプリで運用中)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In-app bug filing (in use in our iPadOS app)"
+          }
+        }
+      }
+    },
+    "エンジニア": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Engineer"
+          }
+        }
+      }
+    },
+    "エンジニアの人？": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Any engineers here?"
+          }
+        }
+      }
+    },
+    "コストとハードル": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cost and hurdle"
+          }
+        }
+      }
+    },
+    "コミュニケーションコストの削減": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cut communication cost"
+          }
+        }
+      }
+    },
+    "コミュニケーションコストの削減。情報不足による確認のやりとりを無くしたい": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cut communication cost. No more back-and-forth over missing info"
+          }
+        }
+      }
+    },
+    "サイズと座標を持つのはここだけ。\nlocalToGlobal で画面座標に": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The only one with size and position.\nlocalToGlobal gives screen coordinates"
+          }
+        }
+      }
+    },
+    "スクリーンショット": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screenshot"
+          }
+        }
+      }
+    },
+    "スタックトレース": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stack trace"
+          }
+        }
+      }
+    },
+    "タップ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap"
+          }
+        }
+      }
+    },
+    "タップした Widget が枠で囲まれる": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The tapped Widget gets outlined"
+          }
+        }
+      }
+    },
+    "タップするだけ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "only need to tap"
+          }
+        }
+      }
+    },
+    "タップ位置を含む候補のうち、面積が最小の要素を選ぶ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick the smallest-area candidate under the tap"
+          }
+        }
+      }
+    },
+    "ネイティブで画面ごと": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "whole screen natively"
+          }
+        }
+      }
+    },
+    "ネイティブのエンコーダを MethodChannel で呼ぶ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Call the native encoder through a MethodChannel"
+          }
+        }
+      }
+    },
+    "バグや改善点を検知": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spot a bug or idea"
+          }
+        }
+      }
+    },
+    "バグチケットの対応は\n場合によっては大変なことが多い": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working on bug tickets\ncan often be tough"
+          }
+        }
+      }
+    },
+    "バグチケットの対応を\nしたことある人？": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Who has worked on\na bug ticket?"
+          }
+        }
+      }
+    },
+    "バグ起票の流れ: いま と アプリ内バグ起票": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filing bugs: today vs. in-app"
+          }
+        }
+      }
+    },
+    "ファイルに溜め": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "in files"
+          }
+        }
+      }
+    },
+    "フレームはファイルに溜め、古い順に消す": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Store frames in files and delete the oldest first"
+          }
+        }
+      }
+    },
+    "プロジェクトに合わせて調整": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "for your project"
+          }
+        }
+      }
+    },
+    "ラベルの種類": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "label type"
+          }
+        }
+      }
+    },
+    "ラベルの種類で、タスク管理 / バグ管理どちらの Projects に入れるかを判定": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The label type decides which Projects board: tasks or bugs"
+          }
+        }
+      }
+    },
+    "ラベルをトリガー": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Labels trigger"
+          }
+        }
+      }
+    },
+    "ラベルをトリガーに Actions で後処理(AI の下調べなど)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Labels trigger post-processing in Actions (e.g. AI research)"
+          }
+        }
+      }
+    },
+    "リングバッファ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ring buffer"
+          }
+        }
+      }
+    },
+    "ログ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logs"
+          }
+        }
+      }
+    },
+    "一番小さい要素": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "smallest element"
+          }
+        }
+      }
+    },
+    "不具合の箇所をエンジニアに明確に伝えられる": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can show engineers exactly where the bug is"
+          }
+        }
+      }
+    },
+    "事象が起きてから動画を撮るのは手間": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording after it happens is a hassle"
+          }
+        }
+      }
+    },
+    "今日話すこと": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's topics"
+          }
+        }
+      }
+    },
+    "仕組みの肝": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How it works"
+          }
+        }
+      }
+    },
+    "作ってみてわかった注意点": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lessons learned building it"
+          }
+        }
+      }
+    },
+    "入れ子は一番小さい要素が選ばれる": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When nested, the smallest element wins"
+          }
+        }
+      }
+    },
+    "再現が難しいと、再現させるのに時間がかかる(そもそも再現しないことも)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hard-to-repro bugs take time to reproduce (or never reproduce)"
+          }
+        }
+      }
+    },
+    "再現しない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "never reproduce"
+          }
+        }
+      }
+    },
+    "再現手順が不明確": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unclear repro steps"
+          }
+        }
+      }
+    },
+    "再現手順や環境情報の記載、ファイルの添付": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repro steps, environment info, attachments"
+          }
+        }
+      }
+    },
+    "効率化や QA の負荷削減": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "efficiency and a lighter QA load"
+          }
+        }
+      }
+    },
+    "動画やスクショの用意": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video / screenshots"
+          }
+        }
+      }
+    },
+    "動画を撮り直さなくていいのが楽": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No need to re-record videos"
+          }
+        }
+      }
+    },
+    "去年末までFlutterアプリ、今はiPadOSアプリのプロジェクト": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On a Flutter app until late last year; now on an iPadOS app"
+          }
+        }
+      }
+    },
+    "報告したい Widget をタップ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the Widget you want to report"
+          }
+        }
+      }
+    },
+    "報告する人が選ぶ(任意・スキップ可)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chosen by the reporter (optional, can skip)"
+          }
+        }
+      }
+    },
+    "報告する人は画面上で対象の Widget をタップするだけにしたい": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reporters should only need to tap the Widget on screen"
+          }
+        }
+      }
+    },
+    "報告とコードを結ぶアンカー": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anchor linking the report to code"
+          }
+        }
+      }
+    },
+    "大変だった点と工夫": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pain points and workarounds"
+          }
+        }
+      }
+    },
+    "実物(レイアウト・描画)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The real thing"
+          }
+        }
+      }
+    },
+    "小ネタ: ラベルは2段階で付ける(同時付与だと concurrency で run がキャンセルされる)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tip: add labels in 2 steps (adding them at once cancels the run via concurrency)"
+          }
+        }
+      }
+    },
+    "手動で情報を入力して起票": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write it up and file"
+          }
+        }
+      }
+    },
+    "探すところから": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hunting for the spot"
+          }
+        }
+      }
+    },
+    "撮り直すのは手間": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-recording afterwards is a hassle"
+          }
+        }
+      }
+    },
+    "撮影はネイティブで画面ごと。PlatformView も写る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture the whole screen natively. PlatformViews are included"
+          }
+        }
+      }
+    },
+    "曖昧だと不具合箇所を探すところから始まる": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If it's vague, you start by hunting for the spot"
+          }
+        }
+      }
+    },
+    "最大の差分: ログは自分で溜める": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biggest difference: collect logs yourself"
+          }
+        }
+      }
+    },
+    "最近車と3Dプリンターを買ってお金が...💸": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Just bought a car and a 3D printer… my wallet 💸"
+          }
+        }
+      }
+    },
+    "機械が自動で集める": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collected automatically"
+          }
+        }
+      }
+    },
+    "現在のiPadOSのプロジェクトのアプリ: 裏で静止画を撮り続けて直近60秒をリングバッファに → 起票時に動画化": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Our current iPadOS app: keeps capturing stills into a 60-second ring buffer → makes a video when filing"
+          }
+        }
+      }
+    },
+    "環境情報": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Environment info"
+          }
+        }
+      }
+    },
+    "環境情報がない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No environment info"
+          }
+        }
+      }
+    },
+    "環境情報などの入力漏れ・間違いがなくなった": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No more missing or wrong environment info"
+          }
+        }
+      }
+    },
+    "環境情報などは自動入力": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Environment info auto-filled"
+          }
+        }
+      }
+    },
+    "画像や動画がない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No images or video"
+          }
+        }
+      }
+    },
+    "画面のどこかわからない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Where on the screen?"
+          }
+        }
+      }
+    },
+    "画面上のWidgetをタップして、対象のWidgetを選ぶ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap a Widget on screen to pick the target"
+          }
+        }
+      }
+    },
+    "画面上のWidgetをタップして選ぶ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a Widget by tapping the screen"
+          }
+        }
+      }
+    },
+    "発表時はここに実際の画面が表示されます": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The live screen appears here during the talk"
+          }
+        }
+      }
+    },
+    "目印は Semantics(identifier:) / ValueKey。a11y対応がデバッグ資産に": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markers: Semantics(identifier:) / ValueKey. a11y work becomes a debug asset"
+          }
+        }
+      }
+    },
+    "直前に何が起きていたか": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What happened just before"
+          }
+        }
+      }
+    },
+    "直近の動画": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent video"
+          }
+        }
+      }
+    },
+    "確定": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "confirms"
+          }
+        }
+      }
+    },
+    "秒数・解像度・fps はプロジェクトに合わせて調整": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tune duration, resolution, and fps for your project"
+          }
+        }
+      }
+    },
+    "端末・OS・バージョン依存の切り分け": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isolating device / OS / version issues"
+          }
+        }
+      }
+    },
+    "終わり": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The End"
+          }
+        }
+      }
+    },
+    "自分で QA": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do QA yourself"
+          }
+        }
+      }
+    },
+    "自分で撮る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture it yourself"
+          }
+        }
+      }
+    },
+    "見た目の証拠": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visual evidence"
+          }
+        }
+      }
+    },
+    "設計図": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blueprint"
+          }
+        }
+      }
+    },
+    "設計図から建てられた実体の一覧。\n設計図と実物の両方を知っている。\nrootElement が根": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The instances built from blueprints.\nKnows both blueprint and real thing.\nrootElement is the root"
+          }
+        }
+      }
+    },
+    "負荷が重い処理は、実行時に OFF にできるようにする": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make heavy work switchable OFF at runtime"
+          }
+        }
+      }
+    },
+    "起きたあとに撮り直すのは手間。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-recording afterwards is a hassle."
+          }
+        }
+      }
+    },
+    "起きるまでの流れ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What led up to it"
+          }
+        }
+      }
+    },
+    "起動時から": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From launch,"
+          }
+        }
+      }
+    },
+    "起動時からアプリ内リングバッファに直近 1000 行を保持し、起票時に添付": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From launch, keep the latest 1000 lines in an in-app ring buffer and attach on filing"
+          }
+        }
+      }
+    },
+    "起票": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File the ticket"
+          }
+        }
+      }
+    },
+    "起票後はGitHub Actionsにおまかせ(発展)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After filing, GitHub Actions takes over (advanced)"
+          }
+        }
+      }
+    },
+    "起票後は自動": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic after filing"
+          }
+        }
+      }
+    },
+    "選択したUI要素": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected UI element"
+          }
+        }
+      }
+    },
+    "部品の台帳": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parts ledger"
+          }
+        }
+      }
+    },
+    "静止画リングバッファ + デバイスで動画化": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still-frame ring buffer + on-device video"
+          }
+        }
+      }
+    },
+    "静止画リングバッファ + デバイスで動画化して、不具合の動画を作る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still-frame ring buffer + on-device encoding to make a bug video"
+          }
+        }
+      }
+    },
+    "面積が最小": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "smallest-area"
+          }
+        }
+      }
+    },
+    "音声入力で書く・大枠だけ起票して PC で整える": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use dictation, or file a rough draft and polish it on a PC"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

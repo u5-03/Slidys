@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'feedback_bundle.dart';
 import 'feedback_draft.dart';
+import 'github_config.dart';
 import 'issue_body_renderer.dart';
 
 /// Issue 起票の結果
@@ -77,7 +78,7 @@ class IssueSubmitter {
     return IssueSubmissionResult(
       issueNumber: number,
       issueUrl: Uri.parse(
-        'https://github.com/u5-03/Slidys/issues/$number',
+        'https://github.com/${GitHubConfig.owner}/${GitHubConfig.repo}/issues/$number',
       ),
       renderedBody: body,
       initialLabels: labels,

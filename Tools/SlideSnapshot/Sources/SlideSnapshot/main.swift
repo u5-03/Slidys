@@ -3,7 +3,7 @@
 //  SlideSnapshot
 //
 //  指定デッキの全スライド(フェーズ込み)を 1920x1080 の PNG に書き出し、一覧 HTML も生成する。
-//  引数: <deck> <outputDir>   deck: iosdc2026 | flutterkaigi2026
+//  引数: <deck> <outputDir> [language]   deck: iosdc2026 | flutterkaigi2026   language: ja(既定) | en
 //
 
 import AppKit
@@ -25,6 +25,9 @@ func run() throws {
     }
     let deck = args[1]
     let outputDir = URL(fileURLWithPath: args[2])
+    // 表示言語(多言語対応デッキ用)。コマンドラインツールにはアプリの言語設定が無いので、既定は日本語にする
+    let language = args.count >= 4 ? (SlideLanguage(rawValue: args[3]) ?? .japanese) : .japanese
+    SlideLanguageStore.shared.language = language
     try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
 
     // 一覧ビュー(SlideListView)を1枚のPNGに描画する検証モード
@@ -114,6 +117,19 @@ func run() throws {
     }
     html += "</div></body></html>"
     try html.write(to: outputDir.appendingPathComponent("index.html"), atomically: true, encoding: .utf8)
+
+    // スピーカーノート(リハーサル用 PDF の生成に使う)
+    var notes: [[String: Any]] = []
+    for (i, slide) in controller.slides.enumerated() {
+        let segments = (slide as? any PhasedScriptProviding)?.scriptSegments ?? [slide.script]
+        notes.append([
+            "slide": i + 1,
+            "name": String(describing: type(of: slide)),
+            "segments": segments,
+        ])
+    }
+    let json = try JSONSerialization.data(withJSONObject: notes, options: [.prettyPrinted])
+    try json.write(to: outputDir.appendingPathComponent("notes.json"))
     print("wrote \(written.count) shots to \(outputDir.path)")
 }
 

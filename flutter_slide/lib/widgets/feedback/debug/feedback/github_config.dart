@@ -8,10 +8,10 @@
 class GitHubConfig {
   const GitHubConfig._();
 
-  /// Issue 起票先 organization (iOS 版と同一)
+  /// Issue 起票先の owner (このスライドアプリのリポジトリ)
   static const String owner = 'u5-03';
 
-  /// Issue 起票先リポジトリ (iOS 版と同一)
+  /// Issue 起票先リポジトリ
   static const String repo = 'Slidys';
 
   /// GitHub App の Client ID (`Iv23li...` 形式)。

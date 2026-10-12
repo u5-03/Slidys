@@ -36,13 +36,13 @@ struct DiagnosticsMotivationSlide: View, PhasedScriptProviding {
     }
 
     var body: some View {
-        HeaderSlide("環境情報の手入力は大変、ログがあると分析が正確") {
-            Item("OS・デバイス・ビルド番号の手入力は大変で、抜けたり間違えたりする", keywords: ["手入力は大変"], accessory: .number(1))
+        HeaderSlide(loc: "環境情報の手入力は大変、ログがあると分析が正確") {
+            Item(loc: "OS・デバイス・ビルド番号の手入力は大変で、抜けたり間違えたりする", keywords: ["手入力は大変"], accessory: .number(1))
             if shows(.second) {
-                Item("ログや Widget 階層があると、直す側はより正確に状況分析できる", keywords: ["より正確に状況分析"], accessory: .number(2))
+                Item(loc: "ログや Widget 階層があると、直す側はより正確に状況分析できる", keywords: ["より正確に状況分析"], accessory: .number(2))
             }
             if shows(.third) {
-                Item("機械が拾える情報は全部機械に。人が書くのはタイトルと一言だけ", keywords: ["全部機械に"], accessory: .number(3))
+                Item(loc: "機械が拾える情報は全部機械に。人が書くのはタイトルと一言だけ", keywords: ["全部機械に"], accessory: .number(3))
             }
         }
     }

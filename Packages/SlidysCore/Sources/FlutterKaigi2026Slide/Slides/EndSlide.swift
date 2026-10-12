@@ -19,7 +19,7 @@ struct EndSlide: View {
     }
 
     var body: some View {
-        HeaderSlide("ご清聴ありがとうございました") {
+        HeaderSlide(loc: "ご清聴ありがとうございました") {
             VStack(alignment: .leading, spacing: 48) {
                 HStack(alignment: .top, spacing: 80) {
                     qrColumn(

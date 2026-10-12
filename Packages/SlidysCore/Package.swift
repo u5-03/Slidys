@@ -5,6 +5,8 @@ import PackageDescription
 
 let package = Package(
     name: "SlidysCore",
+    // String Catalog(Localizable.xcstrings)を持つターゲットがあるので必要。原文は日本語
+    defaultLocalization: "ja",
     platforms: [.iOS(.v26), .macOS(.v26), .visionOS(.v26)],
     products: [
         .library(

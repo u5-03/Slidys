@@ -12,9 +12,9 @@ struct TalkPlanSlide: View, PhasedScriptProviding {
     /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
     var scriptSegments: [String] {
         [
-        "今日話すのはこの3つです。\nまず、画面上の Widget をタップして報告対象を選ぶ仕組み。選んだ Widget が枠で囲まれます。",
-        "次に、再現が難しいバグのために、静止画のリングバッファをデバイスで動画化して「不具合の瞬間の動画」を作る話。",
-        "最後に、Widget階層・ログ・環境情報といった実行時の情報を、チケットに一緒に添付する方法です。\n\nコードは今日はほとんど出しません。最近はAIに聞けば大抵書けるので、大枠と「どこが壁だったか」を中心に話します。詳細はブログとGitHub、スライドはTestFlightで配布します。",
+        "今日の話は3つです。\nまず、画面上の Widget をタップして報告対象を選ぶ仕組み。",
+        "次に、不具合の瞬間の動画を残す仕組み。",
+        "最後に、ログや環境情報をチケットに添付する仕組みです。",
         ]
     }
 
@@ -38,13 +38,13 @@ struct TalkPlanSlide: View, PhasedScriptProviding {
     }
 
     var body: some View {
-        HeaderSlide("今日話すこと") {
-            Item("画面上のWidgetをタップして、対象のWidgetを選ぶ", accessory: .number(1))
+        HeaderSlide(loc: "今日話すこと") {
+            Item(loc: "画面上のWidgetをタップして、対象のWidgetを選ぶ", accessory: .number(1))
             if shows(.second) {
-                Item("静止画リングバッファ + デバイスで動画化して、不具合の動画を作る", accessory: .number(2))
+                Item(loc: "静止画リングバッファ + デバイスで動画化して、不具合の動画を作る", accessory: .number(2))
             }
             if shows(.third) {
-                Item("Widget階層・ログ・環境情報を一緒にチケットに添付する", accessory: .number(3))
+                Item(loc: "Widget階層・ログ・環境情報を一緒にチケットに添付する", accessory: .number(3))
             }
         }
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slide/components/animated_svg_path_widget.dart';
 import 'package:flutter_slide/components/svg_path_widget.dart';
 import 'package:flutter_slide/widgets/feedback/feedback_demo_app.dart';
+import 'package:flutter_slide/widgets/feedback/slide_language.dart';
 import 'package:flutter_slide/widgets/calendar_ui/calendar_ui_widget.dart';
 import 'package:flutter_slide/widgets/icon_move_tab/icon_move_tab_widget.dart';
 import 'package:flutter_slide/widgets/path_animation/flight_route_animation_widget.dart';
@@ -11,6 +12,8 @@ import 'package:flutter_slide/widgets/radial/circle_music_note_widget.dart';
 import 'package:flutter_slide/widgets/symbol_quiz/symbol_quiz_widget.dart';
 
 void main() {
+  // スライド(Swift)で選ばれている表示言語を、初期ルートの `?lang=` から受け取る
+  SlideLanguage.applyInitialRoute();
   runApp(const MyApp());
 }
 
@@ -34,6 +37,7 @@ enum PageType {
   elementPicker,
   screenReplay,
   widgetTree,
+  logSlide,
   ;
 
   String get routeName => '/$name';
@@ -114,6 +118,8 @@ enum PageType {
         return const FeedbackDemoApp(mode: FeedbackDemoMode.screenReplay);
       case PageType.widgetTree:
         return const FeedbackDemoApp(mode: FeedbackDemoMode.widgetTree);
+      case PageType.logSlide:
+        return const FeedbackDemoApp(mode: FeedbackDemoMode.logSlide);
     }
   }
 
@@ -142,6 +148,12 @@ enum PageType {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static Widget _pageScaffold(PageType page) => Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.transparent,
+        body: page.widget,
+      );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -153,11 +165,20 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         routes: {
           for (var page in PageType.values)
-            page.routeName: (context) => Scaffold(
-                  extendBodyBehindAppBar: true,
-                  backgroundColor: Colors.transparent,
-                  body: page.widget,
-                )
+            page.routeName: (context) => _pageScaffold(page),
+        },
+        // `/logSlide?lang=en` のようにクエリ付きで来たルートは、パスだけで画面を引く
+        onGenerateRoute: (settings) {
+          final path = Uri.tryParse(settings.name ?? '')?.path;
+          for (final page in PageType.values) {
+            if (page.routeName == path) {
+              return MaterialPageRoute<void>(
+                settings: settings,
+                builder: (context) => _pageScaffold(page),
+              );
+            }
+          }
+          return null;
         });
   }
 }

@@ -20,19 +20,19 @@ struct TitleSlide: View {
 
     private let title = "その不具合、どのWidgetですか？"
     private let subtitle = "― アプリ内で“直せるバグ報告”を作る"
-    private let dateString = "2026/11/XX" // TODO: 発表日確定後に更新
+    private let dateString = "2026/10/29"
     private let eventName = "FlutterKaigi 2026"
     private let authorName = "Sugiy/すぎー"
 
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 16) {
-                Text(title)
+                Text(title.loc)
                     .font(.system(size: 110, weight: .heavy))
                     .minimumScaleFactor(0.1)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text(subtitle)
+                Text(subtitle.loc)
                     .font(.system(size: 76, weight: .heavy))
                     .minimumScaleFactor(0.1)
                     .lineLimit(1)

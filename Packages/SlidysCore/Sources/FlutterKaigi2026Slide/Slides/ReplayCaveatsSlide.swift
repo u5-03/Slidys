@@ -12,10 +12,10 @@ struct ReplayCaveatsSlide: View, PhasedScriptProviding {
     /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
     var scriptSegments: [String] {
         [
-        "注意点もあります。\ntoImage が拾うのは Flutter が描いたピクセルだけです。地図や WebView、カメラなどの PlatformView は黒か空白になります。ReplayKit が「実画面の録画」なのに対して、こちらは「シーンの録画」です。",
-        "負荷対策として、fps は 8 程度に、pixelRatio は下げてまず小さく。解像度が負荷とファイルサイズの主因です。",
-        "フレームはメモリではなくファイルへローテーション。960 枚をメモリに持たない。",
-        "撮影中はジャンクが増えうるので、デバッグビルド限定で ON/OFF できる前提にしています。",
+        "作ってみてわかった注意点です。\n撮影はネイティブで画面ごと撮るので、PlatformView も写ります。ただ、DRM 付きの動画やパスワード欄など、OS が保護している部分は黒くなります。",
+        "秒数・解像度・fps は、プロジェクトに合わせて調整してください。まずは 8fps・小さめの解像度からがおすすめです。",
+        "フレームはメモリに溜めず、ファイルに書いて古い順に消します。",
+        "録画のような負荷が重い処理は、重たい機能を実行する時にはDebugMenuなどでOFF にできるようにしておくパフォーマンスに影響もしにくいです",
         ]
     }
 
@@ -37,16 +37,16 @@ struct ReplayCaveatsSlide: View, PhasedScriptProviding {
     }
 
     var body: some View {
-        HeaderSlide("作ってみてわかった注意点") {
-            Item("toImage が拾うのは Flutter が描いたピクセルだけ(PlatformView は黒)", keywords: ["Flutter が描いたピクセルだけ"], accessory: .number(1))
+        HeaderSlide(loc: "作ってみてわかった注意点") {
+            Item(loc: "撮影はネイティブで画面ごと。PlatformView も写る", keywords: ["ネイティブで画面ごと"], accessory: .number(1))
             if shows(.second) {
-                Item("fps は 8 程度、pixelRatio は小さく。解像度が負荷とサイズの主因", keywords: ["pixelRatio"], accessory: .number(2))
+                Item(loc: "秒数・解像度・fps はプロジェクトに合わせて調整", keywords: ["プロジェクトに合わせて調整"], accessory: .number(2))
             }
             if shows(.third) {
-                Item("フレームはメモリではなくファイルへローテーション", keywords: ["ファイルへローテーション"], accessory: .number(3))
+                Item(loc: "フレームはファイルに溜め、古い順に消す", keywords: ["ファイルに溜め"], accessory: .number(3))
             }
             if shows(.fourth) {
-                Item("デバッグビルド限定・ON/OFF できる前提で", keywords: ["デバッグビルド限定"], accessory: .number(4))
+                Item(loc: "負荷が重い処理は、実行時に OFF にできるようにする", keywords: ["OFF にできる"], accessory: .number(4))
             }
         }
     }

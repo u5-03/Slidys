@@ -1,6 +1,6 @@
 /// デバッグ機能 (フローティングボタン / Issue 起票 / 画面リプレイ) を有効化するかのフラグ。
 ///
-/// iOS 版 Slidys の `AppEnvironment.isDebugFunctionEnabled` に相当する。
+/// iOS 版アプリの `AppEnvironment.isDebugFunctionEnabled` に相当する。
 /// **ビルドモード (kDebugMode) ではなく明示フラグにしている理由**:
 /// Flutter の Debug ビルドは JIT なので、実機では `flutter run` / デバッガ無しの単独起動で
 /// クラッシュする。実機やカンファレンスのデモでは Profile / Release でビルドする必要があるが、

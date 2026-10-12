@@ -1,7 +1,8 @@
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 import 'element_picker.dart';
 import 'feedback_bundle.dart';
@@ -9,6 +10,7 @@ import 'feedback_draft.dart';
 import 'feedback_session.dart';
 import 'github_config.dart';
 import 'issue_submitter.dart';
+import 'screen_replay_recorder.dart';
 
 /// Composer の送信状態
 sealed class _SubmissionState {
@@ -38,12 +40,30 @@ class _Failed extends _SubmissionState {
 /// iOS 版 `FeedbackComposerScreen.swift` の移植。フォームの構成・必須項目・
 /// 診断データトグル・AI 自動下調べ・2 段階ラベル戦略はそのまま踏襲している。
 class FeedbackComposerScreen extends StatefulWidget {
-  const FeedbackComposerScreen({super.key});
+  const FeedbackComposerScreen({
+    super.key,
+    this.textScale = 1.0,
+    this.recentClipDuration,
+  });
 
-  static Future<void> show(BuildContext context) {
+  /// 文字の拡大率(発表のデモで会場から読めるように大きくする用途)
+  final double textScale;
+
+  /// 「直近の動画を添付」で書き出す長さ。null ならリングバッファの保持時間(60 秒)。
+  /// 秒数・解像度・fps はプロジェクトに合わせて調整する前提。
+  final Duration? recentClipDuration;
+
+  static Future<void> show(
+    BuildContext context, {
+    double textScale = 1.0,
+    Duration? recentClipDuration,
+  }) {
     return Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => const FeedbackComposerScreen(),
+        builder: (_) => FeedbackComposerScreen(
+          textScale: textScale,
+          recentClipDuration: recentClipDuration,
+        ),
         fullscreenDialog: true,
       ),
     );
@@ -58,6 +78,12 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   FeedbackDraft get _draft => FeedbackSession.instance.draft;
   _SubmissionState _state = const _Idle();
 
+  /// 直近の動画を書き出し中か
+  bool _exportingClip = false;
+
+  /// 要素選択のために閉じて開き直す途中か(録画を再開しないため)
+  bool _reopeningAfterPick = false;
+
   /// フィールドごとの永続 TextEditingController (build 毎再生成でカーソルが飛ぶのを防ぐ)。
   final Map<String, TextEditingController> _controllers = {};
 
@@ -68,6 +94,8 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   @override
   void initState() {
     super.initState();
+    // 起票画面を開いている間は録画を止め、直近の動画が「開く直前まで」になるようにする
+    ScreenReplayRecorder.instance.pause();
     // 確認端末欄が未入力なら自動入力 (内部モデル名相当 + OS バージョン)。
     // 再オープン時に既存入力を上書きしないよう空のときだけ設定する。
     if (_draft.bugConfirmedDevice.isEmpty) {
@@ -77,6 +105,8 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
 
   @override
   void dispose() {
+    // 要素選択のために一旦閉じるときは止めたまま(選択中の画面を動画に入れない)
+    if (!_reopeningAfterPick) ScreenReplayRecorder.instance.resume();
     for (final c in _controllers.values) {
       c.dispose();
     }
@@ -146,6 +176,14 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    return MediaQuery(
+      data: mediaQuery.copyWith(textScaler: TextScaler.linear(widget.textScale)),
+      child: _buildScaffold(context),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Issue を起票'),
@@ -261,6 +299,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     final navigator = Navigator.of(context);
 
     // Composer と DebugMenu を閉じてアプリ本体を表示する。
+    _reopeningAfterPick = true;
     navigator.popUntil((route) => route.isFirst);
 
     final identifier = await ElementPicker.pick(overlay);
@@ -271,7 +310,10 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     // Composer を開き直す (下書きはセッションに残っているので入力内容は維持)。
     await navigator.push(
       MaterialPageRoute<void>(
-        builder: (_) => const FeedbackComposerScreen(),
+        builder: (_) => FeedbackComposerScreen(
+          textScale: widget.textScale,
+          recentClipDuration: widget.recentClipDuration,
+        ),
         fullscreenDialog: true,
       ),
     );
@@ -407,7 +449,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     return _section(
       title: '添付ファイル (上限 ${FeedbackDraft.attachmentLimit} 件)',
       children: [
-        for (final a in _draft.attachments)
+        for (final a in _draft.attachments) ...[
           ListTile(
             contentPadding: EdgeInsets.zero,
             dense: true,
@@ -420,6 +462,13 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
               ),
             ),
           ),
+          // 添付した動画はその場で再生して確認できる(フォトライブラリーを開かずに済む)
+          if (a.isVideo && a.filePath != null && _canPreviewClip)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _ClipPreview(key: ValueKey(a.id), path: a.filePath!),
+            ),
+        ],
         if (remaining > 0)
           Align(
             alignment: Alignment.centerLeft,
@@ -428,12 +477,59 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
               label: Text('添付を追加 (残り $remaining 件)'),
               onPressed: _addMockAttachment,
             ),
+          ),
+        if (remaining > 0)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              icon: _exportingClip
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.videocam),
+              label: Text(_exportingClip ? '動画を書き出し中…' : '直近の動画を添付'),
+              onPressed: _exportingClip ? null : _attachRecentClip,
+            ),
           )
         else
           const Text('添付ファイルの上限に達しています'),
       ],
     );
   }
+
+  /// 裏で撮り続けている静止画(リングバッファ)から直近の動画を書き出して添付する。
+  Future<void> _attachRecentClip() async {
+    setState(() => _exportingClip = true);
+    try {
+      final clip = await ScreenReplayRecorder.instance.exportClip(
+        duration: widget.recentClipDuration,
+      );
+      if (!mounted) return;
+      setState(() {
+        _draft.attachments.add(
+          PickedAttachment(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            displayName: 'screen-replay_${clip.duration.toStringAsFixed(0)}s.mp4',
+            contentType: 'video/mp4',
+            filePath: clip.path,
+          ),
+        );
+      });
+      debugPrint('[composer] 直近の動画を添付: ${clip.path}');
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('動画を書き出せませんでした: $error')),
+      );
+    } finally {
+      if (mounted) setState(() => _exportingClip = false);
+    }
+  }
+
+  /// 動画プレビュー(端末内のファイルを再生するので Web では出さない)
+  bool get _canPreviewClip => !kIsWeb;
 
   void _addMockAttachment() {
     // バックエンド未接続のため、擬似的な添付を追加する。
@@ -723,6 +819,174 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
       title: Text(label),
       value: value,
       onChanged: onChanged,
+    );
+  }
+}
+
+/// 添付した動画のプレビュー(video_player)。
+/// シークバーをドラッグして、直近の画面がちゃんと撮れていることをその場で見せられる。
+class _ClipPreview extends StatefulWidget {
+  const _ClipPreview({super.key, required this.path});
+
+  final String path;
+
+  @override
+  State<_ClipPreview> createState() => _ClipPreviewState();
+}
+
+class _ClipPreviewState extends State<_ClipPreview> {
+  late final VideoPlayerController _controller =
+      VideoPlayerController.file(File(widget.path));
+  Object? _error;
+
+  /// ドラッグ中の位置(ms)。ドラッグ中は再生位置の通知で値が戻らないようにする
+  double? _dragMs;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_onTick);
+    _controller.setLooping(true);
+    _controller.initialize().then((_) {
+      if (!mounted) return;
+      setState(() {});
+      _controller.play();
+    }).catchError((Object error) {
+      if (mounted) setState(() => _error = error);
+    });
+  }
+
+  void _onTick() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_onTick);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String _format(Duration d) {
+    final s = d.inMilliseconds / 1000;
+    return '${s.toStringAsFixed(1)} 秒';
+  }
+
+  void _togglePlay() {
+    if (_controller.value.isPlaying) {
+      _controller.pause();
+    } else {
+      _controller.play();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final value = _controller.value;
+
+    if (_error != null) {
+      return Text('動画を再生できませんでした: $_error',
+          style: TextStyle(color: scheme.error));
+    }
+    if (!value.isInitialized) {
+      return const SizedBox(
+        height: 120,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final totalMs = value.duration.inMilliseconds.toDouble();
+    final positionMs =
+        (_dragMs ?? value.position.inMilliseconds.toDouble()).clamp(0.0, totalMs);
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 960),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: _togglePlay,
+              child: AspectRatio(
+                aspectRatio: value.aspectRatio,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    VideoPlayer(_controller),
+                    if (!value.isPlaying && _dragMs == null)
+                      const Icon(Icons.play_circle_fill,
+                          size: 96, color: Colors.white70),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 4, 16, 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    color: Colors.white,
+                    iconSize: 56,
+                    icon: Icon(value.isPlaying ? Icons.pause : Icons.play_arrow),
+                    onPressed: _togglePlay,
+                  ),
+                  Text(
+                    _format(Duration(milliseconds: positionMs.round())),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  Expanded(
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight: 10,
+                        thumbShape:
+                            const RoundSliderThumbShape(enabledThumbRadius: 18),
+                        overlayShape:
+                            const RoundSliderOverlayShape(overlayRadius: 36),
+                      ),
+                      child: Slider(
+                        min: 0,
+                        max: totalMs <= 0 ? 1 : totalMs,
+                        value: totalMs <= 0 ? 0 : positionMs,
+                        activeColor: scheme.primaryContainer,
+                        inactiveColor: Colors.white24,
+                        // ドラッグ中は止め、離したらそのコマで止めたままにする(指し示しながら説明できる)
+                        onChangeStart: (v) {
+                          _controller.pause();
+                          setState(() => _dragMs = v);
+                        },
+                        onChanged: (v) {
+                          setState(() => _dragMs = v);
+                          _controller.seekTo(Duration(milliseconds: v.round()));
+                        },
+                        onChangeEnd: (v) async {
+                          await _controller
+                              .seekTo(Duration(milliseconds: v.round()));
+                          if (!mounted) return;
+                          setState(() => _dragMs = null);
+                        },
+                      ),
+                    ),
+                  ),
+                  Text(
+                    _format(value.duration),
+                    style: const TextStyle(color: Colors.white70, fontSize: 24),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

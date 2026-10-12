@@ -15,9 +15,9 @@ struct ThreeTreesSlide: View, PhasedScriptProviding {
     /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
     var scriptSegments: [String] {
         [
-        "ここで少しFlutterの内側の話です。Flutterには3つのツリーがあります。\nまずWidgetツリー。私たちが普段buildで書いている、不変の「設計図」です。画面上の位置は持っていません。",
-        "次にElementツリー。Widgetからつくられる「実体」で、ツリーの構造と状態を持っています。WidgetsBinding.instance.rootElementから辿れます。",
-        "そしてRenderObjectツリー。レイアウトと描画の実体で、サイズと座標を持っているのはここです。\nつまり「タップして選ぶ」ためにはElementを歩いてRenderObjectに辿り着く必要があります。",
+        "では次に少し仕組みの話をします。Flutter は画面を3つのツリーで管理しています。\nWidget は build で書く「設計図」。描き直されるもので、位置は持っていません。",
+        "Element は、設計図から建てた「部品の台帳」。設計図と実物の両方を知っています。",
+        "RenderObject は「実物」で、サイズと座標を持つのはここだけです。\nなので、Element をたどって、そこから RenderObject の位置を取ります。",
         ]
     }
 
@@ -47,13 +47,13 @@ struct ThreeTreesSlide: View, PhasedScriptProviding {
     }
 
     private let trees: [Tree] = [
-        .init(id: 0, name: "Widget", role: "設計図", detail: "build() で書く不変の構成。\n画面上の位置は持たない", hasPosition: false),
-        .init(id: 1, name: "Element", role: "実体", detail: "Widget から作られる木。\nrootElement から辿れる", hasPosition: false),
-        .init(id: 2, name: "RenderObject", role: "レイアウト・描画", detail: "サイズと座標を持つ。\nlocalToGlobal で画面座標に", hasPosition: true),
+        .init(id: 0, name: "Widget", role: "設計図", detail: "build() で書く不変の構成。\n状態が変わるたび描き直される。\n位置もサイズも持たない", hasPosition: false),
+        .init(id: 1, name: "Element", role: "部品の台帳", detail: "設計図から建てられた実体の一覧。\n設計図と実物の両方を知っている。\nrootElement が根", hasPosition: false),
+        .init(id: 2, name: "RenderObject", role: "実物(レイアウト・描画)", detail: "サイズと座標を持つのはここだけ。\nlocalToGlobal で画面座標に", hasPosition: true),
     ]
 
     var body: some View {
-        HeaderSlide("Flutterの3つのツリー") {
+        HeaderSlide(loc: "Flutterの3つのツリー") {
             HStack(alignment: .top, spacing: 48) {
                 ForEach(trees) { tree in
                     let visible = shows(SlidePhase(rawValue: tree.id) ?? .initial)
@@ -63,18 +63,20 @@ struct ThreeTreesSlide: View, PhasedScriptProviding {
                             .foregroundStyle(tree.hasPosition ? Color.strokeColor : .themeColor)
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
-                        Text(tree.role)
+                        Text(tree.role.loc)
                             .font(.system(size: 40, weight: .bold))
                         treeGlyph(highlighted: tree.hasPosition)
                             .frame(height: 260)
-                        Text(tree.detail)
+                        Text(tree.detail.loc)
                             .font(.system(size: 34, weight: .regular))
                             .foregroundStyle(.gray)
                             .multilineTextAlignment(.center)
-                            .lineLimit(3)
+                            .lineLimit(4)
                             .minimumScaleFactor(0.6)
+                        Spacer(minLength: 0)
                     }
-                    .frame(maxWidth: .infinity)
+                    // 3枚とも同じ高さにそろえる(HStack 側の fixedSize で一番高いカードに合わせる)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.vertical, 36)
                     .padding(.horizontal, 20)
                     .background(
@@ -90,6 +92,7 @@ struct ThreeTreesSlide: View, PhasedScriptProviding {
                     .opacity(visible ? 1 : 0)
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }

@@ -2,21 +2,29 @@ PODS:
   - Flutter (1.0.0)
   - FlutterPluginRegistrant (0.0.1):
     - Flutter
+    - video_player_avfoundation
+  - video_player_avfoundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
   - Flutter (from `../../flutter_slide/.ios/Flutter`)
   - FlutterPluginRegistrant (from `../../flutter_slide/.ios/Flutter/FlutterPluginRegistrant`)
+  - video_player_avfoundation (from `../../flutter_slide/.ios/.symlinks/plugins/video_player_avfoundation/darwin`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: "../../flutter_slide/.ios/Flutter"
   FlutterPluginRegistrant:
     :path: "../../flutter_slide/.ios/Flutter/FlutterPluginRegistrant"
+  video_player_avfoundation:
+    :path: "../../flutter_slide/.ios/.symlinks/plugins/video_player_avfoundation/darwin"
 
 SPEC CHECKSUMS:
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  FlutterPluginRegistrant: 31c463909264601dccf8080d30b71b19413ad188
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  FlutterPluginRegistrant: 6e2f5dc427977ec769f943e023ee8d541c1bdae4
+  video_player_avfoundation: 3453f792138786248960ca029747fcd9f318ef52
 
 PODFILE CHECKSUM: 6127b0cd796291cd7c3b3cd66b1db58e2c94b5fa
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.17.0

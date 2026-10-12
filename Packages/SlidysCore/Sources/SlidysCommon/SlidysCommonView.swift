@@ -145,8 +145,15 @@ extension SlideSectionType: Identifiable, Hashable  {
    }
 }
 
+/// 長押しメニューから PDF 書き出しを頼まれたデッキ
+struct PDFExportRequest: Identifiable {
+    let id: String
+    let source: SlidePDFExportSource
+}
+
 public struct SlidysCommonView: View {
     @State private var selectedSectionType: SlideSectionType?
+    @State private var pdfExportRequest: PDFExportRequest?
     @Environment(\.openWindow) private var openWindow
 
     private let slideTypes: [any SlideTypeProtocol]
@@ -164,6 +171,16 @@ public struct SlidysCommonView: View {
                             Text(type.displayValue)
                                 .padding()
                                 .tag(SlideSectionType.slides(type))
+                                // 長押し(macOS は右クリック)で PDF 書き出し。対応デッキ(pdfExportSource を返すもの)だけ出す
+                                .contextMenu {
+                                    if let source = type.view.pdfExportSource {
+                                        Button {
+                                            pdfExportRequest = PDFExportRequest(id: type.id, source: source)
+                                        } label: {
+                                            Label("PDFを書き出す", systemImage: "doc.richtext")
+                                        }
+                                    }
+                                }
                         }
                     }
                     Section("Other") {
@@ -179,6 +196,9 @@ public struct SlidysCommonView: View {
                 }
                 .listRowBackground(Color.clear)
                 .navigationTitle("Slidys")
+                .sheet(item: $pdfExportRequest) { request in
+                    PDFExportSheet(source: request.source)
+                }
             }
 #if os(macOS)
             .sheet(item: $selectedSectionType) { type in
@@ -194,18 +214,12 @@ public struct SlidysCommonView: View {
             .fullScreenCover(item: $selectedSectionType) { type in
                 switch type {
                 case .slides:
-                    // 閉じるボタンは自前のオーバーレイではなく NavigationStack の toolbar に置く。
-                    // iPhone Duo のようにバーが縦向き(画面端)に出る端末でも、ステータスバーの下など
-                    // 適切な位置へシステムが配置してくれる(機種別の分岐が不要)。
+                    // 閉じる操作は SlideBaseView の発表者メニュー(ナビゲーションバー)に統合されている。
+                    // NavigationStack に載せるのは、iPhone Duo のようにバーが縦向き(画面端)に出る端末でも
+                    // システムが適切な位置へ配置してくれるため(機種別の分岐が不要)。
                     NavigationStack {
                         AnyView(type.view)
-                            .toolbar {
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Button(role: .close) {
-                                        selectedSectionType = nil
-                                    }
-                                }
-                            }
+                            .environment(\.slideCloseAction) { selectedSectionType = nil }
                     }
                 case .info:
                     ZStack(alignment: .topTrailing) {

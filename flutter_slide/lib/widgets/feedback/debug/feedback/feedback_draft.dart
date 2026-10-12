@@ -61,11 +61,15 @@ class PickedAttachment {
     required this.id,
     required this.displayName,
     required this.contentType,
+    this.filePath,
   });
 
   final String id;
   final String displayName;
   final String contentType;
+
+  /// 端末内の実ファイル(直近の動画など)。擬似的な添付では null
+  final String? filePath;
 
   bool get isImage => contentType.startsWith('image/');
   bool get isVideo => contentType.startsWith('video/');

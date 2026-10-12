@@ -40,6 +40,16 @@ public struct iOSDC2026SlideView: SlideViewProtocol {
             listTextStyle: .iosdc2026
         )
     }
+
+    /// PDF 書き出し(スライド一覧の長押しメニュー)。動画や RealityView はプレースホルダーになる。
+    public var pdfExportSource: SlidePDFExportSource? {
+        SlidePDFExportSource(
+            slides: configuration.slideIndexController.slides,
+            slideTheme: CustomSlideTheme(showSlideIndex: true, showsTotalSlideCount: false, listTextStyle: .iosdc2026),
+            slideSize: configuration.size,
+            fileName: "iOSDC2026_Sugiy"
+        )
+    }
 }
 
 public extension iOSDC2026SlideView {

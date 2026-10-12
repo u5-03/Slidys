@@ -38,7 +38,7 @@ struct ChapterDividerSlide: View {
                         .foregroundStyle(isActive ? Color.themeColor : .defaultForegroundColor)
                         .frame(width: 110, alignment: .trailing)
                     // 折り返すと目次として読みにくいので、必ず1行に収める(収まらなければ自動縮小)
-                    Text(title)
+                    Text(title.loc)
                         .font(.system(size: isActive ? 68 : 52, weight: isActive ? .heavy : .bold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)

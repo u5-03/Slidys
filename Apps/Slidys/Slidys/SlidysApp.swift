@@ -20,6 +20,11 @@ import YugiohDuelDiskPackage
 
 @main
 struct SlidysApp: App {
+#if os(iOS)
+    // 外部ディスプレイ(HDMI / AirPlay)用の Scene を自前の Window にする(スライドを外部、ノートを手元に)
+    @UIApplicationDelegateAdaptor(SlidysAppDelegate.self) private var appDelegate
+#endif
+
     var body: some Scene {
         WindowGroup {
             ContentView()

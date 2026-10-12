@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'slide_language.dart';
+
 /// FlutterKaigi2026 デモ用のホーム画面。
 ///
 /// 各カード・ボタンに `Semantics(identifier:)` を付けているので、ElementPicker の
@@ -72,7 +74,8 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Semantics(
+            identifier: 'home.appBar.title', child: Text(widget.title)),
       ),
       backgroundColor: Colors.teal.shade50,
       floatingActionButton: widget.floatingActionButton,
@@ -93,11 +96,12 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
             child: Row(
               children: [
-                _tabButton(0, Icons.home, 'ホーム', 'home.tab.home'),
-                _tabButton(1, Icons.search, '検索', 'home.tab.search'),
-                _tabButton(2, Icons.qr_code, 'コード', 'home.tab.qrCode'),
-                _tabButton(3, Icons.notifications, '通知', 'home.tab.notifications'),
-                _tabButton(4, Icons.settings, '設定', 'home.tab.settings'),
+                _tabButton(0, Icons.home, tr('ホーム', 'Home'), 'home.tab.home'),
+                _tabButton(1, Icons.search, tr('検索', 'Search'), 'home.tab.search'),
+                _tabButton(2, Icons.qr_code, tr('コード', 'Code'), 'home.tab.qrCode'),
+                _tabButton(
+                    3, Icons.notifications, tr('通知', 'Alerts'), 'home.tab.notifications'),
+                _tabButton(4, Icons.settings, tr('設定', 'Settings'), 'home.tab.settings'),
               ],
             ),
           ),
@@ -120,9 +124,14 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.titleSmall),
+              // セクション(カード)だけでなく、タイトルと中身も個別に選べるように identifier を付ける
+              Semantics(
+                identifier: '$id.title',
+                child:
+                    Text(title, style: Theme.of(context).textTheme.titleSmall),
+              ),
               const SizedBox(height: 12),
-              child,
+              Semantics(identifier: '$id.content', child: child),
             ],
           ),
         ),
@@ -134,13 +143,14 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
     final seconds = _elapsed.inMilliseconds / 1000.0;
     return _demoCard(
       id: 'home.stopwatch',
-      title: '⏱ 経過時間',
-      child: Text(
-        '${seconds.toStringAsFixed(1)} 秒',
-        style: Theme.of(context)
-            .textTheme
-            .displaySmall
-            ?.copyWith(fontWeight: FontWeight.bold, color: Colors.teal.shade700),
+      title: tr('⏱ 経過時間', '⏱ Elapsed time'),
+      child: Semantics(
+        identifier: 'home.stopwatch.value',
+        child: Text(
+          tr('${seconds.toStringAsFixed(1)} 秒', '${seconds.toStringAsFixed(1)} s'),
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              fontWeight: FontWeight.bold, color: Colors.teal.shade700),
+        ),
       ),
     );
   }
@@ -148,7 +158,7 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
   Widget _counterCard() {
     return _demoCard(
       id: 'home.counter',
-      title: '＋ カウンター',
+      title: tr('＋ カウンター', '＋ Counter'),
       child: Row(
         children: [
           Semantics(
@@ -164,7 +174,7 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
             child: FilledButton.icon(
               onPressed: _incrementCounter,
               icon: const Icon(Icons.add),
-              label: const Text('カウント'),
+              label: Text(tr('カウント', 'Count')),
             ),
           ),
         ],
@@ -175,22 +185,31 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
   Widget _spinnerCard() {
     return _demoCard(
       id: 'home.spinner',
-      title: '🌀 回転アニメーション',
+      title: tr('🌀 回転アニメーション', '🌀 Rotation animation'),
       child: Center(
-        child: AnimatedBuilder(
-          animation: _anim,
-          builder: (_, __) => Transform.rotate(
-            angle: _anim.value * 2 * pi,
-            child: Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                gradient: const SweepGradient(
-                  colors: [Colors.purple, Colors.blue, Colors.cyan, Colors.purple],
+        child: Semantics(
+          identifier: 'home.spinner.icon',
+          child: AnimatedBuilder(
+            animation: _anim,
+            builder: (_, __) => Transform.rotate(
+              angle: _anim.value * 2 * pi,
+              child: Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  gradient: const SweepGradient(
+                    colors: [
+                      Colors.purple,
+                      Colors.blue,
+                      Colors.cyan,
+                      Colors.purple
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                borderRadius: BorderRadius.circular(16),
+                child:
+                    const Icon(Icons.settings, color: Colors.white, size: 36),
               ),
-              child: const Icon(Icons.settings, color: Colors.white, size: 36),
             ),
           ),
         ),
@@ -201,21 +220,26 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
   Widget _ballCard() {
     return _demoCard(
       id: 'home.ball',
-      title: '⚫ 往復するボール',
+      title: tr('⚫ 往復するボール', '⚫ Bouncing ball'),
       child: SizedBox(
         height: 48,
         child: AnimatedBuilder(
           animation: _anim,
           builder: (_, __) {
             final x = sin(_anim.value * 2 * pi);
-            final color = HSVColor.fromAHSV(1, (_anim.value * 360) % 360, 0.7, 0.95)
-                .toColor();
+            final color =
+                HSVColor.fromAHSV(1, (_anim.value * 360) % 360, 0.7, 0.95)
+                    .toColor();
             return Align(
               alignment: Alignment(x, 0),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+              child: Semantics(
+                identifier: 'home.ball.dot',
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration:
+                      BoxDecoration(shape: BoxShape.circle, color: color),
+                ),
               ),
             );
           },
@@ -227,21 +251,27 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
   Widget _progressCard() {
     return _demoCard(
       id: 'home.progress',
-      title: '📊 アニメーションするバー',
+      title: tr('📊 アニメーションするバー', '📊 Animated bar'),
       child: AnimatedBuilder(
         animation: _anim,
         builder: (_, __) {
           final value = (sin(_anim.value * 2 * pi) + 1) / 2;
           return Column(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: LinearProgressIndicator(value: value, minHeight: 12),
+              Semantics(
+                identifier: 'home.progress.bar',
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(value: value, minHeight: 12),
+                ),
               ),
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,
-                child: Text('${(value * 100).toStringAsFixed(0)} %'),
+                child: Semantics(
+                  identifier: 'home.progress.label',
+                  child: Text('${(value * 100).toStringAsFixed(0)} %'),
+                ),
               ),
             ],
           );
@@ -273,7 +303,8 @@ class _FeedbackDemoHomeState extends State<FeedbackDemoHome>
                   style: TextStyle(
                     fontSize: 12,
                     color: color,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ],

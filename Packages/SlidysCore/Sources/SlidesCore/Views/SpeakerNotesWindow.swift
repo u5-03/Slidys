@@ -34,6 +34,23 @@ extension Slide {
     }
 }
 
+extension SlideIndexController {
+    /// 戻れる先がない(最初のページの最初のフェーズ)か。
+    @MainActor
+    var isAtFirstStep: Bool {
+        currentIndex == 0 && currentSlide.phaseStep(on: self).current == 0
+    }
+
+    /// 進める先がない(最後のページで、まだ出していないフェーズもない)か。
+    /// ページ番号だけで判定すると、最後のページの段階表示が進められなくなる。
+    @MainActor
+    var isAtLastStep: Bool {
+        guard currentIndex >= slides.count - 1 else { return false }
+        let phase = currentSlide.phaseStep(on: self)
+        return phase.current >= phase.last
+    }
+}
+
 #if os(macOS)
 /// スピーカーノートWindowの表示管理(macOS)。
 @MainActor
@@ -72,7 +89,12 @@ public enum SpeakerNotesWindowPresenter {
 struct SpeakerNotesView: View {
     @ObservedObject var slideIndexController: SlideIndexController
     let slideTheme: CustomSlideTheme
-    @State private var startDate = Date()
+    /// 矢印 / Page Up/Down(クリッカー)でのページ送りをこの View 自身で受けるか。
+    /// 別 Window(macOS / iPhone Duo)では true。SlideBaseView に埋め込むときは false にして
+    /// 親(SlideBaseView)側の 1 か所でフォーカスとキー入力を持つ(表示の切り替えでフォーカスが迷子にならないように)
+    var handlesKeyboardNavigation = true
+    /// 経過時間の起点(ノート画面を出し直しても保たれるよう SpeakerNotesSession が持つ)
+    @ObservedObject private var session = SpeakerNotesSession.shared
     @FocusState private var isFocused: Bool
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -122,12 +144,14 @@ struct SpeakerNotesView: View {
                     previewPane(title: "現在") {
                         AnyView(slideIndexController.currentSlide)
                             .environment(\.previewPhaseStep, currentPhase.current)
+                            .followsSlideLanguage()
                     }
                 }
                 previewPane(title: nextPaneTitle) {
                     if let nextStep {
                         AnyView(nextStep.slide)
                             .environment(\.previewPhaseStep, nextStep.phaseStep)
+                            .followsSlideLanguage()
                     } else {
                         Text("最後のスライドです")
                             .font(.system(size: 40))
@@ -147,13 +171,13 @@ struct SpeakerNotesView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button {
-                    startDate = Date()
+                    session.timerStartDate = Date()
                 } label: {
                     Image(systemName: "arrow.counterclockwise.circle.fill")
                         .font(.system(size: 22))
                 }
                 .buttonStyle(.plain)
-                Text(startDate, style: .timer)
+                Text(session.timerStartDate, style: .timer)
                     .font(.system(size: 32, weight: .bold, design: .monospaced))
             }
 
@@ -195,6 +219,9 @@ struct SpeakerNotesView: View {
                     scrollProxy.scrollTo(activeSegmentIndex, anchor: .top)
                 }
             }
+
+            // クリッカー無しでも進められるよう、ノート画面自体に左右のページ送りボタンを置く
+            SlideNavigationBar(slideIndexController: slideIndexController)
         }
         .padding(20)
 #if os(macOS)
@@ -210,18 +237,22 @@ struct SpeakerNotesView: View {
         }
         .preferredColorScheme(.dark)
         // ノートWindowをクリックしてフォーカスが移っても、スライド送りできるようにしておく
-        .focusable()
+        .focusable(handlesKeyboardNavigation)
         .focused($isFocused)
         .focusEffectDisabled()
         .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
+            guard handlesKeyboardNavigation else { return .ignored }
             Task { slideIndexController.back() }
             return .handled
         }
         .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
+            guard handlesKeyboardNavigation else { return .ignored }
             Task { slideIndexController.forward() }
             return .handled
         }
-        .onAppear { isFocused = true }
+        .onAppear {
+            if handlesKeyboardNavigation { isFocused = true }
+        }
     }
 
     /// ノート本文の文字サイズ。macOS は Vision Pro を装着したまま読めるよう大きめ、
@@ -317,6 +348,47 @@ struct SpeakerNotesView: View {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
             }
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+
+/// スピーカーノート画面用のページ送りバー(戻る / ページ番号 / 次へ)。
+/// ページ送りはフェーズ送りも含む(SlideIndexController.forward/back と同じ)。
+struct SlideNavigationBar: View {
+    @ObservedObject var slideIndexController: SlideIndexController
+    /// ボタンの高さ。分割パネルなど狭い場所では小さめにする
+    var compact = false
+
+    private var isFirst: Bool { slideIndexController.isAtFirstStep }
+    private var isLast: Bool { slideIndexController.isAtLastStep }
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Button {
+                slideIndexController.back()
+            } label: {
+                Label("戻る", systemImage: "chevron.left")
+                    .font(compact ? .body : .title2)
+                    .frame(maxWidth: .infinity, minHeight: compact ? 40 : 56)
+            }
+            .buttonStyle(.bordered)
+            .disabled(isFirst)
+
+            Text("\(slideIndexController.currentIndex + 1) / \(slideIndexController.slides.count)")
+                .font(.system(size: compact ? 18 : 24, weight: .bold, design: .monospaced))
+                .frame(minWidth: compact ? 80 : 120)
+
+            Button {
+                slideIndexController.forward()
+            } label: {
+                Label("次へ", systemImage: "chevron.right")
+                    .font(compact ? .body : .title2)
+                    .frame(maxWidth: .infinity, minHeight: compact ? 40 : 56)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(isLast)
         }
         .frame(maxWidth: .infinity)
     }

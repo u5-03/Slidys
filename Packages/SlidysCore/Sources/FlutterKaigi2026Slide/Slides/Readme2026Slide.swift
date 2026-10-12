@@ -13,7 +13,7 @@ import SwiftUI
 struct Readme2026Slide: View {
     /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
     var script: String {
-        "簡単に自己紹介です。すぎーといいます。iOS/Flutterエンジニアです。FlutterKaigiは2024の前夜祭LT以来です。\n先日のiOSDC Japan 2026ではvisionOSでカードバトルを再現する話をしました。今日はそのiOSアプリで運用している仕組みをFlutterに持ち込んだ話です。"
+        "簡単に自己紹介です。すぎーといいます。DeNAでiOS/Flutterエンジニアをしています。\n去年末まではFlutterアプリ、今はiPadOSアプリのプロジェクトにいて、今日はそのiPadOSアプリで運用している仕組みをFlutterに持ち込んだ話です。"
     }
 
     public var transition: AnyTransition {
@@ -26,11 +26,11 @@ struct Readme2026Slide: View {
             info: .init(
                 name: "すぎー/Sugiy",
                 image: .iconDynamic,
-                firstText: "iOS/Flutterエンジニアです",
-                secondText: "FlutterKaigiは2024の前夜祭LT以来2回目",
-                thirdText: "iOSDC Japan 2026でvisionOSのカードバトルの話をしました",
-                fourthText: "社内向けの「アプリ内バグ起票」機能をiOSで運用中",
-                fifthText: "最近車と3Dプリンターを買ってお金が...💸"
+                firstText: "DeNAのiOS/Flutterエンジニア".loc,
+                secondText: "FlutterKaigiは2024の前夜祭LT以来2回目".loc,
+                thirdText: "去年末までFlutterアプリ、今はiPadOSアプリのプロジェクト".loc,
+                fourthText: "最近車と3Dプリンターを買ってお金が...💸".loc,
+                fifthText: "iPhone Duoを検討中…".loc
             ),
             iconSize: 510 // 既定(340)の1.5倍
         )

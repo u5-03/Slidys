@@ -35,7 +35,7 @@ struct BeforeAfterSlide: View, PhasedScriptProviding {
     }
 
     var body: some View {
-        HeaderSlide("報告する人も、直す人もラクになる") {
+        HeaderSlide(loc: "報告する人も、直す人もラクになる") {
             HStack(alignment: .top, spacing: 48) {
                 column(
                     title: "Before",

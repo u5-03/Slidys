@@ -130,6 +130,19 @@ public struct SlideGridView: View {
 
     /// スライドを原寸で描画し、タイル枠へ縮小したサムネイル。
     private func thumbnail(of slide: any Slide, width: CGFloat, height: CGFloat) -> some View {
+        SlideThumbnailView(slide: slide, theme: theme, width: width, slideSize: slideSize)
+    }
+}
+
+/// スライド1枚を原寸で描画し、指定の幅へ縮小したサムネイル(全フェーズ表示・操作不可)。
+struct SlideThumbnailView: View {
+    let slide: any Slide
+    let theme: CustomSlideTheme
+    let width: CGFloat
+    var slideSize: CGSize = SlideSize.standard16_9
+
+    var body: some View {
+        let height = width * slideSize.height / slideSize.width
         AnyView(slide)
             .environment(\.isSlideThumbnail, true)
             .environment(\.revealsAllPhases, true)
