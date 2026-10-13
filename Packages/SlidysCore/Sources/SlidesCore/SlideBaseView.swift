@@ -184,7 +184,9 @@ public struct SlideBaseView: View {
         // ハードウェアキーボード / クリッカー: 「P」でノートパネル切り替え、矢印/Page Up/Downで送り。
         // スライド本体とノート画面はモード切り替えで入れ替わる(消える)ので、常に存在するこの外側の View が
         // フォーカスを持つ。切り替え直後にフォーカスが外れることがあるので、モードが変わったら取り直す
-        .focusable()
+        // キー操作は受けるが、テキスト編集用フォーカスは要求しない。
+        // メニューへフォーカスが移った際にソフトウェアキーボードが出るのを避ける。
+        .focusable(interactions: .activate)
         .focused($isFocused)
         .focusEffectDisabled()
         .onKeyPress(KeyEquivalent("p")) {

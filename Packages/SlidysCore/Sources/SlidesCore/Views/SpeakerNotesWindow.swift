@@ -237,7 +237,12 @@ struct SpeakerNotesView: View {
         }
         .preferredColorScheme(.dark)
         // ノートWindowをクリックしてフォーカスが移っても、スライド送りできるようにしておく
+#if os(iOS)
+        // ノートは読み取り専用なので、キーボード入力のために編集フォーカスを要求しない。
+        .focusable(handlesKeyboardNavigation, interactions: .activate)
+#else
         .focusable(handlesKeyboardNavigation)
+#endif
         .focused($isFocused)
         .focusEffectDisabled()
         .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
