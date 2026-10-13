@@ -104,16 +104,18 @@ public struct SlideBaseView: View {
         externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation
     }
 
-    /// iPhone Duo を開いた状態(内側ディスプレイ)では、同一画面の分割パネルではなく
-    /// 別Window(SpeakerNotesScene)でノートを開く。
+    /// 外部ディスプレイ接続中の iPhone Duo の内側ディスプレイでは、
+    /// 別Window(SpeakerNotesScene)でノートを開く。未接続ならスライドと同じ画面に並べる。
     /// - Note: 判定は3段階。
     ///   1. iPhone idiom かつ supportsMultipleWindows(iPhone Duo 以外の iPhone は false)。
     ///   2. ヒンジが閉じている(=外側ディスプレイ)なら別Windowにしない。シミュレーターで確認したところ、
     ///      外側ディスプレイでも supportsMultipleWindows は true で、別Windowを開くとスライドを覆ってしまうため。
     ///   3. ヒンジ状態が取れない場合は横幅のサイズクラスで代用(内側ディスプレイは regular、外側は compact)。
-    ///   iPad は従来どおりパネル表示(ユーザー要望: Duo のみ別Window)。
+    ///   iPad は従来どおりパネル表示。
     private var opensSpeakerNotesInSeparateWindow: Bool {
-        guard UIDevice.current.userInterfaceIdiom == .phone, supportsMultipleWindows else { return false }
+        guard externalDisplay.isConnected,
+              UIDevice.current.userInterfaceIdiom == .phone,
+              supportsMultipleWindows else { return false }
         if let isHingeClosed { return !isHingeClosed }
         return horizontalSizeClass == .regular
     }
@@ -246,7 +248,8 @@ public struct SlideBaseView: View {
                     toggleSpeakerNotes()
                 } label: {
                     Label(
-                        showsSpeakerNotesPanel ? "スピーカーノートを閉じる" : "右側にスピーカーノートを表示",
+                        showsSpeakerNotesPanel ? "スピーカーノートを閉じる" :
+                            (opensSpeakerNotesInSeparateWindow ? "別ウィンドウでスピーカーノートを開く" : "右側にスピーカーノートを表示"),
                         systemImage: "note.text"
                     )
                 }
