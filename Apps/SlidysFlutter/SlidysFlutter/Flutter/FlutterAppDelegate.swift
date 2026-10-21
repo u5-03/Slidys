@@ -19,6 +19,7 @@ final class FlutterAppDelegate: NSObject, UIApplicationDelegate {
         ExternalDisplayPreviewOverlay.installIfRequested()
         // クリッカー(矢印 / Page Up/Down)をアプリ全体で受ける(Flutter が first responder でも効くように)
         SlideClickerKeyInterceptor.install()
+        ExternalDisplayCoordinator.shared.logDiagnostics(event: "SlidysFlutter launch")
 
         return true
     }
@@ -33,4 +34,3 @@ final class FlutterAppDelegate: NSObject, UIApplicationDelegate {
             ?? UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
     }
 }
-

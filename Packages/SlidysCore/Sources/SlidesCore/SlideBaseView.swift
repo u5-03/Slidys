@@ -155,6 +155,13 @@ public struct SlideBaseView: View {
                 presentationBody
             }
         }
+        .background {
+#if !targetEnvironment(macCatalyst)
+            if #available(iOS 27.0, *) {
+                ExternalDisplayAccessoryView()
+            }
+#endif
+        }
         // 画面上端のシステムジェスチャー(通知センター等)を1段遅らせて、
         // 上部の長押し領域へのタッチ配送が保留されないようにする
         .defersSystemGestures(on: .top)
@@ -162,6 +169,7 @@ public struct SlideBaseView: View {
         // (スライド本体の View はノート表示中に消えるので、ここで登録・解除する)
         .onAppear {
             // スライドを開いたときの言語は、アプリに適用されている言語にする
+            externalDisplay.logDiagnostics(event: "slide appeared")
             languageStore.resetToAppDefault()
             SpeakerNotesSession.shared.attach(
                 slideIndexController,
@@ -261,6 +269,7 @@ public struct SlideBaseView: View {
                 if externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation {
                     // デモ操作用: 手元にスライドを出す(外部にはその画面が映る)
                     Button {
+                        externalDisplay.logDiagnostics(event: "menu: mirroring requested")
                         externalDisplay.preferredMode = .mirroring
                     } label: {
                         Label("手元にもスライドを表示(操作用)", systemImage: "rectangle.on.rectangle")
@@ -268,6 +277,7 @@ public struct SlideBaseView: View {
                 } else if externalDisplay.isConnected {
                     // 外部にスライド、手元にノート。デモ操作のあとに戻すときも同じ項目(続きのページから再開)
                     Button {
+                        externalDisplay.logDiagnostics(event: "menu: presentation requested")
                         showsSpeakerNotesPanel = false
                         externalDisplay.preferredMode = .presentation
                     } label: {
@@ -317,6 +327,9 @@ public struct SlideBaseView: View {
         } label: {
             Image(systemName: "ellipsis.circle")
         }
+        .simultaneousGesture(TapGesture().onEnded {
+            externalDisplay.logDiagnostics(event: "presenter menu tapped")
+        })
     }
 #endif
 

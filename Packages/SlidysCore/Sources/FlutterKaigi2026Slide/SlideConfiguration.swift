@@ -71,8 +71,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         QAFeedbackSlide()
         WrapUpSlide()
 
-        // 紹介と締め
-        VideoIntroSlide()
+        // 締め
         centerText("終わり", script: "以上です。ご清聴ありがとうございました！")
     }
 

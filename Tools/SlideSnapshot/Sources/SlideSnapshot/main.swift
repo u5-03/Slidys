@@ -16,8 +16,14 @@ import UniformTypeIdentifiers
 import iOSDC2026Slide
 import FlutterKaigi2026Slide
 
+private struct PDFExportRouter: FlutterKaigi2026Slide.RouterProtocol {
+    func build(viewType: FlutterKaigi2026ViewType) -> AnyView {
+        AnyView(EmptyView())
+    }
+}
+
 @MainActor
-func run() throws {
+func run() async throws {
     let args = CommandLine.arguments
     guard args.count >= 3 else {
         FileHandle.standardError.write("usage: SlideSnapshot <deck: iosdc2026|flutterkaigi2026> <outputDir>\n".data(using: .utf8)!)
@@ -59,13 +65,28 @@ func run() throws {
     case "iosdc2026":
         controller = iOSDC2026SlideView.makeSlideIndexController()
         listTextStyle = iOSDC2026SlideView.listTextStyle
-    case "flutterkaigi2026":
+    case "flutterkaigi2026", "flutterkaigi2026-pdf":
         // Flutter のデモ画面は DefaultRouter(EmptyView)になるので、スマホ枠だけが描画される
         controller = FlutterKaigi2026SlideView.makeSlideIndexController()
         listTextStyle = FlutterKaigi2026SlideView.listTextStyle
     default:
         FileHandle.standardError.write("unknown deck: \(deck)\n".data(using: .utf8)!)
         exit(2)
+    }
+
+    if deck == "flutterkaigi2026-pdf" {
+        // アプリの「PDFを書き出す」と同じ公開APIを使う。
+        guard let source = FlutterKaigi2026SlideView(router: PDFExportRouter()).pdfExportSource else {
+            throw CocoaError(.fileReadUnknown)
+        }
+        let exportedURL = try await SlidePDFExporter.export(source)
+        let destination = outputDir.appendingPathComponent(exportedURL.lastPathComponent)
+        if FileManager.default.fileExists(atPath: destination.path) {
+            try FileManager.default.removeItem(at: destination)
+        }
+        try FileManager.default.copyItem(at: exportedURL, to: destination)
+        print("exported \(source.slides.count) pages with SlidePDFExporter: \(destination.path)")
+        return
     }
 
     let size = SlideSize.standard16_9
@@ -138,11 +159,12 @@ _ = NSApplication.shared
 NSApp.setActivationPolicy(.prohibited)
 Task { @MainActor in
     do {
-        try run()
+        try await run()
         exit(0)
     } catch {
         FileHandle.standardError.write("error: \(error)\n".data(using: .utf8)!)
         exit(1)
     }
 }
-dispatchMain()
+// PDF の非同期描画でも AppKit の処理をメインスレッドで進める。
+NSApp.run()
