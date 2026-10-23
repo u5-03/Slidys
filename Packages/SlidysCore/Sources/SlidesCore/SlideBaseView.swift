@@ -94,14 +94,19 @@ public struct SlideBaseView: View {
     @State private var isHingeClosed: Bool?
     /// 外部ディスプレイ(HDMI / AirPlay)の接続状態とモード
     @ObservedObject private var externalDisplay = ExternalDisplayCoordinator.shared
+    /// iPhone Duo で内側・外側の両ディスプレイを点けるためのダミーのカメラセッション
+    @ObservedObject private var dualDisplayCapture = DualDisplayCaptureKeeper.shared
     /// 呼び出し側から渡される「スライドを閉じる」操作(発表者メニューに出す)
     @Environment(\.slideCloseAction) private var slideCloseAction
     /// 外部ディスプレイ用のスライドに環境値(Flutter の Router など)を付け直す処理(デッキが登録する)
     @Environment(\.externalDisplaySlideDecorator) private var externalDisplaySlideDecorator
 
-    /// 外部ディスプレイにスライドを出し、手元(iPad)にはスピーカーノートを出す状態か
+    /// 外部ディスプレイにスライドを出し、手元(iPad)にはスピーカーノートを出す状態か。
+    /// iPhone Duo の2画面表示中(外側ディスプレイにスライド)も、内側はノートにする
     private var showsPresenterNotesForExternalDisplay: Bool {
-        externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation
+        // NOTE: 判定結果の変化は body の onChange でログに出す
+        (externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation)
+            || dualDisplayCapture.isRunning
     }
 
     /// 外部ディスプレイ接続中の iPhone Duo の内側ディスプレイでは、
@@ -135,6 +140,12 @@ public struct SlideBaseView: View {
         GeometryReader { proxy in
             if showsPresenterNotesForExternalDisplay {
                 externalDisplayPresenterBody
+                    // 埋め込みカメラなどで隠れる領域(reserved region の occlusion)にノートが重ならないよう避ける
+                    .padding(occlusionInsets(in: proxy))
+                    .background(Color.black.ignoresSafeArea())
+                    .onChange(of: occlusionInsets(in: proxy), initial: true) { _, insets in
+                        dualDisplayDebugLog("notes occlusion insets=\(insets) size=\(proxy.size)")
+                    }
             } else if showsSpeakerNotesPanel {
                 if proxy.size.width < proxy.size.height {
                     // 縦長(iPhone Duo の外側ディスプレイなど): 上にスライド、下にスピーカーノート
@@ -177,8 +188,11 @@ public struct SlideBaseView: View {
                 externalDisplaySlideDecorator: externalDisplaySlideDecorator
             )
         }
+        .modifier(CameraCaptureDeckAccessory(dualDisplayCapture: dualDisplayCapture))
         .onDisappear {
             SpeakerNotesSession.shared.detach(slideIndexController)
+            // スライドを閉じたらカメラも止める(使わないカメラを動かし続けない)
+            dualDisplayCapture.stop()
         }
         // 発表者メニュー。スライド表示中は右上(旧・閉じるボタンの位置)、
         // 外部ディスプレイ出力中(手元はノート)は左上に置く
@@ -215,7 +229,8 @@ public struct SlideBaseView: View {
                 // iPad では既定のシートが小さいので、ページ大のシートにしてサムネイルを多く見せる
                 .presentationSizing(.page)
         }
-        .onChange(of: showsPresenterNotesForExternalDisplay) { _, _ in
+        .onChange(of: showsPresenterNotesForExternalDisplay) { _, showsNotes in
+            dualDisplayDebugLog("inner display shows notes=\(showsNotes) (externalConnected=\(externalDisplay.isConnected) captureRunning=\(dualDisplayCapture.isRunning))")
             refocusForKeyboardNavigation()
         }
         .onChange(of: showsSpeakerNotesPanel) { _, _ in
@@ -237,6 +252,35 @@ public struct SlideBaseView: View {
         }
     }
 
+    /// 画面内で他の要素(iPhone Duo の内側ディスプレイの埋め込みカメラなど)に隠れる領域を、
+    /// いちばん近い辺からの余白に変換する。iOS 27.1 未満 / SDK 27.1 未満では余白なし
+    private func occlusionInsets(in proxy: GeometryProxy) -> EdgeInsets {
+        var insets = EdgeInsets()
+#if canImport(UIKit, _version: 9127.0.85)
+        guard #available(iOS 27.1, *) else { return insets }
+        let size = proxy.size
+        for region in proxy.reservedRegions(kind: .occlusion) where region.isActive {
+            let frame = region.frame.intersection(CGRect(origin: .zero, size: size))
+            guard !frame.isNull, !frame.isEmpty else { continue }
+            // 各辺までの距離が最小の辺に寄っているとみなし、その辺から領域の奥までを空ける
+            let distances: [(Edge, CGFloat)] = [
+                (.top, frame.minY),
+                (.bottom, size.height - frame.maxY),
+                (.leading, frame.minX),
+                (.trailing, size.width - frame.maxX),
+            ]
+            guard let nearest = distances.min(by: { $0.1 < $1.1 })?.0 else { continue }
+            switch nearest {
+            case .top: insets.top = max(insets.top, frame.maxY)
+            case .bottom: insets.bottom = max(insets.bottom, size.height - frame.minY)
+            case .leading: insets.leading = max(insets.leading, frame.maxX)
+            case .trailing: insets.trailing = max(insets.trailing, size.width - frame.minX)
+            }
+        }
+#endif
+        return insets
+    }
+
     /// 外部ディスプレイ接続中(手元はノート)の画面。ページ送りはノート画面内のバーで行う。
     /// 手元にスライドを出す切り替えは左上の発表者メニューから
     private var externalDisplayPresenterBody: some View {
@@ -244,7 +288,9 @@ public struct SlideBaseView: View {
             slideIndexController: slideIndexController,
             slideTheme: slideTheme,
             // キー入力(クリッカー)は外側の body で一括して受ける
-            handlesKeyboardNavigation: false
+            handlesKeyboardNavigation: false,
+            // iPhone Duo の2画面表示中は内側を縦持ちで使う(外側にスライドが出ていて手元からは見えない)
+            usesPortraitPresenterLayout: dualDisplayCapture.isRunning
         )
             .background(Color.black)
             .preferredColorScheme(.dark)
@@ -289,6 +335,30 @@ public struct SlideBaseView: View {
                     }
                     .disabled(true)
                     Text("未接続(HDMI / AirPlay でつなぐと選べます)")
+                }
+            }
+
+            // iPhone Duo: カメラセッション実行中だけ外側ディスプレイも点くので、それを利用して2画面で発表する
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                Section("iPhone Duo 2画面") {
+                    Button {
+                        dualDisplayCapture.toggle()
+                    } label: {
+                        Label(
+                            dualDisplayCapture.isRunning ? "2画面表示を終了(カメラ停止)" : "内側にノート・外側にスライド(カメラ起動)",
+                            systemImage: dualDisplayCapture.isRunning ? "video.slash" : "rectangle.split.2x1"
+                        )
+                    }
+                    if dualDisplayCapture.isRunning {
+                        Button {
+                            dualDisplayCapture.rotatesOuterClockwise.toggle()
+                        } label: {
+                            Label("外側のスライドの上下を反転", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+                        }
+                    }
+                    if let error = dualDisplayCapture.lastError {
+                        Text(error)
+                    }
                 }
             }
 
@@ -478,6 +548,91 @@ public struct SlideBaseView: View {
 #endif
     }
 }
+
+#if os(iOS)
+/// iPhone Duo の2画面表示: カメラセッション実行中に外側ディスプレイへ発表中のデッキを出す(iOS 27.1+)。
+/// 外側に出すのは外部ディスプレイ出力と同じ ExternalDisplayDeckView(SpeakerNotesSession に登録されたデッキ)。
+/// - Note: `CameraCaptureAccessory` は iOS 27.1 SDK(Xcode 27.1 以降)にしか無いので、HingeClosedObserver と同じく
+///   UIKit のモジュールバージョンで SDK を見分ける。
+private struct CameraCaptureDeckAccessory: ViewModifier {
+    @ObservedObject var dualDisplayCapture: DualDisplayCaptureKeeper
+
+    func body(content: Content) -> some View {
+#if canImport(UIKit, _version: 9127.0.85)
+        if #available(iOS 27.1, *) {
+            content
+                .sceneAccessory {
+                    CameraCaptureAccessory(isEnabled: .constant(dualDisplayCapture.isRunning)) {
+                        CameraCaptureDeckView()
+                    }
+                }
+                .onAppear {
+                    dualDisplayDebugLog("CameraCaptureAccessory registered isEnabled=\(dualDisplayCapture.isRunning)")
+                }
+                .onChange(of: dualDisplayCapture.isRunning) { _, isRunning in
+                    dualDisplayDebugLog("CameraCaptureAccessory isEnabled -> \(isRunning)")
+                }
+        } else {
+            content
+                .onAppear { dualDisplayDebugLog("CameraCaptureAccessory unavailable: iOS < 27.1", isError: true) }
+        }
+#else
+        content
+            .onAppear { dualDisplayDebugLog("CameraCaptureAccessory unavailable: built with SDK < 27.1", isError: true) }
+#endif
+    }
+}
+
+/// 外側ディスプレイに出すデッキ。デッキ未登録(スライドを閉じた直後など)は黒画面にする
+/// 外側ディスプレイは縦長(466x678)で渡されるときと、端末の向きに合わせて OS が横長(678x466)で渡すときがある。
+/// 聴衆には常に横向きで見せるので、縦長で渡されたときだけスライドを 90° 回して画面いっぱいに収める
+private struct CameraCaptureDeckView: View {
+    @ObservedObject private var session = SpeakerNotesSession.shared
+    @ObservedObject private var dualDisplayCapture = DualDisplayCaptureKeeper.shared
+
+    var body: some View {
+        GeometryReader { proxy in
+            // OS が外側の Scene を横長で渡してきたとき(端末の向きで 678x466 に変わる)は回さない。
+            // 縦長のときだけ、幅と高さを入れ替えた枠で描いてから 90° 回して横向きに見せる
+            let needsRotation = proxy.size.height > proxy.size.width
+            Group {
+                if let presentation = session.presentation {
+                    ExternalDisplayDeckView(
+                        slideIndexController: presentation.slideIndexController,
+                        slideTheme: presentation.slideTheme,
+                        decorator: presentation.externalDisplaySlideDecorator,
+                        mirrorsInteractiveSlides: false
+                    )
+                } else {
+                    Color.black
+                }
+            }
+            .frame(
+                width: needsRotation ? proxy.size.height : proxy.size.width,
+                height: needsRotation ? proxy.size.width : proxy.size.height
+            )
+            .rotationEffect(.degrees(needsRotation ? (dualDisplayCapture.rotatesOuterClockwise ? 90 : -90) : 0))
+            .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+            .onChange(of: proxy.size, initial: true) { _, size in
+                dualDisplayDebugLog("CameraCaptureDeckView layout size=\(size) rotates=\(size.height > size.width)")
+            }
+        }
+        .background(Color.black)
+        .ignoresSafeArea()
+        .statusBarHidden(true)
+        // 外側ディスプレイに実際に描かれたか(= OS が accessory を表示したか)の確認用
+        .background(
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear {
+                        dualDisplayDebugLog("CameraCaptureDeckView appeared size=\(proxy.size) hasDeck=\(session.presentation != nil)")
+                    }
+                    .onDisappear { dualDisplayDebugLog("CameraCaptureDeckView disappeared") }
+            }
+        )
+    }
+}
+#endif
 
 #if os(iOS)
 /// iPhone Duo のヒンジ状態(閉じているか)を観測する。iOS 27.1 未満や非折りたたみ端末では nil のまま。

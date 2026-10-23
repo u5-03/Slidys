@@ -254,7 +254,7 @@ struct ExternalDisplayRootView: View {
 
 /// 登録されたデッキを外部ディスプレイに描画する。現在のスライドがタップ操作するデモで、手元にもスライドを
 /// 出している(mirroring)ときだけ、手元の画面をスナップショットで映す。
-private struct ExternalDisplayDeckView: View {
+struct ExternalDisplayDeckView: View {
     @ObservedObject var slideIndexController: SlideIndexController
     let slideTheme: CustomSlideTheme
     /// デッキが登録した環境値の注入(Flutter の Router など)。これが無いと埋め込み View が空になる
@@ -379,6 +379,11 @@ public final class SlidysAppDelegate: NSObject, UIApplicationDelegate {
         externalDisplayLog.info("configurationForConnecting role=\(connectingSceneSession.role.rawValue, privacy: .public)")
         return ExternalDisplayCoordinator.sceneConfiguration(for: connectingSceneSession)
             ?? UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+    }
+
+    /// iPhone Duo の2画面表示中は内側ディスプレイを縦に固定する(DualDisplayCaptureKeeper が切り替える)
+    public func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        DualDisplayCaptureKeeper.shared.supportedInterfaceOrientations
     }
 
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {

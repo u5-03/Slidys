@@ -93,6 +93,9 @@ struct SpeakerNotesView: View {
     /// 別 Window(macOS / iPhone Duo)では true。SlideBaseView に埋め込むときは false にして
     /// 親(SlideBaseView)側の 1 か所でフォーカスとキー入力を持つ(表示の切り替えでフォーカスが迷子にならないように)
     var handlesKeyboardNavigation = true
+    /// iPhone Duo の2画面表示(内側を縦持ち)用。スライドは外側に出ていて手元から見えないので、
+    /// 幅が狭くても「現在」のプレビューを省かず、「現在」「次」を横に並べて上部に小さく出し、原稿の領域を広く取る
+    var usesPortraitPresenterLayout = false
     /// 経過時間の起点(ノート画面を出し直しても保たれるよう SpeakerNotesSession が持つ)
     @ObservedObject private var session = SpeakerNotesSession.shared
     @FocusState private var isFocused: Bool
@@ -102,7 +105,7 @@ struct SpeakerNotesView: View {
     /// 隣のWindowにスライド本体が見えているので「現在」のプレビューを省いて原稿の領域を確保する。
     private var showsCurrentPreview: Bool {
 #if os(iOS)
-        horizontalSizeClass != .compact
+        usesPortraitPresenterLayout || horizontalSizeClass != .compact
 #else
         true
 #endif

@@ -516,6 +516,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Slidys;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCameraUsageDescription = "iPhone Duo の2画面表示(内側にノート・外側にスライド)のためにカメラを使用します。映像は記録・送信しません";
 				INFOPLIST_KEY_NSHandsTrackingUsageDescription = "The app requires this so your hands can interact with the slides placed in your environment.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMotionUsageDescription = "このアプリはモーションセンサーを使用します";
@@ -561,6 +562,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Slidys;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCameraUsageDescription = "iPhone Duo の2画面表示(内側にノート・外側にスライド)のためにカメラを使用します。映像は記録・送信しません";
 				INFOPLIST_KEY_NSHandsTrackingUsageDescription = "The app requires this so your hands can interact with the slides placed in your environment.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMotionUsageDescription = "このアプリはモーションセンサーを使用します";
