@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../slide_language.dart';
+
 import 'element_picker.dart';
 import 'feedback_bundle.dart';
 import 'feedback_draft.dart';
@@ -178,7 +180,8 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     return MediaQuery(
-      data: mediaQuery.copyWith(textScaler: TextScaler.linear(widget.textScale)),
+      data:
+          mediaQuery.copyWith(textScaler: TextScaler.linear(widget.textScale)),
       child: _buildScaffold(context),
     );
   }
@@ -186,7 +189,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Issue を起票'),
+        title: Text(tr('Issue を起票', 'Create an issue')),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
@@ -258,7 +261,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   Widget _elementSection() {
     final id = _draft.selectedAccessibilityId;
     return _section(
-      title: '対象 UI 要素 (任意)',
+      title: tr('対象 UI 要素 (任意)', 'Target UI element (optional)'),
       children: [
         if (id != null && id.isNotEmpty) ...[
           Row(
@@ -270,17 +273,17 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
               TextButton(
                 onPressed: () =>
                     setState(() => _draft.selectedAccessibilityId = null),
-                child: const Text('クリア'),
+                child: Text(tr('クリア', 'Clear')),
               ),
             ],
           ),
         ] else
-          const Text('選択されていません'),
+          Text(tr('選択されていません', 'No element selected')),
         Align(
           alignment: Alignment.centerLeft,
           child: TextButton.icon(
             icon: const Icon(Icons.center_focus_strong),
-            label: const Text('画面から選ぶ'),
+            label: Text(tr('画面から選ぶ', 'Pick from screen')),
             onPressed: _pickElement,
           ),
         ),
@@ -323,12 +326,13 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
 
   Widget _issueKindSection() {
     return _section(
-      title: 'Issue 種別',
+      title: tr('Issue 種別', 'Issue type'),
       children: [
         SegmentedButton<IssueKind>(
-          segments: const [
-            ButtonSegment(value: IssueKind.task, label: Text('タスク管理')),
-            ButtonSegment(value: IssueKind.bug, label: Text('バグ管理')),
+          segments: [
+            ButtonSegment(
+                value: IssueKind.task, label: Text(tr('タスク管理', 'Task'))),
+            ButtonSegment(value: IssueKind.bug, label: Text(tr('バグ管理', 'Bug'))),
           ],
           selected: {_draft.issueKind},
           onSelectionChanged: (selected) {
@@ -344,10 +348,11 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   Widget _issueContentSection() {
     final isBug = _draft.issueKind == IssueKind.bug;
     return _section(
-      title: 'Issue 内容',
+      title: tr('Issue 内容', 'Issue details'),
       footer: isBug
-          ? '項目はすべて qa-bug-template.md と同じです'
-          : 'Issue として GitHub に起票されます',
+          ? tr('項目はすべて qa-bug-template.md と同じです',
+              'Fields match qa-bug-template.md')
+          : tr('Issue として GitHub に起票されます', 'Creates an issue on GitHub'),
       children: isBug ? _bugContentRows() : _taskContentRows(),
     );
   }
@@ -356,13 +361,13 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     return [
       _textField(
         fieldKey: 'title',
-        label: '概要 (タイトル)',
-        hint: 'バグの要点を 1 行で',
+        label: tr('概要 (タイトル)', 'Summary (title)'),
+        hint: tr('バグの要点を 1 行で', 'Summarize the bug in one line'),
         value: _draft.title,
         onChanged: (v) => setState(() => _draft.title = v),
       ),
       _dropdown<BugPriority>(
-        label: '優先度',
+        label: tr('優先度', 'Priority'),
         value: _draft.bugPriority,
         values: BugPriority.values,
         labelOf: (v) => v.rawValue,
@@ -370,45 +375,58 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
       ),
       _textField(
         fieldKey: 'bug.details',
-        label: '詳細',
+        label: tr('詳細', 'Description'),
         value: _draft.bugDetails,
         minLines: 3,
         onChanged: (v) => setState(() => _draft.bugDetails = v),
       ),
       _textField(
         fieldKey: 'bug.reproSteps',
-        label: '再現手順',
-        hint: '例: 1. 一覧を開く  2. 項目をタップ  3. ...',
+        label: tr('再現手順', 'Steps to reproduce'),
+        hint: tr('例: 1. 一覧を開く  2. 項目をタップ  3. ...',
+            'Example: 1. Open the list  2. Tap an item  3. ...'),
         value: _draft.bugReproSteps,
         minLines: 3,
         onChanged: (v) => setState(() => _draft.bugReproSteps = v),
       ),
       _textField(
         fieldKey: 'bug.expectation',
-        label: '期待する結果',
+        label: tr('期待する結果', 'Expected result'),
         value: _draft.bugExpectation,
         minLines: 2,
         onChanged: (v) => setState(() => _draft.bugExpectation = v),
       ),
       _dropdown<Reproducibility>(
-        label: '再現性',
+        label: tr('再現性', 'Reproducibility'),
         value: _draft.bugReproducibility,
         values: Reproducibility.values,
-        labelOf: (v) => v.rawValue,
+        labelOf: (v) => tr(
+            v.rawValue,
+            switch (v) {
+              Reproducibility.always => 'Always',
+              Reproducibility.sometimes => 'Sometimes',
+              Reproducibility.never => 'Never'
+            }),
         onChanged: (v) => setState(() => _draft.bugReproducibility = v),
       ),
       _textField(
         fieldKey: 'bug.confirmedDevice',
-        label: '確認端末',
-        hint: '起動時に自動入力',
+        label: tr('確認端末', 'Tested device'),
+        hint: tr('起動時に自動入力', 'Filled automatically when opened'),
         value: _draft.bugConfirmedDevice,
         onChanged: (v) => setState(() => _draft.bugConfirmedDevice = v),
       ),
       _dropdown<TestCaseScope>(
-        label: 'テストケース内/外',
+        label: tr('テストケース内/外', 'Test case coverage'),
         value: _draft.bugTestCaseScope,
         values: TestCaseScope.values,
-        labelOf: (v) => v.rawValue,
+        labelOf: (v) => tr(
+            v.rawValue,
+            switch (v) {
+              TestCaseScope.inside => 'Within test cases',
+              TestCaseScope.outside => 'Outside test cases',
+              TestCaseScope.unspecified => 'Not specified'
+            }),
         onChanged: (v) => setState(() => _draft.bugTestCaseScope = v),
       ),
     ];
@@ -418,22 +436,22 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     return [
       _textField(
         fieldKey: 'title',
-        label: 'タイトル',
-        hint: 'タスクのタイトル',
+        label: tr('タイトル', 'Title'),
+        hint: tr('タスクのタイトル', 'Task title'),
         value: _draft.title,
         onChanged: (v) => setState(() => _draft.title = v),
       ),
       _textField(
         fieldKey: 'task.currentIssue',
-        label: '現状の課題・わかりにくいところ',
+        label: tr('現状の課題・わかりにくいところ', 'Current problem or confusing behavior'),
         value: _draft.taskCurrentIssue,
         minLines: 4,
         onChanged: (v) => setState(() => _draft.taskCurrentIssue = v),
       ),
       _textField(
         fieldKey: 'task.improvement',
-        label: '改善案 (任意)',
-        hint: 'もし具体的な改善案があれば',
+        label: tr('改善案 (任意)', 'Suggested improvement (optional)'),
+        hint: tr('もし具体的な改善案があれば', 'Describe an improvement, if you have one'),
         value: _draft.taskImprovement,
         minLines: 3,
         onChanged: (v) => setState(() => _draft.taskImprovement = v),
@@ -444,10 +462,10 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   // ---- 4. 添付ファイル ----
 
   Widget _attachmentSection() {
-    final remaining =
-        FeedbackDraft.attachmentLimit - _draft.attachments.length;
+    final remaining = FeedbackDraft.attachmentLimit - _draft.attachments.length;
     return _section(
-      title: '添付ファイル (上限 ${FeedbackDraft.attachmentLimit} 件)',
+      title: tr('添付ファイル (上限 ${FeedbackDraft.attachmentLimit} 件)',
+          'Attachments (up to ${FeedbackDraft.attachmentLimit})'),
       children: [
         for (final a in _draft.attachments) ...[
           ListTile(
@@ -474,7 +492,8 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               icon: const Icon(Icons.add_photo_alternate),
-              label: Text('添付を追加 (残り $remaining 件)'),
+              label: Text(tr('添付を追加 (残り $remaining 件)',
+                  'Add attachment ($remaining remaining)')),
               onPressed: _addMockAttachment,
             ),
           ),
@@ -489,12 +508,14 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.videocam),
-              label: Text(_exportingClip ? '動画を書き出し中…' : '直近の動画を添付'),
+              label: Text(_exportingClip
+                  ? tr('動画を書き出し中…', 'Exporting video…')
+                  : tr('直近の動画を添付', 'Attach recent video')),
               onPressed: _exportingClip ? null : _attachRecentClip,
             ),
           )
         else
-          const Text('添付ファイルの上限に達しています'),
+          Text(tr('添付ファイルの上限に達しています', 'Attachment limit reached')),
       ],
     );
   }
@@ -511,7 +532,8 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
         _draft.attachments.add(
           PickedAttachment(
             id: DateTime.now().microsecondsSinceEpoch.toString(),
-            displayName: 'screen-replay_${clip.duration.toStringAsFixed(0)}s.mp4',
+            displayName:
+                'screen-replay_${clip.duration.toStringAsFixed(0)}s.mp4',
             contentType: 'video/mp4',
             filePath: clip.path,
           ),
@@ -521,7 +543,9 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('動画を書き出せませんでした: $error')),
+        SnackBar(
+            content: Text(
+                tr('動画を書き出せませんでした: $error', 'Could not export video: $error'))),
       );
     } finally {
       if (mounted) setState(() => _exportingClip = false);
@@ -549,31 +573,34 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
 
   Widget _diagnosticSection() {
     return _section(
-      title: '診断データ (任意)',
-      footer: 'ON にした項目を Issue にアップロードする想定 (現状は本文に列挙のみ)',
+      title: tr('診断データ (任意)', 'Diagnostics (optional)'),
+      footer: tr('ON にした項目を Issue にアップロードする想定 (現状は本文に列挙のみ)',
+          'Selected diagnostics would be uploaded (currently listed in the issue body only)'),
       children: [
         _switch(
-          'スタックトレース',
+          tr('スタックトレース', 'Stack trace'),
           _draft.includeStackTrace,
           (v) => setState(() => _draft.includeStackTrace = v),
         ),
         _switch(
-          'Widget 階層 (View Hierarchy)',
+          tr('Widget 階層 (View Hierarchy)', 'Widget hierarchy (View Hierarchy)'),
           _draft.includeViewHierarchy,
           (v) => setState(() => _draft.includeViewHierarchy = v),
         ),
         _switch(
-          'ログ',
+          tr('ログ', 'Logs'),
           _draft.includeLogs,
           (v) => setState(() => _draft.includeLogs = v),
         ),
         _switch(
-          'Debug Info (デバイス / バージョン等)',
+          tr('Debug Info (デバイス / バージョン等)',
+              'Debug info (device / version, etc.)'),
           _draft.includeDebugInfo,
           (v) => setState(() => _draft.includeDebugInfo = v),
         ),
         _switch(
-          'App Context (設定値 + 前回クラッシュ)',
+          tr('App Context (設定値 + 前回クラッシュ)',
+              'App context (settings + previous crash)'),
           _draft.includeAppContext,
           (v) => setState(() => _draft.includeAppContext = v),
         ),
@@ -585,13 +612,14 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
 
   Widget _aiAutoSearchSection() {
     return _section(
-      title: 'AI 自動下調べ (任意)',
-      footer:
-          'ON にすると起票後に Vertex AI 経由で下調べを自動実行する想定。必須項目が'
-          'すべて入力されるまで有効化されません',
+      title: tr('AI 自動下調べ (任意)', 'AI research (optional)'),
+      footer: tr(
+          'ON にすると起票後に Vertex AI 経由で下調べを自動実行する想定。必須項目がすべて入力されるまで有効化されません',
+          'When enabled, Vertex AI would research the issue after submission. All required fields must be filled first.'),
       children: [
         _switch(
-          'Issue 起票後に AI で自動下調べする',
+          tr('Issue 起票後に AI で自動下調べする',
+              'Run AI research after creating the issue'),
           _draft.requestAiAutoSearch,
           _draft.isValid
               ? (v) => setState(() => _draft.requestAiAutoSearch = v)
@@ -599,7 +627,8 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
         ),
         if (!_draft.isValid)
           Text(
-            '必須項目がすべて入力されると有効化されます',
+            tr('必須項目がすべて入力されると有効化されます',
+                'Available once all required fields are filled'),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         if (_draft.requestAiAutoSearch)
@@ -607,8 +636,10 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
             padding: const EdgeInsets.only(top: 8),
             child: _textField(
               fieldKey: 'ai.prompt',
-              label: 'AI への追加指示 (任意)',
-              hint: '例: 過去 7 日以内の類似 Issue を重点的に',
+              label:
+                  tr('AI への追加指示 (任意)', 'Additional AI instructions (optional)'),
+              hint: tr('例: 過去 7 日以内の類似 Issue を重点的に',
+                  'Example: Focus on similar issues from the past 7 days'),
               value: _draft.aiPromptCustomText,
               minLines: 2,
               onChanged: (v) => setState(() => _draft.aiPromptCustomText = v),
@@ -623,10 +654,10 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
   Widget _authenticationSection() {
     final configured = GitHubConfig.isConfigured;
     return _section(
-      title: '認証 (GitHub OAuth)',
-      footer:
-          'OAuth Device Flow でサインインする想定。client_id は GitHubConfig に設定します'
-          ' (現在: ${configured ? '設定済み' : '未設定'})',
+      title: tr('認証 (GitHub OAuth)', 'Authentication (GitHub OAuth)'),
+      footer: tr(
+          'OAuth Device Flow でサインインする想定。client_id は GitHubConfig に設定します (現在: ${configured ? '設定済み' : '未設定'})',
+          'Sign-in would use OAuth Device Flow. Set client_id in GitHubConfig (currently: ${configured ? 'configured' : 'not configured'}).'),
       children: [
         Row(
           children: [
@@ -639,8 +670,10 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
             Expanded(
               child: Text(
                 configured
-                    ? 'GitHub App client_id 設定済み'
-                    : 'client_id 未設定 (GitHubConfig.clientId)',
+                    ? tr('GitHub App client_id 設定済み',
+                        'GitHub App client_id configured')
+                    : tr('client_id 未設定 (GitHubConfig.clientId)',
+                        'client_id not configured (GitHubConfig.clientId)'),
               ),
             ),
           ],
@@ -649,12 +682,13 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
           alignment: Alignment.centerLeft,
           child: TextButton.icon(
             icon: const Icon(Icons.key),
-            label: const Text('GitHub にサインイン (擬似)'),
+            label: Text(tr('GitHub にサインイン (擬似)', 'Sign in to GitHub (demo)')),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
-                    'バックエンド未接続: 実装時は OAuth Device Flow を接続します',
+                    tr('バックエンド未接続: 実装時は OAuth Device Flow を接続します',
+                        'Backend not connected: OAuth Device Flow would be used'),
                   ),
                 ),
               );
@@ -672,9 +706,10 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     if (state is _Succeeded) {
       final r = state.result;
       return _section(
-        title: '送信完了',
+        title: tr('送信完了', 'Submitted'),
         children: [
-          Text('Issue #${r.issueNumber} を作成しました (擬似)'),
+          Text(tr('Issue #${r.issueNumber} を作成しました (擬似)',
+              'Created issue #${r.issueNumber} (demo)')),
           const SizedBox(height: 4),
           SelectableText(
             r.issueUrl.toString(),
@@ -687,7 +722,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               icon: const Icon(Icons.article),
-              label: const Text('送信予定だった本文を見る'),
+              label: Text(tr('送信予定だった本文を見る', 'Preview issue body')),
               onPressed: () => _showBodyPreview(r.renderedBody),
             ),
           ),
@@ -696,7 +731,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
     }
     if (state is _Failed) {
       return _section(
-        title: '送信失敗',
+        title: tr('送信失敗', 'Submission failed'),
         children: [
           Text(
             '${state.error}',
@@ -706,7 +741,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               icon: const Icon(Icons.refresh),
-              label: const Text('再送信'),
+              label: Text(tr('再送信', 'Retry')),
               onPressed: _performSubmit,
             ),
           ),
@@ -748,7 +783,7 @@ class _FeedbackComposerScreenState extends State<FeedbackComposerScreen> {
                 width: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : const Text('送信'),
+            : Text(tr('送信', 'Submit')),
       ),
     );
   }
@@ -869,7 +904,7 @@ class _ClipPreviewState extends State<_ClipPreview> {
 
   String _format(Duration d) {
     final s = d.inMilliseconds / 1000;
-    return '${s.toStringAsFixed(1)} 秒';
+    return tr('${s.toStringAsFixed(1)} 秒', '${s.toStringAsFixed(1)} s');
   }
 
   void _togglePlay() {
@@ -886,7 +921,7 @@ class _ClipPreviewState extends State<_ClipPreview> {
     final value = _controller.value;
 
     if (_error != null) {
-      return Text('動画を再生できませんでした: $_error',
+      return Text(tr('動画を再生できませんでした: $_error', 'Could not play video: $_error'),
           style: TextStyle(color: scheme.error));
     }
     if (!value.isInitialized) {
@@ -897,8 +932,8 @@ class _ClipPreviewState extends State<_ClipPreview> {
     }
 
     final totalMs = value.duration.inMilliseconds.toDouble();
-    final positionMs =
-        (_dragMs ?? value.position.inMilliseconds.toDouble()).clamp(0.0, totalMs);
+    final positionMs = (_dragMs ?? value.position.inMilliseconds.toDouble())
+        .clamp(0.0, totalMs);
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 960),
@@ -933,7 +968,8 @@ class _ClipPreviewState extends State<_ClipPreview> {
                   IconButton(
                     color: Colors.white,
                     iconSize: 56,
-                    icon: Icon(value.isPlaying ? Icons.pause : Icons.play_arrow),
+                    icon:
+                        Icon(value.isPlaying ? Icons.pause : Icons.play_arrow),
                     onPressed: _togglePlay,
                   ),
                   Text(

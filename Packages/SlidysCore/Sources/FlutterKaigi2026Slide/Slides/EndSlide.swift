@@ -1,82 +1,68 @@
-//
-//  EndSlide.swift
-//  FlutterKaigi2026Slide
-//
-
 import SwiftUI
 import SlideKit
 import SlidesCore
 
 @Slide
 struct EndSlide: View {
-    /// スピーカーノート(発表者用の原稿。ノートWindowに表示される)
     var script: String {
-        "発表の詳細とコードはブログにまとめます。このスライドアプリは Flutter のデモごと TestFlight で配布しているので、手元で触ってみてください。\nご清聴ありがとうございました！"
+        "このスライドアプリはFlutterのデモごとTestFlightで配布しています。左のQRコードから触ってみてください。PDFのスライドは右のSpeaker Deckからご覧いただけます。ご清聴ありがとうございました！"
     }
 
-    public var transition: AnyTransition {
-        SlideTransition.defaultTransition
-    }
+    public var transition: AnyTransition { SlideTransition.defaultTransition }
 
     var body: some View {
-        HeaderSlide(loc: "ご清聴ありがとうございました") {
-            VStack(alignment: .leading, spacing: 48) {
-                HStack(alignment: .top, spacing: 80) {
-                    qrColumn(
-                        title: "このスライドアプリ(TestFlight / Flutterデモ入り)",
-                        url: SlideConstants.testFlightFlutterPublicLink.absoluteString
-                    ) {
-                        // SlidesCoreにバンドル済みのTestFlight配布用QR(Flutter版)
-                        QrCodeType.flutter.view
-                    }
-                    VStack(alignment: .leading, spacing: 32) {
-                        Text("本日の発表のブログ(詳細・コード)")
-                            .font(.system(size: 40, weight: .bold))
-                        // TODO: 公開後にブログURLとQRに差し替える
-                        Text("https://ulog.sugiy.com/ (公開後に更新)")
-                            .font(.system(size: 30, weight: .regular))
-                            .foregroundStyle(.gray)
-                        Text("実装リポジトリ")
-                            .font(.system(size: 40, weight: .bold))
-                            .padding(.top, 24)
-                        Text("https://github.com/u5-03/Slidys")
-                            .font(.system(size: 30, weight: .regular))
-                            .foregroundStyle(.gray)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                }
-                .frame(maxWidth: .infinity)
+        HeaderSlide(loc: "終わり") {
+            HStack(alignment: .top, spacing: 100) {
+                qrColumn(
+                    title: "SlidysFlutterを試す",
+                    subtitle: "TestFlight / Flutterデモ入り",
+                    asset: "EndingTestFlightQR",
+                    url: SlideConstants.testFlightFlutterPublicLink,
+                    linkLabel: "testflight.apple.com/join/tKHf1Uq2"
+                )
+                qrColumn(
+                    title: "PDFスライドを見る",
+                    subtitle: "Speaker Deck",
+                    asset: "EndingSpeakerDeckQR",
+                    url: URL(string: "https://speakerdeck.com/u503/sono-fuguai-dono-widget-desu-ka-nai-de-naoseru-bagu-houkoku-o-tsukuru")!,
+                    linkLabel: "speakerdeck.com/u503"
+                )
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.horizontal, 60)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
     }
 
-    private func qrColumn(
-        title: String,
-        url: String,
-        @ViewBuilder qrImage: () -> some View
-    ) -> some View {
+    private func qrColumn(title: String, subtitle: String, asset: String,
+                          url: URL, linkLabel: String) -> some View {
         VStack(spacing: 24) {
-            Text(title)
-                .font(.system(size: 40, weight: .bold))
+            Text(title.loc)
+                .font(.system(size: 48, weight: .bold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
-            qrImage()
-                .frame(width: 440, height: 440)
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            Text(url)
-                .font(.system(size: 26, weight: .regular))
+            Text(subtitle.loc)
+                .font(.system(size: 32))
                 .foregroundStyle(.gray)
+            Link(destination: url) {
+                Image(asset, bundle: .module)
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .frame(width: 460, height: 460)
+            }
+            .accessibilityLabel(Text(title.loc))
+            Text(linkLabel)
+                .font(.system(size: 26))
+                .foregroundStyle(.gray)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity)
     }
 }
 
 #Preview {
-    SlidePreview {
-        EndSlide()
-    }
-    .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
-    .itemStyle(CustomItemStyle())
+    SlidePreview { EndSlide() }
+        .headerSlideStyle(CustomHeaderSlideStyle(listTextStyle: .large))
+        .itemStyle(CustomItemStyle())
 }

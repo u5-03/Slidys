@@ -648,6 +648,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SlidysFlutter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SlidysFlutter;
+				INFOPLIST_KEY_NSCameraUsageDescription = "iPhone Duo の2画面表示(内側にノート・外側にスライド)のためにカメラを使用します。映像は記録・送信しません";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSMotionUsageDescription = "このアプリはモーションセンサーを使用します";
@@ -695,6 +696,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SlidysFlutter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SlidysFlutter;
+				INFOPLIST_KEY_NSCameraUsageDescription = "iPhone Duo の2画面表示(内側にノート・外側にスライド)のためにカメラを使用します。映像は記録・送信しません";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSMotionUsageDescription = "このアプリはモーションセンサーを使用します";

@@ -12,9 +12,9 @@ struct ElementPickerInsightsSlide: View, PhasedScriptProviding {
     /// スピーカーノート(フェーズごとのセグメント。区切りがスライド内の「次を表示」位置)
     var scriptSegments: [String] {
         [
-        "仕組みの肝は4つです。\nひとつ目、Element ツリーをトップからたどって、RenderObject の位置を取る。",
+        "仕組の重要なポイントは4つです。\nひとつ目、Element ツリーをトップからたどって、RenderObject の位置を取る。",
         "ふたつ目、localToGlobal で画面座標にして、そのまま枠にする。",
-        "みっつ目、候補は Semantics の identifier を持つ要素だけにします。付け忘れた部品は、一番近い親が選ばれます。アクセシビリティ 対応がそのままデバッグ機能でも活用できます。",
+        "みっつ目、候補は Semantics の identifier を持つ要素だけにします。アクセシビリティ 対応がそのままデバッグ機能でも活用できます。",
         "よっつ目、タップ位置を含む候補のうち、一番小さいものを選ぶ。ざっくりこんな感じです！",
         ]
     }

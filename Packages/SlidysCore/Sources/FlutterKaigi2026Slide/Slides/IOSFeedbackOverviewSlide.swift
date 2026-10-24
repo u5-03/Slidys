@@ -17,7 +17,7 @@ struct IOSFeedbackOverviewSlide: View, PhasedScriptProviding {
     var scriptSegments: [String] {
         [
         "まずは起票の流れを確認しましょう。これが一般的な流れです。動画やスクショを用意して、再現手順や環境情報を手で書いて起票する。ここが大変です。",
-        "それに対して、iPadOSアプリで運用しているアプリ内バグ起票がこちらです。動画はアプリが撮っていて、環境情報は自動で入り、起票後は GitHub Actions が下調べまでやります。\nこれを Flutter で作れるのか、が今日の話です。",
+        "それに対して、私がいるプロジェクトで運用しているアプリ内バグ起票がこちらです。動画はアプリが撮っていて、環境情報は自動入力され、起票後に GitHub Actions がValidationや下調べを行います。\nこのアプリ内の処理を Flutter で作れるのか、が今日の話です。",
         ]
     }
 
@@ -53,7 +53,7 @@ struct IOSFeedbackOverviewSlide: View, PhasedScriptProviding {
 
     private let inAppFlow: [Step] = [
         .init(symbol: "exclamationmark.bubble", title: "バグや改善点を検知", detail: "", highlighted: false),
-        .init(symbol: "photo.on.rectangle", title: "動画やスクショの用意", detail: "アプリが自動で撮影開始", highlighted: true),
+        .init(symbol: "video", title: "動画の用意", detail: "アプリが自動で記録", highlighted: true),
         .init(symbol: "ladybug", title: "起票", detail: "環境情報などは自動入力", highlighted: true),
         .init(symbol: "gearshape.2", title: "Actionsで下調べ・振り分け", detail: "起票後は自動", highlighted: true),
     ]

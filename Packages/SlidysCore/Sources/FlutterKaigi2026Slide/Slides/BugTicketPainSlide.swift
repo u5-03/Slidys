@@ -131,17 +131,39 @@ private struct SpeechBubbleShape: Shape {
     let tail: Tail
 
     func path(in rect: CGRect) -> Path {
-        var path = Path(roundedRect: rect, cornerRadius: 40, style: .continuous)
+        let radius: CGFloat = 40
         let isTop = tail == .topLeading || tail == .topTrailing
         let isLeading = tail == .topLeading || tail == .bottomLeading
-        // しっぽの付け根は辺の内側に少し食い込ませて、継ぎ目が出ないようにする
-        let edgeY = isTop ? rect.minY + 2 : rect.maxY - 2
-        let tipY = isTop ? rect.minY - 64 : rect.maxY + 64
-        let edgeX = isLeading ? rect.minX : rect.maxX
-        let direction: CGFloat = isLeading ? 1 : -1
-        path.move(to: CGPoint(x: edgeX + direction * 90, y: edgeY))
-        path.addLine(to: CGPoint(x: edgeX + direction * 180, y: edgeY))
-        path.addLine(to: CGPoint(x: edgeX + direction * 30, y: tipY))
+        let baseLeft = isLeading ? rect.minX + 90 : rect.maxX - 180
+        let baseRight = isLeading ? rect.minX + 180 : rect.maxX - 90
+        let tipX = isLeading ? rect.minX + 30 : rect.maxX - 30
+
+        // 本体としっぽを単一の輪郭で描く。重なったサブパスの巻き方向や
+        // アンチエイリアスによる接合部分の線・抜けを防ぐ。
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX + radius, y: rect.minY))
+        if isTop {
+            path.addLine(to: CGPoint(x: baseLeft, y: rect.minY))
+            path.addLine(to: CGPoint(x: tipX, y: rect.minY - 64))
+            path.addLine(to: CGPoint(x: baseRight, y: rect.minY))
+        }
+        path.addLine(to: CGPoint(x: rect.maxX - radius, y: rect.minY))
+        path.addArc(center: CGPoint(x: rect.maxX - radius, y: rect.minY + radius),
+                    radius: radius, startAngle: .degrees(-90), endAngle: .degrees(0), clockwise: false)
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - radius))
+        path.addArc(center: CGPoint(x: rect.maxX - radius, y: rect.maxY - radius),
+                    radius: radius, startAngle: .degrees(0), endAngle: .degrees(90), clockwise: false)
+        if !isTop {
+            path.addLine(to: CGPoint(x: baseRight, y: rect.maxY))
+            path.addLine(to: CGPoint(x: tipX, y: rect.maxY + 64))
+            path.addLine(to: CGPoint(x: baseLeft, y: rect.maxY))
+        }
+        path.addLine(to: CGPoint(x: rect.minX + radius, y: rect.maxY))
+        path.addArc(center: CGPoint(x: rect.minX + radius, y: rect.maxY - radius),
+                    radius: radius, startAngle: .degrees(90), endAngle: .degrees(180), clockwise: false)
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + radius))
+        path.addArc(center: CGPoint(x: rect.minX + radius, y: rect.minY + radius),
+                    radius: radius, startAngle: .degrees(180), endAngle: .degrees(270), clockwise: false)
         path.closeSubpath()
         return path
     }

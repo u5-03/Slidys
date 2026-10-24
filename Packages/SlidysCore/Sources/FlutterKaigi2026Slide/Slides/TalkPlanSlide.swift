@@ -13,7 +13,7 @@ struct TalkPlanSlide: View, PhasedScriptProviding {
     var scriptSegments: [String] {
         [
         "今日の話は3つです。\nまず、画面上の Widget をタップして報告対象を選ぶ仕組み。",
-        "次に、不具合の瞬間の動画を残す仕組み。",
+        "次に、不具合の瞬間を動画にする仕組み。",
         "最後に、ログや環境情報をチケットに添付する仕組みです。",
         ]
     }

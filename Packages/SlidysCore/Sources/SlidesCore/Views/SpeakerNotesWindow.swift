@@ -372,27 +372,49 @@ struct SlideNavigationBar: View {
     private var isFirst: Bool { slideIndexController.isAtFirstStep }
     private var isLast: Bool { slideIndexController.isAtLastStep }
 
+    @AppStorage("speakerNotesControlsOnRight") private var controlsOnRight = false
+
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: compact ? 8 : 16) {
+            if controlsOnRight {
+                pageCounter
+                navigationButtons
+            } else {
+                navigationButtons
+                pageCounter
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var pageCounter: some View {
+        Text("\(slideIndexController.currentIndex + 1) / \(slideIndexController.slides.count)")
+            .font(.system(size: compact ? 18 : 24, weight: .bold, design: .monospaced))
+            .fixedSize()
+            .frame(maxWidth: .infinity, alignment: controlsOnRight ? .leading : .trailing)
+    }
+
+    private var navigationButtons: some View {
+        HStack(spacing: compact ? 8 : 16) {
             Button {
                 slideIndexController.back()
             } label: {
                 Label("戻る", systemImage: "chevron.left")
                     .font(compact ? .body : .title2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .frame(maxWidth: .infinity, minHeight: compact ? 40 : 56)
             }
             .buttonStyle(.bordered)
             .disabled(isFirst)
-
-            Text("\(slideIndexController.currentIndex + 1) / \(slideIndexController.slides.count)")
-                .font(.system(size: compact ? 18 : 24, weight: .bold, design: .monospaced))
-                .frame(minWidth: compact ? 80 : 120)
 
             Button {
                 slideIndexController.forward()
             } label: {
                 Label("次へ", systemImage: "chevron.right")
                     .font(compact ? .body : .title2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .frame(maxWidth: .infinity, minHeight: compact ? 40 : 56)
             }
             .buttonStyle(.borderedProminent)

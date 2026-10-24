@@ -24,7 +24,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
 
     @MainActor
     public let slideIndexController = SlideIndexController(index: 0) {
-        centerText("FlutterKaigi 2026", script: "(登壇前の待機スライド。話し始めたら次へ)")
+        centerText("FlutterKaigi 2026 スライド", script: "(登壇前の待機スライド。話し始めたら次へ)")
 
         // つかみ: いつもの質問から
         centerText("みなさん", script: "みなさん。")
@@ -51,7 +51,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         ChapterDividerSlide(activeIndex: 0, script: "ではまず1つ目、画面上のWidgetをタップして選ぶ仕組みです。")
         PickerMotivationSlide()
         ElementPickerFlowSlide()
-        ThreeTreesSlide()
+        // ThreeTreesSlide() // 今回の発表では非表示(スライド本体は保持)
         ElementPickerInsightsSlide()
 
         // 2. 静止画リングバッファ + デバイスで動画化
@@ -64,7 +64,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         ChapterDividerSlide(activeIndex: 2, script: "最後に3つ目、Widget階層・ログ・環境情報を一緒にチケットに添付する話です。")
         DiagnosticsTableSlide()
         LogBufferSlide()
-        ServerPipelineSlide()
+        // ServerPipelineSlide() // 今回の発表では非表示(スライド本体は保持)
 
         // まとめ
         MotivationSlide()
@@ -72,7 +72,7 @@ public struct SlideConfiguration: SlideConfigurationProtocol {
         WrapUpSlide()
 
         // 締め
-        centerText("終わり", script: "以上です。ご清聴ありがとうございました！")
+        EndSlide()
     }
 
     public init() {}

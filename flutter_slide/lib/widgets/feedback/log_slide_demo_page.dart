@@ -141,7 +141,7 @@ class _RecordingMotionState extends State<_RecordingMotion>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 4),
+    duration: const Duration(seconds: 2),
   )..repeat();
 
   @override

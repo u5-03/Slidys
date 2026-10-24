@@ -1,6 +1,66 @@
 {
   "sourceLanguage": "ja",
   "strings": {
+    "PDFスライドを見る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View the PDF slides"
+          }
+        }
+      }
+    },
+    "TestFlight / Flutterデモ入り": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TestFlight / Includes Flutter demos"
+          }
+        }
+      }
+    },
+    "SlidysFlutterを試す": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try SlidysFlutter"
+          }
+        }
+      }
+    },
+    "× 標準のDart自体にはエンコーダがない": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "× Standard Dart itself has no video encoder"
+          }
+        }
+      }
+    },
+    "アプリが自動で記録": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorded automatically by the app"
+          }
+        }
+      }
+    },
+    "動画の用意": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare video"
+          }
+        }
+      }
+    },
     "2段階": {
       "localizations": {
         "en": {
@@ -156,6 +216,16 @@
     },
     "FlutterKaigi 2026": {
       "shouldTranslate": false
+    },
+    "FlutterKaigi 2026 スライド": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FlutterKaigi 2026 Slides"
+          }
+        }
+      }
     },
     "FlutterKaigiは2024の前夜祭LT以来2回目": {
       "localizations": {
@@ -340,12 +410,12 @@
         }
       }
     },
-    "iPhone Duoを検討中…": {
+    "iPhone Duoを買ってしまったので、お金が...💸": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Thinking about getting an iPhone Duo…"
+            "value": "I ended up buying an iPhone Duo, so my money...💸"
           }
         }
       }
@@ -389,16 +459,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "toImage shows PlatformViews as black → capture the whole view hierarchy natively"
-          }
-        }
-      }
-    },
-    "× Dartだけでは不可": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "× Not possible in Dart alone"
           }
         }
       }
@@ -1173,12 +1233,12 @@
         }
       }
     },
-    "最近車と3Dプリンターを買ってお金が...💸": {
+    "2025年のベルリンでのFlutterconではパフォーマンスについての話をしてました": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Just bought a car and a 3D printer… my wallet 💸"
+            "value": "I talked about performance at Fluttercon 2025 in Berlin"
           }
         }
       }

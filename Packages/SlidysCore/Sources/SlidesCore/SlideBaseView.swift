@@ -30,6 +30,7 @@ public extension SlideConfigurationProtocol {
 
 public struct SlideBaseView: View {
     @FocusState private var isFocused: Bool
+    @AppStorage("speakerNotesControlsOnRight") private var speakerNotesControlsOnRight = false
     @State private var timeRemaining: TimeInterval
     @State private var isTimerRunning = false
     @State private var timer: Timer?
@@ -105,8 +106,12 @@ public struct SlideBaseView: View {
     /// iPhone Duo の2画面表示中(外側ディスプレイにスライド)も、内側はノートにする
     private var showsPresenterNotesForExternalDisplay: Bool {
         // NOTE: 判定結果の変化は body の onChange でログに出す
-        (externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation)
-            || dualDisplayCapture.isRunning
+        // 外部出力中はユーザーが選んだ手元の表示モードを優先する。
+        // Duo のカメラセッションは外側画面を維持するため継続するが、ノート表示を強制しない。
+        if externalDisplay.isConnected {
+            return externalDisplay.effectiveMode == .presentation
+        }
+        return dualDisplayCapture.isRunning
     }
 
     /// 外部ディスプレイ接続中の iPhone Duo の内側ディスプレイでは、
@@ -385,6 +390,14 @@ public struct SlideBaseView: View {
                 }
                 .pickerStyle(.menu)
             }
+
+            Picker(selection: $speakerNotesControlsOnRight) {
+                Text("左寄せ").tag(false)
+                Text("右寄せ").tag(true)
+            } label: {
+                Label("ノートの操作ボタン配置", systemImage: "hand.point.up.left")
+            }
+            .pickerStyle(.menu)
 
             if let slideCloseAction {
                 Divider()

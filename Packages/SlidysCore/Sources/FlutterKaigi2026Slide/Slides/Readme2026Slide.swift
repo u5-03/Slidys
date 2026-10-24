@@ -29,8 +29,8 @@ struct Readme2026Slide: View {
                 firstText: "DeNAのiOS/Flutterエンジニア".loc,
                 secondText: "FlutterKaigiは2024の前夜祭LT以来2回目".loc,
                 thirdText: "去年末までFlutterアプリ、今はiPadOSアプリのプロジェクト".loc,
-                fourthText: "最近車と3Dプリンターを買ってお金が...💸".loc,
-                fifthText: "iPhone Duoを検討中…".loc
+                fourthText: "2025年のベルリンでのFlutterconではパフォーマンスについての話をしてました".loc,
+                fifthText: "iPhone Duoを買ってしまったので、お金が...💸".loc
             ),
             iconSize: 510 // 既定(340)の1.5倍
         )
