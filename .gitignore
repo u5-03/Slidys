@@ -7,6 +7,16 @@ FlutterFrameworks/
 **/.build/
 **/build/**
 
+# SlidysFlutter uses FlutterNativeIntegration through SwiftPM.
+Apps/SlidysFlutter/Pods/
+Apps/SlidysFlutter/Podfile
+Apps/SlidysFlutter/Podfile.lock
+flutter_slide/.ios/Podfile
+flutter_slide/.ios/Podfile.lock
+flutter_slide/.ios/Pods/
+flutter_slide/.ios/.symlinks/
+flutter_slide/.ios/Flutter/ephemeral/
+
 # Xcode user specific files
 Apps/Slidys.xcworkspace/xcuserdata/
 Apps/SlidysFlutter/SlidysFlutter.xcodeproj/xcuserdata/
