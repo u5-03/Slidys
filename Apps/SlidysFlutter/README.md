@@ -59,6 +59,25 @@ Release のみを生成します。Flutter 用のカスタム環境変数や FVM
 同じ Workspace の他アプリをビルドする場合も、依存解決に必要な Flutter パッケージを生成します。
 既存の `SlidysShareScreenshots` 用スタブ作成処理とマクロ検証設定も引き続き実行されます。
 
+### 既存アプリのビルド番号を引き継ぐ
+
+TestFlight 配布時は Xcode Cloud のビルド番号が使われます。
+同じアプリバージョンで過去にアップロードした番号より小さい場合、
+`The bundle version must be higher than the previously uploaded version` で配布が失敗します。
+`CURRENT_PROJECT_VERSION` の変更ではなく、App Store Connect 側の採番設定を変更してください。
+
+1. 対象アプリの TestFlight で、同じバージョンのアップロード済みビルド番号の最大値を確認します。
+2. **Xcode Cloud → Settings → Build Number → Next Build Number → Edit** を開きます。
+3. アップロード済みの最大値と、Cloud ですでに使用した番号の両方より大きい整数を保存します。
+4. 新しいビルドを開始します。失敗済みの成果物には新しい番号は反映されません。
+
+2026-10-29 の確認時点では、`1.0.0` のアップロード済み最大値は `202610241731` です。
+Cloud 側でそれ以上の番号をまだ使っていなければ、次回番号は `202610241732` に設定できます。
+以降は Cloud の自動インクリメントを使い、別の配布経路を使う場合も番号を重複させないでください。
+設定には Admin または App Manager 権限が必要です。
+
+公式手順: [Xcode Cloud の次回ビルド番号の設定](https://developer.apple.com/documentation/xcode/setting-the-next-build-number-for-xcode-cloud-builds)
+
 公式手順: [Flutter Add-to-app / Swift Package Manager](https://docs.flutter.dev/add-to-app/ios/project-setup)
 
 ## 検証
