@@ -14,8 +14,17 @@ import json, os, pathlib, sys
 args = sys.argv[1:]
 with open(os.environ['CALL_LOG'], 'a') as log:
     log.write(json.dumps(args) + '\\n')
-if args == ['--version', '--machine']:
-    print(json.dumps({'frameworkVersion': os.environ.get('SDK_VERSION', '3.47.5')}))
+if args in (['--version'], ['--version', '--machine']):
+    if os.environ.get('BOOTSTRAP_STDOUT'):
+        print('Building flutter tool...')
+        print('Resolving dependencies...')
+    if os.environ.get('SDK_BOOTSTRAP_FAILURE'):
+        raise SystemExit(42)
+    version = {'frameworkVersion': os.environ.get('SDK_VERSION', '3.47.5')}
+    cache = pathlib.Path(__file__).resolve().parent / 'cache/flutter.version.json'
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(version))
+    print(json.dumps(version) if '--machine' in args else 'Flutter ' + version['frameworkVersion'])
 elif args[:2] == ['pub', 'get']:
     pathlib.Path('.ios').mkdir(exist_ok=True)
     pathlib.Path('.ios/Podfile').write_text('generated legacy Podfile')
@@ -32,6 +41,9 @@ elif args[:2] == ['pub', 'get']:
 elif args[:2] == ['build', 'swift-package']:
     assert not pathlib.Path('.ios/Podfile').exists()
     assert not pathlib.Path('.ios/Podfile.lock').exists()
+    package = pathlib.Path('build/ios/SwiftPackages/FlutterNativeIntegration')
+    package.mkdir(parents=True, exist_ok=True)
+    (package / 'Package.swift').write_text('// generated Swift package')
 '''
 
 
@@ -52,7 +64,8 @@ class PrepareFlutterTests(unittest.TestCase):
         flutter.write_text(FAKE_FLUTTER)
         flutter.chmod(0o755)
         self.env = dict(os.environ, CALL_LOG=str(self.root / 'calls.jsonl'))
-        for key in ('FLUTTER_ROOT', 'CI_XCODEBUILD_ACTION', 'SDK_VERSION', 'UNSUPPORTED_PLUGIN'):
+        for key in ('FLUTTER_ROOT', 'CI_XCODEBUILD_ACTION', 'SDK_VERSION', 'UNSUPPORTED_PLUGIN',
+                    'BOOTSTRAP_STDOUT', 'SDK_BOOTSTRAP_FAILURE'):
             self.env.pop(key, None)
 
     def run_prepare(self, **env):
@@ -73,6 +86,17 @@ class PrepareFlutterTests(unittest.TestCase):
         result = self.run_prepare(CI_XCODEBUILD_ACTION='archive')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.calls()[-1][-3:], ['--build-mode', 'release', '--no-codesign'])
+
+    def test_first_sdk_invocation_can_print_bootstrap_logs(self):
+        result = self.run_prepare(BOOTSTRAP_STDOUT='1', CI_XCODEBUILD_ACTION='archive')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.calls()[-1][:2], ['build', 'swift-package'])
+
+    def test_sdk_bootstrap_failure_stops_before_dependency_resolution(self):
+        result = self.run_prepare(SDK_BOOTSTRAP_FAILURE='1')
+        self.assertEqual(result.returncode, 42)
+        self.assertNotIn('JSONDecodeError', result.stderr)
+        self.assertEqual(len(self.calls()), 1)
 
     def test_project_ci_symlink_resolves_repository_root(self):
         project = self.root / 'Apps/SlidysFlutter'
@@ -111,10 +135,24 @@ shutil.copy(os.environ['FIXTURE_FLUTTER'], sdk / 'bin/flutter')
 ''')
         git.chmod(0o755)
         result = self.run_prepare(PATH=str(mock_bin) + os.pathsep + self.env['PATH'],
-                                  GIT_LOG=str(self.root / 'git.json'), FIXTURE_FLUTTER=str(fixture))
+                                  GIT_LOG=str(self.root / 'git.json'), FIXTURE_FLUTTER=str(fixture),
+                                  BOOTSTRAP_STDOUT='1')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads((self.root / 'git.json').read_text())[:-1],
                          ['clone', '--depth', '1', '--branch', '3.47.5', 'https://github.com/flutter/flutter.git'])
+
+    def test_post_clone_creates_flutter_package_and_missing_screenshot_stub(self):
+        shutil.copy(SCRIPTS / 'ci_post_clone.sh', self.scripts)
+        checkout = self.root / 'checkout/repository'
+        checkout.mkdir(parents=True)
+        result = subprocess.run([str(self.scripts / 'ci_post_clone.sh')], capture_output=True, text=True,
+                                env=self.env | {'CI_PRIMARY_REPOSITORY_PATH': str(checkout),
+                                                'CI_XCODEBUILD_ACTION': 'archive', 'BOOTSTRAP_STDOUT': '1'})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((self.module / 'build/ios/SwiftPackages/FlutterNativeIntegration/Package.swift').is_file())
+        stub = checkout.parent / 'AppStoreScreenshotTest'
+        self.assertTrue((stub / 'Package.swift').is_file())
+        self.assertTrue((stub / 'Sources/AppStoreScreenshotTest/Stub.swift').is_file())
 
     def test_existing_screenshot_stub_does_not_skip_flutter_preparation(self):
         shutil.copy(SCRIPTS / 'ci_post_clone.sh', self.scripts)

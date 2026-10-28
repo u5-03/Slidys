@@ -22,7 +22,11 @@ export PATH="$FLUTTER_ROOT/bin:$PATH"
 export CI=true
 export FLUTTER_SUPPRESS_ANALYTICS=true
 
-SDK_VERSION=$("$FLUTTER_ROOT/bin/flutter" --version --machine | python3 -c 'import json, sys; print(json.load(sys.stdin)["frameworkVersion"])')
+# A fresh SDK bootstraps the Flutter tool before handling --version. Bootstrap
+# logs can appear on stdout even with --machine, so never parse that stream.
+# Flutter writes this version cache after initialization, before printing --version.
+"$FLUTTER_ROOT/bin/flutter" --version
+SDK_VERSION=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["frameworkVersion"])' "$FLUTTER_ROOT/bin/cache/flutter.version.json")
 if [ "$SDK_VERSION" != "$FLUTTER_VERSION" ]; then
     echo "error: Flutter $FLUTTER_VERSION is required by .fvmrc; found $SDK_VERSION at $FLUTTER_ROOT" >&2
     exit 1
