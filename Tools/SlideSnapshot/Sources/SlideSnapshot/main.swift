@@ -3,7 +3,7 @@
 //  SlideSnapshot
 //
 //  指定デッキの全スライド(フェーズ込み)を 1920x1080 の PNG に書き出し、一覧 HTML も生成する。
-//  引数: <deck> <outputDir>   deck: iosdc2026
+//  引数: <deck> <outputDir> [language]   deck: iosdc2026 | flutterkaigi2026   language: ja(既定) | en
 //
 
 import AppKit
@@ -14,16 +14,26 @@ import SlidesCore
 import SwiftUI
 import UniformTypeIdentifiers
 import iOSDC2026Slide
+import FlutterKaigi2026Slide
+
+private struct PDFExportRouter: FlutterKaigi2026Slide.RouterProtocol {
+    func build(viewType: FlutterKaigi2026ViewType) -> AnyView {
+        AnyView(EmptyView())
+    }
+}
 
 @MainActor
-func run() throws {
+func run() async throws {
     let args = CommandLine.arguments
     guard args.count >= 3 else {
-        FileHandle.standardError.write("usage: SlideSnapshot <deck: iosdc2026> <outputDir>\n".data(using: .utf8)!)
+        FileHandle.standardError.write("usage: SlideSnapshot <deck: iosdc2026|flutterkaigi2026> <outputDir>\n".data(using: .utf8)!)
         exit(2)
     }
     let deck = args[1]
     let outputDir = URL(fileURLWithPath: args[2])
+    // 表示言語(多言語対応デッキ用)。コマンドラインツールにはアプリの言語設定が無いので、既定は日本語にする
+    let language = args.count >= 4 ? (SlideLanguage(rawValue: args[3]) ?? .japanese) : .japanese
+    SlideLanguageStore.shared.language = language
     try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
 
     // 一覧ビュー(SlideListView)を1枚のPNGに描画する検証モード
@@ -55,9 +65,28 @@ func run() throws {
     case "iosdc2026":
         controller = iOSDC2026SlideView.makeSlideIndexController()
         listTextStyle = iOSDC2026SlideView.listTextStyle
+    case "flutterkaigi2026", "flutterkaigi2026-pdf":
+        // Flutter のデモ画面は DefaultRouter(EmptyView)になるので、スマホ枠だけが描画される
+        controller = FlutterKaigi2026SlideView.makeSlideIndexController()
+        listTextStyle = FlutterKaigi2026SlideView.listTextStyle
     default:
         FileHandle.standardError.write("unknown deck: \(deck)\n".data(using: .utf8)!)
         exit(2)
+    }
+
+    if deck == "flutterkaigi2026-pdf" {
+        // アプリの「PDFを書き出す」と同じ公開APIを使う。
+        guard let source = FlutterKaigi2026SlideView(router: PDFExportRouter()).pdfExportSource else {
+            throw CocoaError(.fileReadUnknown)
+        }
+        let exportedURL = try await SlidePDFExporter.export(source)
+        let destination = outputDir.appendingPathComponent(exportedURL.lastPathComponent)
+        if FileManager.default.fileExists(atPath: destination.path) {
+            try FileManager.default.removeItem(at: destination)
+        }
+        try FileManager.default.copyItem(at: exportedURL, to: destination)
+        print("exported \(source.slides.count) pages with SlidePDFExporter: \(destination.path)")
+        return
     }
 
     let size = SlideSize.standard16_9
@@ -109,6 +138,19 @@ func run() throws {
     }
     html += "</div></body></html>"
     try html.write(to: outputDir.appendingPathComponent("index.html"), atomically: true, encoding: .utf8)
+
+    // スピーカーノート(リハーサル用 PDF の生成に使う)
+    var notes: [[String: Any]] = []
+    for (i, slide) in controller.slides.enumerated() {
+        let segments = (slide as? any PhasedScriptProviding)?.scriptSegments ?? [slide.script]
+        notes.append([
+            "slide": i + 1,
+            "name": String(describing: type(of: slide)),
+            "segments": segments,
+        ])
+    }
+    let json = try JSONSerialization.data(withJSONObject: notes, options: [.prettyPrinted])
+    try json.write(to: outputDir.appendingPathComponent("notes.json"))
     print("wrote \(written.count) shots to \(outputDir.path)")
 }
 
@@ -117,11 +159,12 @@ _ = NSApplication.shared
 NSApp.setActivationPolicy(.prohibited)
 Task { @MainActor in
     do {
-        try run()
+        try await run()
         exit(0)
     } catch {
         FileHandle.standardError.write("error: \(error)\n".data(using: .utf8)!)
         exit(1)
     }
 }
-dispatchMain()
+// PDF の非同期描画でも AppKit の処理をメインスレッドで進める。
+NSApp.run()

@@ -2,7 +2,9 @@
 //  SpeakerNotesWindow.swift
 //  SlidesCore
 //
-//  発表者用のスピーカーノートWindow(macOS専用)。
+//  発表者用のスピーカーノート画面。
+//  macOS では NSWindow(SpeakerNotesWindowPresenter)で、iPhone Duo(内側ディスプレイ)/iPad では
+//  SwiftUI の別Scene(SpeakerNotesScene)で開く。
 //  メインのスライドと同じ SlideIndexController を購読するため、
 //  スライド送り(フェーズ送り含む)に合わせてノートも自動で切り替わる。
 //
@@ -18,6 +20,7 @@
 
 #if os(macOS)
 import AppKit
+#endif
 import SlideKit
 import SwiftUI
 
@@ -31,7 +34,25 @@ extension Slide {
     }
 }
 
-/// スピーカーノートWindowの表示管理。
+extension SlideIndexController {
+    /// 戻れる先がない(最初のページの最初のフェーズ)か。
+    @MainActor
+    var isAtFirstStep: Bool {
+        currentIndex == 0 && currentSlide.phaseStep(on: self).current == 0
+    }
+
+    /// 進める先がない(最後のページで、まだ出していないフェーズもない)か。
+    /// ページ番号だけで判定すると、最後のページの段階表示が進められなくなる。
+    @MainActor
+    var isAtLastStep: Bool {
+        guard currentIndex >= slides.count - 1 else { return false }
+        let phase = currentSlide.phaseStep(on: self)
+        return phase.current >= phase.last
+    }
+}
+
+#if os(macOS)
+/// スピーカーノートWindowの表示管理(macOS)。
 @MainActor
 public enum SpeakerNotesWindowPresenter {
     private static var window: NSWindow?
@@ -62,13 +83,33 @@ public enum SpeakerNotesWindowPresenter {
         Self.window = win
     }
 }
+#endif
 
 /// ノート本体のView。現在/次のプレビュー・ページ番号・経過時間・原稿を表示する。
 struct SpeakerNotesView: View {
     @ObservedObject var slideIndexController: SlideIndexController
     let slideTheme: CustomSlideTheme
-    @State private var startDate = Date()
+    /// 矢印 / Page Up/Down(クリッカー)でのページ送りをこの View 自身で受けるか。
+    /// 別 Window(macOS / iPhone Duo)では true。SlideBaseView に埋め込むときは false にして
+    /// 親(SlideBaseView)側の 1 か所でフォーカスとキー入力を持つ(表示の切り替えでフォーカスが迷子にならないように)
+    var handlesKeyboardNavigation = true
+    /// iPhone Duo の2画面表示(内側を縦持ち)用。スライドは外側に出ていて手元から見えないので、
+    /// 幅が狭くても「現在」のプレビューを省かず、「現在」「次」を横に並べて上部に小さく出し、原稿の領域を広く取る
+    var usesPortraitPresenterLayout = false
+    /// 経過時間の起点(ノート画面を出し直しても保たれるよう SpeakerNotesSession が持つ)
+    @ObservedObject private var session = SpeakerNotesSession.shared
     @FocusState private var isFocused: Bool
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    /// 幅が狭いWindow(iPhone Duo の内側ディスプレイを2分割した状態など)では、
+    /// 隣のWindowにスライド本体が見えているので「現在」のプレビューを省いて原稿の領域を確保する。
+    private var showsCurrentPreview: Bool {
+#if os(iOS)
+        usesPortraitPresenterLayout || horizontalSizeClass != .compact
+#else
+        true
+#endif
+    }
 
     private var currentIndex: Int { slideIndexController.currentIndex }
 
@@ -102,14 +143,18 @@ struct SpeakerNotesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 16) {
-                previewPane(title: "現在") {
-                    AnyView(slideIndexController.currentSlide)
-                        .environment(\.previewPhaseStep, currentPhase.current)
+                if showsCurrentPreview {
+                    previewPane(title: "現在") {
+                        AnyView(slideIndexController.currentSlide)
+                            .environment(\.previewPhaseStep, currentPhase.current)
+                            .followsSlideLanguage()
+                    }
                 }
                 previewPane(title: nextPaneTitle) {
                     if let nextStep {
                         AnyView(nextStep.slide)
                             .environment(\.previewPhaseStep, nextStep.phaseStep)
+                            .followsSlideLanguage()
                     } else {
                         Text("最後のスライドです")
                             .font(.system(size: 40))
@@ -122,19 +167,20 @@ struct SpeakerNotesView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 14) {
                 Text("\(currentIndex + 1) / \(slideIndexController.slides.count)")
-                    .font(.system(size: 34, weight: .heavy, design: .monospaced))
+                    .font(.system(size: counterFontSize, weight: .heavy, design: .monospaced))
+                    .fixedSize()
                 Text(currentSlideName)
                     .font(.system(size: 16))
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button {
-                    startDate = Date()
+                    session.timerStartDate = Date()
                 } label: {
                     Image(systemName: "arrow.counterclockwise.circle.fill")
                         .font(.system(size: 22))
                 }
                 .buttonStyle(.plain)
-                Text(startDate, style: .timer)
+                Text(session.timerStartDate, style: .timer)
                     .font(.system(size: 32, weight: .bold, design: .monospaced))
             }
 
@@ -176,9 +222,17 @@ struct SpeakerNotesView: View {
                     scrollProxy.scrollTo(activeSegmentIndex, anchor: .top)
                 }
             }
+
+            // クリッカー無しでも進められるよう、ノート画面自体に左右のページ送りボタンを置く
+            SlideNavigationBar(slideIndexController: slideIndexController)
         }
         .padding(20)
+#if os(macOS)
         .frame(minWidth: 640, minHeight: 480)
+#else
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(Color.black)
+#endif
         // ページ送り時のクロスフェード等を無効化(controller側のwithAnimationを打ち消す)
         .transaction { transaction in
             transaction.animation = nil
@@ -186,22 +240,56 @@ struct SpeakerNotesView: View {
         }
         .preferredColorScheme(.dark)
         // ノートWindowをクリックしてフォーカスが移っても、スライド送りできるようにしておく
-        .focusable()
+#if os(iOS)
+        // ノートは読み取り専用なので、キーボード入力のために編集フォーカスを要求しない。
+        .focusable(handlesKeyboardNavigation, interactions: .activate)
+#else
+        .focusable(handlesKeyboardNavigation)
+#endif
         .focused($isFocused)
         .focusEffectDisabled()
         .onKeyPress(keys: [.leftArrow, .pageUp]) { _ in
+            guard handlesKeyboardNavigation else { return .ignored }
             Task { slideIndexController.back() }
             return .handled
         }
         .onKeyPress(keys: [.rightArrow, .pageDown]) { _ in
+            guard handlesKeyboardNavigation else { return .ignored }
             Task { slideIndexController.forward() }
             return .handled
         }
-        .onAppear { isFocused = true }
+        .onAppear {
+            if handlesKeyboardNavigation { isFocused = true }
+        }
     }
 
-    /// ノート本文の文字サイズ。Vision Proを装着したまま読めるよう大きめにしている。
-    private var noteFontSize: CGFloat { 45 }
+    /// ノート本文の文字サイズ。macOS は Vision Pro を装着したまま読めるよう大きめ、
+    /// iOS(iPhone Duo / iPad の別Window)は手元で読む前提で小さめにしている。
+    private var noteFontSize: CGFloat {
+#if os(macOS)
+        45
+#else
+        horizontalSizeClass == .compact ? 22 : 28
+#endif
+    }
+
+    /// ページ番号の文字サイズ(狭いWindowでは折り返さないよう小さめに)
+    private var counterFontSize: CGFloat {
+#if os(macOS)
+        34
+#else
+        horizontalSizeClass == .compact ? 24 : 30
+#endif
+    }
+
+    /// 「ここで次を表示」区切りの文字サイズ(noteFontSize に合わせて縮める)
+    private var separatorFontSize: CGFloat {
+#if os(macOS)
+        28
+#else
+        horizontalSizeClass == .compact ? 15 : 18
+#endif
+    }
 
     /// 表示用の整形: 連続する改行(空行)を1つにまとめ、前後の余白を落とす
     private func normalizedNote(_ text: String) -> String {
@@ -228,7 +316,7 @@ struct SpeakerNotesView: View {
                 .frame(height: 3)
                 .foregroundStyle(isNext ? Color.orange : Color.white.opacity(0.25))
             Text("▼ ここで次を表示")
-                .font(.system(size: 28, weight: .bold))
+                .font(.system(size: separatorFontSize, weight: .bold))
                 .foregroundStyle(isNext ? Color.orange : Color.white.opacity(0.35))
                 .fixedSize()
             Rectangle()
@@ -272,4 +360,66 @@ struct SpeakerNotesView: View {
         .frame(maxWidth: .infinity)
     }
 }
-#endif
+
+
+/// スピーカーノート画面用のページ送りバー(戻る / ページ番号 / 次へ)。
+/// ページ送りはフェーズ送りも含む(SlideIndexController.forward/back と同じ)。
+struct SlideNavigationBar: View {
+    @ObservedObject var slideIndexController: SlideIndexController
+    /// ボタンの高さ。分割パネルなど狭い場所では小さめにする
+    var compact = false
+
+    private var isFirst: Bool { slideIndexController.isAtFirstStep }
+    private var isLast: Bool { slideIndexController.isAtLastStep }
+
+    @AppStorage("speakerNotesControlsOnRight") private var controlsOnRight = false
+
+    var body: some View {
+        HStack(spacing: compact ? 8 : 16) {
+            if controlsOnRight {
+                pageCounter
+                navigationButtons
+            } else {
+                navigationButtons
+                pageCounter
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var pageCounter: some View {
+        Text("\(slideIndexController.currentIndex + 1) / \(slideIndexController.slides.count)")
+            .font(.system(size: compact ? 18 : 24, weight: .bold, design: .monospaced))
+            .fixedSize()
+            .frame(maxWidth: .infinity, alignment: controlsOnRight ? .leading : .trailing)
+    }
+
+    private var navigationButtons: some View {
+        HStack(spacing: compact ? 8 : 16) {
+            Button {
+                slideIndexController.back()
+            } label: {
+                Label("戻る", systemImage: "chevron.left")
+                    .font(compact ? .body : .title2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .frame(maxWidth: .infinity, minHeight: compact ? 40 : 56)
+            }
+            .buttonStyle(.bordered)
+            .disabled(isFirst)
+
+            Button {
+                slideIndexController.forward()
+            } label: {
+                Label("次へ", systemImage: "chevron.right")
+                    .font(compact ? .body : .title2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .frame(maxWidth: .infinity, minHeight: compact ? 40 : 56)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(isLast)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}

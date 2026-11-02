@@ -1,0 +1,9 @@
+{
+  "id" : "d3e759b3-a9a4-4fbc-9e7e-8cab170428c2",
+  "targets" : [
+    {
+      "id" : "7a63c85c-9e42-42ed-bb4f-1fd151e66bc8",
+      "name" : "SlidysFlutter"
+    }
+  ]
+}

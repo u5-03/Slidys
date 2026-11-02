@@ -13,7 +13,4 @@
    <FileRef
       location = "group:SlidysFlutter/SlidysFlutter.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:SlidysFlutter/Pods/Pods.xcodeproj">
-   </FileRef>
 </Workspace>

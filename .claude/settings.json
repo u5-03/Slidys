@@ -13,6 +13,9 @@
       "Bash(pwd)"
     ],
     "deny": [
+      "Read(//**/*.p8)",
+      "Read(//**/AuthKey_*.p8)",
+      "Read(~/.appstoreconnect/**)",
       "Bash(rm -rf /)",
       "Bash(rm -rf --no-preserve-root *)",
       "Bash(rm -rf ~)",

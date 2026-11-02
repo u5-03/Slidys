@@ -8,6 +8,7 @@
 import SwiftUI
 import FlutterKaigiSlide
 import FlutterNinjasSlide
+import FlutterKaigi2026Slide
 import ChibaSwiftSlide
 import KanagawaSwiftSlide
 import iOSDCSlide
@@ -17,6 +18,7 @@ import SlidysCommon
 enum FlutterSlideType: CaseIterable, Identifiable, SlideTypeProtocol {
     case flutterKaigi
     case FlutterNinjas
+    case flutterKaigi2026
 
     var id: String {
         return displayValue
@@ -28,6 +30,8 @@ enum FlutterSlideType: CaseIterable, Identifiable, SlideTypeProtocol {
             return "FlutterKaigi2024"
         case .FlutterNinjas:
             return "FlutterNinjas2025"
+        case .flutterKaigi2026:
+            return "FlutterKaigi2026"
         }
     }
 
@@ -37,6 +41,8 @@ enum FlutterSlideType: CaseIterable, Identifiable, SlideTypeProtocol {
             FlutterKaigiSlideView(router: FlutterKaigiRouter())
         case .FlutterNinjas:
             FlutterNinjasSlideView(router: FlutterNinjasRouter())
+        case .flutterKaigi2026:
+            FlutterKaigi2026SlideView(router: FlutterKaigi2026Router())
         }
     }
 }

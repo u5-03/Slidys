@@ -19,6 +19,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SlidesCore", package: "SlidysCore"),
                 .product(name: "iOSDC2026Slide", package: "SlidysCore"),
+                .product(name: "FlutterKaigi2026Slide", package: "SlidysCore"),
                 .product(name: "SlideKit", package: "SlideKit"),
             ]
         )

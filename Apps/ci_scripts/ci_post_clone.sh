@@ -8,6 +8,13 @@
 # (本物: https://github.com/u5-03/AppStoreScreenshotTest ※private)
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+
+# All schemes in Slidys.xcworkspace resolve SlidysFlutter's local package.
+# Generate it before Xcode Cloud starts resolving dependencies, including when
+# another app's workflow is selected.
+"$SCRIPT_DIR/prepare_flutter.sh"
+
 PACKAGE_DIR="$(dirname "${CI_PRIMARY_REPOSITORY_PATH:-/Volumes/workspace/repository}")/AppStoreScreenshotTest"
 
 if [ -d "$PACKAGE_DIR" ]; then

@@ -5,6 +5,8 @@ import PackageDescription
 
 let package = Package(
     name: "SlidysCore",
+    // String Catalog(Localizable.xcstrings)を持つターゲットがあるので必要。原文は日本語
+    defaultLocalization: "ja",
     platforms: [.iOS(.v26), .macOS(.v26), .visionOS(.v26)],
     products: [
         .library(
@@ -66,6 +68,10 @@ let package = Package(
         .library(
             name: "iOSDC2026Slide",
             targets: ["iOSDC2026Slide"]
+        ),
+        .library(
+            name: "FlutterKaigi2026Slide",
+            targets: ["FlutterKaigi2026Slide"]
         ),
     ],
     dependencies: [
@@ -217,6 +223,12 @@ let package = Package(
                     package: "YugiohDuelDiskPackage",
                     condition: .when(platforms: [.visionOS])
                 ),
+            ]
+        ),
+        .target(
+            name: "FlutterKaigi2026Slide",
+            dependencies: [
+                "SlidesCore",
             ]
         ),
         .testTarget(

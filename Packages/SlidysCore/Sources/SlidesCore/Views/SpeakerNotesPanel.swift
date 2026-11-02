@@ -62,6 +62,9 @@ public struct SpeakerNotesPanel: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
+
+            // クリッカー無しでも進められるよう、パネルにも左右のページ送りボタンを置く
+            SlideNavigationBar(slideIndexController: slideIndexController, compact: true)
         }
         .padding(16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
