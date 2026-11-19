@@ -42,10 +42,8 @@ public enum ExternalDisplayMode {
 
 #if os(iOS)
 import Combine
-import OSLog
 import UIKit
 
-private let externalDisplayLog = Logger(subsystem: "Slidys", category: "ExternalDisplay")
 
 @MainActor
 public final class ExternalDisplayCoordinator: ObservableObject {
@@ -54,7 +52,9 @@ public final class ExternalDisplayCoordinator: ObservableObject {
     /// 外部ディスプレイが接続されているか
     @Published public private(set) var isConnected = false
     /// 発表者が選んだモード(既定はミラーリング。発表者メニューで「外部ディスプレイに出力」を選ぶと presentation)
-    @Published public var preferredMode: ExternalDisplayMode = .mirroring
+    @Published public var preferredMode: ExternalDisplayMode = .mirroring {
+        didSet { PresenterSlideCapture.shared.diagnostics("external-mode old=\(oldValue) new=\(preferredMode)") }
+    }
 
     /// 実際に適用されるモード(いまは preferredMode と同じ。将来の自動切り替え用に分けている)
     public var effectiveMode: ExternalDisplayMode { preferredMode }
@@ -64,29 +64,10 @@ public final class ExternalDisplayCoordinator: ObservableObject {
     fileprivate var accessoryRegistrationCount = 0
 
     private init() {
-        for notification in [UIScreen.didConnectNotification, UIScreen.didDisconnectNotification] {
-            NotificationCenter.default.publisher(for: notification)
-                .sink { [weak self] notification in
-                    self?.logDiagnostics(event: notification.name.rawValue)
-                }
-                .store(in: &cancellables)
-        }
         $preferredMode
             .dropFirst()
             .sink { [weak self] _ in self?.applyMode() }
             .store(in: &cancellables)
-    }
-
-    /// 物理画面の接続と、アプリが受け取った外部 Scene を分けて記録する。
-    /// notice レベルなので Release / TestFlight でも Console から確認できる。
-    public func logDiagnostics(event: String) {
-        let scenes = UIApplication.shared.connectedScenes
-            .map { "\($0.session.role.rawValue):\($0.activationState.rawValue)" }
-            .sorted().joined(separator: ",")
-        externalDisplayLog.notice("event=\(event, privacy: .public) os=\(UIDevice.current.systemVersion, privacy: .public) idiom=\(UIDevice.current.userInterfaceIdiom.rawValue) screens=\(UIScreen.screens.count) scenes=[\(scenes, privacy: .public)] delegates=\(self.delegates.count) connected=\(self.isConnected) simulated=\(self.simulatesConnection) mode=\(String(describing: self.effectiveMode), privacy: .public)")
-        if #available(iOS 27.0, *) {
-            externalDisplayLog.notice("iOS27 accessoryRegistrations=\(self.accessoryRegistrationCount)")
-        }
     }
 
     public func togglePreferredMode() {
@@ -96,7 +77,6 @@ public final class ExternalDisplayCoordinator: ObservableObject {
     /// 外部ディスプレイ用の UISceneConfiguration。それ以外の役割なら nil。
     /// UIApplicationDelegate の configurationForConnecting から呼ぶ。
     public static func sceneConfiguration(for session: UISceneSession) -> UISceneConfiguration? {
-        externalDisplayLog.notice("configuration requested role=\(session.role.rawValue, privacy: .public) external=\(session.role == .externalDisplay)")
         guard session.role == .externalDisplay else { return nil }
         // iOS 27以降は、表示中のViewControllerに登録したScene accessoryが設定を提供する。
         if #available(iOS 27.0, *) { return nil }
@@ -126,11 +106,9 @@ public final class ExternalDisplayCoordinator: ObservableObject {
 
     private func updateConnection() {
         isConnected = delegates.count > 0 || simulatesConnection
-        logDiagnostics(event: "connection updated")
     }
 
     private func applyMode() {
-        logDiagnostics(event: "mode changed")
         let mode = effectiveMode
         for delegate in delegates.allObjects {
             delegate.apply(mode: mode)
@@ -169,14 +147,12 @@ final class ExternalDisplayAccessoryController: UIViewController {
         registration.isEnabled = true
         self.registration = registration
         ExternalDisplayCoordinator.shared.accessoryRegistrationCount += 1
-        ExternalDisplayCoordinator.shared.logDiagnostics(event: "external accessory registered")
     }
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         guard let registration, lastAvailability != registration.isAvailable else { return }
         lastAvailability = registration.isAvailable
-        externalDisplayLog.notice("external accessory available=\(registration.isAvailable) enabled=\(registration.isEnabled)")
     }
 
     func unregisterAccessory() {
@@ -184,7 +160,6 @@ final class ExternalDisplayAccessoryController: UIViewController {
         unregisterSceneAccessory(registration)
         self.registration = nil
         ExternalDisplayCoordinator.shared.accessoryRegistrationCount -= 1
-        ExternalDisplayCoordinator.shared.logDiagnostics(event: "external accessory unregistered")
     }
 }
 #endif
@@ -199,7 +174,6 @@ public final class ExternalDisplaySceneDelegate: NSObject, UIWindowSceneDelegate
     private weak var windowScene: UIWindowScene?
 
     public func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        externalDisplayLog.notice("external scene willConnect role=\(session.role.rawValue, privacy: .public)")
         guard let windowScene = scene as? UIWindowScene else { return }
         self.windowScene = windowScene
         ExternalDisplayCoordinator.shared.register(self)
@@ -207,7 +181,6 @@ public final class ExternalDisplaySceneDelegate: NSObject, UIWindowSceneDelegate
     }
 
     public func sceneDidDisconnect(_ scene: UIScene) {
-        externalDisplayLog.notice("external scene disconnected")
         window = nil
         ExternalDisplayCoordinator.shared.unregister(self)
     }
@@ -215,13 +188,12 @@ public final class ExternalDisplaySceneDelegate: NSObject, UIWindowSceneDelegate
     /// 外部ディスプレイの Window は常に持つ(中身の切り替えは ExternalDisplayRootView が行う)。
     @MainActor
     func apply(mode: ExternalDisplayMode) {
-        externalDisplayLog.notice("apply mode=\(String(describing: mode), privacy: .public) existingWindow=\(self.window != nil) sceneAvailable=\(self.windowScene != nil)")
         guard window == nil, let windowScene else { return }
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = UIHostingController(rootView: ExternalDisplayRootView())
-        window.makeKeyAndVisible()
+        // Output-only windows must not become the app's current presentation/capture window.
+        window.isHidden = false
         self.window = window
-        externalDisplayLog.notice("external window created screen=\(windowScene.screen.bounds.debugDescription, privacy: .public)")
     }
 }
 
@@ -232,10 +204,13 @@ public final class ExternalDisplaySceneDelegate: NSObject, UIWindowSceneDelegate
 struct ExternalDisplayRootView: View {
     @ObservedObject private var session = SpeakerNotesSession.shared
     @ObservedObject private var coordinator = ExternalDisplayCoordinator.shared
+    @ObservedObject private var slideCapture = PresenterSlideCapture.shared
 
     var body: some View {
         Group {
-            if let presentation = session.presentation {
+            if session.presentation != nil && slideCapture.output == .capture {
+                PresenterSlideMirrorView()
+            } else if let presentation = session.presentation {
                 ExternalDisplayDeckView(
                     slideIndexController: presentation.slideIndexController,
                     slideTheme: presentation.slideTheme,
@@ -243,7 +218,7 @@ struct ExternalDisplayRootView: View {
                     mirrorsInteractiveSlides: coordinator.effectiveMode == .mirroring
                 )
             } else {
-                ScreenMirrorView()
+                Color.black
             }
         }
         .background(Color.black)
@@ -261,13 +236,17 @@ struct ExternalDisplayDeckView: View {
     let decorator: ExternalDisplaySlideDecorator?
     let mirrorsInteractiveSlides: Bool
 
+    @ObservedObject private var slideCapture = PresenterSlideCapture.shared
+
     private var shouldMirrorScreen: Bool {
         mirrorsInteractiveSlides && slideIndexController.currentSlide is ExternalDisplayMirroringPreferred
     }
 
     var body: some View {
-        if shouldMirrorScreen {
-            ScreenMirrorView()
+        if slideCapture.output == .capture {
+            PresenterSlideMirrorView()
+        } else if shouldMirrorScreen {
+            PresenterSlideMirrorView()
         } else {
             PresentationView(slideSize: SlideSize.standard16_9) {
                 decorated(
@@ -341,16 +320,11 @@ final class ScreenMirrorUIView: UIView {
             ?? scenes.first { $0.session.role == .windowApplication }?.screen
     }
 
-    private var tickCount = 0
 
     @objc private func tick() {
         guard let screen = sourceScreen else {
-            if tickCount == 0 { externalDisplayLog.error("mirror: source screen not found") }
-            tickCount += 1
             return
         }
-        if tickCount == 0 { externalDisplayLog.info("mirror: start screen=\(screen.bounds.debugDescription, privacy: .public) bounds=\(self.bounds.debugDescription, privacy: .public)") }
-        tickCount += 1
         let newSnapshot = screen.snapshotView(afterScreenUpdates: false)
         snapshot?.removeFromSuperview()
         let source = screen.bounds.size
@@ -376,14 +350,14 @@ public final class SlidysAppDelegate: NSObject, UIApplicationDelegate {
         configurationForConnecting connectingSceneSession: UISceneSession,
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
-        externalDisplayLog.info("configurationForConnecting role=\(connectingSceneSession.role.rawValue, privacy: .public)")
         return ExternalDisplayCoordinator.sceneConfiguration(for: connectingSceneSession)
             ?? UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
     }
 
-    /// iPhone Duo の2画面表示中は内側ディスプレイを縦に固定する(DualDisplayCaptureKeeper が切り替える)
+    /// 外部出力・Duo出力中も全方向への回転を許可する。
     public func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        DualDisplayCaptureKeeper.shared.supportedInterfaceOrientations
+        let mask = DualDisplayCaptureKeeper.shared.supportedInterfaceOrientations
+        return mask
     }
 
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -410,7 +384,8 @@ public enum ExternalDisplayPreviewOverlay {
                     .first(where: { $0.session.role == .windowApplication }) else { return }
             ExternalDisplayCoordinator.shared.simulateConnection()
             let overlay = UIWindow(windowScene: scene)
-            overlay.frame = CGRect(x: 16, y: 60, width: 480, height: 270)
+            overlay.frame = CGRect(x: max(16, scene.screen.bounds.width - 496),
+                                   y: max(60, scene.screen.bounds.height - 286), width: 480, height: 270)
             overlay.windowLevel = .statusBar - 1
             overlay.isUserInteractionEnabled = false
             overlay.layer.borderColor = UIColor.orange.cgColor
@@ -418,7 +393,6 @@ public enum ExternalDisplayPreviewOverlay {
             overlay.rootViewController = UIHostingController(rootView: ExternalDisplayRootView())
             overlay.isHidden = false
             window = overlay
-            externalDisplayLog.info("preview overlay installed")
         }
     }
 }

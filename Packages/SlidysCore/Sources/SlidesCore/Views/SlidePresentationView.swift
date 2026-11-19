@@ -22,11 +22,25 @@ struct SlidePresentationView<Content: View>: View {
             Color.slideDefaultBackground
                 .ignoresSafeArea()
             SlideScreen(slideSize: slideSize) {
-                content()
+                PresenterSlideCaptureSurface { content() }
             }
             .clipped()
             .aspectRatio(slideSize, contentMode: .fit)
+
         }
+    }
+}
+#endif
+
+#if os(iOS)
+#Preview("取得範囲：横長の手元画面", traits: .fixedLayout(width: 951, height: 669)) {
+    SlidePresentationView(slideSize: CGSize(width: 1600, height: 900)) {
+        Color.blue.overlay { Text("16:9 SLIDE").font(.largeTitle).foregroundStyle(.white) }
+    }
+}
+#Preview("取得範囲：縦長の手元画面", traits: .fixedLayout(width: 669, height: 951)) {
+    SlidePresentationView(slideSize: CGSize(width: 1600, height: 900)) {
+        Color.blue.overlay { Text("16:9 SLIDE").font(.largeTitle).foregroundStyle(.white) }
     }
 }
 #endif

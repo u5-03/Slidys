@@ -1,5 +1,7 @@
 # TestFlight へ手元から配布する
 
+今後の通常の配布対象は **Slidysのみ**。SlidysFlutterはユーザーが明示指定した場合だけ配布する。
+
 Xcode Cloud を使わず、手元の Mac で archive → ipa → App Store Connect アップロード → TestFlight の
 テスターグループ追加(外部テスター向けの Beta App Review 提出まで)を行う。
 
@@ -29,7 +31,7 @@ ASC_TEAM_ID=669226BDWM
 3. SlidysFlutter を配布する場合は Flutter が必要
    - `brew tap leoafarias/fvm && brew install fvm cocoapods`
    - `cd flutter_slide && fvm install`(`.fvmrc` のバージョンが入る)→ `fvm flutter pub get && fvm flutter precache --ios`
-   - `cd Apps/SlidysFlutter && pod install`
+   - 現在のプロジェクトはFlutterのSwift Package統合を使用する。生成済みの `flutter_slide/build/ios/SwiftPackages/FlutterNativeIntegration/Package.swift` が必要。旧CocoaPods構成の場合のみ `cd Apps/SlidysFlutter && pod install` を実行する。
 
 ## 使い方
 
@@ -88,3 +90,5 @@ make testflight-tester-remove-slidys EMAIL=a@example.com GROUP=ExternalTestGroup
   `usesNonExemptEncryption=false` の両方で申告している(HTTPS のみの標準的な暗号化のため)
 - 外部グループへ追加すると Beta App Review が自動で提出される。初回や大きな変更のときは承認まで
   時間がかかるので、それまでは内部グループで確認する
+
+- Apple DeveloperのProgram License Agreement更新があると、アーカイブが成功しても配布用プロファイル取得・IPA書き出しが拒否される。Account Holder本人がDeveloperアカウント画面で同意した後、保存した `latest` のアーカイブからexport / upload / distributeを再開する。

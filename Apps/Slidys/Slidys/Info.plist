@@ -13,15 +13,11 @@
 		<key>CFBundlePrimaryIcon</key>
 		<string>AppIcon</string>
 	</dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_slidys-duel._tcp</string>
 		<string>_slidys-duel._udp</string>
 	</array>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>近くのデバイスと対戦(デュエル)するために、ローカルネットワークを使用します。</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

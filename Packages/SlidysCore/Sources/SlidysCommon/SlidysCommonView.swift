@@ -18,6 +18,7 @@ import NagoyaSwiftSlide
 import iOSDC2025Slide
 import HakodateSwiftSlide
 import iOSDC2026Slide
+import SaitamaSwiftSlide
 
 public protocol SlideTypeProtocol: CaseIterable, Identifiable, Codable, Equatable, Hashable {
     var id: String { get }
@@ -37,6 +38,7 @@ public enum SlideType: SlideTypeProtocol {
     case iOSDC2025
     case hakodateSwift
     case iOSDC2026
+    case saitamaSwift
 
     public static let slideWindowKey = "SlideWindowKey"
 
@@ -68,6 +70,8 @@ public enum SlideType: SlideTypeProtocol {
             return "Hakodate.swift #1"
         case .iOSDC2026:
             return "iOSDC2026"
+        case .saitamaSwift:
+            return "Saitama.swift #1"
         }
     }
 
@@ -95,6 +99,8 @@ public enum SlideType: SlideTypeProtocol {
             HakodateSwiftSlideView()
         case .iOSDC2026:
             iOSDC2026SlideView()
+        case .saitamaSwift:
+            SaitamaSwiftSlideView()
         }
     }
 }
@@ -154,6 +160,7 @@ struct PDFExportRequest: Identifiable {
 public struct SlidysCommonView: View {
     @State private var selectedSectionType: SlideSectionType?
     @State private var pdfExportRequest: PDFExportRequest?
+    @State private var showsSaitamaPreview = false
     @Environment(\.openWindow) private var openWindow
 
     private let slideTypes: [any SlideTypeProtocol]
@@ -168,8 +175,21 @@ public struct SlidysCommonView: View {
                 List(selection: $selectedSectionType) {
                     Section("Slides") {
                         ForEach(slideTypes, id: \.id) { type in
-                            Text(type.displayValue)
-                                .padding()
+                            HStack {
+                                Text(type.displayValue)
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                if let nativeType = type as? SlideType, nativeType == .saitamaSwift {
+                                    Button {
+                                        showsSaitamaPreview = true
+                                    } label: {
+                                        Label("一覧", systemImage: "square.grid.3x3")
+                                    }
+                                    .buttonStyle(.borderless)
+                                    .accessibilityLabel("Saitama.swift #1の全15枚をプレビュー")
+                                    .padding(.trailing, 8)
+                                }
+                            }
                                 .tag(SlideSectionType.slides(type))
                                 // 長押し(macOS は右クリック)で PDF 書き出し。対応デッキ(pdfExportSource を返すもの)だけ出す
                                 .contextMenu {
@@ -199,6 +219,11 @@ public struct SlidysCommonView: View {
                 .sheet(item: $pdfExportRequest) { request in
                     PDFExportSheet(source: request.source)
                 }
+#if !os(iOS)
+                .sheet(isPresented: $showsSaitamaPreview) {
+                    SaitamaSwiftSlidePreviewView()
+                }
+#endif
             }
 #if os(macOS)
             .sheet(item: $selectedSectionType) { type in
@@ -211,21 +236,32 @@ public struct SlidysCommonView: View {
                 }
             }
 #elseif os(iOS)
-            .fullScreenCover(item: $selectedSectionType) { type in
-                switch type {
-                case .slides:
-                    // 閉じる操作は SlideBaseView の発表者メニュー(ナビゲーションバー)に統合されている。
-                    // NavigationStack に載せるのは、iPhone Duo のようにバーが縦向き(画面端)に出る端末でも
-                    // システムが適切な位置へ配置してくれるため(機種別の分岐が不要)。
-                    NavigationStack {
-                        AnyView(type.view)
-                            .environment(\.slideCloseAction) { selectedSectionType = nil }
+            // モーダル用PresentationHostingControllerを通さず、rootの4方向許可を使う。
+            .allowsHitTesting(selectedSectionType == nil && !showsSaitamaPreview)
+            .accessibilityHidden(selectedSectionType != nil || showsSaitamaPreview)
+            .overlay {
+                Group {
+                    if showsSaitamaPreview {
+                        SaitamaSwiftSlidePreviewView(onClose: { showsSaitamaPreview = false })
+                    } else if let type = selectedSectionType {
+                        switch type {
+                        case .slides:
+                            NavigationStack {
+                                AnyView(type.view)
+                                    .environment(\.slideCloseAction) { selectedSectionType = nil }
+                            }
+                        case .info:
+                            ZStack(alignment: .topTrailing) {
+                                type.view
+                                closeButton.padding()
+                            }
+                        }
                     }
-                case .info:
-                    ZStack(alignment: .topTrailing) {
-                        type.view
-                        closeButton
-                            .padding()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background {
+                    if selectedSectionType != nil || showsSaitamaPreview {
+                        Color.slideBackgroundColor.ignoresSafeArea()
                     }
                 }
             }

@@ -20,6 +20,8 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
     case blenderSample
     case taiyakiFocus
     case taiyakiRealityKit
+    case saitamaLandmarks
+    case saitamaSymbolQuiz
     case immersiveSpaceControl
     case yugiohDuelDisk
     /// 2人対戦モード(Vision Pro ↔ iPhone / 1台デモ)。
@@ -30,12 +32,12 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
 
     public static var allCases: [SamplePageType] {
 #if os(visionOS)
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .immersiveSpaceControl, .yugiohDuelDisk, .yugiohDuelMatch, .hitenryuSummon]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .saitamaLandmarks, .saitamaSymbolQuiz, .immersiveSpaceControl, .yugiohDuelDisk, .yugiohDuelMatch, .hitenryuSummon]
 #elseif os(iOS)
         // iOS では対戦モードの 2D ボード(DuelBoardView)だけを出す(ImmersiveSpace 前提のものは除外)。
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .yugiohDuelMatch, .hitenryuSummon]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .saitamaLandmarks, .saitamaSymbolQuiz, .yugiohDuelMatch, .hitenryuSummon]
 #else
-        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .hitenryuSummon]
+        return [.yugiohEffect, .japanSymbolQuizExtra1, .japanSymbolQuizExtra2, .japanSymbolQuizExtra3, .pixelImage, .blenderSample, .taiyakiFocus, .taiyakiRealityKit, .saitamaLandmarks, .saitamaSymbolQuiz, .hitenryuSummon]
 #endif
     }
 
@@ -59,6 +61,10 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             return "Blenderサンプル"
         case .taiyakiFocus:
             return "たい焼きフォーカス"
+        case .saitamaLandmarks:
+            return "Saitama Landmarks RealityKit"
+        case .saitamaSymbolQuiz:
+            return "Saitama Symbol Quiz"
         case .taiyakiRealityKit:
             return "Taiyaki RealityKit"
         case .immersiveSpaceControl:
@@ -118,6 +124,10 @@ public enum SamplePageType: String, CaseIterable, Identifiable, Codable, Equatab
             BlenderSampleView()
         case .taiyakiFocus:
             TaiyakiFocusView()
+        case .saitamaLandmarks:
+            SaitamaLandmarkPreviewView()
+        case .saitamaSymbolQuiz:
+            SaitamaSymbolQuizView()
         case .taiyakiRealityKit:
             TaiyakiRealityKitSampleView()
         case .immersiveSpaceControl:
@@ -165,11 +175,16 @@ struct SamplePageView: View {
                 }
             }
 #elseif os(iOS)
-            .fullScreenCover(item: $selectedType) { type in
-                ZStack(alignment: .topTrailing) {
-                    type.view
-                    closeButton
-                        .padding()
+            .allowsHitTesting(selectedType == nil)
+            .accessibilityHidden(selectedType != nil)
+            .overlay {
+                if let type = selectedType {
+                    ZStack(alignment: .topTrailing) {
+                        type.view
+                        closeButton.padding()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background { Color.slideBackgroundColor.ignoresSafeArea() }
                 }
             }
 #elseif os(visionOS)

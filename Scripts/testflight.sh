@@ -162,7 +162,7 @@ optional_auth() {
     fi
 }
 
-# ---- Flutter 前提チェック(SlidysFlutter は Flutter エンジンと Pods が必要) ----
+# ---- Flutter 前提チェック(Swift Package Manager / 旧 CocoaPods の両方に対応) ----
 check_flutter_prereqs() {
     [ "$TARGET" = "flutter" ] || return 0
     local xcconfig="$PROJECT_ROOT/flutter_slide/.ios/Flutter/Generated.xcconfig"
@@ -183,7 +183,12 @@ MSG
         echo "Flutter engine が未取得です: cd flutter_slide && fvm flutter precache --ios" >&2
         exit 1
     fi
-    if [ ! -f "$PROJECT_ROOT/Apps/SlidysFlutter/Pods/Manifest.lock" ]; then
+    if grep -q 'XCLocalSwiftPackageReference.*FlutterNativeIntegration' "$PROJECT_ROOT/Apps/SlidysFlutter/SlidysFlutter.xcodeproj/project.pbxproj"; then
+        if [ ! -f "$PROJECT_ROOT/flutter_slide/build/ios/SwiftPackages/FlutterNativeIntegration/Package.swift" ]; then
+            echo "Flutter Swift Package が未生成です。Flutter の Swift Package 統合を生成してください。" >&2
+            exit 1
+        fi
+    elif [ ! -f "$PROJECT_ROOT/Apps/SlidysFlutter/Pods/Manifest.lock" ]; then
         echo "Pods が未生成です: cd Apps/SlidysFlutter && pod install" >&2
         exit 1
     fi
@@ -284,7 +289,7 @@ resolve_archive() {
 do_export() {
     optional_auth
     resolve_archive
-    ensure_profiles
+    ensure_profiles || return 1
     echo "==> Export ipa → $EXPORT_DIR"
     write_export_options "$OUT_DIR/ExportOptions-export.plist" export
     xcodebuild -exportArchive \
@@ -300,7 +305,7 @@ do_export() {
 do_upload() {
     require_auth
     resolve_archive
-    ensure_profiles
+    ensure_profiles || return 1
     echo "==> Upload to App Store Connect (build=$BUILD_NUMBER)"
     write_export_options "$OUT_DIR/ExportOptions-upload.plist" upload
     xcodebuild -exportArchive \

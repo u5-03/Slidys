@@ -73,6 +73,8 @@ public struct TaiyakiFocusView: View {
         case fillingOnly
     }
 
+    public enum ModelSource: Sendable { case blender, procedural }
+    private let modelSource: ModelSource
     private let mode: Mode
     /// テキスト・バブルUIの拡大率。スライド埋め込みで遠くから見せる場合は1より大きくする
     private let fontScale: CGFloat
@@ -80,7 +82,8 @@ public struct TaiyakiFocusView: View {
     /// カメラ(z=1.2, fov60°)の見える範囲は高さ約1.4なので、回転の余白込みで0.9程度まで
     private let modelScale: Float
 
-    public init(mode: Mode = .full, fontScale: CGFloat = 1, modelScale: Float = 0.6) {
+    public init(mode: Mode = .full, fontScale: CGFloat = 1, modelScale: Float = 0.6, modelSource: ModelSource = .blender) {
+        self.modelSource = modelSource
         self.mode = mode
         self.fontScale = fontScale
         self.modelScale = modelScale
@@ -176,6 +179,15 @@ public struct TaiyakiFocusView: View {
                 }
             }
         }
+        .onDisappear {
+            // Release the old scene promptly when presenter layouts replace this view.
+            pivotEntity?.stopAllAnimations(recursive: true)
+            pivotEntity?.removeFromParent()
+            pivotEntity = nil
+            sceneEntity = nil
+            anchorLocalPositions = [:]
+            taiyakiBuildTrace("RealityView disappeared scene-released")
+        }
         .onChange(of: selectedFilling) { _, newValue in
             guard let sceneEntity else { return }
             applyFilling(newValue, to: sceneEntity)
@@ -216,6 +228,7 @@ public struct TaiyakiFocusView: View {
 
     private var realityView: some View {
         RealityView { content in
+            taiyakiBuildTrace("RealityView make begin source=\(modelSource)")
 #if !os(visionOS)
             content.camera = .virtual
             let camera = PerspectiveCamera()
@@ -234,24 +247,41 @@ public struct TaiyakiFocusView: View {
             content.add(fillLight)
 
             do {
-                let scene = try await Entity(named: "Taiyaki", in: sugiyBundle)
+                let scene: Entity
+                switch modelSource {
+                case .blender:
+                    scene = try await Entity(named: "Taiyaki", in: sugiyBundle)
+                case .procedural:
+                    scene = try await TaiyakiEntity.make().root
+                }
+                try Task.checkCancellation()
                 applyFilling(selectedFilling, to: scene)
+                // 生成モデルの初期スケールを保ち、両ソースを同じ表示サイズへ正規化。
+                scene.position = .zero
 
                 let rawBounds = scene.visualBounds(relativeTo: nil)
                 let maxExtent = max(rawBounds.extents.x, max(rawBounds.extents.y, rawBounds.extents.z))
                 if maxExtent > 0 {
-                    scene.scale = SIMD3<Float>(repeating: modelScale / maxExtent)
+                    scene.scale *= SIMD3<Float>(repeating: modelScale / maxExtent)
                 }
                 let scaledBounds = scene.visualBounds(relativeTo: nil)
                 scene.position = -scaledBounds.center
 
-                scene.generateCollisionShapes(recursive: true)
+                taiyakiBuildTrace("collision generation begin")
+                // The procedural model already has one root input volume.
+                // Avoid generating redundant convex collision shapes for every mesh.
+                if modelSource == .blender {
+                    scene.generateCollisionShapes(recursive: true)
+                }
+                taiyakiBuildTrace("collision generation end")
                 scene.components.set(InputTargetComponent())
 
                 let pivot = Entity()
                 pivot.name = "TaiyakiFocusPivot"
                 pivot.addChild(scene)
+                taiyakiBuildTrace("content add begin")
                 content.add(pivot)
+                taiyakiBuildTrace("content add end")
 
                 var positions: [TaiyakiPart: SIMD3<Float>] = [:]
                 for part in TaiyakiPart.allCases {
@@ -262,6 +292,8 @@ public struct TaiyakiFocusView: View {
                 anchorLocalPositions = positions
                 pivotEntity = pivot
                 sceneEntity = scene
+            } catch is CancellationError {
+                taiyakiBuildTrace("RealityView make cancelled")
             } catch {
                 loadErrorMessage = "モデルの読み込みに失敗しました\n\(error.localizedDescription)"
             }

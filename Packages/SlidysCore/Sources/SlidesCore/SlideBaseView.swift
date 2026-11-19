@@ -89,12 +89,12 @@ public struct SlideBaseView: View {
     /// 発表者メニューの「ページを選ぶ」で出す一覧
     @State private var showsPagePicker = false
     @Environment(\.supportsMultipleWindows) private var supportsMultipleWindows
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Environment(\.openWindow) private var openWindow
     /// ヒンジが閉じているか(iOS 27.1+ の onHingeChange から取得。非折りたたみ端末や未取得時は nil)
     @State private var isHingeClosed: Bool?
+    @State private var isHingePartiallyOpen = false
     /// 外部ディスプレイ(HDMI / AirPlay)の接続状態とモード
     @ObservedObject private var externalDisplay = ExternalDisplayCoordinator.shared
+    @ObservedObject private var slideCapture = PresenterSlideCapture.shared
     /// iPhone Duo で内側・外側の両ディスプレイを点けるためのダミーのカメラセッション
     @ObservedObject private var dualDisplayCapture = DualDisplayCaptureKeeper.shared
     /// 呼び出し側から渡される「スライドを閉じる」操作(発表者メニューに出す)
@@ -102,55 +102,56 @@ public struct SlideBaseView: View {
     /// 外部ディスプレイ用のスライドに環境値(Flutter の Router など)を付け直す処理(デッキが登録する)
     @Environment(\.externalDisplaySlideDecorator) private var externalDisplaySlideDecorator
 
-    /// 外部ディスプレイにスライドを出し、手元(iPad)にはスピーカーノートを出す状態か。
-    /// iPhone Duo の2画面表示中(外側ディスプレイにスライド)も、内側はノートにする
-    private var showsPresenterNotesForExternalDisplay: Bool {
-        // NOTE: 判定結果の変化は body の onChange でログに出す
-        // 外部出力中はユーザーが選んだ手元の表示モードを優先する。
-        // Duo のカメラセッションは外側画面を維持するため継続するが、ノート表示を強制しない。
-        if externalDisplay.isConnected {
-            return externalDisplay.effectiveMode == .presentation
-        }
-        return dualDisplayCapture.isRunning
+    private var displayRouting: PresenterDisplayRouting {
+        PresenterDisplayRouting(
+            externalConnected: externalDisplay.isConnected,
+            externalPresentation: externalDisplay.effectiveMode == .presentation,
+            duoEnabled: dualDisplayCapture.isRunning,
+            duoMode: dualDisplayCapture.displayMode,
+            capturesOutput: slideCapture.output == .capture
+        )
     }
 
-    /// 外部ディスプレイ接続中の iPhone Duo の内側ディスプレイでは、
-    /// 別Window(SpeakerNotesScene)でノートを開く。未接続ならスライドと同じ画面に並べる。
-    /// - Note: 判定は3段階。
-    ///   1. iPhone idiom かつ supportsMultipleWindows(iPhone Duo 以外の iPhone は false)。
-    ///   2. ヒンジが閉じている(=外側ディスプレイ)なら別Windowにしない。シミュレーターで確認したところ、
-    ///      外側ディスプレイでも supportsMultipleWindows は true で、別Windowを開くとスライドを覆ってしまうため。
-    ///   3. ヒンジ状態が取れない場合は横幅のサイズクラスで代用(内側ディスプレイは regular、外側は compact)。
-    ///   iPad は従来どおりパネル表示。
-    private var opensSpeakerNotesInSeparateWindow: Bool {
-        guard externalDisplay.isConnected,
-              UIDevice.current.userInterfaceIdiom == .phone,
-              supportsMultipleWindows else { return false }
-        if let isHingeClosed { return !isHingeClosed }
-        return horizontalSizeClass == .regular
-    }
+    private var showsPresenterNotesForExternalDisplay: Bool { displayRouting.mainShowsPresenterNotes }
 
     private func toggleSpeakerNotes() {
-        if opensSpeakerNotesInSeparateWindow {
+        if showsPresenterNotesForExternalDisplay {
+            externalDisplay.preferredMode = .mirroring
+            if dualDisplayCapture.isRunning { dualDisplayCapture.displayMode = .mirroredSlides }
             showsSpeakerNotesPanel = false
-            openWindow(id: SpeakerNotesScene.windowID)
+        } else if dualDisplayCapture.isRunning && dualDisplayCapture.displayMode == .innerSlides {
+            dualDisplayCapture.displayMode = .outerSlides
         } else {
+            // Notes requested here always stay in this view; never open another scene.
             showsSpeakerNotesPanel.toggle()
         }
     }
+
 #endif
 
     public var body: some View {
 #if os(iOS)
         GeometryReader { proxy in
-            if showsPresenterNotesForExternalDisplay {
+            if displayRouting.mainMirrorsOuter {
+                PresenterSlideMirrorView()
+            } else if let division = tabletopDivision(in: proxy) {
+                DuoTabletopLayout(division: division) {
+                    presentationBody
+                } controls: {
+                    if showsSpeakerNotesPanel || showsPresenterNotesForExternalDisplay {
+                        SpeakerNotesPanel(slideIndexController: slideIndexController)
+                    } else {
+                        SlideNavigationBar(slideIndexController: slideIndexController)
+                            .padding(24)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.black)
+                    }
+                }
+            } else if showsPresenterNotesForExternalDisplay {
                 externalDisplayPresenterBody
                     // 埋め込みカメラなどで隠れる領域(reserved region の occlusion)にノートが重ならないよう避ける
                     .padding(occlusionInsets(in: proxy))
                     .background(Color.black.ignoresSafeArea())
-                    .onChange(of: occlusionInsets(in: proxy), initial: true) { _, insets in
-                        dualDisplayDebugLog("notes occlusion insets=\(insets) size=\(proxy.size)")
-                    }
             } else if showsSpeakerNotesPanel {
                 if proxy.size.width < proxy.size.height {
                     // 縦長(iPhone Duo の外側ディスプレイなど): 上にスライド、下にスピーカーノート
@@ -171,6 +172,7 @@ public struct SlideBaseView: View {
                 presentationBody
             }
         }
+        .modifier(HingeClosedObserver(isHingeClosed: $isHingeClosed, isPartiallyOpen: $isHingePartiallyOpen))
         .background {
 #if !targetEnvironment(macCatalyst)
             if #available(iOS 27.0, *) {
@@ -185,7 +187,6 @@ public struct SlideBaseView: View {
         // (スライド本体の View はノート表示中に消えるので、ここで登録・解除する)
         .onAppear {
             // スライドを開いたときの言語は、アプリに適用されている言語にする
-            externalDisplay.logDiagnostics(event: "slide appeared")
             languageStore.resetToAppDefault()
             SpeakerNotesSession.shared.attach(
                 slideIndexController,
@@ -235,7 +236,6 @@ public struct SlideBaseView: View {
                 .presentationSizing(.page)
         }
         .onChange(of: showsPresenterNotesForExternalDisplay) { _, showsNotes in
-            dualDisplayDebugLog("inner display shows notes=\(showsNotes) (externalConnected=\(externalDisplay.isConnected) captureRunning=\(dualDisplayCapture.isRunning))")
             refocusForKeyboardNavigation()
         }
         .onChange(of: showsSpeakerNotesPanel) { _, _ in
@@ -249,6 +249,19 @@ public struct SlideBaseView: View {
 
 #if os(iOS)
     /// 画面構成が入れ替わった直後はフォーカスが消えることがあるので、少し待ってから取り直す
+    private func tabletopDivision(in proxy: GeometryProxy) -> CGRect? {
+#if canImport(UIKit, _version: 9127.0.85)
+        if #available(iOS 27.1, *), isHingePartiallyOpen,
+           UIDevice.current.userInterfaceIdiom == .phone {
+            return proxy.reservedRegions(kind: .division)
+                .filter { $0.isActive }
+                .map(\.frame)
+                .first { $0.width > proxy.size.width * 0.5 && $0.height < proxy.size.height * 0.3 && $0.minY > 0 && $0.maxY < proxy.size.height }
+        }
+#endif
+        return nil
+    }
+
     private func refocusForKeyboardNavigation() {
         isFocused = false
         Task { @MainActor in
@@ -295,7 +308,8 @@ public struct SlideBaseView: View {
             // キー入力(クリッカー)は外側の body で一括して受ける
             handlesKeyboardNavigation: false,
             // iPhone Duo の2画面表示中は内側を縦持ちで使う(外側にスライドが出ていて手元からは見えない)
-            usesPortraitPresenterLayout: dualDisplayCapture.isRunning
+            usesPortraitPresenterLayout: dualDisplayCapture.isRunning,
+            interactiveCurrentSlide: displayRouting.interactiveMainPreview
         )
             .background(Color.black)
             .preferredColorScheme(.dark)
@@ -303,101 +317,92 @@ public struct SlideBaseView: View {
 
     /// 発表者メニュー(ナビゲーションバー)。スピーカーノート・外部ディスプレイ・閉じる、をここに集約する
     private var presenterMenu: some View {
-        Menu {
-            if !showsPresenterNotesForExternalDisplay {
-                Button {
-                    toggleSpeakerNotes()
-                } label: {
-                    Label(
-                        showsSpeakerNotesPanel ? "スピーカーノートを閉じる" :
-                            (opensSpeakerNotesInSeparateWindow ? "別ウィンドウでスピーカーノートを開く" : "右側にスピーカーノートを表示"),
-                        systemImage: "note.text"
-                    )
-                }
+        Menu { presenterMenuItems } label: { Image(systemName: "ellipsis.circle") }
+    }
+
+    @ViewBuilder fileprivate var presenterMenuItems: some View {
+            Button {
+                toggleSpeakerNotes()
+            } label: {
+                Label(
+                    (showsSpeakerNotesPanel || showsPresenterNotesForExternalDisplay)
+                        ? "スピーカーノートを閉じる" : "スピーカーノートを表示",
+                    systemImage: "note.text"
+                )
             }
 
-            Section("外部ディスプレイ") {
-                if externalDisplay.isConnected && externalDisplay.effectiveMode == .presentation {
-                    // デモ操作用: 手元にスライドを出す(外部にはその画面が映る)
+            Menu {
+                Button {
+                    slideIndexController.backToFirst()
+                } label: {
+                    Label("最初のスライドへ", systemImage: "arrowshape.turn.up.backward.2")
+                }
+                Button {
+                    showsPagePicker = true
+                } label: {
+                    Label("ページを選ぶ", systemImage: "square.grid.3x3")
+                }
+            } label: {
+                Label("ページ移動", systemImage: "square.grid.3x3")
+            }
+
+            if externalDisplay.isConnected {
+                Menu {
                     Button {
-                        externalDisplay.logDiagnostics(event: "menu: mirroring requested")
+                        showsSpeakerNotesPanel = false
                         externalDisplay.preferredMode = .mirroring
+                        if dualDisplayCapture.isRunning { dualDisplayCapture.displayMode = .mirroredSlides }
                     } label: {
-                        Label("手元にもスライドを表示(操作用)", systemImage: "rectangle.on.rectangle")
+                        Label("手元にもスライドを表示（操作用）", systemImage: "rectangle.on.rectangle")
                     }
-                } else if externalDisplay.isConnected {
-                    // 外部にスライド、手元にノート。デモ操作のあとに戻すときも同じ項目(続きのページから再開)
                     Button {
-                        externalDisplay.logDiagnostics(event: "menu: presentation requested")
                         showsSpeakerNotesPanel = false
                         externalDisplay.preferredMode = .presentation
+                        if dualDisplayCapture.isRunning { dualDisplayCapture.displayMode = .outerSlides }
                     } label: {
-                        Label("外部ディスプレイに出力(手元はノート)", systemImage: "tv")
-                    }
-                } else {
-                    Button {} label: {
-                        Label("外部ディスプレイに出力", systemImage: "tv.slash")
-                    }
-                    .disabled(true)
-                    Text("未接続(HDMI / AirPlay でつなぐと選べます)")
-                }
-            }
-
-            // iPhone Duo: カメラセッション実行中だけ外側ディスプレイも点くので、それを利用して2画面で発表する
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                Section("iPhone Duo 2画面") {
-                    Button {
-                        dualDisplayCapture.toggle()
-                    } label: {
-                        Label(
-                            dualDisplayCapture.isRunning ? "2画面表示を終了(カメラ停止)" : "内側にノート・外側にスライド(カメラ起動)",
-                            systemImage: dualDisplayCapture.isRunning ? "video.slash" : "rectangle.split.2x1"
-                        )
-                    }
-                    if dualDisplayCapture.isRunning {
-                        Button {
-                            dualDisplayCapture.rotatesOuterClockwise.toggle()
-                        } label: {
-                            Label("外側のスライドの上下を反転", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-                        }
-                    }
-                    if let error = dualDisplayCapture.lastError {
-                        Text(error)
-                    }
-                }
-            }
-
-            Button {
-                slideIndexController.backToFirst()
-            } label: {
-                Label("最初のスライドへ", systemImage: "arrowshape.turn.up.backward.2")
-            }
-
-            Button {
-                showsPagePicker = true
-            } label: {
-                Label("ページを選ぶ", systemImage: "square.grid.3x3")
-            }
-
-            // 多言語対応しているデッキだけ、表示言語を切り替えられる
-            if slideConfiguration.supportedLanguages.count > 1 {
-                Picker(selection: $languageStore.language) {
-                    ForEach(slideConfiguration.supportedLanguages) { language in
-                        Text(language.displayName).tag(language)
+                        Label("外部にスライド・手元にノート", systemImage: "tv")
                     }
                 } label: {
-                    Label("言語 / Language", systemImage: "globe")
+                    Label("外部ディスプレイ", systemImage: "tv")
+                }
+            }
+
+            if UIDevice.current.userInterfaceIdiom == .phone && supportsMultipleWindows {
+                DuoDisplayModeMenu()
+            }
+
+            if externalDisplay.isConnected || dualDisplayCapture.isRunning {
+                Picker("スライドの出力方式", selection: $slideCapture.output) {
+                    ForEach(PresenterSlideOutput.allCases) { output in
+                        Text(output.title).tag(output)
+                    }
                 }
                 .pickerStyle(.menu)
             }
 
-            Picker(selection: $speakerNotesControlsOnRight) {
-                Text("左寄せ").tag(false)
-                Text("右寄せ").tag(true)
+            Menu {
+                // 多言語対応しているデッキだけ、表示言語を切り替えられる
+                if slideConfiguration.supportedLanguages.count > 1 {
+                    Picker(selection: $languageStore.language) {
+                        ForEach(slideConfiguration.supportedLanguages) { language in
+                            Text(language.displayName).tag(language)
+                        }
+                    } label: {
+                        Label("言語 / Language", systemImage: "globe")
+                    }
+                    .pickerStyle(.menu)
+                }
+
+                Picker(selection: $speakerNotesControlsOnRight) {
+                    Text("左寄せ").tag(false)
+                    Text("右寄せ").tag(true)
+                } label: {
+                    Label("ノートの操作ボタン配置", systemImage: "hand.point.up.left")
+                }
+                .pickerStyle(.menu)
             } label: {
-                Label("ノートの操作ボタン配置", systemImage: "hand.point.up.left")
+                Label("表示設定", systemImage: "slider.horizontal.3")
             }
-            .pickerStyle(.menu)
 
             if let slideCloseAction {
                 Divider()
@@ -407,13 +412,8 @@ public struct SlideBaseView: View {
                     Label("スライドを閉じる", systemImage: "xmark.circle")
                 }
             }
-        } label: {
-            Image(systemName: "ellipsis.circle")
-        }
-        .simultaneousGesture(TapGesture().onEnded {
-            externalDisplay.logDiagnostics(event: "presenter menu tapped")
-        })
     }
+
 #endif
 
     private var presentationBody: some View {
@@ -552,13 +552,6 @@ public struct SlideBaseView: View {
             return .handled
         }
 #endif
-#if os(iOS)
-        // NOTE: キー入力(クリッカー)の処理とデッキの共有(SpeakerNotesSession.attach/detach)は外側の body 側で行う。
-        // ここ(スライド本体)に付けると、外部ディスプレイ出力で手元がノート表示に切り替わった瞬間に
-        // この View が消えてフォーカスが失われ、戻ってきてもキー入力が届かなくなる
-        // (デッキ共有も同様に onDisappear で解除されてしまう)。
-        .modifier(HingeClosedObserver(isHingeClosed: $isHingeClosed))
-#endif
     }
 }
 
@@ -579,19 +572,13 @@ private struct CameraCaptureDeckAccessory: ViewModifier {
                         CameraCaptureDeckView()
                     }
                 }
-                .onAppear {
-                    dualDisplayDebugLog("CameraCaptureAccessory registered isEnabled=\(dualDisplayCapture.isRunning)")
-                }
-                .onChange(of: dualDisplayCapture.isRunning) { _, isRunning in
-                    dualDisplayDebugLog("CameraCaptureAccessory isEnabled -> \(isRunning)")
-                }
         } else {
             content
-                .onAppear { dualDisplayDebugLog("CameraCaptureAccessory unavailable: iOS < 27.1", isError: true) }
+                .onAppear { dualDisplayError("CameraCaptureAccessory unavailable: iOS < 27.1") }
         }
 #else
         content
-            .onAppear { dualDisplayDebugLog("CameraCaptureAccessory unavailable: built with SDK < 27.1", isError: true) }
+            .onAppear { dualDisplayError("CameraCaptureAccessory unavailable: built with SDK < 27.1") }
 #endif
     }
 }
@@ -602,20 +589,37 @@ private struct CameraCaptureDeckAccessory: ViewModifier {
 private struct CameraCaptureDeckView: View {
     @ObservedObject private var session = SpeakerNotesSession.shared
     @ObservedObject private var dualDisplayCapture = DualDisplayCaptureKeeper.shared
+    @ObservedObject private var slideCapture = PresenterSlideCapture.shared
 
     var body: some View {
         GeometryReader { proxy in
-            // OS が外側の Scene を横長で渡してきたとき(端末の向きで 678x466 に変わる)は回さない。
-            // 縦長のときだけ、幅と高さを入れ替えた枠で描いてから 90° 回して横向きに見せる
-            let needsRotation = proxy.size.height > proxy.size.width
+            let showsNotes = dualDisplayCapture.displayMode == .innerSlides
+            let needsRotation = !showsNotes && proxy.size.height > proxy.size.width
             Group {
                 if let presentation = session.presentation {
-                    ExternalDisplayDeckView(
-                        slideIndexController: presentation.slideIndexController,
-                        slideTheme: presentation.slideTheme,
-                        decorator: presentation.externalDisplaySlideDecorator,
-                        mirrorsInteractiveSlides: false
-                    )
+                    if showsNotes {
+                        NavigationStack {
+                            SpeakerNotesView(
+                                slideIndexController: presentation.slideIndexController,
+                                slideTheme: presentation.slideTheme,
+                                usesPortraitPresenterLayout: true,
+                                interactiveCurrentSlide: slideCapture.output == .capture
+                            )
+                            .toolbar {
+                                ToolbarItem(placement: .topBarTrailing) { DuoDisplayModeMenu() }
+                            }
+                        }
+                        .preferredColorScheme(.dark)
+                    } else if dualDisplayCapture.displayMode == .mirroredSlides || slideCapture.output == .capture {
+                        PresenterSlideMirrorView()
+                    } else {
+                        ExternalDisplayDeckView(
+                            slideIndexController: presentation.slideIndexController,
+                            slideTheme: presentation.slideTheme,
+                            decorator: presentation.externalDisplaySlideDecorator,
+                            mirrorsInteractiveSlides: false
+                        )
+                    }
                 } else {
                     Color.black
                 }
@@ -626,25 +630,55 @@ private struct CameraCaptureDeckView: View {
             )
             .rotationEffect(.degrees(needsRotation ? (dualDisplayCapture.rotatesOuterClockwise ? 90 : -90) : 0))
             .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
-            .onChange(of: proxy.size, initial: true) { _, size in
-                dualDisplayDebugLog("CameraCaptureDeckView layout size=\(size) rotates=\(size.height > size.width)")
-            }
         }
         .background(Color.black)
         .ignoresSafeArea()
         .statusBarHidden(true)
-        // 外側ディスプレイに実際に描かれたか(= OS が accessory を表示したか)の確認用
-        .background(
-            GeometryReader { proxy in
-                Color.clear
-                    .onAppear {
-                        dualDisplayDebugLog("CameraCaptureDeckView appeared size=\(proxy.size) hasDeck=\(session.presentation != nil)")
-                    }
-                    .onDisappear { dualDisplayDebugLog("CameraCaptureDeckView disappeared") }
-            }
-        )
     }
 }
+
+/// Shared by the inner menu and the presenter's outer-display notes.
+private struct DuoDisplayModeMenu: View {
+    @ObservedObject private var keeper = DualDisplayCaptureKeeper.shared
+    @ObservedObject private var capture = PresenterSlideCapture.shared
+
+    var body: some View {
+        Menu {
+            ForEach(DuoDisplayMode.allCases) { mode in
+                Button {
+                    keeper.start(mode: mode)
+                } label: {
+                    if keeper.isRunning && keeper.displayMode == mode {
+                        Label(mode.title, systemImage: "checkmark")
+                    } else {
+                        Text(mode.title)
+                    }
+                }
+            }
+            if keeper.isRunning {
+                Divider()
+                if keeper.displayMode != .mirroredSlides {
+                    Picker("スライドの出力方式", selection: $capture.output) {
+                        ForEach(PresenterSlideOutput.allCases) { output in
+                            Text(output.title).tag(output)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+                if keeper.displayMode != .innerSlides {
+                    Button("外側のスライドの上下を反転", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
+                        keeper.rotatesOuterClockwise.toggle()
+                    }
+                }
+                Button("2画面表示を終了", systemImage: "video.slash") { keeper.stop() }
+            }
+            if let error = keeper.lastError { Text(error) }
+        } label: {
+            Label("iPhone Duo", systemImage: "rectangle.split.2x1")
+        }
+    }
+}
+
 #endif
 
 #if os(iOS)
@@ -654,12 +688,14 @@ private struct CameraCaptureDeckView: View {
 ///   SDK の有無は UIKit のモジュールバージョン(27.0 = 9127.0.84、27.1 = 9127.0.85)で見分ける。
 private struct HingeClosedObserver: ViewModifier {
     @Binding var isHingeClosed: Bool?
+    @Binding var isPartiallyOpen: Bool
 
     func body(content: Content) -> some View {
 #if canImport(UIKit, _version: 9127.0.85)
         if #available(iOS 27.1, *) {
             content.onHingeChange { _, context in
                 isHingeClosed = context.hinge.map { $0.status == .closed }
+                isPartiallyOpen = context.hinge?.status == .partiallyOpen
             }
         } else {
             content
@@ -723,3 +759,35 @@ private extension SlideBaseView {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 }
+
+#if os(iOS)
+@MainActor private struct PresenterControlsPreviewConfiguration: SlideConfigurationProtocol {
+    let slideIndexController = SlideIndexController {
+        CenterTextSlide(text: "操作するスライド", script: "ここに発表者のノートを表示します。スライドを操作しても聴衆にはノートを出しません。")
+        CenterTextSlide(text: "次のスライド", script: "次のページのノートです。")
+    }
+}
+
+#Preview("発表者メニューの項目", traits: .fixedLayout(width: 400, height: 500)) {
+    NavigationStack {
+        List {
+            SlideBaseView(slideConfiguration: PresenterControlsPreviewConfiguration()).presenterMenuItems
+        }
+        .navigationTitle("発表者メニュー")
+    }
+    .environment(\.slideCloseAction, {})
+}
+
+#Preview("Duo外側のノート", traits: .fixedLayout(width: 678, height: 466)) {
+    NavigationStack {
+        SpeakerNotesView(
+            slideIndexController: PresenterControlsPreviewConfiguration().slideIndexController,
+            slideTheme: CustomSlideTheme(showSlideIndex: false, listTextStyle: .large),
+            usesPortraitPresenterLayout: true,
+            interactiveCurrentSlide: true
+        )
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { DuoDisplayModeMenu() } }
+    }
+    .preferredColorScheme(.dark)
+}
+#endif

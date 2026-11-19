@@ -20,16 +20,9 @@ import UIKit
 
 private let dualDisplayLog = Logger(subsystem: "Slidys", category: "DualDisplay")
 
-/// 検証用ログの共通 prefix。Xcode のコンソールで「[DuoDual]」と入れて絞り込む
-let dualDisplayLogPrefix = "[DuoDual]"
-
-/// iPhone Duo 2画面表示の検証用ログ。Xcode のコンソールと Console.app(subsystem: Slidys / category: DualDisplay)の両方に出る
-func dualDisplayDebugLog(_ message: String, isError: Bool = false) {
-    if isError {
-        dualDisplayLog.error("\(dualDisplayLogPrefix, privacy: .public) \(message, privacy: .public)")
-    } else {
-        dualDisplayLog.info("\(dualDisplayLogPrefix, privacy: .public) \(message, privacy: .public)")
-    }
+/// Camera failures remain visible without the former rotation investigation noise.
+func dualDisplayError(_ message: String) {
+    dualDisplayLog.error("[DuoCamera] \(message, privacy: .public)")
 }
 
 @MainActor
@@ -43,10 +36,13 @@ public final class DualDisplayCaptureKeeper: ObservableObject {
     /// 外側ディスプレイ(縦長)のスライドを横向きにするための回転方向。
     /// 端末の持ち方で上下が逆になるので、発表者メニューから反転できる
     @Published public var rotatesOuterClockwise = true
+    @Published public var displayMode: DuoDisplayMode = .outerSlides {
+        didSet { PresenterSlideCapture.shared.diagnostics("duo-mode old=\(oldValue.rawValue) new=\(displayMode.rawValue)") }
+    }
 
     /// アプリが許可する画面の向き(SlidysAppDelegate が返す)。
-    /// 2画面表示中は内側ディスプレイを縦持ち前提にするため縦に固定する
-    public private(set) var supportedInterfaceOrientations: UIInterfaceOrientationMask = .all
+    /// 2画面表示の開始・終了によって回転を制限しない。
+    public let supportedInterfaceOrientations: UIInterfaceOrientationMask = .all
 
     private let session = AVCaptureSession()
     /// AVCaptureSession の startRunning / stopRunning はブロックするので専用キューで呼ぶ
@@ -54,68 +50,54 @@ public final class DualDisplayCaptureKeeper: ObservableObject {
     private let sampleBufferDelegate = DiscardingSampleBufferDelegate()
     private var isConfigured = false
     private var observers: [NSObjectProtocol] = []
+    private var startTask: Task<Void, Never>?
+    private var startRequestID = UUID()
 
     private init() {}
 
     public func toggle() {
-        dualDisplayDebugLog("toggle isRunning=\(isRunning) iOS=\(UIDevice.current.systemVersion) model=\(UIDevice.current.model)")
         if isRunning { stop() } else { start() }
     }
 
-    public func start() {
-        guard !isRunning else { return }
+    public func start(mode: DuoDisplayMode? = nil) {
+        if let mode { displayMode = mode }
+        guard !isRunning, startTask == nil else { return }
         lastError = nil
-        Task {
+        let requestID = UUID()
+        startRequestID = requestID
+        startTask = Task {
+            defer { if startRequestID == requestID { startTask = nil } }
             let granted = await requestCameraAccess()
-            dualDisplayDebugLog("camera access granted=\(granted) status=\(AVCaptureDevice.authorizationStatus(for: .video).rawValue)")
+            guard !Task.isCancelled else { return }
             guard granted else {
                 lastError = "カメラへのアクセスが許可されていません"
                 return
             }
             guard configureIfNeeded() else {
-                dualDisplayDebugLog("configure failed: \(lastError ?? "-")", isError: true)
+                dualDisplayError("configure failed: \(lastError ?? "-")")
                 return
             }
             observeSessionAndScenes()
             let session = session
             sessionQueue.async {
                 session.startRunning()
-                dualDisplayDebugLog("startRunning finished session.isRunning=\(session.isRunning)")
             }
             isRunning = true
-            lockInnerDisplayOrientation(.portrait)
-            dualDisplayDebugLog("capture session start requested")
-            logScenes(reason: "start")
         }
     }
 
     public func stop() {
+        startTask?.cancel()
+        startTask = nil
+        startRequestID = UUID()
         guard isRunning else { return }
         let session = session
         sessionQueue.async {
             session.stopRunning()
-            dualDisplayDebugLog("stopRunning finished session.isRunning=\(session.isRunning)")
         }
         isRunning = false
-        lockInnerDisplayOrientation(.all)
         observers.forEach(NotificationCenter.default.removeObserver)
         observers.removeAll()
-        dualDisplayDebugLog("capture session stop requested")
-    }
-
-    /// 内側ディスプレイ(アプリ本体の Scene)の向きを固定 / 解除する
-    private func lockInnerDisplayOrientation(_ mask: UIInterfaceOrientationMask) {
-        supportedInterfaceOrientations = mask
-        let scenes = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .filter { $0.session.role == .windowApplication }
-        for scene in scenes {
-            scene.keyWindow?.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()
-            scene.requestGeometryUpdate(.iOS(interfaceOrientations: mask)) { error in
-                dualDisplayDebugLog("requestGeometryUpdate failed: \(error.localizedDescription)", isError: true)
-            }
-        }
-        dualDisplayDebugLog("inner orientation lock -> \(mask == .portrait ? "portrait" : "all")")
     }
 
     private func requestCameraAccess() async -> Bool {
@@ -154,7 +136,6 @@ public final class DualDisplayCaptureKeeper: ObservableObject {
             }
             session.addInput(input)
             session.addOutput(output)
-            dualDisplayDebugLog("configured device=\(device.localizedName) position=\(device.position.rawValue) preset=\(session.sessionPreset.rawValue)")
             isConfigured = true
             return true
         } catch {
@@ -170,29 +151,14 @@ public final class DualDisplayCaptureKeeper: ObservableObject {
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: AVCaptureSession.wasInterruptedNotification, object: session, queue: .main) { notification in
             let reason = (notification.userInfo?[AVCaptureSessionInterruptionReasonKey] as? Int) ?? -1
-            dualDisplayDebugLog("capture session interrupted reason=\(reason)", isError: true)
-        })
-        observers.append(center.addObserver(forName: AVCaptureSession.interruptionEndedNotification, object: session, queue: .main) { _ in
-            dualDisplayDebugLog("capture session interruption ended")
+            dualDisplayError("capture session interrupted reason=\(reason)")
         })
         observers.append(center.addObserver(forName: AVCaptureSession.runtimeErrorNotification, object: session, queue: .main) { notification in
             let error = notification.userInfo?[AVCaptureSessionErrorKey] as? Error
-            dualDisplayDebugLog("capture session runtime error \(error?.localizedDescription ?? "-")", isError: true)
+            dualDisplayError("capture session runtime error \(error?.localizedDescription ?? "-")")
         })
-        for name in [UIScene.willConnectNotification, UIScene.didDisconnectNotification] {
-            observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] notification in
-                let reason = notification.name.rawValue
-                MainActor.assumeIsolated { self?.logScenes(reason: reason) }
-            })
-        }
     }
 
-    private func logScenes(reason: String) {
-        for scene in UIApplication.shared.connectedScenes {
-            let windowScene = scene as? UIWindowScene
-            dualDisplayDebugLog("[\(reason)] scene role=\(scene.session.role.rawValue) state=\(scene.activationState.rawValue) screen=\(windowScene?.screen.bounds.debugDescription ?? "-")")
-        }
-    }
 }
 
 /// 映像は使わないので、届いたフレームは何もせず捨てる
