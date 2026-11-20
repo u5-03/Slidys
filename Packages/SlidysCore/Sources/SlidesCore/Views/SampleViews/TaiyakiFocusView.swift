@@ -126,6 +126,7 @@ public struct TaiyakiFocusView: View {
     private var bubbleHeight: CGFloat { 54 * fontScale }
 
     @Environment(\.isSlideThumbnail) private var isSlideThumbnail
+    @Environment(\.displayScale) private var displayScale
 
     public var body: some View {
         // スライド一覧のサムネイルではRealityViewを起動せず、プレースホルダーだけ出す
@@ -143,6 +144,7 @@ public struct TaiyakiFocusView: View {
 
     private var mainContent: some View {
         GeometryReader { proxy in
+            let renderScale = RealityViewRenderBudget.scale(size: proxy.size, displayScale: displayScale)
             ZStack {
                 Color.black.ignoresSafeArea()
 
@@ -153,7 +155,16 @@ public struct TaiyakiFocusView: View {
                         .multilineTextAlignment(.center)
                         .padding()
                 } else {
+                    // SlideKit scales a 1920-point slide after layout. Without
+                    // bounding the native surface, a 3x device can allocate a
+                    // roughly 5760-pixel render target even for a small preview.
                     realityView
+                        .frame(width: proxy.size.width * renderScale, height: proxy.size.height * renderScale)
+                        .scaleEffect(1 / renderScale)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .onAppear {
+                            taiyakiBuildTrace("render-budget logical=\(proxy.size) displayScale=\(displayScale) renderScale=\(renderScale) estimatedPixels=\(CGSize(width: proxy.size.width * renderScale * displayScale, height: proxy.size.height * renderScale * displayScale))")
+                        }
 
                     if mode == .full, focusedPart == nil && !isTransitioning {
                         anchorBubbles(in: proxy.size)
@@ -180,13 +191,12 @@ public struct TaiyakiFocusView: View {
             }
         }
         .onDisappear {
-            // Release the old scene promptly when presenter layouts replace this view.
+            // A hosting controller or system sheet may temporarily hide a live
+            // RealityView. Removing its root here leaves that reused renderer empty
+            // because RealityView's make closure need not run again on reappearance.
             pivotEntity?.stopAllAnimations(recursive: true)
-            pivotEntity?.removeFromParent()
-            pivotEntity = nil
-            sceneEntity = nil
-            anchorLocalPositions = [:]
-            taiyakiBuildTrace("RealityView disappeared scene-released")
+            lastDragTranslation = .zero
+            taiyakiBuildTrace("RealityView disappeared animations-stopped; scene-owned-by-view")
         }
         .onChange(of: selectedFilling) { _, newValue in
             guard let sceneEntity else { return }
@@ -282,6 +292,12 @@ public struct TaiyakiFocusView: View {
                 taiyakiBuildTrace("content add begin")
                 content.add(pivot)
                 taiyakiBuildTrace("content add end")
+#if os(iOS)
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(1))
+                    PresenterRenderDiagnostics.reportMetalSurfaces(reason: "taiyaki-loaded")
+                }
+#endif
 
                 var positions: [TaiyakiPart: SIMD3<Float>] = [:]
                 for part in TaiyakiPart.allCases {
@@ -514,4 +530,16 @@ public struct TaiyakiFocusView: View {
 
 #Preview {
     TaiyakiFocusView()
+}
+
+import Foundation
+import CoreGraphics
+
+/// Bound the native RealityView surface before SlideKit scales the logical slide.
+enum RealityViewRenderBudget {
+    static func scale(size: CGSize, displayScale: CGFloat) -> CGFloat {
+        let edge = max(size.width, size.height)
+        guard edge.isFinite, edge > 0, displayScale.isFinite, displayScale > 0 else { return 1 }
+        return min(1, 1920 / (edge * displayScale))
+    }
 }

@@ -2,15 +2,23 @@ import SlideKit
 import SlidesCore
 import SwiftUI
 import WebKit
+import OSLog
 
 /// 投稿ページのアプリ誘導モーダルを避け、公式の埋め込みウィジェットを表示する。
 @Slide struct SaitamaTweetSlide: View {
+    @Environment(\.isSlideThumbnail) private var isThumbnail
     var transition: AnyTransition { SlideTransition.defaultTransition }
     var script: String { "Apple Storeのデモのように、3Dモデルの気になる部分へフォーカスする見せ方です。" }
     var body: some View {
         GeometryReader { proxy in
-            EmbeddedSaitamaTweet()
-                .background(.black)
+            Group {
+                if isThumbnail {
+                    EmbeddedContentPlaceholder(title: "Apple Storeの3Dデモ", systemImage: "play.rectangle", caption: "投稿の動画")
+                } else {
+                    EmbeddedSaitamaTweet()
+                }
+            }
+                .background(Color.slideBackgroundColor)
                 // Keep the shared corner navigation regions outside the interactive post.
                 .overlay {
                     Color.clear
@@ -22,13 +30,15 @@ import WebKit
     }
 }
 
+private let tweetLog = Logger(subsystem: "Slidys", category: "PresenterCapture")
+
 private enum TweetDocument {
     static let html = """
     <!doctype html><html lang="ja"><head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="twitter:dnt" content="on">
     <style>
-      html,body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; color:#fff; }
+      html,body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:transparent; color:#fff; }
       #post { position:absolute; top:0; left:0; width:550px; transform-origin:top left; }
       #post iframe { margin:0 !important; }
       blockquote { margin:0; }
@@ -70,19 +80,35 @@ private enum TweetDocument {
         let config = WKWebViewConfiguration()
 #if os(iOS) || os(visionOS)
         config.allowsInlineMediaPlayback = true
+        // Keep one inline player on the source display. Do not let WebKit move
+        // playback to a separate AirPlay/PiP presentation while mirroring the app.
+        config.allowsAirPlayForMediaPlayback = false
+        config.allowsPictureInPictureMediaPlayback = false
         config.mediaTypesRequiringUserActionForPlayback = []
 #endif
         let view = WKWebView(frame: .zero, configuration: config)
         view.navigationDelegate = delegate
+        view.underPageBackgroundColor = .clear
 #if os(iOS) || os(visionOS)
         view.isOpaque = false
 #endif
+        tweetLog.notice("[PresenterCapture] tweet webview-created inline=true airplay=false pip=false")
         view.loadHTMLString(html, baseURL: URL(string: "https://ulog.sugiy.com/"))
         return view
     }
 }
 
 private final class TweetNavigationDelegate: NSObject, WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        tweetLog.notice("[PresenterCapture] tweet document-loaded")
+    }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
+        let detail = error as NSError
+        tweetLog.error("[PresenterCapture] tweet load-failed domain=\(detail.domain, privacy: .public) code=\(detail.code)")
+    }
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        tweetLog.error("[PresenterCapture] tweet web-content-process-terminated")
+    }
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         // 投稿の動画は埋め込み内で再生し、リンクから投稿ページやXアプリへ遷移させない。
@@ -101,6 +127,12 @@ private struct EmbeddedSaitamaTweet: UIViewRepresentable {
     func makeCoordinator() -> TweetNavigationDelegate { TweetNavigationDelegate() }
     func makeUIView(context: Context) -> WKWebView { TweetDocument.makeWebView(delegate: context.coordinator) }
     func updateUIView(_ view: WKWebView, context: Context) {}
+    static func dismantleUIView(_ view: WKWebView, coordinator: TweetNavigationDelegate) {
+        view.pauseAllMediaPlayback(completionHandler: {})
+        view.stopLoading()
+        view.navigationDelegate = nil
+        tweetLog.notice("[PresenterCapture] tweet webview-dismantled playback-paused")
+    }
 }
 #elseif os(macOS)
 private struct EmbeddedSaitamaTweet: NSViewRepresentable {

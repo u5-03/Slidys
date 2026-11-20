@@ -28,7 +28,7 @@ import UIKit
 #if os(iOS)
             AudienceCameraView()
                 .padding(32)
-                .background(.black)
+                .background(Color.slideBackgroundColor)
                 .excludesFromSlideTapNavigation()
 #else
             Text("会場撮影はiPhone / iPadで利用できます")
@@ -38,11 +38,26 @@ import UIKit
 }
 
 #if os(iOS)
-private final class AudienceCamera: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
-    let session = AVCaptureSession()
-    private let queue = DispatchQueue(label: "Slidys.SaitamaAudienceCamera")
-    private let output = AVCapturePhotoOutput()
-    private var configured = false
+@MainActor
+private final class AudienceCamera: NSObject, ObservableObject {
+    private lazy var worker = AudienceCameraWorker(
+        onRunning: { [weak self] running, message in
+            guard let self, self.wantsRunning else { return }
+            self.running = running
+            self.message = message
+        },
+        onPhoto: { [weak self] data, message in
+            guard let self else { return }
+            if let data, let image = UIImage(data: data) {
+                self.photo = image
+                AudiencePhotoStore.shared.photo = image
+            }
+            self.capturing = false
+            self.message = message
+        }
+    )
+    var session: AVCaptureSession { worker.session }
+    private var wantsRunning = false
     var captureAngle: CGFloat = 0
     @Published var photo: UIImage?
     @Published var message = "カメラを開始すると、ここに会場を表示します"
@@ -50,65 +65,102 @@ private final class AudienceCamera: NSObject, ObservableObject, AVCapturePhotoCa
     @Published var capturing = false
 
     func start() {
+        wantsRunning = true
         Task { @MainActor in
             let allowed = await AVCaptureDevice.requestAccess(for: .video)
+            guard wantsRunning else { return }
             guard allowed else {
                 message = "カメラを利用できません。設定でアクセスを許可してください。"
                 return
             }
-            queue.async { [self] in
-                do {
-                    if !configured {
-                        session.beginConfiguration()
-                        defer { session.commitConfiguration() }
-                        session.sessionPreset = .photo
-                        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
-                            throw CameraError.unavailable
-                        }
-                        let input = try AVCaptureDeviceInput(device: device)
-                        guard session.canAddInput(input), session.canAddOutput(output) else { throw CameraError.unavailable }
-                        session.addInput(input)
-                        session.addOutput(output)
-                        configured = true
-                    }
-                    session.startRunning()
-                    DispatchQueue.main.async { self.running = self.session.isRunning; self.message = self.session.isRunning ? "" : "カメラを開始できませんでした" }
-                } catch {
-                    DispatchQueue.main.async { self.message = "カメラを開始できませんでした：\(error.localizedDescription)" }
-                }
-            }
+            worker.start()
         }
     }
     func stop() {
+        wantsRunning = false
         running = false
-        queue.async { self.session.stopRunning() }
+        worker.stop()
     }
     func shoot() {
         guard running, !capturing else { return }
         capturing = true
-        let angle = captureAngle
-        queue.async {
-            if let connection = self.output.connection(with: .video), connection.isVideoRotationAngleSupported(angle) {
+        worker.shoot(angle: captureAngle)
+    }
+}
+
+/// AVFoundation and mutable configuration are confined to this serial queue.
+/// Only Sendable values and main-actor callbacks cross back into the UI.
+private final class AudienceCameraWorker: NSObject, @unchecked Sendable, AVCapturePhotoCaptureDelegate {
+    let session = AVCaptureSession()
+    private let queue = DispatchQueue(label: "Slidys.SaitamaAudienceCamera")
+    private let output = AVCapturePhotoOutput()
+    private var configured = false
+    private let onRunning: @MainActor @Sendable (Bool, String) -> Void
+    private let onPhoto: @MainActor @Sendable (Data?, String) -> Void
+
+    init(onRunning: @escaping @MainActor @Sendable (Bool, String) -> Void,
+         onPhoto: @escaping @MainActor @Sendable (Data?, String) -> Void) {
+        self.onRunning = onRunning
+        self.onPhoto = onPhoto
+        super.init()
+    }
+
+    func start() {
+        queue.async { [self] in
+            do {
+                if !configured {
+                    session.beginConfiguration()
+                    defer { session.commitConfiguration() }
+                    session.sessionPreset = .photo
+                    guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+                        throw CameraError.unavailable
+                    }
+                    let input = try AVCaptureDeviceInput(device: device)
+                    guard session.canAddInput(input), session.canAddOutput(output) else { throw CameraError.unavailable }
+                    session.addInput(input)
+                    session.addOutput(output)
+                    configured = true
+                }
+                session.startRunning()
+                let running = session.isRunning
+                Task { @MainActor in onRunning(running, running ? "" : "カメラを開始できませんでした") }
+            } catch {
+                let message = "カメラを開始できませんでした：\(error.localizedDescription)"
+                Task { @MainActor in onRunning(false, message) }
+            }
+        }
+    }
+    func stop() {
+        queue.async { self.session.stopRunning() }
+    }
+    func shoot(angle: CGFloat) {
+        queue.async { [self] in
+            if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(angle) {
                 connection.videoRotationAngle = angle
             }
-            self.output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
+            output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
         }
     }
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        guard error == nil, let data = photo.fileDataRepresentation(), let originalImage = UIImage(data: data) else {
-            DispatchQueue.main.async { self.capturing = false; self.message = "撮影できませんでした。もう一度お試しください。" }
+        guard error == nil, let data = photo.fileDataRepresentation() else {
+            Task { @MainActor in onPhoto(nil, "撮影できませんでした。もう一度お試しください。") }
             return
         }
-        let image = originalImage.audienceWidePhoto()
-        var saveMessage = ""
-        do {
-            let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent("SaitamaAudiencePhotos", isDirectory: true)
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            guard let wideData = image.jpegData(compressionQuality: 0.95) else { throw CameraError.unavailable }
-            try wideData.write(to: directory.appendingPathComponent("\(UUID().uuidString).jpg"), options: .atomic)
-        } catch { saveMessage = "撮影しましたが、保存できませんでした" }
-        let result = saveMessage
-        DispatchQueue.main.async { self.photo = image; AudiencePhotoStore.shared.photo = image; self.capturing = false; self.message = result }
+        queue.async { [self] in
+            guard let image = UIImage(data: data)?.audienceWidePhoto(),
+                  let wideData = image.jpegData(compressionQuality: 0.95) else {
+                Task { @MainActor in onPhoto(nil, "撮影できませんでした。もう一度お試しください。") }
+                return
+            }
+            var saveMessage = ""
+            do {
+                let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent("SaitamaAudiencePhotos", isDirectory: true)
+                try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+                try wideData.write(to: directory.appendingPathComponent("\(UUID().uuidString).jpg"), options: .atomic)
+            } catch { saveMessage = "撮影しましたが、保存できませんでした" }
+            let message = saveMessage
+            Task { @MainActor in onPhoto(wideData, message) }
+        }
     }
     private enum CameraError: Error { case unavailable }
 }
@@ -133,12 +185,15 @@ private final class AudiencePreviewUIView: UIView {
         let coordinator = AVCaptureDevice.RotationCoordinator(device: input.device, previewLayer: previewLayer)
         rotationCoordinator = coordinator
         previewObservation = coordinator.observe(\.videoRotationAngleForHorizonLevelPreview, options: [.initial, .new]) { [weak self] coordinator, _ in
-            guard let connection = self?.previewLayer.connection else { return }
             let angle = coordinator.videoRotationAngleForHorizonLevelPreview
-            if connection.isVideoRotationAngleSupported(angle) { connection.videoRotationAngle = angle }
+            Task { @MainActor [weak self] in
+                guard let connection = self?.previewLayer.connection else { return }
+                if connection.isVideoRotationAngleSupported(angle) { connection.videoRotationAngle = angle }
+            }
         }
         captureObservation = coordinator.observe(\.videoRotationAngleForHorizonLevelCapture, options: [.initial, .new]) { [weak self] coordinator, _ in
-            self?.onCaptureAngle?(coordinator.videoRotationAngleForHorizonLevelCapture)
+            let angle = coordinator.videoRotationAngleForHorizonLevelCapture
+            Task { @MainActor [weak self] in self?.onCaptureAngle?(angle) }
         }
     }
 }
@@ -156,10 +211,11 @@ private struct AudienceCameraPreview: UIViewRepresentable {
         proposal.replacingUnspecifiedDimensions()
     }
 }
+@MainActor
 private struct AudienceCameraView: View {
     @StateObject private var camera: AudienceCamera
-    init(camera: AudienceCamera = AudienceCamera()) {
-        _camera = StateObject(wrappedValue: camera)
+    init(camera: AudienceCamera? = nil) {
+        _camera = StateObject(wrappedValue: camera ?? AudienceCamera())
     }
     var body: some View {
         GeometryReader { proxy in
@@ -213,7 +269,7 @@ private struct AudienceCameraView: View {
     var body: some View {
         AudienceCameraView(camera: camera)
             .padding(32)
-            .background(.black)
+            .background(Color.slideBackgroundColor)
             // Mount the actual AVCaptureVideoPreviewLayer without requesting camera access.
             .onAppear { camera.running = true }
     }

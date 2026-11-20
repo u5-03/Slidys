@@ -102,7 +102,7 @@ struct SpeakerNotesView: View {
     @ObservedObject private var session = SpeakerNotesSession.shared
 #if os(iOS)
     @ObservedObject private var slideCapture = PresenterSlideCapture.shared
-    private var capturesCurrentSlide: Bool { interactiveCurrentSlide ?? (slideCapture.output == .capture) }
+    private var capturesCurrentSlide: Bool { interactiveCurrentSlide ?? (slideCapture.output.usesCapturedSlides) }
 #else
     private var capturesCurrentSlide: Bool { false }
 #endif
@@ -264,7 +264,7 @@ struct SpeakerNotesView: View {
             }
 
             // クリッカー無しでも進められるよう、ノート画面自体に左右のページ送りボタンを置く
-            SlideNavigationBar(slideIndexController: slideIndexController)
+            SlideNavigationBar(slideIndexController: slideIndexController, compact: availableSize.width < 400)
         }
         .padding(20)
 #if os(macOS)
@@ -460,7 +460,6 @@ struct SlideNavigationBar: View {
         Text("\(slideIndexController.currentIndex + 1) / \(slideIndexController.slides.count)")
             .font(.system(size: compact ? 18 : 24, weight: .bold, design: .monospaced))
             .fixedSize()
-            .frame(maxWidth: .infinity, alignment: controlsOnRight ? .leading : .trailing)
     }
 
     private var navigationButtons: some View {

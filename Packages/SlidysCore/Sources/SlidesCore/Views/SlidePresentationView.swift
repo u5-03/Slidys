@@ -16,13 +16,24 @@ import SwiftUI
 struct SlidePresentationView<Content: View>: View {
     let slideSize: CGSize
     @ViewBuilder let content: () -> Content
+    @ObservedObject private var capture = PresenterSlideCapture.shared
+    @ObservedObject private var duo = DualDisplayCaptureKeeper.shared
+    private var needsCapture: Bool {
+        capture.output.usesCapturedSlides || (duo.isRunning && duo.displayMode == .mirroredSlides)
+    }
 
     var body: some View {
         ZStack(alignment: .center) {
             Color.slideDefaultBackground
                 .ignoresSafeArea()
             SlideScreen(slideSize: slideSize) {
-                PresenterSlideCaptureSurface { content() }
+                Group {
+                    if needsCapture {
+                        PresenterSlideCaptureSurface { content() }
+                    } else {
+                        content()
+                    }
+                }
             }
             .clipped()
             .aspectRatio(slideSize, contentMode: .fit)

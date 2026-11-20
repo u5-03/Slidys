@@ -108,13 +108,18 @@ public struct SlideBaseView: View {
             externalPresentation: externalDisplay.effectiveMode == .presentation,
             duoEnabled: dualDisplayCapture.isRunning,
             duoMode: dualDisplayCapture.displayMode,
-            capturesOutput: slideCapture.output == .capture
+            capturesOutput: slideCapture.output.usesCapturedSlides
         )
     }
 
     private var showsPresenterNotesForExternalDisplay: Bool { displayRouting.mainShowsPresenterNotes }
 
     private func toggleSpeakerNotes() {
+        if externalDisplay.effectiveMode == .systemMirroring {
+            showsSpeakerNotesPanel = false
+            externalDisplay.finishSystemMirroringDemo()
+            return
+        }
         if showsPresenterNotesForExternalDisplay {
             externalDisplay.preferredMode = .mirroring
             if dualDisplayCapture.isRunning { dualDisplayCapture.displayMode = .mirroredSlides }
@@ -315,6 +320,37 @@ public struct SlideBaseView: View {
             .preferredColorScheme(.dark)
     }
 
+    @ViewBuilder
+    fileprivate var externalDisplayMenuItems: some View {
+                    Button {
+                        showsSpeakerNotesPanel = false
+                        externalDisplay.beginPresenterCaptureDemo()
+                    } label: {
+                        Label("操作デモ（Duo維持・試験）", systemImage: "play.rectangle")
+                    }
+                    Button {
+                        showsSpeakerNotesPanel = false
+                        externalDisplay.finishSystemMirroringDemo()
+                    } label: {
+                        Label("外部にスライド・手元にノート（通常）", systemImage: "note.text")
+                    }
+                    Menu("その他・緊急用") {
+                        Button {
+                            showsSpeakerNotesPanel = false
+                            externalDisplay.beginSystemMirroringDemo()
+                        } label: {
+                            Label("HDMIのみでデモ（Duo停止）", systemImage: "tv")
+                        }
+                        Button {
+                            showsSpeakerNotesPanel = false
+                            externalDisplay.preferredMode = .mirroring
+                            if dualDisplayCapture.isRunning { dualDisplayCapture.displayMode = .mirroredSlides }
+                        } label: {
+                            Label(dualDisplayCapture.isRunning ? "手元にもスライドを表示（画像転送）" : "手元にもスライドを表示（OSミラーリング）", systemImage: "rectangle.on.rectangle")
+                        }
+                    }
+    }
+
     /// 発表者メニュー(ナビゲーションバー)。スピーカーノート・外部ディスプレイ・閉じる、をここに集約する
     private var presenterMenu: some View {
         Menu { presenterMenuItems } label: { Image(systemName: "ellipsis.circle") }
@@ -346,22 +382,9 @@ public struct SlideBaseView: View {
                 Label("ページ移動", systemImage: "square.grid.3x3")
             }
 
-            if externalDisplay.isConnected {
+            if externalDisplay.isConnected || externalDisplay.effectiveMode == .systemMirroring {
                 Menu {
-                    Button {
-                        showsSpeakerNotesPanel = false
-                        externalDisplay.preferredMode = .mirroring
-                        if dualDisplayCapture.isRunning { dualDisplayCapture.displayMode = .mirroredSlides }
-                    } label: {
-                        Label("手元にもスライドを表示（操作用）", systemImage: "rectangle.on.rectangle")
-                    }
-                    Button {
-                        showsSpeakerNotesPanel = false
-                        externalDisplay.preferredMode = .presentation
-                        if dualDisplayCapture.isRunning { dualDisplayCapture.displayMode = .outerSlides }
-                    } label: {
-                        Label("外部にスライド・手元にノート", systemImage: "tv")
-                    }
+                    externalDisplayMenuItems
                 } label: {
                     Label("外部ディスプレイ", systemImage: "tv")
                 }
@@ -371,13 +394,19 @@ public struct SlideBaseView: View {
                 DuoDisplayModeMenu()
             }
 
-            if externalDisplay.isConnected || dualDisplayCapture.isRunning {
+            if (externalDisplay.isConnected || dualDisplayCapture.isRunning) && externalDisplay.effectiveMode != .systemMirroring {
                 Picker("スライドの出力方式", selection: $slideCapture.output) {
                     ForEach(PresenterSlideOutput.allCases) { output in
                         Text(output.title).tag(output)
                     }
                 }
                 .pickerStyle(.menu)
+            }
+
+            if slideCapture.output == .systemCapture {
+                Button("画面共有を選び直す", systemImage: "rectangle.on.rectangle") {
+                    slideCapture.restartSystemCapture()
+                }
             }
 
             Menu {
@@ -603,21 +632,21 @@ private struct CameraCaptureDeckView: View {
                                 slideIndexController: presentation.slideIndexController,
                                 slideTheme: presentation.slideTheme,
                                 usesPortraitPresenterLayout: true,
-                                interactiveCurrentSlide: slideCapture.output == .capture
+                                interactiveCurrentSlide: slideCapture.output.usesCapturedSlides
                             )
                             .toolbar {
                                 ToolbarItem(placement: .topBarTrailing) { DuoDisplayModeMenu() }
                             }
                         }
+                        .modifier(DuoNotesCaseMargin())
                         .preferredColorScheme(.dark)
-                    } else if dualDisplayCapture.displayMode == .mirroredSlides || slideCapture.output == .capture {
+                    } else if dualDisplayCapture.displayMode == .mirroredSlides || slideCapture.output.usesCapturedSlides {
                         PresenterSlideMirrorView()
                     } else {
                         ExternalDisplayDeckView(
                             slideIndexController: presentation.slideIndexController,
                             slideTheme: presentation.slideTheme,
-                            decorator: presentation.externalDisplaySlideDecorator,
-                            mirrorsInteractiveSlides: false
+                            decorator: presentation.externalDisplaySlideDecorator
                         )
                     }
                 } else {
@@ -657,6 +686,9 @@ private struct DuoDisplayModeMenu: View {
             }
             if keeper.isRunning {
                 Divider()
+                if keeper.displayMode == .innerSlides {
+                    DuoNotesCaseMarginMenu()
+                }
                 if keeper.displayMode != .mirroredSlides {
                     Picker("スライドの出力方式", selection: $capture.output) {
                         ForEach(PresenterSlideOutput.allCases) { output in
@@ -789,5 +821,13 @@ private extension SlideBaseView {
         .toolbar { ToolbarItem(placement: .topBarTrailing) { DuoDisplayModeMenu() } }
     }
     .preferredColorScheme(.dark)
+}
+#Preview("本番構成の外部表示メニュー", traits: .fixedLayout(width: 500, height: 340)) {
+    NavigationStack {
+        List {
+            SlideBaseView(slideConfiguration: PresenterControlsPreviewConfiguration()).externalDisplayMenuItems
+        }
+        .navigationTitle("外部ディスプレイ")
+    }
 }
 #endif

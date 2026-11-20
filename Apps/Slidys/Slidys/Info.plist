@@ -8,11 +8,15 @@
 	<string>group.yugo.sugiyama.iOSDC2024Slide</string>
 	<key>BAUsesAppleHosting</key>
 	<true/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>
 		<string>AppIcon</string>
 	</dict>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>操作中のスライドを外部ディスプレイやアウターディスプレイに表示するため、画面を取得します。</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_slidys-duel._tcp</string>

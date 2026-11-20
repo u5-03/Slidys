@@ -37,3 +37,21 @@ struct PresenterCaptureResolution {
                       height: max(1, floor(source.height * scale)))
     }
 }
+
+/// Leave CPU headroom for input and the source view; match divisors of display refresh.
+struct PresenterCapturePacing {
+    /// Spend at most roughly 20% of the main thread on the optional outer copy.
+    /// This is a post-capture quiet period, not a requested display refresh rate.
+    static func outerQuietPeriod(captureMS: Double) -> TimeInterval {
+        guard captureMS.isFinite, captureMS > 0 else { return 0.5 }
+        return max(0.5, captureMS / 1000 * 4)
+    }
+
+    static func target(sourceMaximum: Int, outputMaximum: Int, captureMS: Double) -> Float {
+        let ceiling = max(1, min(sourceMaximum, outputMaximum))
+        guard captureMS.isFinite, captureMS > 0 else { return Float(min(30, ceiling)) }
+        let budgetRate = 1000 / (captureMS * 1.5)
+        let rates = (1...8).map { Double(ceiling) / Double($0) }.filter { $0 >= 15 }
+        return Float(rates.first(where: { $0 <= budgetRate }) ?? Double(min(15, ceiling)))
+    }
+}

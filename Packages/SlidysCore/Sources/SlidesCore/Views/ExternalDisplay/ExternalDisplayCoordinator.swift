@@ -8,15 +8,10 @@
 //  そこに発表中のデッキ(SpeakerNotesSession に登録されたもの)を表示する。
 //  手元の iPad 側は SlideBaseView がスピーカーノート画面に切り替わる。
 //
-//  モード(手元の iPad をどう使うか):
-//   - mirroring   : 手元にもスライドを出す(既定)。外部ディスプレイは自前 Window で同じデッキを描画する。
-//                   Flutter のデモなど発表者がタップ操作するスライド(ExternalDisplayMirroringPreferred)では、
-//                   別インスタンスを描いても操作が反映されないので、手元の画面をスナップショットで映す(ScreenMirrorView)
-//   - presentation: 外部ディスプレイにスライド、手元にスピーカーノート
-//  切り替えはナビゲーションバーの発表者メニューから手動で行う(デモ操作のときは「手元にもスライドを表示」、
-//  終わったら「スピーカーノートに戻す」)
-//  注意: Info.plist で外部ディスプレイの Scene を宣言すると OS のミラーリングは効かなくなる
-//  (Window を外すと真っ黒になる)ので、外部ディスプレイの Window は常に持ち続ける。
+//  presentation: 外部画面はデッキを直接描画し、手元にノートを表示できる。
+//  mirroring: Duo停止・独立描画設定ならScene accessoryを無効にしてOSミラーリング。
+//  Duo併用時の画像転送は明示的な選択に限り、対話スライドから暗黙に開始しない。
+//  systemMirroring: 明示的なHDMI単独デモ用。Duoを停止しOSミラーリングを要求する。
 //
 //  iOS 27以降はスライド表示中のViewControllerにScene accessoryを登録する。
 //  iOS 26以前のアプリ側の配線:
@@ -38,6 +33,8 @@ public protocol ExternalDisplayMirroringPreferred {}
 public enum ExternalDisplayMode {
     case presentation
     case mirroring
+    /// Yield the connected screen to UIKit; no app-generated capture frames.
+    case systemMirroring
 }
 
 #if os(iOS)
@@ -53,21 +50,69 @@ public final class ExternalDisplayCoordinator: ObservableObject {
     @Published public private(set) var isConnected = false
     /// 発表者が選んだモード(既定はミラーリング。発表者メニューで「外部ディスプレイに出力」を選ぶと presentation)
     @Published public var preferredMode: ExternalDisplayMode = .mirroring {
-        didSet { PresenterSlideCapture.shared.diagnostics("external-mode old=\(oldValue) new=\(preferredMode)") }
+        didSet {
+            PresenterSlideCapture.shared.diagnostics("external-mode old=\(oldValue) new=\(preferredMode)")
+            applyMode()
+        }
     }
 
-    /// 実際に適用されるモード(いまは preferredMode と同じ。将来の自動切り替え用に分けている)
-    public var effectiveMode: ExternalDisplayMode { preferredMode }
+    /// HDMIの出力方式。Duoの転送方式とは独立して判定する。
+    public var effectiveMode: ExternalDisplayMode {
+        // The legacy "mirroring" choice must really yield HDMI to UIKit when
+        // the inner display contains the slides and capture was not explicitly selected.
+        if preferredMode == .mirroring,
+           (!DualDisplayCaptureKeeper.shared.isRunning || DualDisplayCaptureKeeper.shared.displayMode == .mirroredSlides),
+           PresenterSlideCapture.shared.output == .independent {
+            return .systemMirroring
+        }
+        return preferredMode
+    }
+
+    func refreshOutputRouting() { applyMode() }
 
     private let delegates = NSHashTable<ExternalDisplaySceneDelegate>.weakObjects()
-    private var cancellables = Set<AnyCancellable>()
+    private var availableAccessories: [ObjectIdentifier: Bool] = [:]
+    private var resumeDuoAfterDemo = false
     fileprivate var accessoryRegistrationCount = 0
 
-    private init() {
-        $preferredMode
-            .dropFirst()
-            .sink { [weak self] _ in self?.applyMode() }
-            .store(in: &cancellables)
+    private init() {}
+
+    /// Keep both outputs on the same captured frame; validate full-display acquisition
+    /// on hardware before relying on this experimental path during the talk.
+    public func beginPresenterCaptureDemo() {
+        preferredMode = .presentation
+        if DualDisplayCaptureKeeper.shared.isRunning {
+            DualDisplayCaptureKeeper.shared.displayMode = .outerSlides
+        }
+        PresenterSlideCapture.shared.output = .systemCapture
+        PresenterSlideCapture.shared.diagnostics("stage-demo transport=screencapturekit-full-display duoPreserved=\(DualDisplayCaptureKeeper.shared.isRunning)")
+    }
+
+    /// Emergency HDMI-only alternative: release custom external content and stop Duo
+    /// camera/accessory path while the presenter manipulates the one live slide.
+    public func beginSystemMirroringDemo() {
+        guard preferredMode != .systemMirroring else { return }
+        resumeDuoAfterDemo = DualDisplayCaptureKeeper.shared.isRunning
+        PresenterSlideCapture.shared.output = .independent
+        DualDisplayCaptureKeeper.shared.stop()
+        preferredMode = .systemMirroring
+        PresenterSlideCapture.shared.diagnostics("stage-demo transport=os-mirroring-requested duoSuspended=\(resumeDuoAfterDemo) capture=false")
+    }
+
+    public func finishSystemMirroringDemo() {
+        let restoreDuo = resumeDuoAfterDemo
+        resumeDuoAfterDemo = false
+        PresenterSlideCapture.shared.output = .independent
+        preferredMode = .presentation
+        if restoreDuo { DualDisplayCaptureKeeper.shared.start(mode: .outerSlides) }
+        else if DualDisplayCaptureKeeper.shared.isRunning { DualDisplayCaptureKeeper.shared.displayMode = .outerSlides }
+        PresenterSlideCapture.shared.diagnostics("stage-notes transport=direct-render duoRestored=\(restoreDuo) capture=false")
+    }
+
+    fileprivate func setAccessoryAvailability(_ id: ObjectIdentifier, available: Bool?) {
+        guard availableAccessories[id] != available else { return }
+        availableAccessories[id] = available
+        updateConnection()
     }
 
     public func togglePreferredMode() {
@@ -105,7 +150,8 @@ public final class ExternalDisplayCoordinator: ObservableObject {
     }
 
     private func updateConnection() {
-        isConnected = delegates.count > 0 || simulatesConnection
+        let connected = delegates.count > 0 || availableAccessories.values.contains(true) || simulatesConnection
+        if isConnected != connected { isConnected = connected }
     }
 
     private func applyMode() {
@@ -120,11 +166,16 @@ public final class ExternalDisplayCoordinator: ObservableObject {
 /// スライドのライフサイクルに外部Sceneの登録を紐づける。メイン画面の子ViewControllerとして保持する。
 @available(iOS 27.0, *)
 struct ExternalDisplayAccessoryView: UIViewControllerRepresentable {
+    @ObservedObject private var coordinator = ExternalDisplayCoordinator.shared
+    @ObservedObject private var capture = PresenterSlideCapture.shared
+    @ObservedObject private var duo = DualDisplayCaptureKeeper.shared
     func makeUIViewController(context: Context) -> ExternalDisplayAccessoryController {
         ExternalDisplayAccessoryController()
     }
 
-    func updateUIViewController(_ controller: ExternalDisplayAccessoryController, context: Context) {}
+    func updateUIViewController(_ controller: ExternalDisplayAccessoryController, context: Context) {
+        controller.setOutputEnabled(coordinator.effectiveMode != .systemMirroring)
+    }
 
     static func dismantleUIViewController(_ controller: ExternalDisplayAccessoryController, coordinator: ()) {
         controller.unregisterAccessory()
@@ -144,21 +195,48 @@ final class ExternalDisplayAccessoryController: UIViewController {
         configuration.delegateClass = ExternalDisplaySceneDelegate.self
         let accessory = UISceneAccessory.externalNonInteractive(sceneConfiguration: configuration)
         let registration = registerSceneAccessory(accessory)
-        registration.isEnabled = true
+        registration.isEnabled = ExternalDisplayCoordinator.shared.effectiveMode != .systemMirroring
         self.registration = registration
         ExternalDisplayCoordinator.shared.accessoryRegistrationCount += 1
+        reportTransportAfterTransition()
     }
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         guard let registration, lastAvailability != registration.isAvailable else { return }
         lastAvailability = registration.isAvailable
+        ExternalDisplayCoordinator.shared.setAccessoryAvailability(ObjectIdentifier(self), available: registration.isAvailable)
+        PresenterSlideCapture.shared.diagnostics("external-accessory available=\(registration.isAvailable) enabled=\(registration.isEnabled)")
+    }
+
+    override func updateProperties() {
+        super.updateProperties()
+        if let registration {
+            ExternalDisplayCoordinator.shared.setAccessoryAvailability(ObjectIdentifier(self), available: registration.isAvailable)
+        }
+    }
+
+    func setOutputEnabled(_ enabled: Bool) {
+        loadViewIfNeeded()
+        guard let registration, registration.isEnabled != enabled else { return }
+        registration.isEnabled = enabled
+        PresenterSlideCapture.shared.diagnostics("external-accessory enabled=\(enabled) available=\(registration.isAvailable) transport=\(enabled ? "direct-render-or-explicit-capture" : "os-mirroring-requested")")
+        reportTransportAfterTransition()
+    }
+
+    private func reportTransportAfterTransition() {
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(700))
+            guard self?.registration != nil else { return }
+            PresenterRenderDiagnostics.reportOutputTransport()
+        }
     }
 
     func unregisterAccessory() {
         guard let registration else { return }
         unregisterSceneAccessory(registration)
         self.registration = nil
+        ExternalDisplayCoordinator.shared.setAccessoryAvailability(ObjectIdentifier(self), available: nil)
         ExternalDisplayCoordinator.shared.accessoryRegistrationCount -= 1
     }
 }
@@ -188,6 +266,11 @@ public final class ExternalDisplaySceneDelegate: NSObject, UIWindowSceneDelegate
     /// 外部ディスプレイの Window は常に持つ(中身の切り替えは ExternalDisplayRootView が行う)。
     @MainActor
     func apply(mode: ExternalDisplayMode) {
+        if mode == .systemMirroring {
+            window?.isHidden = true
+            window = nil
+            return
+        }
         guard window == nil, let windowScene else { return }
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = UIHostingController(rootView: ExternalDisplayRootView())
@@ -197,10 +280,7 @@ public final class ExternalDisplaySceneDelegate: NSObject, UIWindowSceneDelegate
     }
 }
 
-/// 外部ディスプレイに出す内容。
-///  - デッキ未登録: 手元の画面をそのまま映す(スナップショットによるミラーリング)
-///  - タップ操作するデモのスライド(ExternalDisplayMirroringPreferred)で手元にもスライドを出しているとき: 同上
-///  - それ以外: 登録されたデッキを外部ディスプレイ側で独立に描画する(手元はノートでもスライドでもよい)
+/// 明示的な映像転送モード以外は、外部画面でデッキを直接描画する。
 struct ExternalDisplayRootView: View {
     @ObservedObject private var session = SpeakerNotesSession.shared
     @ObservedObject private var coordinator = ExternalDisplayCoordinator.shared
@@ -208,14 +288,13 @@ struct ExternalDisplayRootView: View {
 
     var body: some View {
         Group {
-            if session.presentation != nil && slideCapture.output == .capture {
+            if session.presentation != nil && slideCapture.output.usesCapturedSlides {
                 PresenterSlideMirrorView()
             } else if let presentation = session.presentation {
                 ExternalDisplayDeckView(
                     slideIndexController: presentation.slideIndexController,
                     slideTheme: presentation.slideTheme,
-                    decorator: presentation.externalDisplaySlideDecorator,
-                    mirrorsInteractiveSlides: coordinator.effectiveMode == .mirroring
+                    decorator: presentation.externalDisplaySlideDecorator
                 )
             } else {
                 Color.black
@@ -227,25 +306,17 @@ struct ExternalDisplayRootView: View {
     }
 }
 
-/// 登録されたデッキを外部ディスプレイに描画する。現在のスライドがタップ操作するデモで、手元にもスライドを
-/// 出している(mirroring)ときだけ、手元の画面をスナップショットで映す。
+/// 登録されたデッキを直接描画する。映像転送への切り替えは明示的な選択に限る。
 struct ExternalDisplayDeckView: View {
     @ObservedObject var slideIndexController: SlideIndexController
     let slideTheme: CustomSlideTheme
     /// デッキが登録した環境値の注入(Flutter の Router など)。これが無いと埋め込み View が空になる
     let decorator: ExternalDisplaySlideDecorator?
-    let mirrorsInteractiveSlides: Bool
 
     @ObservedObject private var slideCapture = PresenterSlideCapture.shared
 
-    private var shouldMirrorScreen: Bool {
-        mirrorsInteractiveSlides && slideIndexController.currentSlide is ExternalDisplayMirroringPreferred
-    }
-
     var body: some View {
-        if slideCapture.output == .capture {
-            PresenterSlideMirrorView()
-        } else if shouldMirrorScreen {
+        if slideCapture.output.usesCapturedSlides {
             PresenterSlideMirrorView()
         } else {
             PresentationView(slideSize: SlideSize.standard16_9) {

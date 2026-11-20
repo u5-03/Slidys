@@ -1,4 +1,5 @@
 import Observation
+import SlideKit
 import RealityKit
 import SummonEffectAssets
 import SwiftUI
@@ -95,8 +96,7 @@ public struct SaitamaSymbolQuizView: View {
         GeometryReader { geometry in
             let unit = max(0.5, geometry.size.width / 1200)
             ZStack {
-                LinearGradient(colors: [Color(red: 0.06, green: 0.13, blue: 0.19), .black],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                Color.slideBackgroundColor
                 if isThumbnail || session.selected == nil {
                     cardSelection(size: geometry.size, unit: unit)
                 } else if let selected = session.selected {
@@ -285,6 +285,7 @@ private struct QuizCard: View, Animatable {
 }
 
 private struct SaitamaSummonedScene: View {
+    @Environment(\.displayScale) private var displayScale
     let landmark: SaitamaLandmark
     let session: SaitamaQuizSession
     let reduceMotion: Bool
@@ -301,6 +302,7 @@ private struct SaitamaSummonedScene: View {
 
     var body: some View {
         GeometryReader { geometry in
+            let renderScale = RealityViewRenderBudget.scale(size: geometry.size, displayScale: displayScale)
             RealityView { content in
                 let selectionID = session.selectionID
 #if !os(visionOS)
@@ -366,6 +368,9 @@ private struct SaitamaSummonedScene: View {
                 pivot?.scale = .init(repeating: value)
             }
             .onChange(of: geometry.size) { _, size in fitCamera(size) }
+            .frame(width: geometry.size.width * renderScale, height: geometry.size.height * renderScale)
+            .scaleEffect(1 / renderScale)
+            .frame(width: geometry.size.width, height: geometry.size.height)
             .gesture(DragGesture().targetedToAnyEntity().onChanged { value in
                 guard session.phase == .inspecting else { return }
                 let dx = Float(value.translation.width - dragTranslation.width)
@@ -415,6 +420,11 @@ private struct SaitamaSummonedScene: View {
     }
 }
 
+@Slide private struct SaitamaQuizLayoutPreview: View {
+    var body: some View { SaitamaSymbolQuizView() }
+}
+
 #Preview("Saitama Symbol Quiz") {
-    SaitamaSymbolQuizView().frame(width: 1200, height: 675)
+    SlidePreview { SaitamaQuizLayoutPreview() }
+        .slideTheme(CustomSlideTheme(showSlideIndex: false, listTextStyle: .large))
 }

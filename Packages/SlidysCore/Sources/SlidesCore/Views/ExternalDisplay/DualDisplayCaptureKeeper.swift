@@ -30,14 +30,19 @@ public final class DualDisplayCaptureKeeper: ObservableObject {
     public static let shared = DualDisplayCaptureKeeper()
 
     /// ダミーのカメラセッションを動かしているか
-    @Published public private(set) var isRunning = false
+    @Published public private(set) var isRunning = false {
+        didSet { ExternalDisplayCoordinator.shared.refreshOutputRouting() }
+    }
     /// 権限なし・カメラなしなどで開始できなかったときの理由
     @Published public private(set) var lastError: String?
     /// 外側ディスプレイ(縦長)のスライドを横向きにするための回転方向。
     /// 端末の持ち方で上下が逆になるので、発表者メニューから反転できる
     @Published public var rotatesOuterClockwise = true
     @Published public var displayMode: DuoDisplayMode = .outerSlides {
-        didSet { PresenterSlideCapture.shared.diagnostics("duo-mode old=\(oldValue.rawValue) new=\(displayMode.rawValue)") }
+        didSet {
+            ExternalDisplayCoordinator.shared.refreshOutputRouting()
+            PresenterSlideCapture.shared.diagnostics("duo-mode old=\(oldValue.rawValue) new=\(displayMode.rawValue)")
+        }
     }
 
     /// アプリが許可する画面の向き(SlidysAppDelegate が返す)。
