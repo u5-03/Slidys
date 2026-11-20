@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A565D2100000000000000001 /* apple_store_focus_demo.mov in Resources */ = {isa = PBXBuildFile; fileRef = A565D2100000000000000002 /* apple_store_focus_demo.mov */; };
 		682E4D1C2F6EE72200DA3D04 /* SlidysBackgroundDownloadExtension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 682E4D142F6EE72200DA3D04 /* SlidysBackgroundDownloadExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C33B7A8C2CE0E8A6007FC049 /* SlidysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33B7A8B2CE0E8A6007FC049 /* SlidysApp.swift */; };
 		C33B7A8E2CE0E8A6007FC049 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33B7A8D2CE0E8A6007FC049 /* ContentView.swift */; };
@@ -48,6 +49,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A565D2100000000000000002 /* apple_store_focus_demo.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = apple_store_focus_demo.mov; sourceTree = "<group>"; };
 		682E4D142F6EE72200DA3D04 /* SlidysBackgroundDownloadExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = SlidysBackgroundDownloadExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C33B7A882CE0E8A6007FC049 /* Slidys.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slidys.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C33B7A8B2CE0E8A6007FC049 /* SlidysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidysApp.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 			children = (
 				C33B7A922CE0E8A7007FC049 /* Preview Assets.xcassets */,
 				D1A5E00000000000000FA000 /* book_animation.mp4 */,
+				A565D2100000000000000002 /* apple_store_focus_demo.mov */,
 				D1A5E00100000000000FA001 /* duel_demo_dragon.mp4 */,
 				D1A5E00200000000000FA002 /* duel_demo_full.mp4 */,
 				D1A5E00300000000000FA003 /* hand_gesture_entity_sample.mp4 */,
@@ -264,6 +267,7 @@
 			files = (
 				C33B7A932CE0E8A7007FC049 /* Preview Assets.xcassets in Resources */,
 				D1B5E00000000000000FB000 /* book_animation.mp4 in Resources */,
+				A565D2100000000000000001 /* apple_store_focus_demo.mov in Resources */,
 				D1B5E00100000000000FB001 /* duel_demo_dragon.mp4 in Resources */,
 				D1B5E00200000000000FB002 /* duel_demo_full.mp4 in Resources */,
 				D1B5E00300000000000FB003 /* hand_gesture_entity_sample.mp4 in Resources */,

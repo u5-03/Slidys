@@ -279,3 +279,11 @@ Xcode 26以降のCommand Line Toolsがインストールされている必要が
 ```bash
 xcode-select --install
 ```
+
+## Saitama.swiftのApple Store動画
+
+- 配信ファイル: `payload/apple_store_focus_demo.mov`（元動画、縦1080×1920、約12.3秒）。
+- `VideoView(videoType: .appleStoreFocusDemo, seamlessLoop: true)`で表示時に再生し、AVQueuePlayer / AVPlayerLooperでループする。離脱時は停止・解放する。
+- 開発用はSlidysのPreview Contentへ同じファイルを配置。Releaseの動画は従来どおりBackground Assetsから取得する。
+- 新動画を含むパックはSlidys向けバージョン3としてアップロード。外部TestFlightのアセット審査はアプリ本体とは別に提出が必要。
+- `build-asset-pack.sh`は毎回新しい一時パスへパッケージ化し、古い.aarを誤って再アップロードしない。

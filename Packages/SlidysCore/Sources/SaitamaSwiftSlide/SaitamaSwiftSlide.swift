@@ -33,7 +33,8 @@ struct SaitamaSlideConfiguration: SlideConfigurationProtocol {
         CenterTextSlide(text: "私はiOSDC2026で\nこんな発表をしてました", script: "私は9月11日のiOSDC Japan 2026で、こんな発表をしていました。")
         SaitamaIOSDCTitleSlide()
         SaitamaOpeningPhotoSlide()
-        SaitamaTweetSlide()
+        SaitamaAppleStoreVideoSlide()
+        SaitamaAppleStoreDetailSlide()
         SaitamaTaiyakiDemoSlide()
         CenterTextSlide(text: "今回はこれらの話のもう少し詳しくお話しします！", script: "今回は、これらの話をもう少し詳しくお話しします！")
         SaitamaTitleSlide()
@@ -165,12 +166,12 @@ struct SaitamaTitleSlide: View {
     }
 }
 
-@Slide struct SaitamaTaiyakiDemoSlide: View, ExternalDisplayMirroringPreferred {
-    var script: String { "【1:10–2:30 / 80秒】まずはデモです。これはiOSDCのカードバトルで使ったものと同じたい焼きのUSDZです。ドラッグで回すと、こちらを向いている部位にプラスが出ます。目をタップすると、目が見やすい位置へズームして解説が出ます。マイナスで元へ戻せます。具材を変えると見た目も変わります。写真を何枚も並べる代わりに、ひとつのモデルから気になる場所を探ってもらうUIです。" }
+@Slide struct SaitamaTaiyakiDemoSlide: View {
+    var script: String { "【1:10–2:30 / 80秒】まずはデモです。これはiOSDCのカードバトルで使ったものと同じたい焼きのUSDZです。表示すると右に1回転、左に1回転し、そのあと具材が0.5秒ごとに切り替わります。こちらを向いている部位にプラスが出ます。手動操作を始めると自動デモは止まります。目をタップすると、目が見やすい位置へズームして解説が出ます。マイナスで元へ戻せます。具材を変えると見た目も変わります。写真を何枚も並べる代わりに、ひとつのモデルから気になる場所を探ってもらうUIです。" }
     var transition: AnyTransition { SlideTransition.defaultTransition }
     var body: some View {
         HeaderSlide("デモ：たい焼きフォーカス") {
-            TaiyakiFocusView(mode: .full, fontScale: 2.1, modelScale: 1.2)
+            TaiyakiFocusView(mode: .full, fontScale: 2.1, modelScale: 1.2, automaticDemo: true)
                 .clipShape(RoundedRectangle(cornerRadius: 24))
                 .excludesFromSlideTapNavigation()
         }

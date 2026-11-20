@@ -22,6 +22,7 @@ public enum VideoType {
     case duelDemoFull
     /// iOSDC2026 デモ2の保険動画(竜のモンスターの召喚エフェクト)
     case duelDemoDragon
+    case appleStoreFocusDemo
 
     var fileName: String {
         switch self {
@@ -41,11 +42,13 @@ public enum VideoType {
             return "duel_demo_full"
         case .duelDemoDragon:
             return "duel_demo_dragon"
+        case .appleStoreFocusDemo:
+            return "apple_store_focus_demo"
         }
     }
 
     var fileExtension: String {
-        return "mp4"
+        return self == .appleStoreFocusDemo ? "mov" : "mp4"
     }
 }
 
@@ -58,9 +61,14 @@ public struct VideoView: View {
     @State private var timeObserverToken: Any?
     @State private var isLoading = true
     @State private var loadError: String?
+    @State private var playerLooper: AVPlayerLooper?
+    private let localVideoURL: URL?
+    private let seamlessLoop: Bool
     private let videoType: VideoType
 
-    public init(videoType: VideoType) {
+    public init(videoType: VideoType, seamlessLoop: Bool = false, localVideoURL: URL? = nil) {
+        self.localVideoURL = localVideoURL
+        self.seamlessLoop = seamlessLoop
         self.videoType = videoType
     }
 
@@ -106,23 +114,44 @@ public struct VideoView: View {
         .task {
             guard !isSlideThumbnail else { return }
             do {
-                let url = try await resolveVideoURL(for: videoType)
+                let url: URL
+                if let localVideoURL {
+                    url = localVideoURL
+                } else {
+                    url = try await resolveVideoURL(for: videoType)
+                }
+                try Task.checkCancellation()
                 let item = AVPlayerItem(url: url)
-                let newPlayer = AVPlayer(playerItem: item)
+                let newPlayer: AVPlayer
+                if seamlessLoop {
+                    let queuePlayer = AVQueuePlayer()
+                    playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: item)
+                    newPlayer = queuePlayer
+                } else {
+                    newPlayer = AVPlayer(playerItem: item)
+                }
+                if seamlessLoop { newPlayer.allowsExternalPlayback = false }
                 playerItem = item
                 player = newPlayer
 
-                await item.seek(to: .zero)
-                try await Task.sleep(for: .seconds(1))
+                if !seamlessLoop {
+                    await item.seek(to: .zero)
+                    try await Task.sleep(for: .seconds(1))
+                }
+                try Task.checkCancellation()
                 newPlayer.play()
-                NotificationCenter.default
-                    .publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
-                    .sink { _ in
-                        newPlayer.seek(to: .zero)
-                        newPlayer.play()
-                    }
-                    .store(in: &cancellableSet)
+                if !seamlessLoop {
+                    NotificationCenter.default
+                        .publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
+                        .sink { _ in
+                            newPlayer.seek(to: .zero)
+                            newPlayer.play()
+                        }
+                        .store(in: &cancellableSet)
+                }
                 isLoading = false
+            } catch is CancellationError {
+                player?.pause()
             } catch {
                 loadError = error.localizedDescription
                 isLoading = false
@@ -130,10 +159,16 @@ public struct VideoView: View {
         }
         .onDisappear {
             player?.pause()
+            playerLooper?.disableLooping()
+            playerLooper = nil
+            (player as? AVQueuePlayer)?.removeAllItems()
             if let token = timeObserverToken {
                 player?.removeTimeObserver(token)
                 timeObserverToken = nil
             }
+            player = nil
+            playerItem = nil
+            cancellableSet.removeAll()
         }
     }
 
@@ -145,7 +180,8 @@ public struct VideoView: View {
         // 2. AssetPackManager から取得（TestFlight / App Store）
         // バンドルIDを持たない実行環境(スナップショット用CLIツールなど)では
         // AssetPackManagerがfatalErrorになるため、その前にエラーで抜ける
-        guard Bundle.main.bundleIdentifier != nil else {
+        guard Bundle.main.bundleIdentifier != nil,
+              ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else {
             throw CocoaError(.fileNoSuchFile)
         }
         let pack = try await AssetPackManager.shared.assetPack(withID: "slidys-videos")

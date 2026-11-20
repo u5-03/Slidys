@@ -75,6 +75,8 @@ public struct TaiyakiFocusView: View {
 
     public enum ModelSource: Sendable { case blender, procedural }
     private let modelSource: ModelSource
+    private let automaticDemo: Bool
+    @State private var automaticDemoInterrupted = false
     private let mode: Mode
     /// テキスト・バブルUIの拡大率。スライド埋め込みで遠くから見せる場合は1より大きくする
     private let fontScale: CGFloat
@@ -82,7 +84,8 @@ public struct TaiyakiFocusView: View {
     /// カメラ(z=1.2, fov60°)の見える範囲は高さ約1.4なので、回転の余白込みで0.9程度まで
     private let modelScale: Float
 
-    public init(mode: Mode = .full, fontScale: CGFloat = 1, modelScale: Float = 0.6, modelSource: ModelSource = .blender) {
+    public init(mode: Mode = .full, fontScale: CGFloat = 1, modelScale: Float = 0.6, modelSource: ModelSource = .blender, automaticDemo: Bool = false) {
+        self.automaticDemo = automaticDemo
         self.modelSource = modelSource
         self.mode = mode
         self.fontScale = fontScale
@@ -190,6 +193,10 @@ public struct TaiyakiFocusView: View {
                 }
             }
         }
+        .task(id: pivotEntity?.id) {
+            guard automaticDemo, !automaticDemoInterrupted, pivotEntity != nil else { return }
+            await runAutomaticDemo()
+        }
         .onDisappear {
             // A hosting controller or system sheet may temporarily hide a live
             // RealityView. Removing its root here leaves that reused renderer empty
@@ -201,6 +208,46 @@ public struct TaiyakiFocusView: View {
         .onChange(of: selectedFilling) { _, newValue in
             guard let sceneEntity else { return }
             applyFilling(newValue, to: sceneEntity)
+        }
+    }
+
+    /// 表示中だけ実行する。スライドを離れると.taskがキャンセルし、手動操作にも即座に譲る。
+    @MainActor
+    private func runAutomaticDemo() async {
+        selectedFilling = .redBeans
+        let clock = ContinuousClock()
+        do {
+            // 360度を始点・終点のクォータニオンだけで補間すると回転しないため、
+            // 経過時間から角度を算出する。各表示先が同じ8秒のデモを再生できる。
+            for direction: Float in [1, -1] {
+                let started = clock.now
+                while true {
+                    try Task.checkCancellation()
+                    guard !automaticDemoInterrupted, focusedPart == nil else { return }
+                    let elapsed = started.duration(to: clock.now)
+                    let seconds = Double(elapsed.components.seconds)
+                        + Double(elapsed.components.attoseconds) / 1e18
+                    let progress = min(seconds / 4, 1)
+                    let rotation = simd_quatf(angle: direction * 2 * .pi * Float(progress),
+                                              axis: SIMD3<Float>(0, 1, 0))
+                    modelRotation = rotation
+                    pivotEntity?.transform.rotation = rotation
+                    if progress >= 1 { break }
+                    try await Task.sleep(for: .milliseconds(33))
+                }
+            }
+            modelRotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
+            pivotEntity?.transform.rotation = modelRotation
+            for filling in TaiyakiFilling.allCases {
+                try Task.checkCancellation()
+                guard !automaticDemoInterrupted else { return }
+                selectedFilling = filling
+                try await Task.sleep(for: .milliseconds(500))
+            }
+        } catch is CancellationError {
+            // 次のスライドへ進んだら停止する。
+        } catch {
+            taiyakiBuildTrace("automatic demo stopped: \(error.localizedDescription)")
         }
     }
 
@@ -217,6 +264,7 @@ public struct TaiyakiFocusView: View {
             HStack(spacing: 8) {
                 ForEach(TaiyakiFilling.allCases) { filling in
                     Button {
+                        automaticDemoInterrupted = true
                         selectedFilling = filling
                     } label: {
                         Text(filling.displayName)
@@ -324,6 +372,7 @@ public struct TaiyakiFocusView: View {
                 .targetedToAnyEntity()
                 .onChanged { value in
                     guard focusedPart == nil, !isTransitioning else { return }
+                    automaticDemoInterrupted = true
                     let sensitivity: Float = 0.012
                     let deltaX = Float(value.translation.width - lastDragTranslation.width)
                     let deltaY = Float(value.translation.height - lastDragTranslation.height)
@@ -462,6 +511,7 @@ public struct TaiyakiFocusView: View {
     // MARK: - フォーカス制御
 
     private func focus(on part: TaiyakiPart) {
+        automaticDemoInterrupted = true
         guard let pivot = pivotEntity, let local = anchorLocalPositions[part] else { return }
         isTransitioning = true
         preFocusRotation = modelRotation
