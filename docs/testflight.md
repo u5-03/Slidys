@@ -5,6 +5,12 @@
 Xcode Cloud を使わず、手元の Mac で archive → ipa → App Store Connect アップロード → TestFlight の
 テスターグループ追加(外部テスター向けの Beta App Review 提出まで)を行う。
 
+## Xcode Cloudを実行する場合
+
+「Deploy External TestFlight」などのCloud実行は**ブラウザではなくCLI**を使用する。
+[CLI実行・状態確認・配布保留の手順](xcode-cloud-cli.md)を参照。
+以下は手元のMacでアーカイブする場合の手順。
+
 ## 準備(初回のみ)
 
 認証は MyApps(Shireka など)の deploy スクリプトと同じ仕組みを使う。秘密はリポジトリの外に置く。
