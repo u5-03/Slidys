@@ -134,7 +134,9 @@ public struct VideoView: View {
                 } else {
                     newPlayer = AVPlayer(playerItem: item)
                 }
+#if !os(visionOS)
                 if seamlessLoop { newPlayer.allowsExternalPlayback = false }
+#endif
                 playerItem = item
                 player = newPlayer
 
