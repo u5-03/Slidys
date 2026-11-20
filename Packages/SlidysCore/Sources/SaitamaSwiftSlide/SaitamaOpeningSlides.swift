@@ -21,7 +21,7 @@ import UIKit
 }
 
 @Slide struct SaitamaAudienceCameraSlide: View {
-    var script: String { "埼玉に住んでいる方、出身の方、手を上げてください！カメラを開始して、会場を撮影します。撮影が済んだら次のスライドへ進みます。" }
+    var script: String { "埼玉に住んでいる方、出身の方、手を上げてください！画角を合わせて、撮影ボタンで会場を撮影します。撮影が済んだら次のスライドへ進みます。" }
     var transition: AnyTransition { SlideTransition.defaultTransition }
     var body: some View {
         Group {
@@ -60,11 +60,12 @@ private final class AudienceCamera: NSObject, ObservableObject {
     private var wantsRunning = false
     var captureAngle: CGFloat = 0
     @Published var photo: UIImage?
-    @Published var message = "カメラを開始すると、ここに会場を表示します"
+    @Published var message = ""
     @Published var running = false
     @Published var capturing = false
 
     func start() {
+        guard !wantsRunning else { return }
         wantsRunning = true
         Task { @MainActor in
             let allowed = await AVCaptureDevice.requestAccess(for: .video)
@@ -213,6 +214,7 @@ private struct AudienceCameraPreview: UIViewRepresentable {
 }
 @MainActor
 private struct AudienceCameraView: View {
+    @Environment(\.isSlideThumbnail) private var isSlideThumbnail
     @StateObject private var camera: AudienceCamera
     init(camera: AudienceCamera? = nil) {
         _camera = StateObject(wrappedValue: camera ?? AudienceCamera())
@@ -240,20 +242,26 @@ private struct AudienceCameraView: View {
                     Button(camera.capturing ? "撮影中…" : "撮影", systemImage: "camera.shutter.button.fill") { camera.shoot() }
                         .disabled(camera.capturing)
                 } else {
-                    Button("カメラを開始", systemImage: "camera.fill") { camera.start() }
+                    Button("撮影", systemImage: "camera.shutter.button.fill") {}
+                        .disabled(true)
                 }
                 Spacer()
             }
             .font(.system(size: 40, weight: .bold))
             .buttonStyle(.borderedProminent)
             Group {
-                if !camera.message.isEmpty && camera.message != "カメラを開始すると、ここに会場を表示します" {
+                if !camera.message.isEmpty {
                     Text(camera.message).font(.system(size: 24)).foregroundStyle(.white)
                 } else { Color.clear }
             }
             .frame(height: 48)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+        .task(id: isSlideThumbnail) {
+            guard !isSlideThumbnail,
+                  ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return }
+            camera.start()
         }
         .onDisappear { camera.stop() }
     }
