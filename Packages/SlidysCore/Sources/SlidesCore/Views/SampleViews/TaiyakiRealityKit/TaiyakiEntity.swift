@@ -105,7 +105,8 @@ enum TaiyakiEntity {
         // Emptyと同じローカル目印。ワールド固定のAnchorEntityではない。
         // 生成済みの部位の正面側を目安に置き、親の変形・回転・拡大に追従させる。
         for (part, name) in [(TaiyakiPart.eye, "Eye"), (.tail, "Tail"),
-                             (.dorsalFin, "DorsalFin"), (.logo, "Logo")] {
+                             (.dorsalFin, "DorsalFin"), (.logo, "Logo"),
+                             (.filling, "Filling")] {
             guard let model = root.findEntity(named: name) else { continue }
             let bounds = model.visualBounds(relativeTo: root)
             let anchor = Entity()
