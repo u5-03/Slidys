@@ -274,7 +274,8 @@ public struct TaiyakiFocusView: View {
                     try await Task.sleep(for: .milliseconds(500))
                     guard !automaticDemoInterrupted else { return }
                     focus(on: part, automatically: true)
-                    try await Task.sleep(for: .seconds(2.25))
+                    // 到着まで0.75秒、説明表示は1.5秒から2.25秒へ延長する。
+                    try await Task.sleep(for: .seconds(3))
                     guard !automaticDemoInterrupted else { return }
                     unfocus(automatically: true)
                     try await Task.sleep(for: .milliseconds(750))
@@ -589,11 +590,14 @@ public struct TaiyakiFocusView: View {
         withAnimation(.easeInOut(duration: 0.2)) {
             focusedPart = nil
         }
-        let base = Transform(scale: .one, rotation: preFocusRotation, translation: .zero)
+        let restoredRotation = automatically
+            ? simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
+            : preFocusRotation
+        let base = Transform(scale: .one, rotation: restoredRotation, translation: .zero)
         pivot.move(to: base, relativeTo: nil, duration: 0.6, timingFunction: .easeInOut)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
             pivot.transform = base  // 倍率・位置を確実に復元する
-            modelRotation = preFocusRotation
+            modelRotation = restoredRotation
             isTransitioning = false
         }
     }
