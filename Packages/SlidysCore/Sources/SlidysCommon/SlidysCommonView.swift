@@ -160,7 +160,6 @@ struct PDFExportRequest: Identifiable {
 public struct SlidysCommonView: View {
     @State private var selectedSectionType: SlideSectionType?
     @State private var pdfExportRequest: PDFExportRequest?
-    @State private var showsSaitamaPreview = false
     @Environment(\.openWindow) private var openWindow
 
     private let slideTypes: [any SlideTypeProtocol]
@@ -175,21 +174,9 @@ public struct SlidysCommonView: View {
                 List(selection: $selectedSectionType) {
                     Section("Slides") {
                         ForEach(slideTypes, id: \.id) { type in
-                            HStack {
-                                Text(type.displayValue)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                if let nativeType = type as? SlideType, nativeType == .saitamaSwift {
-                                    Button {
-                                        showsSaitamaPreview = true
-                                    } label: {
-                                        Label("一覧", systemImage: "square.grid.3x3")
-                                    }
-                                    .buttonStyle(.borderless)
-                                    .accessibilityLabel("Saitama.swift #1の全15枚をプレビュー")
-                                    .padding(.trailing, 8)
-                                }
-                            }
+                            Text(type.displayValue)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .tag(SlideSectionType.slides(type))
                                 // 長押し(macOS は右クリック)で PDF 書き出し。対応デッキ(pdfExportSource を返すもの)だけ出す
                                 .contextMenu {
@@ -219,11 +206,6 @@ public struct SlidysCommonView: View {
                 .sheet(item: $pdfExportRequest) { request in
                     PDFExportSheet(source: request.source)
                 }
-#if !os(iOS)
-                .sheet(isPresented: $showsSaitamaPreview) {
-                    SaitamaSwiftSlidePreviewView()
-                }
-#endif
             }
 #if os(macOS)
             .sheet(item: $selectedSectionType) { type in
@@ -237,13 +219,11 @@ public struct SlidysCommonView: View {
             }
 #elseif os(iOS)
             // モーダル用PresentationHostingControllerを通さず、rootの4方向許可を使う。
-            .allowsHitTesting(selectedSectionType == nil && !showsSaitamaPreview)
-            .accessibilityHidden(selectedSectionType != nil || showsSaitamaPreview)
+            .allowsHitTesting(selectedSectionType == nil)
+            .accessibilityHidden(selectedSectionType != nil)
             .overlay {
                 Group {
-                    if showsSaitamaPreview {
-                        SaitamaSwiftSlidePreviewView(onClose: { showsSaitamaPreview = false })
-                    } else if let type = selectedSectionType {
+                    if let type = selectedSectionType {
                         switch type {
                         case .slides:
                             NavigationStack {
@@ -260,7 +240,7 @@ public struct SlidysCommonView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background {
-                    if selectedSectionType != nil || showsSaitamaPreview {
+                    if selectedSectionType != nil {
                         Color.slideBackgroundColor.ignoresSafeArea()
                     }
                 }
