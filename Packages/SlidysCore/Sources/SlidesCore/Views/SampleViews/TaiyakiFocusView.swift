@@ -564,7 +564,7 @@ public struct TaiyakiFocusView: View {
         preFocusRotation = modelRotation
 
         // 正面(わずかに前傾)を向きながら、アンカーがfocusTargetに来るようにズーム
-        let rotation = automatically ? modelRotation : focusRotation
+        let rotation = focusRotation
         let translation = focusTarget - rotation.act(local * focusScale)
         let target = Transform(scale: SIMD3<Float>(repeating: focusScale),
                                rotation: rotation,
