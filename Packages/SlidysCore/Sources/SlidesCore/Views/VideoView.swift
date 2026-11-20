@@ -78,7 +78,7 @@ public struct VideoView: View {
                 // スライド一覧のサムネイルでは動画を起動しない
                 // (AVPlayerやAssetPackManagerがプレビューエージェント内で全数起動してクラッシュするため)
                 ZStack {
-                    Color.black
+                    if seamlessLoop { Color.slideBackgroundColor } else { Color.black }
                     VStack(spacing: 16) {
                         Image(systemName: "play.rectangle.fill")
                             .font(.system(size: 160, weight: .light))
@@ -88,6 +88,9 @@ public struct VideoView: View {
                     .foregroundStyle(.gray)
                 }
             } else if let player {
+                if seamlessLoop {
+                    TransparentVideoSurface(player: player)
+                } else {
 #if os(macOS)
                 // SwiftUIのVideoPlayerはmacOSで「デバッガ非接続の起動」(TestFlight配布版など)だと
                 // 内部クラスVideoPlayerViewのスーパークラスAVPlayerViewのメタデータ解決に失敗して
@@ -97,6 +100,7 @@ public struct VideoView: View {
 #else
                 VideoPlayer(player: player)
 #endif
+                }
             } else if let loadError {
                 VStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle")
@@ -208,6 +212,46 @@ private struct MacVideoPlayerView: NSViewRepresentable {
         if view.player !== player {
             view.player = player
         }
+    }
+}
+#endif
+
+
+/// The player layer draws only the aspect-fit video, leaving the slide background visible.
+#if os(macOS)
+private struct TransparentVideoSurface: NSViewRepresentable {
+    let player: AVPlayer
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        view.wantsLayer = true
+        let layer = AVPlayerLayer(player: player)
+        layer.videoGravity = .resizeAspect
+        layer.backgroundColor = NSColor.clear.cgColor
+        view.layer = layer
+        return view
+    }
+    func updateNSView(_ view: NSView, context: Context) {
+        (view.layer as? AVPlayerLayer)?.player = player
+    }
+}
+#else
+private struct TransparentVideoSurface: UIViewRepresentable {
+    let player: AVPlayer
+    func makeUIView(context: Context) -> PlayerSurface {
+        let view = PlayerSurface()
+        view.backgroundColor = .clear
+        view.isOpaque = false
+        let layer = view.layer as! AVPlayerLayer
+        layer.player = player
+        layer.videoGravity = .resizeAspect
+        layer.backgroundColor = UIColor.clear.cgColor
+        return view
+    }
+    func updateUIView(_ view: PlayerSurface, context: Context) {
+        (view.layer as? AVPlayerLayer)?.player = player
+    }
+    final class PlayerSurface: UIView {
+        override class var layerClass: AnyClass { AVPlayerLayer.self }
     }
 }
 #endif
