@@ -33,7 +33,14 @@ resolve_apple_id() {
 
 build_pack() {
     echo "Building asset pack..."
-    (cd "$PACK_DIR" && xcrun ba-package package manifest.json --output-path "$OUTPUT_FILE")
+    # ba-package can leave an old archive in place when its output already exists.
+    # Always package to a fresh path and replace the deliverable only after success.
+    local staging_dir
+    staging_dir=$(mktemp -d "${TMPDIR:-/tmp}/slidys-asset-pack.XXXXXX")
+    (cd "$PACK_DIR" && xcrun ba-package package manifest.json --output-path "$staging_dir/slidys-videos.aar")
+    [ -s "$staging_dir/slidys-videos.aar" ] || { echo "Asset pack was not created." >&2; exit 1; }
+    mv "$staging_dir/slidys-videos.aar" "$OUTPUT_FILE"
+    rmdir "$staging_dir"
     echo "Built: $OUTPUT_FILE"
 }
 

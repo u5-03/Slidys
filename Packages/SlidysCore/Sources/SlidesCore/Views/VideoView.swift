@@ -22,6 +22,7 @@ public enum VideoType {
     case duelDemoFull
     /// iOSDC2026 デモ2の保険動画(竜のモンスターの召喚エフェクト)
     case duelDemoDragon
+    case appleStoreFocusDemo
 
     var fileName: String {
         switch self {
@@ -41,11 +42,13 @@ public enum VideoType {
             return "duel_demo_full"
         case .duelDemoDragon:
             return "duel_demo_dragon"
+        case .appleStoreFocusDemo:
+            return "apple_store_focus_demo"
         }
     }
 
     var fileExtension: String {
-        return "mp4"
+        return self == .appleStoreFocusDemo ? "mov" : "mp4"
     }
 }
 
@@ -58,9 +61,14 @@ public struct VideoView: View {
     @State private var timeObserverToken: Any?
     @State private var isLoading = true
     @State private var loadError: String?
+    @State private var playerLooper: AVPlayerLooper?
+    private let localVideoURL: URL?
+    private let seamlessLoop: Bool
     private let videoType: VideoType
 
-    public init(videoType: VideoType) {
+    public init(videoType: VideoType, seamlessLoop: Bool = false, localVideoURL: URL? = nil) {
+        self.localVideoURL = localVideoURL
+        self.seamlessLoop = seamlessLoop
         self.videoType = videoType
     }
 
@@ -70,7 +78,7 @@ public struct VideoView: View {
                 // スライド一覧のサムネイルでは動画を起動しない
                 // (AVPlayerやAssetPackManagerがプレビューエージェント内で全数起動してクラッシュするため)
                 ZStack {
-                    Color.black
+                    if seamlessLoop { Color.slideBackgroundColor } else { Color.black }
                     VStack(spacing: 16) {
                         Image(systemName: "play.rectangle.fill")
                             .font(.system(size: 160, weight: .light))
@@ -80,6 +88,9 @@ public struct VideoView: View {
                     .foregroundStyle(.gray)
                 }
             } else if let player {
+                if seamlessLoop {
+                    TransparentVideoSurface(player: player)
+                } else {
 #if os(macOS)
                 // SwiftUIのVideoPlayerはmacOSで「デバッガ非接続の起動」(TestFlight配布版など)だと
                 // 内部クラスVideoPlayerViewのスーパークラスAVPlayerViewのメタデータ解決に失敗して
@@ -89,6 +100,7 @@ public struct VideoView: View {
 #else
                 VideoPlayer(player: player)
 #endif
+                }
             } else if let loadError {
                 VStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle")
@@ -106,23 +118,46 @@ public struct VideoView: View {
         .task {
             guard !isSlideThumbnail else { return }
             do {
-                let url = try await resolveVideoURL(for: videoType)
+                let url: URL
+                if let localVideoURL {
+                    url = localVideoURL
+                } else {
+                    url = try await resolveVideoURL(for: videoType)
+                }
+                try Task.checkCancellation()
                 let item = AVPlayerItem(url: url)
-                let newPlayer = AVPlayer(playerItem: item)
+                let newPlayer: AVPlayer
+                if seamlessLoop {
+                    let queuePlayer = AVQueuePlayer()
+                    playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: item)
+                    newPlayer = queuePlayer
+                } else {
+                    newPlayer = AVPlayer(playerItem: item)
+                }
+#if !os(visionOS)
+                if seamlessLoop { newPlayer.allowsExternalPlayback = false }
+#endif
                 playerItem = item
                 player = newPlayer
 
-                await item.seek(to: .zero)
-                try await Task.sleep(for: .seconds(1))
+                if !seamlessLoop {
+                    await item.seek(to: .zero)
+                    try await Task.sleep(for: .seconds(1))
+                }
+                try Task.checkCancellation()
                 newPlayer.play()
-                NotificationCenter.default
-                    .publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
-                    .sink { _ in
-                        newPlayer.seek(to: .zero)
-                        newPlayer.play()
-                    }
-                    .store(in: &cancellableSet)
+                if !seamlessLoop {
+                    NotificationCenter.default
+                        .publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
+                        .sink { _ in
+                            newPlayer.seek(to: .zero)
+                            newPlayer.play()
+                        }
+                        .store(in: &cancellableSet)
+                }
                 isLoading = false
+            } catch is CancellationError {
+                player?.pause()
             } catch {
                 loadError = error.localizedDescription
                 isLoading = false
@@ -130,10 +165,16 @@ public struct VideoView: View {
         }
         .onDisappear {
             player?.pause()
+            playerLooper?.disableLooping()
+            playerLooper = nil
+            (player as? AVQueuePlayer)?.removeAllItems()
             if let token = timeObserverToken {
                 player?.removeTimeObserver(token)
                 timeObserverToken = nil
             }
+            player = nil
+            playerItem = nil
+            cancellableSet.removeAll()
         }
     }
 
@@ -145,7 +186,8 @@ public struct VideoView: View {
         // 2. AssetPackManager から取得（TestFlight / App Store）
         // バンドルIDを持たない実行環境(スナップショット用CLIツールなど)では
         // AssetPackManagerがfatalErrorになるため、その前にエラーで抜ける
-        guard Bundle.main.bundleIdentifier != nil else {
+        guard Bundle.main.bundleIdentifier != nil,
+              ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else {
             throw CocoaError(.fileNoSuchFile)
         }
         let pack = try await AssetPackManager.shared.assetPack(withID: "slidys-videos")
@@ -172,6 +214,46 @@ private struct MacVideoPlayerView: NSViewRepresentable {
         if view.player !== player {
             view.player = player
         }
+    }
+}
+#endif
+
+
+/// The player layer draws only the aspect-fit video, leaving the slide background visible.
+#if os(macOS)
+private struct TransparentVideoSurface: NSViewRepresentable {
+    let player: AVPlayer
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        view.wantsLayer = true
+        let layer = AVPlayerLayer(player: player)
+        layer.videoGravity = .resizeAspect
+        layer.backgroundColor = NSColor.clear.cgColor
+        view.layer = layer
+        return view
+    }
+    func updateNSView(_ view: NSView, context: Context) {
+        (view.layer as? AVPlayerLayer)?.player = player
+    }
+}
+#else
+private struct TransparentVideoSurface: UIViewRepresentable {
+    let player: AVPlayer
+    func makeUIView(context: Context) -> PlayerSurface {
+        let view = PlayerSurface()
+        view.backgroundColor = .clear
+        view.isOpaque = false
+        let layer = view.layer as! AVPlayerLayer
+        layer.player = player
+        layer.videoGravity = .resizeAspect
+        layer.backgroundColor = UIColor.clear.cgColor
+        return view
+    }
+    func updateUIView(_ view: PlayerSurface, context: Context) {
+        (view.layer as? AVPlayerLayer)?.player = player
+    }
+    final class PlayerSurface: UIView {
+        override class var layerClass: AnyClass { AVPlayerLayer.self }
     }
 }
 #endif

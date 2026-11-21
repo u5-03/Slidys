@@ -41,6 +41,41 @@ enum FillingBuilder {
         return meshes
     }
 
+    /// A smooth filling surface following the same mouth opening as the beans.
+    static func smooth(surface: TaiyakiBodySurface) -> TaiyakiMesh {
+        let boundary = MouthMeshBuilder.boundary(configuration: surface.configuration, count: 64,
+                                                  inset: TaiyakiDesign.crumbWidth)
+        let center = TaiyakiDesign.cutCenter
+        let rings = 8
+        var mesh = TaiyakiMesh()
+        func point(_ p: SIMD2<Float>, radius: Float) -> SIMD3<Float> {
+            [p.x, p.y, surface.height(p) - 0.015 + 0.020 * (1 - radius * radius)]
+        }
+        let middle = mesh.vertex(point(center, radius: 0))
+        for ring in 1...rings {
+            let radius = Float(ring) / Float(rings)
+            for edge in boundary {
+                mesh.vertex(point(center + (edge - center) * radius, radius: radius))
+            }
+        }
+        func front(_ a: UInt32, _ b: UInt32, _ c: UInt32) {
+            let normal = simd_cross(mesh.positions[Int(b)] - mesh.positions[Int(a)],
+                                    mesh.positions[Int(c)] - mesh.positions[Int(a)])
+            mesh.triangle(a, b, c, reversed: normal.z < 0)
+        }
+        let count = boundary.count
+        for i in 0..<count {
+            let j = (i + 1) % count
+            front(middle, UInt32(1 + i), UInt32(1 + j))
+            for ring in 0..<(rings - 1) {
+                let a = UInt32(1 + ring * count + i), b = UInt32(1 + ring * count + j)
+                front(a, a + UInt32(count), b)
+                front(b, a + UInt32(count), b + UInt32(count))
+            }
+        }
+        return mesh
+    }
+
     /// An asymmetric bean with a shallow hilum-like crease, not a copied sphere.
     static func ellipsoid(center: SIMD3<Float>, radii: SIMD3<Float>, rotation: simd_quatf,
                           seed: Float = 0, segments: Int = 12, rings: Int = 8) -> TaiyakiMesh {

@@ -73,6 +73,7 @@ let package = Package(
             name: "FlutterKaigi2026Slide",
             targets: ["FlutterKaigi2026Slide"]
         ),
+        .library(name: "SaitamaSwiftSlide", targets: ["SaitamaSwiftSlide"]),
     ],
     dependencies: [
         .package(url: "https://github.com/mtj0928/SlideKit", from: "0.7.0"),
@@ -126,6 +127,7 @@ let package = Package(
                 "iOSDC2025Slide",
                 "HakodateSwiftSlide",
                 "iOSDC2026Slide",
+                "SaitamaSwiftSlide",
             ]
         ),
         .target(
@@ -231,6 +233,7 @@ let package = Package(
                 "SlidesCore",
             ]
         ),
+        .target(name: "SaitamaSwiftSlide", dependencies: ["SlidesCore"], resources: [.process("Resources")]),
         .testTarget(
             name: "KanagawaSwiftSlideTests",
             dependencies: ["KanagawaSwiftSlide"]

@@ -279,3 +279,13 @@ Xcode 26以降のCommand Line Toolsがインストールされている必要が
 ```bash
 xcode-select --install
 ```
+
+## Saitama.swiftのApple Store動画
+
+- 配信ファイル: `payload/apple_store_focus_demo.mov`（元動画、縦1080×1920、約12.3秒）。
+- `VideoView(videoType: .appleStoreFocusDemo, seamlessLoop: true)`で表示時に再生し、AVQueuePlayer / AVPlayerLooperでループする。離脱時は停止・解放する。
+- 開発用はSlidysのPreview Contentへ同じファイルを配置。Releaseの動画は従来どおりBackground Assetsから取得する。
+- 新動画を含むパックはSlidys向けバージョン3としてアップロード。外部TestFlightのアセット審査はアプリ本体とは別に提出が必要。
+- `build-asset-pack.sh`は毎回新しい一時パスへパッケージ化し、古い.aarを誤って再アップロードしない。
+
+Saitamaの自動たい焼きデモは左右各1回転を1.5倍速（各約2.67秒）で行い、具材を0.5秒ずつ切り替える。その後、瞳・具材のアンカーをカメラ正面に向けて＋を見せてから、それぞれにフォーカスして戻す。動画表示は透明なAVPlayerLayerを使い、余白には標準のスライド背景色を表示する。

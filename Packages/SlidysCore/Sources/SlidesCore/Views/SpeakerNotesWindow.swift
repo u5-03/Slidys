@@ -96,8 +96,16 @@ struct SpeakerNotesView: View {
     /// iPhone Duo の2画面表示(内側を縦持ち)用。スライドは外側に出ていて手元から見えないので、
     /// 幅が狭くても「現在」のプレビューを省かず、「現在」「次」を横に並べて上部に小さく出し、原稿の領域を広く取る
     var usesPortraitPresenterLayout = false
+    /// The containing display decides whether this preview is the interactive capture source.
+    var interactiveCurrentSlide: Bool? = nil
     /// 経過時間の起点(ノート画面を出し直しても保たれるよう SpeakerNotesSession が持つ)
     @ObservedObject private var session = SpeakerNotesSession.shared
+#if os(iOS)
+    @ObservedObject private var slideCapture = PresenterSlideCapture.shared
+    private var capturesCurrentSlide: Bool { interactiveCurrentSlide ?? (slideCapture.output.usesCapturedSlides) }
+#else
+    private var capturesCurrentSlide: Bool { false }
+#endif
     @FocusState private var isFocused: Bool
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -105,7 +113,7 @@ struct SpeakerNotesView: View {
     /// 隣のWindowにスライド本体が見えているので「現在」のプレビューを省いて原稿の領域を確保する。
     private var showsCurrentPreview: Bool {
 #if os(iOS)
-        usesPortraitPresenterLayout || horizontalSizeClass != .compact
+        capturesCurrentSlide || usesPortraitPresenterLayout || horizontalSizeClass != .compact
 #else
         true
 #endif
@@ -141,29 +149,61 @@ struct SpeakerNotesView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 16) {
+        GeometryReader { geometry in
+            notesContent(availableSize: geometry.size)
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
+                .clipped()
+        }
+    }
+
+    private func notesContent(availableSize: CGSize) -> some View {
+        // Keep room for the script and navigation even in a short landscape window.
+        let stacksPreviews = capturesCurrentSlide && availableSize.width < availableSize.height
+        let previewLayout = stacksPreviews
+            ? AnyLayout(VStackLayout(alignment: .trailing, spacing: 8))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 16))
+        let operationHeight = max(70, min(availableSize.height * 0.62, availableSize.height - (stacksPreviews ? 360 : 250)))
+        let availableWidth = max(1, availableSize.width - 40)
+        let nextPreviewWidth = min(180, availableWidth * 0.25)
+        let operationWidth = max(1, min(stacksPreviews ? availableWidth : availableWidth - nextPreviewWidth - 16, operationHeight * 16 / 9))
+        return VStack(alignment: .leading, spacing: 14) {
+            previewLayout {
                 if showsCurrentPreview {
-                    previewPane(title: "現在") {
-                        AnyView(slideIndexController.currentSlide)
+                    previewPane(title: capturesCurrentSlide ? "現在（操作用）" : "現在", interactive: capturesCurrentSlide) {
+                        decoratedCurrentSlide
+                            .id(currentIndex)
                             .environment(\.previewPhaseStep, currentPhase.current)
                             .followsSlideLanguage()
                     }
+                    .frame(
+                        width: capturesCurrentSlide ? operationWidth : nil,
+                        height: capturesCurrentSlide ? operationWidth * 9 / 16 + 26 : nil
+                    )
                 }
-                previewPane(title: nextPaneTitle) {
-                    if let nextStep {
-                        AnyView(nextStep.slide)
-                            .environment(\.previewPhaseStep, nextStep.phaseStep)
-                            .followsSlideLanguage()
-                    } else {
-                        Text("最後のスライドです")
-                            .font(.system(size: 40))
-                            .foregroundStyle(.secondary)
-                            .frame(width: SlideSize.standard16_9.width,
-                                   height: SlideSize.standard16_9.height)
+                Group {
+                    previewPane(title: nextPaneTitle) {
+                        if let nextStep {
+                            presentationSlideView(nextStep.slide)
+                                .environment(\.previewPhaseStep, nextStep.phaseStep)
+                                .followsSlideLanguage()
+                        } else {
+                            Text("最後のスライドです")
+                                .font(.system(size: 40))
+                                .foregroundStyle(.secondary)
+                                .frame(width: SlideSize.standard16_9.width,
+                                       height: SlideSize.standard16_9.height)
+                        }
                     }
                 }
+                .frame(
+                    width: capturesCurrentSlide ? nextPreviewWidth : nil,
+                    height: capturesCurrentSlide ? nextPreviewWidth * 9 / 16 + 26 : nil
+                )
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: capturesCurrentSlide
+                   ? operationWidth * 9 / 16 + 26 + (stacksPreviews ? nextPreviewWidth * 9 / 16 + 34 : 0)
+                   : nil, alignment: .top)
 
             HStack(alignment: .firstTextBaseline, spacing: 14) {
                 Text("\(currentIndex + 1) / \(slideIndexController.slides.count)")
@@ -224,7 +264,7 @@ struct SpeakerNotesView: View {
             }
 
             // クリッカー無しでも進められるよう、ノート画面自体に左右のページ送りボタンを置く
-            SlideNavigationBar(slideIndexController: slideIndexController)
+            SlideNavigationBar(slideIndexController: slideIndexController, compact: availableSize.width < 400)
         }
         .padding(20)
 #if os(macOS)
@@ -235,6 +275,12 @@ struct SpeakerNotesView: View {
 #endif
         // ページ送り時のクロスフェード等を無効化(controller側のwithAnimationを打ち消す)
         .transaction { transaction in
+            if !capturesCurrentSlide {
+                transaction.animation = nil
+                transaction.disablesAnimations = true
+            }
+        }
+        .transaction(value: currentIndex) { transaction in
             transaction.animation = nil
             transaction.disablesAnimations = true
         }
@@ -330,27 +376,50 @@ struct SpeakerNotesView: View {
         return nextStep.index == currentIndex ? "次(このページの続き)" : "次のページ"
     }
 
+    private var decoratedCurrentSlide: AnyView {
+        let view = presentationSlideView(slideIndexController.currentSlide)
+        return session.presentation?.externalDisplaySlideDecorator?(view) ?? view
+    }
+
+    @ViewBuilder
+    private func captureSurface<Content: View>(interactive: Bool, @ViewBuilder content: @escaping () -> Content) -> some View {
+#if os(iOS)
+        if interactive {
+            PresenterSlideCaptureSurface(content: content)
+        } else {
+            content()
+        }
+#else
+        content()
+#endif
+    }
+
     /// スライドを原寸で描画して縮小するプレビュー枠。
-    private func previewPane(title: String, @ViewBuilder content: () -> some View) -> some View {
+    private func previewPane(title: String, interactive: Bool = false, @ViewBuilder content: () -> some View) -> some View {
         let slideSize = SlideSize.standard16_9
         let slideContent = content()
         return VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.secondary)
+                .frame(height: 20, alignment: .leading)
             GeometryReader { proxy in
                 let scale = proxy.size.width / slideSize.width
-                slideContent
+                captureSurface(interactive: interactive) { slideContent }
                     .environment(\.slideIndexController, slideIndexController)
-                    .environment(\.isSlideThumbnail, true) // 動画やRealityViewはプレースホルダーに
+                    .environment(\.isSlideThumbnail, !interactive)
                     .slideTheme(slideTheme)
                     .foregroundColor(.black)
-                    .background(.white)
+                    .background(.slideBackgroundColor)
                     .frame(width: slideSize.width, height: slideSize.height)
                     .scaleEffect(scale, anchor: .topLeading)
-                    .allowsHitTesting(false)
+                    .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
+                    .clipped()
+                    .allowsHitTesting(interactive)
             }
             .aspectRatio(slideSize.width / slideSize.height, contentMode: .fit)
+            .clipped()
+            .contentShape(Rectangle())
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -391,7 +460,6 @@ struct SlideNavigationBar: View {
         Text("\(slideIndexController.currentIndex + 1) / \(slideIndexController.slides.count)")
             .font(.system(size: compact ? 18 : 24, weight: .bold, design: .monospaced))
             .fixedSize()
-            .frame(maxWidth: .infinity, alignment: controlsOnRight ? .leading : .trailing)
     }
 
     private var navigationButtons: some View {
@@ -423,3 +491,34 @@ struct SlideNavigationBar: View {
         .frame(maxWidth: .infinity)
     }
 }
+
+#if os(iOS)
+#Preview("操作できる現在のスライド", traits: .fixedLayout(width: 1024, height: 768)) {
+    SpeakerNotesView(
+        slideIndexController: SlideIndexController {
+            CenterTextSlide(text: "操作用スライド", script: "この領域は出力映像に含まれません。")
+            CenterTextSlide(text: "次のスライド", script: "次のノート")
+        },
+        slideTheme: CustomSlideTheme(showSlideIndex: false, listTextStyle: .large),
+        handlesKeyboardNavigation: false
+    )
+    .onAppear { PresenterSlideCapture.shared.output = .capture }
+    .onDisappear { PresenterSlideCapture.shared.output = .independent }
+}
+#endif
+
+#if os(iOS)
+#Preview("操作用ノート（Duo縦）") {
+    SpeakerNotesView(
+        slideIndexController: SlideIndexController {
+            CenterTextSlide(text: "操作用スライド", script: "ノートを残したまま、大きなスライドを操作できます。")
+            CenterTextSlide(text: "次のスライド", script: "次のノート")
+        },
+        slideTheme: CustomSlideTheme(showSlideIndex: false, listTextStyle: .large),
+        handlesKeyboardNavigation: false,
+        usesPortraitPresenterLayout: true
+    )
+    .onAppear { PresenterSlideCapture.shared.output = .capture }
+    .onDisappear { PresenterSlideCapture.shared.output = .independent }
+}
+#endif

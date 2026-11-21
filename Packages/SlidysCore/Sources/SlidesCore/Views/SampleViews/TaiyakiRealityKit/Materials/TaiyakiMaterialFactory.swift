@@ -93,6 +93,16 @@ enum TaiyakiMaterialFactory {
     }
 
     @MainActor
+    static func smoothFilling(_ kind: TaiyakiFilling) -> PhysicallyBasedMaterial {
+        switch kind {
+        case .custard: solid(0.98, 0.84, 0.46, roughness: 0.32)
+        case .matcha: solid(0.30, 0.43, 0.10, roughness: 0.44)
+        case .chocolate: solid(0.19, 0.065, 0.035, roughness: 0.28)
+        case .redBeans: bean(0)
+        }
+    }
+
+    @MainActor
     private static func solid(_ r: Double, _ g: Double, _ b: Double, roughness: Float) -> PhysicallyBasedMaterial {
         var material = PhysicallyBasedMaterial()
         material.baseColor = .init(tint: TaiyakiColor(red: r, green: g, blue: b, alpha: 1))

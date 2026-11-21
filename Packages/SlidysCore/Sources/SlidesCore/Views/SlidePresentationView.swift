@@ -16,17 +16,42 @@ import SwiftUI
 struct SlidePresentationView<Content: View>: View {
     let slideSize: CGSize
     @ViewBuilder let content: () -> Content
+    @ObservedObject private var capture = PresenterSlideCapture.shared
+    @ObservedObject private var duo = DualDisplayCaptureKeeper.shared
+    private var needsCapture: Bool {
+        capture.output.usesCapturedSlides || (duo.isRunning && duo.displayMode == .mirroredSlides)
+    }
 
     var body: some View {
         ZStack(alignment: .center) {
             Color.slideDefaultBackground
                 .ignoresSafeArea()
             SlideScreen(slideSize: slideSize) {
-                content()
+                Group {
+                    if needsCapture {
+                        PresenterSlideCaptureSurface { content() }
+                    } else {
+                        content()
+                    }
+                }
             }
             .clipped()
             .aspectRatio(slideSize, contentMode: .fit)
+
         }
+    }
+}
+#endif
+
+#if os(iOS)
+#Preview("取得範囲：横長の手元画面", traits: .fixedLayout(width: 951, height: 669)) {
+    SlidePresentationView(slideSize: CGSize(width: 1600, height: 900)) {
+        Color.blue.overlay { Text("16:9 SLIDE").font(.largeTitle).foregroundStyle(.white) }
+    }
+}
+#Preview("取得範囲：縦長の手元画面", traits: .fixedLayout(width: 669, height: 951)) {
+    SlidePresentationView(slideSize: CGSize(width: 1600, height: 900)) {
+        Color.blue.overlay { Text("16:9 SLIDE").font(.largeTitle).foregroundStyle(.white) }
     }
 }
 #endif

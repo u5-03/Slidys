@@ -90,9 +90,10 @@ class Client:
 
 def find_app(client, bundle_id):
     apps = client.get("/v1/apps", **{"filter[bundleId]": bundle_id}).get("data", [])
-    if not apps:
-        sys.exit(f"App not found for bundle id {bundle_id}")
-    return apps[0]["id"]
+    matches = [app for app in apps if app.get("attributes", {}).get("bundleId") == bundle_id]
+    if len(matches) != 1:
+        sys.exit(f"Expected exactly one app for bundle id {bundle_id}, found {len(matches)}")
+    return matches[0]["id"]
 
 
 def wait_for_build(client, app_id, version, build_number, timeout_sec):

@@ -73,6 +73,11 @@ public struct TaiyakiFocusView: View {
         case fillingOnly
     }
 
+    public enum ModelSource: Sendable { case blender, procedural }
+    private let modelSource: ModelSource
+    private let automaticDemo: Bool
+    @State private var automaticDemoInterrupted = false
+    @State private var automaticTargetPart: TaiyakiPart?
     private let mode: Mode
     /// テキスト・バブルUIの拡大率。スライド埋め込みで遠くから見せる場合は1より大きくする
     private let fontScale: CGFloat
@@ -80,7 +85,9 @@ public struct TaiyakiFocusView: View {
     /// カメラ(z=1.2, fov60°)の見える範囲は高さ約1.4なので、回転の余白込みで0.9程度まで
     private let modelScale: Float
 
-    public init(mode: Mode = .full, fontScale: CGFloat = 1, modelScale: Float = 0.6) {
+    public init(mode: Mode = .full, fontScale: CGFloat = 1, modelScale: Float = 0.6, modelSource: ModelSource = .blender, automaticDemo: Bool = false) {
+        self.automaticDemo = automaticDemo
+        self.modelSource = modelSource
         self.mode = mode
         self.fontScale = fontScale
         self.modelScale = modelScale
@@ -123,6 +130,7 @@ public struct TaiyakiFocusView: View {
     private var bubbleHeight: CGFloat { 54 * fontScale }
 
     @Environment(\.isSlideThumbnail) private var isSlideThumbnail
+    @Environment(\.displayScale) private var displayScale
 
     public var body: some View {
         // スライド一覧のサムネイルではRealityViewを起動せず、プレースホルダーだけ出す
@@ -140,6 +148,7 @@ public struct TaiyakiFocusView: View {
 
     private var mainContent: some View {
         GeometryReader { proxy in
+            let renderScale = RealityViewRenderBudget.scale(size: proxy.size, displayScale: displayScale)
             ZStack {
                 Color.black.ignoresSafeArea()
 
@@ -150,7 +159,16 @@ public struct TaiyakiFocusView: View {
                         .multilineTextAlignment(.center)
                         .padding()
                 } else {
+                    // SlideKit scales a 1920-point slide after layout. Without
+                    // bounding the native surface, a 3x device can allocate a
+                    // roughly 5760-pixel render target even for a small preview.
                     realityView
+                        .frame(width: proxy.size.width * renderScale, height: proxy.size.height * renderScale)
+                        .scaleEffect(1 / renderScale)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .onAppear {
+                            taiyakiBuildTrace("render-budget logical=\(proxy.size) displayScale=\(displayScale) renderScale=\(renderScale) estimatedPixels=\(CGSize(width: proxy.size.width * renderScale * displayScale, height: proxy.size.height * renderScale * displayScale))")
+                        }
 
                     if mode == .full, focusedPart == nil && !isTransitioning {
                         anchorBubbles(in: proxy.size)
@@ -176,9 +194,98 @@ public struct TaiyakiFocusView: View {
                 }
             }
         }
+        .task(id: pivotEntity?.id) {
+            guard automaticDemo, !automaticDemoInterrupted, pivotEntity != nil else { return }
+            await runAutomaticDemo()
+        }
+        .onDisappear {
+            // A hosting controller or system sheet may temporarily hide a live
+            // RealityView. Removing its root here leaves that reused renderer empty
+            // because RealityView's make closure need not run again on reappearance.
+            pivotEntity?.stopAllAnimations(recursive: true)
+            lastDragTranslation = .zero
+            taiyakiBuildTrace("RealityView disappeared animations-stopped; scene-owned-by-view")
+        }
         .onChange(of: selectedFilling) { _, newValue in
             guard let sceneEntity else { return }
             applyFilling(newValue, to: sceneEntity)
+        }
+    }
+
+    /// 表示中だけ実行する。スライドを離れると.taskがキャンセルし、手動操作にも即座に譲る。
+    @MainActor
+    private func runAutomaticDemo() async {
+        selectedFilling = .redBeans
+        let clock = ContinuousClock()
+        do {
+            // 360度を始点・終点のクォータニオンだけで補間すると回転しないため、
+            // 経過時間から角度を算出する。各表示先が同じ速度のデモを再生できる。
+            for direction: Float in [1, -1] {
+                let started = clock.now
+                while true {
+                    try Task.checkCancellation()
+                    guard !automaticDemoInterrupted, focusedPart == nil else { return }
+                    let elapsed = started.duration(to: clock.now)
+                    let seconds = Double(elapsed.components.seconds)
+                        + Double(elapsed.components.attoseconds) / 1e18
+                    let progress = min(seconds / (4 / 1.5), 1)
+                    let rotation = simd_quatf(angle: direction * 2 * .pi * Float(progress),
+                                              axis: SIMD3<Float>(0, 1, 0))
+                    modelRotation = rotation
+                    pivotEntity?.transform.rotation = rotation
+                    if progress >= 1 { break }
+                    try await Task.sleep(for: .milliseconds(33))
+                }
+            }
+            modelRotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
+            pivotEntity?.transform.rotation = modelRotation
+            for filling in TaiyakiFilling.allCases {
+                try Task.checkCancellation()
+                guard !automaticDemoInterrupted else { return }
+                selectedFilling = filling
+                try await Task.sleep(for: .milliseconds(500))
+            }
+            if mode == .full {
+                selectedFilling = .redBeans
+                for part in [TaiyakiPart.eye, .filling] {
+                    try Task.checkCancellation()
+                    guard !automaticDemoInterrupted,
+                          let localPosition = anchorLocalPositions[part],
+                          simd_length(localPosition) > 0.0001 else { return }
+                    automaticTargetPart = part
+                    let initialRotation = modelRotation
+                    // アンカーの方向をカメラ正面へ向け、＋を見せてからズームする。
+                    let targetRotation = simd_quatf(from: simd_normalize(localPosition),
+                                                   to: SIMD3<Float>(0, 0, 1))
+                    let started = clock.now
+                    while true {
+                        try Task.checkCancellation()
+                        guard !automaticDemoInterrupted else { return }
+                        let elapsed = started.duration(to: clock.now)
+                        let seconds = Double(elapsed.components.seconds)
+                            + Double(elapsed.components.attoseconds) / 1e18
+                        let progress = Float(min(seconds / 0.65, 1))
+                        let easedProgress = progress * progress * (3 - 2 * progress)
+                        modelRotation = simd_slerp(initialRotation, targetRotation, easedProgress)
+                        pivotEntity?.transform.rotation = modelRotation
+                        if progress >= 1 { break }
+                        try await Task.sleep(for: .milliseconds(33))
+                    }
+                    try await Task.sleep(for: .milliseconds(500))
+                    guard !automaticDemoInterrupted else { return }
+                    focus(on: part, automatically: true)
+                    // 到着まで0.75秒、説明表示は1.5秒から2.25秒へ延長する。
+                    try await Task.sleep(for: .seconds(3))
+                    guard !automaticDemoInterrupted else { return }
+                    unfocus(automatically: true)
+                    try await Task.sleep(for: .milliseconds(750))
+                }
+                automaticTargetPart = nil
+            }
+        } catch is CancellationError {
+            // 次のスライドへ進んだら停止する。
+        } catch {
+            taiyakiBuildTrace("automatic demo stopped: \(error.localizedDescription)")
         }
     }
 
@@ -195,6 +302,8 @@ public struct TaiyakiFocusView: View {
             HStack(spacing: 8) {
                 ForEach(TaiyakiFilling.allCases) { filling in
                     Button {
+                        automaticDemoInterrupted = true
+                        automaticTargetPart = nil
                         selectedFilling = filling
                     } label: {
                         Text(filling.displayName)
@@ -216,6 +325,7 @@ public struct TaiyakiFocusView: View {
 
     private var realityView: some View {
         RealityView { content in
+            taiyakiBuildTrace("RealityView make begin source=\(modelSource)")
 #if !os(visionOS)
             content.camera = .virtual
             let camera = PerspectiveCamera()
@@ -234,24 +344,47 @@ public struct TaiyakiFocusView: View {
             content.add(fillLight)
 
             do {
-                let scene = try await Entity(named: "Taiyaki", in: sugiyBundle)
+                let scene: Entity
+                switch modelSource {
+                case .blender:
+                    scene = try await Entity(named: "Taiyaki", in: sugiyBundle)
+                case .procedural:
+                    scene = try await TaiyakiEntity.make().root
+                }
+                try Task.checkCancellation()
                 applyFilling(selectedFilling, to: scene)
+                // 生成モデルの初期スケールを保ち、両ソースを同じ表示サイズへ正規化。
+                scene.position = .zero
 
                 let rawBounds = scene.visualBounds(relativeTo: nil)
                 let maxExtent = max(rawBounds.extents.x, max(rawBounds.extents.y, rawBounds.extents.z))
                 if maxExtent > 0 {
-                    scene.scale = SIMD3<Float>(repeating: modelScale / maxExtent)
+                    scene.scale *= SIMD3<Float>(repeating: modelScale / maxExtent)
                 }
                 let scaledBounds = scene.visualBounds(relativeTo: nil)
                 scene.position = -scaledBounds.center
 
-                scene.generateCollisionShapes(recursive: true)
+                taiyakiBuildTrace("collision generation begin")
+                // The procedural model already has one root input volume.
+                // Avoid generating redundant convex collision shapes for every mesh.
+                if modelSource == .blender {
+                    scene.generateCollisionShapes(recursive: true)
+                }
+                taiyakiBuildTrace("collision generation end")
                 scene.components.set(InputTargetComponent())
 
                 let pivot = Entity()
                 pivot.name = "TaiyakiFocusPivot"
                 pivot.addChild(scene)
+                taiyakiBuildTrace("content add begin")
                 content.add(pivot)
+                taiyakiBuildTrace("content add end")
+#if os(iOS)
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(1))
+                    PresenterRenderDiagnostics.reportMetalSurfaces(reason: "taiyaki-loaded")
+                }
+#endif
 
                 var positions: [TaiyakiPart: SIMD3<Float>] = [:]
                 for part in TaiyakiPart.allCases {
@@ -262,6 +395,8 @@ public struct TaiyakiFocusView: View {
                 anchorLocalPositions = positions
                 pivotEntity = pivot
                 sceneEntity = scene
+            } catch is CancellationError {
+                taiyakiBuildTrace("RealityView make cancelled")
             } catch {
                 loadErrorMessage = "モデルの読み込みに失敗しました\n\(error.localizedDescription)"
             }
@@ -276,6 +411,8 @@ public struct TaiyakiFocusView: View {
                 .targetedToAnyEntity()
                 .onChanged { value in
                     guard focusedPart == nil, !isTransitioning else { return }
+                    automaticDemoInterrupted = true
+                    automaticTargetPart = nil
                     let sensitivity: Float = 0.012
                     let deltaX = Float(value.translation.width - lastDragTranslation.width)
                     let deltaY = Float(value.translation.height - lastDragTranslation.height)
@@ -310,7 +447,12 @@ public struct TaiyakiFocusView: View {
             guard let info = projectedAnchor(part, in: size), info.facing > 0.2 else { continue }
             candidates.append((part, info.point, info.facing))
         }
-        candidates.sort { $0.facing > $1.facing }
+        candidates.sort {
+            if ($0.part == automaticTargetPart) != ($1.part == automaticTargetPart) {
+                return $0.part == automaticTargetPart
+            }
+            return $0.facing > $1.facing
+        }
 
         var placed: [Bubble] = []
         for cand in candidates {
@@ -413,7 +555,11 @@ public struct TaiyakiFocusView: View {
 
     // MARK: - フォーカス制御
 
-    private func focus(on part: TaiyakiPart) {
+    private func focus(on part: TaiyakiPart, automatically: Bool = false) {
+        if !automatically {
+            automaticDemoInterrupted = true
+            automaticTargetPart = nil
+        }
         guard let pivot = pivotEntity, let local = anchorLocalPositions[part] else { return }
         isTransitioning = true
         preFocusRotation = modelRotation
@@ -434,17 +580,24 @@ public struct TaiyakiFocusView: View {
         }
     }
 
-    private func unfocus() {
+    private func unfocus(automatically: Bool = false) {
+        if !automatically {
+            automaticDemoInterrupted = true
+            automaticTargetPart = nil
+        }
         guard let pivot = pivotEntity else { return }
         isTransitioning = true
         withAnimation(.easeInOut(duration: 0.2)) {
             focusedPart = nil
         }
-        let base = Transform(scale: .one, rotation: preFocusRotation, translation: .zero)
+        let restoredRotation = automatically
+            ? simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
+            : preFocusRotation
+        let base = Transform(scale: .one, rotation: restoredRotation, translation: .zero)
         pivot.move(to: base, relativeTo: nil, duration: 0.6, timingFunction: .easeInOut)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
             pivot.transform = base  // 倍率・位置を確実に復元する
-            modelRotation = preFocusRotation
+            modelRotation = restoredRotation
             isTransitioning = false
         }
     }
@@ -482,4 +635,16 @@ public struct TaiyakiFocusView: View {
 
 #Preview {
     TaiyakiFocusView()
+}
+
+import Foundation
+import CoreGraphics
+
+/// Bound the native RealityView surface before SlideKit scales the logical slide.
+enum RealityViewRenderBudget {
+    static func scale(size: CGSize, displayScale: CGFloat) -> CGFloat {
+        let edge = max(size.width, size.height)
+        guard edge.isFinite, edge > 0, displayScale.isFinite, displayScale > 0 else { return 1 }
+        return min(1, 1920 / (edge * displayScale))
+    }
 }
